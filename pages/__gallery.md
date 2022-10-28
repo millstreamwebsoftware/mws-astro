@@ -1,13 +1,17 @@
 ---
-layout: ../layouts/Gallery.astro
+layout: ../layouts/MdPanel.astro
 gallery:
   {
-    "columns": 2,
+    "columns": 3,
     "images":
       [
-        { "src": "/images/gallery/tohc-choc-experiment-oct-10-2022.jpeg" },
-        { "src": "/images/gallery/tohc-experiment-oct-2022.jpeg" },
-        { "src": "/images/gallery/tohc-raspberry-coconut-oct-2022.jpeg" },
+        { "image": "/images/gallery/tohc-choc-experiment-oct-10-2022.jpeg" },
+        {
+          "image": "/images/gallery/tohc-experiment-oct-2022.jpeg",
+          "title": "Test Title",
+          "description": "This is an example of how descriptions look on gallery images",
+        },
+        { "image": "/images/gallery/tohc-raspberry-coconut-oct-2022.jpeg" },
       ],
   }
 

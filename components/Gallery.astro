@@ -1,0 +1,60 @@
+---
+import { Gallery } from '../types';
+
+export interface Props {
+	gallery: Gallery;
+}
+
+const { gallery } = Astro.props;
+const columns = gallery.columns
+---
+
+<ul class="gallery">
+    {gallery.images.map(img => (
+        <li class="gallery-item">
+            <a href={img.link}>
+            <figure>
+                <img src={img.image} alt={img.alt}/>
+                {(img.title || img.description) && 
+                <figcaption>
+                    <h3>{img.title}</h3>
+                    <p>{img.description}</p>
+                </figcaption>
+                }
+            </figure>
+            </a>
+        </li>
+    ))}
+</ul>
+
+<style define:vars={{ columns }}>
+    .gallery {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        list-style-type: none;
+    }
+    
+    .gallery .gallery-item {
+        flex: 0 1 calc( 100% / var(--columns));
+    }
+    
+    .gallery .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .gallery-item figure {
+        margin: 0;
+        position: relative;
+    }
+
+    .gallery-item figure figcaption {
+        position: absolute;
+        bottom: 0;
+    }
+</style>

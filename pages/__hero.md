@@ -1,12 +1,6 @@
 ---
 layout: ../layouts/MdPanel.astro
-# backgroundImage: /images/tohc-banner-idea-rob-supplied.jpeg
-
-background: {
-    "type":"flickity",
-    "
-}
-
+backgroundImage: /images/tohc-banner-idea-rob-supplied.jpeg
 
 foreground: white
 
