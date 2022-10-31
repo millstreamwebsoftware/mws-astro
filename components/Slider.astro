@@ -2,65 +2,68 @@
 import { Slider } from "../types";
 
 export interface Props {
-	slider: Slider;
+  slider: Slider;
 }
 
 const { slider } = Astro.props;
 
-import '../styles/flickity.css';
-import '../styles/flickity-fade.css';
+import "../styles/flickity.css";
+import "../styles/flickity-fade.css";
 ---
 
 <div class="slider" data-flickity={JSON.stringify(slider.options)}>
-    {slider.images.map(img => (
-        <div class="slider-item">
-            <a href={img.link}>
-            <figure>
-                <img src={img.image} alt={img.alt}/>
-                {(img.title || img.description) && 
-                <figcaption>
-                    <h3>{img.title}</h3>
-                    <p>{img.description}</p>
-                </figcaption>
-                }
-            </figure>
-            </a>
-        </div>
-    ))}
+  {
+    slider.images.map((img) => (
+      <div class="slider-item">
+        <a href={img.link}>
+          <figure>
+            <img src={img.image} alt={img.alt} />
+            {(img.title || img.description) && (
+              <figcaption>
+                <h3>{img.title}</h3>
+                <p>{img.description}</p>
+              </figcaption>
+            )}
+          </figure>
+        </a>
+      </div>
+    ))
+  }
 </div>
 
 <style>
-    .slider, .flickity-viewport {
-        position: absolute;
-        inset: 0;
-        padding: 0;
-        margin: 0;
-    }
+  .slider,
+  .flickity-viewport {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    margin: 0;
+  }
 
-    .slider-item {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-    }
+  .slider-item {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
 
-    /* a {
+  /* a {
         position:absolute;
         inset: 0;
     } */
 
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    figure {
-        margin: 0;
-        position: relative;
-    }
+  figure {
+    margin: 0;
+    position: relative;
+  }
 
-    figure figcaption {
-        position: absolute;
-        bottom: 0;
-    }
+  figure figcaption {
+    position: absolute;
+    bottom: 0;
+  }
 </style>

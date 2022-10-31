@@ -1,64 +1,65 @@
 ---
-import Gallery from '../components/Gallery.astro';
-import Slider from '../components/Slider.astro';
+import Gallery from "../components/Gallery.astro";
+import Slider from "../components/Slider.astro";
 
-const {frontmatter} = Astro.props;
+const { frontmatter } = Astro.props;
 const backgroundImage = frontmatter.backgroundImage;
 const backgroundColor = frontmatter.background;
 const foregroundColor = frontmatter.foreground;
 const indent = frontmatter.indent;
 const gallery = frontmatter.gallery;
 const slider = frontmatter.slider;
-const panelLayout  = frontmatter.panelLayout
+const panelLayout = frontmatter.panelLayout;
 ---
+
 <section class={panelLayout}>
-    <div class="userBG">
-      {backgroundImage && <img class="userBG" src={backgroundImage} />}
-      {gallery && <Gallery gallery={gallery}/>}
-      {slider && <Slider slider={slider} />}
-    </div>
-    <article>
-        <slot />
-    </article>
+  <div class="userBG">
+    {backgroundImage && <img class="userBG" src={backgroundImage} />}
+    {gallery && <Gallery gallery={gallery} />}
+    {slider && <Slider slider={slider} />}
+  </div>
+  <article>
+    <slot />
+  </article>
 </section>
 
 <style define:vars={{ backgroundColor, foregroundColor, indent }}>
-    section {
-        position: relative;
-        color: var(--foregroundColor);
-        background: var(--backgroundColor);
-        padding: var(--indent);
-        gap: var(--column-gap);
-    }
+  section {
+    position: relative;
+    color: var(--foregroundColor);
+    background: var(--backgroundColor);
+    padding: var(--indent);
+    gap: var(--column-gap);
+  }
 
-    .userBG img {
-        object-fit: cover;
-        object-position: center;
-    }
+  .userBG img {
+    object-fit: cover;
+    object-position: center;
+  }
 
-    .userBG {
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-    }
+  .userBG {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
 
-    section.centered {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-size: cover;
-    }
+  section.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+  }
 
-    section.two-column {
-        columns: 2;
-    }
+  section.two-column {
+    columns: 2;
+  }
 
-    section.three-column {
-        columns: 3;
-    }
+  section.three-column {
+    columns: 3;
+  }
 
-    section.four-column {
-        columns: 4;
-    }
+  section.four-column {
+    columns: 4;
+  }
 </style>

@@ -28,14 +28,20 @@ html {
     font-family: var(--text-font-family);
 }
 
-p, li {
+p,
+li {
     margin: 0;
     line-height: 1.5;
     font-size: var(--text-size-medium);
     color: rgb(var(--text-color));
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin: 0;
     line-height: 1.5;
     font-family: var(--heading-font-family);
@@ -56,10 +62,10 @@ hr {
     border: none;
 }
 
-main > section {
+main>section {
     padding: var(--indent);
 }
 
-article > * + * {
+article>*+* {
     margin-top: var(--text-gap);
 }

@@ -1,35 +1,35 @@
 ---
 export interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
 
-import '../styles/styles.css';
+import "../styles/styles.css";
 ---
 
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<script>
-			import 'flickity'
-			import 'flickity-fade'
-		</script>
-		<!-- <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <script>
+      import "flickity";
+      import "flickity-fade";
+    </script>
+    <!-- <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
 		<script src="https://unpkg.com/flickity-fade@2/flickity-fade.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/flickity-fade@2/flickity-fade.css"> -->
 
-		<link rel="stylesheet" href="/styles/fonts.css" />
-	</head>
-	<body>
-		<article>
-			<slot />
-		</article>
-	</body>
+    <link rel="stylesheet" href="/styles/fonts.css" />
+  </head>
+  <body>
+    <article>
+      <slot />
+    </article>
+  </body>
 </html>
