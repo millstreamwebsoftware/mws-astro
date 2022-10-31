@@ -6,23 +6,28 @@ const {frontmatter} = Astro.props;
 const backgroundImage = frontmatter.backgroundImage;
 const backgroundColor = frontmatter.background;
 const foregroundColor = frontmatter.foreground;
+const indent = frontmatter.indent;
 const gallery = frontmatter.gallery;
 const slider = frontmatter.slider;
+const panelLayout  = frontmatter.panelLayout
 ---
-<section>
+<section class={panelLayout}>
     <div class="userBG">
-        {backgroundImage && <img src={backgroundImage} />}
-        {gallery && <Gallery gallery={gallery} />}
-        {slider && <Slider slider={slider} />}
+      {backgroundImage && <img class="userBG" src={backgroundImage} />}
+      {gallery && <Gallery gallery={gallery}/>}
+      {slider && <Slider slider={slider} />}
     </div>
-    <slot />
+    <article>
+        <slot />
+    </article>
 </section>
 
-<style define:vars={{ backgroundColor, foregroundColor }}>
+<style define:vars={{ backgroundColor, foregroundColor, indent }}>
     section {
         color: var(--foregroundColor);
         background: var(--backgroundColor);
-        padding: 5rem;
+        padding: var(--indent);
+        gap: var(--column-gap);
     }
 
     .userBG img {
@@ -34,5 +39,25 @@ const slider = frontmatter.slider;
         position: absolute;
         inset: 0;
         z-index: -1;
+    }
+
+    section.centered {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+    }
+
+    section.two-column {
+        columns: 2;
+    }
+
+    section.three-column {
+        columns: 3;
+    }
+
+    section.four-column {
+        columns: 4;
     }
 </style>

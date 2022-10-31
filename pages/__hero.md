@@ -28,6 +28,7 @@ slider:
 foreground: white
 
 weight: 0
+panelLayout: "centered"
 ---
 
 ![The Oar House](/images/TOHC-Logo-Distressed-Blk.svg)
