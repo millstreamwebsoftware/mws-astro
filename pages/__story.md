@@ -2,7 +2,7 @@
 layout: ../layouts/MdPanel.astro
 weight: 3
 panelLayout: "two-column"
-
+background: rgb(228, 246, 245)
 ---
 
 # Our Story
