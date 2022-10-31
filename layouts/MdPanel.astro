@@ -1,15 +1,20 @@
 ---
-import Gallery from '../components/Gallery.astro'
+import Gallery from '../components/Gallery.astro';
+import Slider from '../components/Slider.astro';
 
 const {frontmatter} = Astro.props;
 const backgroundImage = frontmatter.backgroundImage;
 const backgroundColor = frontmatter.background;
 const foregroundColor = frontmatter.foreground;
 const gallery = frontmatter.gallery;
+const slider = frontmatter.slider;
 ---
 <section>
-    {backgroundImage && <img class="userBG" src={backgroundImage} />}
-    {gallery && <Gallery gallery={gallery}/>}
+    <div class="userBG">
+        {backgroundImage && <img src={backgroundImage} />}
+        {gallery && <Gallery gallery={gallery} />}
+        {slider && <Slider slider={slider} />}
+    </div>
     <slot />
 </section>
 
@@ -20,11 +25,14 @@ const gallery = frontmatter.gallery;
         padding: 5rem;
     }
 
-    section img.userBG {
+    .userBG img {
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .userBG {
         position: absolute;
         inset: 0;
         z-index: -1;
-        object-fit: cover;
-        object-position: center;
     }
 </style>
