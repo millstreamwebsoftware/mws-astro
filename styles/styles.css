@@ -10,7 +10,7 @@
     --text-font-family: "Ronnia W01 Light";
     --heading-font-family: "Ronnia W01 Bold";
 
-    --color-primary: 93 105 128;
+    --color-primary: 24, 58, 78;
     --text-color: var(--color-primary);
     --heading-color: var(--color-primary);
 }
@@ -60,7 +60,6 @@ main > section {
     padding: var(--indent);
 }
 
-article > * {
-    margin-bottom: var(--text-gap);
+article > * + * {
+    margin-top: var(--text-gap);
 }
-
