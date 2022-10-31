@@ -1,5 +1,6 @@
 ---
-import Gallery from '../components/Gallery.astro'
+import Gallery from '../components/Gallery.astro';
+import Slider from '../components/Slider.astro';
 
 const {frontmatter} = Astro.props;
 const backgroundImage = frontmatter.backgroundImage;
@@ -7,11 +8,15 @@ const backgroundColor = frontmatter.background;
 const foregroundColor = frontmatter.foreground;
 const indent = frontmatter.indent;
 const gallery = frontmatter.gallery;
+const slider = frontmatter.slider;
 const panelLayout  = frontmatter.panelLayout
 ---
 <section class={panelLayout}>
-    {backgroundImage && <img class="userBG" src={backgroundImage} />}
-    {gallery && <Gallery gallery={gallery}/>}
+    <div class="userBG">
+      {backgroundImage && <img class="userBG" src={backgroundImage} />}
+      {gallery && <Gallery gallery={gallery}/>}
+      {slider && <Slider slider={slider} />}
+    </div>
     <article>
         <slot />
     </article>
@@ -25,12 +30,15 @@ const panelLayout  = frontmatter.panelLayout
         gap: var(--column-gap);
     }
 
-    section img.userBG {
+    .userBG img {
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .userBG {
         position: absolute;
         inset: 0;
         z-index: -1;
-        object-fit: cover;
-        object-position: center;
     }
 
     section.centered {
