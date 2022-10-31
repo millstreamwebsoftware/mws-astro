@@ -22,6 +22,7 @@ slider:
         autoPlay: 6000,
         prevNextButtons: false,
         pageDots: false,
+        imagesLoaded: false,
       },
   }
 

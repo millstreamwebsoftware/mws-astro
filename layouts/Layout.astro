@@ -6,8 +6,6 @@ export interface Props {
 const { title } = Astro.props;
 
 import '../styles/styles.css';
-import '../styles/flickity.css';
-import '../styles/flickity-fade.css';
 ---
 
 <!DOCTYPE html>
@@ -19,9 +17,13 @@ import '../styles/flickity-fade.css';
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<script>
-			import '../scripts/flickity.pkgd.min.js'
-			import '../scripts/flickity-fade.js'
+			import 'flickity'
+			import 'flickity-fade'
 		</script>
+		<!-- <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+		<script src="https://unpkg.com/flickity-fade@2/flickity-fade.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/flickity-fade@2/flickity-fade.css"> -->
 
 		<link rel="stylesheet" href="/styles/fonts.css" />
 	</head>
