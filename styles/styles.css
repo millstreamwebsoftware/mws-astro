@@ -1,5 +1,5 @@
 :root {
-    --indent: 10vw;
+    --indent: 8vw;
     --text-gap: 2rem;
     --column-gap: 5vw;
     --text-size-huge: 48px;
@@ -74,4 +74,8 @@ main>section {
 
 article>*+* {
     margin-top: var(--text-gap);
+}
+
+.center {
+    text-align: center;
 }
