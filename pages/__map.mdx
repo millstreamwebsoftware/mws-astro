@@ -3,10 +3,17 @@ layout: "../layouts/MdPanel.astro"
 
 weight: 6
 location: "ANA Rowing Club"
+panelLayout: "two-column"
 ---
 
 import Map from "../components/Map.astro";
 
-# Test panel
+<div>
+## Contact details
 
+- AP Hinds Reserve,
+- Milne Street,
+- Bayswater WA 6053
+
+</div>
 <Map location={frontmatter.location} />
