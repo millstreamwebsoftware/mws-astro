@@ -13,8 +13,8 @@ const panelLayout = frontmatter.panelLayout;
 ---
 
 <section class={panelLayout}>
-  <div class="userBG">
-    {backgroundImage && <img class="userBG" src={backgroundImage} />}
+  <div class="panelBackground">
+    {backgroundImage && <img src={backgroundImage} />}
     {gallery && <Gallery gallery={gallery} />}
     {slider && <Slider slider={slider} />}
   </div>
@@ -32,12 +32,12 @@ const panelLayout = frontmatter.panelLayout;
     gap: var(--column-gap);
   }
 
-  .userBG img {
+  .panelBackground img {
     object-fit: cover;
     object-position: center;
   }
 
-  .userBG {
+  .panelBackground {
     position: absolute;
     inset: 0;
     z-index: -1;
