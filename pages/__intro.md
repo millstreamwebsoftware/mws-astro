@@ -1,6 +1,8 @@
 ---
 layout: ../layouts/MdPanel.astro
-background: red
+background: rgb(186, 232, 232)
+color: rgb(186, 232, 232)
+panelLayout: "centered"
 weight: 2
 ---
 
