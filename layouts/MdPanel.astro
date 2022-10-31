@@ -5,19 +5,24 @@ const {frontmatter} = Astro.props;
 const backgroundImage = frontmatter.backgroundImage;
 const backgroundColor = frontmatter.background;
 const foregroundColor = frontmatter.foreground;
+const indent = frontmatter.indent;
 const gallery = frontmatter.gallery;
+const panelLayout  = frontmatter.panelLayout
 ---
-<section>
+<section class={panelLayout}>
     {backgroundImage && <img class="userBG" src={backgroundImage} />}
     {gallery && <Gallery gallery={gallery}/>}
-    <slot />
+    <article>
+        <slot />
+    </article>
 </section>
 
-<style define:vars={{ backgroundColor, foregroundColor }}>
+<style define:vars={{ backgroundColor, foregroundColor, indent }}>
     section {
         color: var(--foregroundColor);
         background: var(--backgroundColor);
-        padding: 5rem;
+        padding: var(--indent);
+        gap: var(--column-gap);
     }
 
     section img.userBG {
@@ -26,5 +31,25 @@ const gallery = frontmatter.gallery;
         z-index: -1;
         object-fit: cover;
         object-position: center;
+    }
+
+    section.centered {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+    }
+
+    section.two-column {
+        columns: 2;
+    }
+
+    section.three-column {
+        columns: 3;
+    }
+
+    section.four-column {
+        columns: 4;
     }
 </style>
