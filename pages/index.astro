@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const panels = await Astro.glob("./__*.md");
+const panels = await Astro.glob("./__*.(md|mdx)");
 panels.sort((a, b) => a.frontmatter.weight - b.frontmatter.weight);
 
 const title = "The Oar House";
