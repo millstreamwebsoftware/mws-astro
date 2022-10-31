@@ -23,6 +23,7 @@ slider:
         prevNextButtons: false,
         pageDots: false,
         imagesLoaded: false,
+        selectedAttraction: 0.001,
       },
   }
 
