@@ -11,9 +11,10 @@ const indent = frontmatter.indent;
 const gallery = frontmatter.gallery;
 const slider = frontmatter.slider;
 const panelLayout = frontmatter.panelLayout;
+const uniqueid = frontmatter.url.split("__").pop();
 ---
 
-<section class={panelLayout}>
+<section class={panelLayout} data-section-name={uniqueid}>
   <div class="panelBackground">
     {backgroundImage && <img src={backgroundImage} />}
     {gallery && <Gallery gallery={gallery} />}
