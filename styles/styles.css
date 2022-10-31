@@ -3,12 +3,16 @@
     --text-gap: 2rem;
     --column-gap: 5vw;
     --text-size-huge: 48px;
+    --text-size-xxlarge: 32px;
     --text-size-xlarge: 24px;
     --text-size-large: 18px;
     --text-size-medium: 16px;
+    --text-size-small: 14px;
+    --text-size-xsmall: 12px;
+    --text-size-xxsmall: 10px;
 
-    --text-font-family: "Ronnia W01 Light";
-    --heading-font-family: "Ronnia W01 Bold";
+    --feature-font-family: "Rosewood W05 Fill";
+    --default-font-family: "Ronnia W01 Light";
 
     --color-primary: 24, 58, 78;
     --text-color: var(--color-primary);
@@ -25,7 +29,7 @@ html {
     max-height: 100%;
     font-size: 62.5%;
     overflow-x: hidden;
-    font-family: var(--text-font-family);
+    font-family: var(--default-font-family);
 }
 
 p,
@@ -44,16 +48,18 @@ h5,
 h6 {
     margin: 0;
     line-height: 1.5;
-    font-family: var(--heading-font-family);
+    font-family: var(--default-font-family);
     color: rgb(var(--heading-color));
 }
 
 h1 {
-    font-size: var(--text-size-huge);
+    font-size: var(--text-size-xxlarge);
+    font-family: var(--feature-font-family);
 }
 
 h2 {
     font-size: var(--text-size-xlarge);
+    font-family: var(--feature-font-family);
 }
 
 hr {
