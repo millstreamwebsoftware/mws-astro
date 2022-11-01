@@ -3,16 +3,18 @@ import { Gallery } from "../types";
 
 export interface Props {
   gallery: Gallery;
+  background?: string;
 }
 
 const { gallery } = Astro.props;
 const columns = gallery.columns;
+const columnGap = gallery.columnGap || "1rem";
 ---
 
-<ul class="gallery">
+<div class="gallery">
   {
     gallery.images.map((img) => (
-      <li class="gallery-item">
+      <div class="gallery-item">
         <a href={img.link}>
           <figure>
             <img src={img.image} alt={img.alt} />
@@ -24,39 +26,39 @@ const columns = gallery.columns;
             )}
           </figure>
         </a>
-      </li>
+      </div>
     ))
   }
-</ul>
+</div>
 
-<style define:vars={{ columns }}>
+<style define:vars={{ columns, columnGap }}>
   .gallery {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    list-style-type: none;
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    grid-template-rows: 1fr;
+    gap: var(--columnGap);
+    padding: var(--columnGap);
   }
 
-  .gallery .gallery-item {
-    flex: 0 1 calc(100% / var(--columns));
-  }
-
-  .gallery .gallery-item img {
+  img {
+    aspect-ratio: 1;
+    object-fit: cover;
     width: 100%;
     height: 100%;
-    object-fit: cover;
   }
 
-  .gallery-item figure {
-    margin: 0;
+  .gallery-item {
+    line-height: 0;
     position: relative;
   }
 
-  .gallery-item figure figcaption {
+  figcaption {
+    padding: 2vw;
     position: absolute;
     bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(3px);
   }
 </style>

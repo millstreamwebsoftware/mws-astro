@@ -68,7 +68,7 @@ hr {
     border: none;
 }
 
-main>section {
+main > section {
     padding: var(--indent);
 }
 

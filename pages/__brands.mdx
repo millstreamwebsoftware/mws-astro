@@ -2,24 +2,41 @@
 layout: "../layouts/MdPanel.astro"
 
 weight: 5
-testGallery:
+
+slider:
   {
-    columns: 3,
     images:
       [
-        { image: "/images/gallery/tohc-choc-experiment-oct-10-2022.jpeg" },
         {
-          image: "/images/gallery/tohc-experiment-oct-2022.jpeg",
-          title: "Test Title",
-          description: "This is an example of how descriptions look on gallery images",
+          image: "/images/brands/LEFTFIELD+LOGO.png",
+          link: "https://www.leftfieldcoffee.com/",
+          width: 256,
+          height: 256,
         },
-        { image: "/images/gallery/tohc-raspberry-coconut-oct-2022.jpeg" },
+        {
+          image: "/images/brands/loafers-artisan-logo.png",
+          link: "https://www.loafersartisan.com.au/",
+          width: 256,
+          height: 256,
+        },
+        {
+          image: "/images/brands/Pietro_Gelateria.webp",
+          link: "https://www.pietrogelateria.com/",
+          width: 256,
+          height: 256,
+        },
       ],
+    options:
+      {
+        imagesLoaded: false,
+        groupCells: 3,
+        setGallerySize: true,
+        wrapAround: true,
+        pageDots: false,
+      },
   }
 ---
 
-import Gallery from "../components/Gallery.astro";
+import Slider from "../components/Slider.astro";
 
-# Test panel
-
-<Gallery gallery={frontmatter.testGallery} />
+<Slider slider={frontmatter.slider} />

@@ -3,6 +3,7 @@ import Gallery from "../components/Gallery.astro";
 import Slider from "../components/Slider.astro";
 
 const { frontmatter } = Astro.props;
+const background = frontmatter.background;
 const backgroundImage = frontmatter.backgroundImage;
 const backgroundColor = frontmatter.background;
 const foregroundColor = frontmatter.foreground;
@@ -16,16 +17,31 @@ const uniqueid = frontmatter.url.split("__").pop();
 
 <section class={panelLayout} data-section-name={uniqueid}>
   <div class="panelBackground">
-    {backgroundImage && <img src={backgroundImage} />}
-    {gallery && <Gallery gallery={gallery} />}
-    {slider && <Slider slider={slider} />}
+    {background == "image" && <img src={backgroundImage} />}
+    {
+      background == "slider" && (
+        <Slider slider={slider} background="background" />
+      )
+    }
+    {
+      background == "gallery" && (
+        <Gallery gallery={gallery} background="background" />
+      )
+    }
   </div>
   <article>
     <slot />
   </article>
 </section>
 
-<style define:vars={{ backgroundColor, foregroundColor, indent, panelHeight }}>
+<style
+  define:vars={{
+    backgroundColor,
+    foregroundColor,
+    indent,
+    panelHeight,
+  }}
+>
   section {
     position: relative;
     color: var(--foregroundColor);
