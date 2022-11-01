@@ -4,10 +4,13 @@ type GalleryItem = {
     description?: string;
     alt?: string;
     link?: string;
+    height?: number;
+    width?: number;
 }
 
 type Gallery = {
     columns: number;
+    columnGap?: string;
     images: GalleryItem[];
 }
 
@@ -49,9 +52,18 @@ type Slider = {
     options: FlickityOptions;
 }
 
+type Panel = {
+    background?: object;
+    backgroundColor?: string;
+    foregroundColor?: string;
+    indent?: string;
+    panelLayout?: string;
+}
+
 export type {
     GalleryItem,
     Gallery,
     FlickityOptions,
-    Slider
+    Slider,
+    Panel
 }
