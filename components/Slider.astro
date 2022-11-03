@@ -50,9 +50,9 @@ const { slider, background } = Astro.props;
   }
 
   /* a {
-          position:absolute;
-          inset: 0;
-      } */
+      position:absolute;
+      inset: 0;
+  } */
 
   .panelBackground .slider img {
     width: 100%;
@@ -68,5 +68,28 @@ const { slider, background } = Astro.props;
   .panelBackground .slider figure figcaption {
     position: absolute;
     bottom: 0;
+  }
+
+  .carousel {
+    background: #eee;
+  }
+
+  .carousel-cell {
+    width: 66%;
+    height: 200px;
+    margin-right: 10px;
+    background: #8c8;
+    border-radius: 5px;
+    counter-increment: carousel-cell;
+  }
+
+  /* cell number */
+  .carousel-cell:before {
+    display: block;
+    text-align: center;
+    content: counter(carousel-cell);
+    line-height: 200px;
+    font-size: 80px;
+    color: white;
   }
 </style>
