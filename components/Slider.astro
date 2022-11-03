@@ -7,8 +7,6 @@ export interface Props {
 }
 
 const { slider, background } = Astro.props;
-import "../styles/flickity.css";
-import "../styles/flickity-fade.css";
 ---
 
 <div class="slider" data-flickity={JSON.stringify(slider.options)}>
