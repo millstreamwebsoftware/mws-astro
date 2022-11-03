@@ -72,7 +72,7 @@ main > section {
     padding: var(--indent);
 }
 
-article>*+* {
+article > * + * {
     margin-top: var(--text-gap);
 }
 
