@@ -8,79 +8,43 @@ export interface Props {
 }
 
 const { slider, background } = Astro.props;
+
+const speed = 6000;
 ---
 
-<div class="slider" data-flickity={JSON.stringify(slider.options)}>
-  {
-    slider.images.map((img) => (
-      <div class="slider-item">
-        {void (img.imageFit = slider.imageFit)}
-        <Image image={img} />
-      </div>
-    ))
-  }
+<div class="swiper">
+  <div class="swiper-wrapper">
+    {
+      slider.images.map((img) => (
+        <div class="swiper-slide">
+          {void (img.imageFit = slider.imageFit)}
+          <Image image={img} />
+        </div>
+      ))
+    }
+  </div>
+  <div class="swiper-pagination"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
 </div>
 
-<style is:global>
-  .panelBackground .slider,
-  .panelBackground .flickity-viewport {
-    position: absolute;
-    inset: 0;
-    padding: 0;
-    margin: 0;
-  }
-
-  .panelBackground .slider-item {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
-
-  .panelBackground a {
-    position: absolute;
-    inset: 0;
-  }
-
-  .panelBackground figure {
-    height: 100%;
-  }
-
-  .panelBackground .slider img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .panelBackground .slider figure {
-    margin: 0;
-    position: relative;
-  }
-
-  .panelBackground .slider figure figcaption {
-    position: absolute;
-    bottom: 0;
-  }
-
-  .carousel {
-    background: #eee;
-  }
-
-  .carousel-cell {
-    width: 66%;
-    height: 200px;
-    margin-right: 10px;
-    background: #8c8;
-    border-radius: 5px;
-    counter-increment: carousel-cell;
-  }
-
-  /* cell number */
-  .carousel-cell:before {
-    display: block;
-    text-align: center;
-    content: counter(carousel-cell);
-    line-height: 200px;
-    font-size: 80px;
-    color: white;
-  }
-</style>
+<script define:vars={{ speed }}>
+  new Swiper(".swiper", {
+    speed: speed,
+    slidesPerView: 3,
+    centeredSlides: true,
+    effect: "fade",
+    fadeEffect: {
+      crossFade: true,
+    },
+    spaceBetween: 30,
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+    },
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+  });
+</script>
