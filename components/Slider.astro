@@ -1,5 +1,6 @@
 ---
 import { Slider } from "../types";
+import Image from "./Image.astro";
 
 export interface Props {
   slider: Slider;
@@ -13,22 +14,8 @@ const { slider, background } = Astro.props;
   {
     slider.images.map((img) => (
       <div class="slider-item">
-        <a href={img.link}>
-          <figure>
-            <img
-              src={img.image}
-              alt={img.alt}
-              height={img.height}
-              width={img.width}
-            />
-            {(img.title || img.description) && (
-              <figcaption>
-                <h3>{img.title}</h3>
-                <p>{img.description}</p>
-              </figcaption>
-            )}
-          </figure>
-        </a>
+        {void (img.imageFit = slider.imageFit)}
+        <Image image={img} />
       </div>
     ))
   }

@@ -6,6 +6,7 @@ type GalleryItem = {
     link?: string;
     height?: number;
     width?: number;
+    imageFit?: string;
 }
 
 type Gallery = {
@@ -49,6 +50,7 @@ type FlickityOptions = {
 
 type Slider = {
     images: GalleryItem[];
+    imageFit?: string;
     options: FlickityOptions;
 }
 
