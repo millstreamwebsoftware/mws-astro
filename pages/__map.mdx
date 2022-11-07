@@ -2,11 +2,43 @@
 layout: "../layouts/MdPanel.astro"
 
 weight: 6
-location: "ANA Rowing Club"
 panelLayout: "two-column"
+
+contact:
+  [
+    { "name": "name", "label": "Name", "type": "text", "required": true },
+    { "name": "email", "label": "Email", "type": "email", "required": true },
+    {
+      "name": "message",
+      "label": "Message",
+      "type": "textarea",
+      "required": true,
+    },
+    {
+      "class": "group1",
+      "label": "Form Group",
+      "fields":
+        [
+          { "name": "name2", "label": "Name", "type": "text" },
+          { "name": "email2", "label": "Email", "type": "email" },
+          { "name": "message2", "label": "Message", "type": "textarea" },
+          {
+            "class": "group2",
+            "label": "Another Form Group",
+            "fields":
+              [
+                { "name": "name3", "label": "Name", "type": "text" },
+                { "name": "email3", "label": "Email", "type": "email" },
+                { "name": "message3", "label": "Message", "type": "textarea" },
+              ],
+          },
+        ],
+    },
+  ]
 ---
 
 import Map from "../components/Map.astro";
+import Form from "../components/Form.astro";
 
 <div>
 ## Contact details
@@ -16,4 +48,5 @@ import Map from "../components/Map.astro";
 - Bayswater WA 6053
 
 </div>
-<Map location={frontmatter.location} />
+<Form action="https://usebasin.com/f/35a20d02ad22" fields={frontmatter.contact}/>
+<Map location="ANA Rowing Club" />

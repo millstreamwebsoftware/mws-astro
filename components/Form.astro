@@ -1,0 +1,82 @@
+---
+export interface Props {
+  action?: string;
+  method?: string;
+  fields: object[];
+  groupClass?: string;
+}
+
+const { action, method, fields, groupClass } = Astro.props;
+const Container = action ? "form" : "div";
+---
+
+<Container
+  id={action && "a"}
+  action={action}
+  method={action && (method || "POST")}
+  enctype={action && "multipart/form-data"}
+  class={groupClass}
+>
+  {
+    fields.map((field) => (
+      <>
+        {field.fields ? (
+          <>
+            <label class={"group " + field.class} for={field.name}>
+              {field.label}
+            </label>
+            <Astro.self
+              groupClass={"group " + field.class + ""}
+              fields={field.fields}
+            />
+          </>
+        ) : (
+          <>
+            <label for={field.name}>{field.label}</label>
+            {field.type == "textarea" ? (
+              <textarea name={field.name} required={field.required} />
+            ) : (
+              <input
+                name={field.name}
+                type={field.type}
+                required={field.required}
+              />
+            )}
+          </>
+        )}
+      </>
+    ))
+  }
+  {action && <input type="hidden" name="_captcha" />}
+  {action && <button type="submit">Submit</button>}
+</Container>
+
+<style>
+  label,
+  input,
+  textarea {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+  }
+
+  input,
+  textarea {
+    margin-bottom: 1rem;
+  }
+
+  .group {
+    padding-left: 1rem;
+    margin-left: 1rem;
+    border-left: 1px solid #444444;
+  }
+
+  label.group {
+    font-weight: bold;
+    margin-top: 2rem;
+  }
+
+  div.group {
+    padding-top: 1rem;
+  }
+</style>
