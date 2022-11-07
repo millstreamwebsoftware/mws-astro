@@ -79,3 +79,13 @@ article > * + * {
 .center {
     text-align: center;
 }
+
+.panelBackground > * {
+    position: absolute;
+    inset: 0;
+}
+
+.panelBackground .swiper figure {
+    height: 100%;
+    width: 100%;
+}

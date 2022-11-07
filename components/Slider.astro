@@ -1,5 +1,6 @@
 ---
 import { Slider } from "../types";
+import { SwiperOptions } from "swiper";
 import Image from "./Image.astro";
 
 export interface Props {
@@ -9,7 +10,7 @@ export interface Props {
 
 const { slider, background } = Astro.props;
 
-const speed = 6000;
+let options = slider.options;
 ---
 
 <div class="swiper">
@@ -23,28 +24,31 @@ const speed = 6000;
       ))
     }
   </div>
-  <div class="swiper-pagination"></div>
-  <div class="swiper-button-prev"></div>
-  <div class="swiper-button-next"></div>
+  { options.pagination &&
+    <div class="swiper-pagination"></div>
+  }
+  { options.navigation && 
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  }
 </div>
 
-<script define:vars={{ speed }}>
-  new Swiper(".swiper", {
-    speed: speed,
-    slidesPerView: 3,
-    centeredSlides: true,
-    effect: "fade",
-    fadeEffect: {
-      crossFade: true,
-    },
-    spaceBetween: 30,
-    autoplay: {
-      delay: 5000,
-      disableOnInteraction: false,
-    },
-    navigation: {
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    },
-  });
+<script define:vars={{ options }}>
+  new Swiper(document.currentScript.previousElementSibling, options);
 </script>
+
+<style lang="scss">
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+  }
+
+  // .swiper::after {
+  //   content: "";
+  //   position: absolute;
+  //   inset: 0;
+  //   z-index: 1;
+  //   background: linear-gradient(to right, white 10%, transparent 40%, transparent 60%, white 90%);
+  //   pointer-events: none;
+  // }
+</style>
