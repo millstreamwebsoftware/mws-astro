@@ -2,7 +2,7 @@
 layout: "../layouts/MdPanel.astro"
 
 weight: 6
-panelLayout: "two-column"
+panelLayout: "two-one-one"
 
 contact:
   [
@@ -40,13 +40,21 @@ contact:
 import Map from "../components/Map.astro";
 import Form from "../components/Form.astro";
 
-<div>
+<section>
+
 ## Contact details
 
 - AP Hinds Reserve,
 - Milne Street,
 - Bayswater WA 6053
 
-</div>
-<Form action="https://usebasin.com/f/35a20d02ad22" fields={frontmatter.contact}/>
-<Map location="ANA Rowing Club" />
+<Form
+  action="https://usebasin.com/f/35a20d02ad22"
+  fields={frontmatter.contact}
+/>
+
+</section>
+
+<section>
+  <Map location="ANA Rowing Club" />
+</section>
