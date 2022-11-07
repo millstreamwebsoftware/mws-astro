@@ -15,7 +15,7 @@ const panelLayout = frontmatter.panelLayout;
 const uniqueid = frontmatter.url.split("__").pop();
 ---
 
-<section class={panelLayout} data-section-name={uniqueid}>
+<article class={panelLayout} data-section-name={uniqueid}>
   <div class="panelBackground">
     {background == "image" && <img src={backgroundImage} />}
     {
@@ -29,12 +29,10 @@ const uniqueid = frontmatter.url.split("__").pop();
       )
     }
   </div>
-  <article>
-    <slot />
-  </article>
-</section>
-
+  <slot />
+</article>
 <style
+  lang="scss"
   define:vars={{
     backgroundColor,
     foregroundColor,
@@ -42,43 +40,12 @@ const uniqueid = frontmatter.url.split("__").pop();
     panelHeight,
   }}
 >
-  section {
+  article {
     position: relative;
     color: var(--foregroundColor);
     background: var(--backgroundColor);
     padding: var(--indent);
     gap: var(--column-gap);
     min-height: var(--panelHeight);
-  }
-
-  .panelBackground img {
-    object-fit: cover;
-    object-position: center;
-  }
-
-  .panelBackground {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-  }
-
-  section.centered {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-size: cover;
-  }
-
-  section.two-column {
-    columns: 2;
-  }
-
-  section.three-column {
-    columns: 3;
-  }
-
-  section.four-column {
-    columns: 4;
   }
 </style>
