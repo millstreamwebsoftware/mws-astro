@@ -1,0 +1,175 @@
+:root {
+  --indent: 8vw;
+  --text-gap: 2rem;
+  --column-gap: 5vw;
+  --text-size-huge: 48px;
+  --text-size-xxlarge: 32px;
+  --text-size-xlarge: 24px;
+  --text-size-large: 18px;
+  --text-size-medium: 15px;
+  --text-size-small: 14px;
+  --text-size-xsmall: 12px;
+  --text-size-xxsmall: 10px;
+
+  --feature-font-family: "Rosewood W05 Fill";
+  --default-font-family: "Ronnia W01 Light";
+  --bold-font-family: "Ronnia W01 Regular";
+
+  --color-primary: 24 58 78;
+  --text-color: var(--color-primary);
+  --heading-color: var(--color-primary);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  height: 100%;
+  max-height: 100%;
+  font-size: 62.5%;
+  overflow-x: hidden;
+  font-family: var(--default-font-family);
+}
+
+p,
+li,
+input,
+button,
+textarea,
+label,
+select {
+  margin: 0;
+  line-height: 1.5;
+  font-family: var(--default-font-family);
+  font-size: var(--text-size-medium);
+  color: rgb(var(--text-color));
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  line-height: 1.5;
+  font-family: var(--default-font-family);
+  color: rgb(var(--heading-color));
+}
+
+h1 {
+  font-size: var(--text-size-xxlarge);
+  font-family: var(--feature-font-family);
+}
+
+h2 {
+  font-size: var(--text-size-xlarge);
+  font-family: var(--feature-font-family);
+}
+
+hr {
+  height: 1px;
+  background-color: rgb(var(--color-primary) / 0.25);
+  border: none;
+}
+
+section
+  > :is(h1, h2, h3, h4, h5, h6, p, ul)
+  + :is(h1, h2, h3, h4, h5, h6, p, ul) {
+  margin-top: var(--text-gap);
+}
+
+article {
+  display: grid;
+  grid-template-areas: "column1" "column2" "column3" "column4";
+  grid-auto-columns: 1fr;
+  grid-auto-rows: min-content;
+  grid-auto-flow: column;
+
+  // Layout columns
+
+  & > section:nth-child(2) {
+    grid-area: column1;
+  }
+
+  & > section:nth-child(3) {
+    grid-area: column2;
+  }
+
+  & > section:nth-child(4) {
+    grid-area: column3;
+  }
+
+  & > section:nth-child(5) {
+    grid-area: column4;
+  }
+
+  // Layout styles
+
+  &.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+  }
+
+  &.one-two-one {
+      grid-template-areas: "column1 column1" "column2 column3" "column4 column4";
+  }
+
+  &.two-one-one {
+    grid-template-areas: "column1 column2" "column3 column3" "column4 column4";
+  }
+
+  &.three-one {
+    grid-template-areas: "column1 column2 column3" "column4 column4 column4";
+  }
+
+  &.four {
+    grid-template-areas: "column1" "column2" "column3" "column4";
+  }
+}
+
+.panelBackground {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  & > * {
+    position: absolute;
+    inset: 0;
+  }
+
+  img {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .swiper figure {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+form {
+    label {
+        display: block;
+        margin: 25px 0 5px 0;
+        font-family: var(--bold-font-family);
+        font-size: var(--text-size-small);
+    }
+
+    & > :first-child {
+        margin-top: 0;
+    }
+
+
+    [type="text"], [type="email"], textarea {
+        border: 1px solid rgb(var(--color-primary) / 0.4);
+        width: 100%;
+        padding: 5px 10px;
+    }
+}
