@@ -14,26 +14,6 @@ contact:
       "type": "textarea",
       "required": true,
     },
-    {
-      "class": "group1",
-      "label": "Form Group",
-      "fields":
-        [
-          { "name": "name2", "label": "Name", "type": "text" },
-          { "name": "email2", "label": "Email", "type": "email" },
-          { "name": "message2", "label": "Message", "type": "textarea" },
-          {
-            "class": "group2",
-            "label": "Another Form Group",
-            "fields":
-              [
-                { "name": "name3", "label": "Name", "type": "text" },
-                { "name": "email3", "label": "Email", "type": "email" },
-                { "name": "message3", "label": "Message", "type": "textarea" },
-              ],
-          },
-        ],
-    },
   ]
 ---
 
@@ -47,6 +27,8 @@ import Form from "../components/Form.astro";
 - AP Hinds Reserve,
 - Milne Street,
 - Bayswater WA 6053
+
+### Contact us
 
 <Form
   action="https://usebasin.com/f/35a20d02ad22"

@@ -31,7 +31,7 @@ const Container = action ? "form" : "div";
             />
           </>
         ) : (
-          <>
+          <div>
             <label for={field.name}>{field.label}</label>
             {field.type == "textarea" ? (
               <textarea name={field.name} required={field.required} />
@@ -42,7 +42,7 @@ const Container = action ? "form" : "div";
                 required={field.required}
               />
             )}
-          </>
+          </div>
         )}
       </>
     ))
@@ -51,32 +51,39 @@ const Container = action ? "form" : "div";
   {action && <button type="submit">Submit</button>}
 </Container>
 
-<style>
-  label,
-  input,
-  textarea {
-    width: 100%;
-    max-width: 100%;
+<style lang="scss">
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--text-gap);
+  }
+
+  label {
     display: block;
+    margin: 0 0 5px 0;
+    font-family: var(--bold-font-family);
+    font-size: var(--text-size-small);
   }
 
-  input,
+  [type="text"],
+  [type="email"],
   textarea {
-    margin-bottom: 1rem;
+    border: 1px solid rgb(var(--color-primary) / 0.4);
+    width: 100%;
+    padding: 5px 10px;
   }
 
-  .group {
-    padding-left: 1rem;
-    margin-left: 1rem;
-    border-left: 1px solid #444444;
-  }
+  button {
+    background: none;
+    display: block;
+    border: 2px solid rgb(var(--color-primary) / 0.4);
+    border-radius: 5px;
+    padding: 10px 16px;
+    width: min-content;
+    cursor: pointer;
 
-  label.group {
-    font-weight: bold;
-    margin-top: 2rem;
-  }
-
-  div.group {
-    padding-top: 1rem;
+    &:hover {
+      background-color: rgb(var(--color-primary) / 0.1);
+    }
   }
 </style>

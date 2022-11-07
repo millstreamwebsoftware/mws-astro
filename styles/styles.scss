@@ -1,6 +1,7 @@
 :root {
   --indent: 8vw;
   --text-gap: 2rem;
+  --text-gap-small: 1rem;
   --column-gap: 5vw;
   --text-size-huge: 48px;
   --text-size-xxlarge: 32px;
@@ -69,6 +70,11 @@ h2 {
   font-family: var(--feature-font-family);
 }
 
+h3 {
+    font-size: var(--text-size-large);
+    font-family: var(--default-font-family);
+}
+
 hr {
   height: 1px;
   background-color: rgb(var(--color-primary) / 0.25);
@@ -76,8 +82,8 @@ hr {
 }
 
 section
-  > :is(h1, h2, h3, h4, h5, h6, p, ul)
-  + :is(h1, h2, h3, h4, h5, h6, p, ul) {
+  > :is(h1, h2, h3, h4, h5, h6, p, ul, form)
+  + :is(h1, h2, h3, h4, h5, h6, p, ul, form) {
   margin-top: var(--text-gap);
 }
 
@@ -154,22 +160,22 @@ article {
   }
 }
 
-form {
-    label {
-        display: block;
-        margin: 25px 0 5px 0;
-        font-family: var(--bold-font-family);
-        font-size: var(--text-size-small);
-    }
+// form {
+//     label {
+//         display: block;
+//         margin: 25px 0 5px 0;
+//         font-family: var(--bold-font-family);
+//         font-size: var(--text-size-small);
+//     }
 
-    & > :first-child {
-        margin-top: 0;
-    }
+//     & > :first-child {
+//         margin-top: 0;
+//     }
 
 
-    [type="text"], [type="email"], textarea {
-        border: 1px solid rgb(var(--color-primary) / 0.4);
-        width: 100%;
-        padding: 5px 10px;
-    }
-}
+//     [type="text"], [type="email"], textarea {
+//         border: 1px solid rgb(var(--color-primary) / 0.4);
+//         width: 100%;
+//         padding: 5px 10px;
+//     }
+// }
