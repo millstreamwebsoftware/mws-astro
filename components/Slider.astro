@@ -5,10 +5,9 @@ import Image from "./Image.astro";
 
 export interface Props {
   slider: Slider;
-  background?: string;
 }
 
-const { slider, background } = Astro.props;
+const { slider } = Astro.props;
 
 let options = slider.options;
 ---
@@ -35,9 +34,14 @@ let options = slider.options;
 
 <script define:vars={{ options }}>
   new Swiper(document.currentScript.previousElementSibling, options);
+  console.log("Created new Swiper at", document.currentScript.previousElementSibling, "with options", options);
 </script>
 
 <style lang="scss">
+  .swiper {
+    max-width: 100%;
+  }
+
   .swiper-slide {
     display: flex;
     justify-content: center;

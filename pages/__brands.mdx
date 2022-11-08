@@ -43,10 +43,9 @@ slider:
           },
       },
   }
+# draft: true
 ---
 
 import Slider from "../components/Slider.astro";
 
-<section>
-  <Slider slider={frontmatter.slider} />
-</section>
+<Slider slider={frontmatter.slider} />
