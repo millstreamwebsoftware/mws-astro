@@ -9,6 +9,7 @@ const { image } = Astro.props;
 const imageFit = image.imageFit || "cover";
 var imageWidth = "100%";
 var imageHeight = "100%";
+var margin = image.margin || 0;
 if (image.height) {
   imageHeight = image.height + "px";
 }
@@ -36,7 +37,7 @@ if (image.width) {
   </a>
 </figure>
 
-<style lang="scss" define:vars={{ imageFit, imageHeight, imageWidth }}>
+<style lang="scss" define:vars={{ imageFit, imageHeight, imageWidth, margin }}>
   img {
     object-fit: var(--imageFit);
     height: var(--imageHeight);
@@ -45,7 +46,14 @@ if (image.width) {
 
   figure {
     display: block;
+    position: relative;
     height: var(--imageHeight);
     width: var(--imageWidth);
+    margin: var(--margin);
+  }
+
+  a {
+    position: absolute;
+    inset: 0;
   }
 </style>
