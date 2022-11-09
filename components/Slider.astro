@@ -34,7 +34,7 @@ let options = slider.options;
 
 <script define:vars={{ options }}>
   new Swiper(document.currentScript.previousElementSibling, options);
-  console.log("Created new Swiper at", document.currentScript.previousElementSibling, "with options", options);
+  document.currentScript.remove()
 </script>
 
 <style lang="scss">
