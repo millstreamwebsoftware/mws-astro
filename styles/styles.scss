@@ -189,6 +189,18 @@ article[data-section-name="hero"] section {
   pointer-events: none;
 }
 
+.swiper-slide > * {
+  flex-shrink: 0;
+}
+
+.swiper {
+  margin-bottom: 5rem;
+
+  @at-root .panelBackground & {
+    margin-bottom: 0;
+  }
+}
+
 // form {
 //     label {
 //         display: block;

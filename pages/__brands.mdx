@@ -50,5 +50,14 @@ slider:
 ---
 
 import Slider from "../components/Slider.astro";
+import Image from "../components/Image.astro";
 
 <Slider slider={frontmatter.slider} />
+
+<Image
+  image={{
+    image: "/images/icons/TOHC-wriggly-line-blk.svg",
+    height: 4,
+    imageFit: "contain",
+  }}
+/>
