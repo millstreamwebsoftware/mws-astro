@@ -22,9 +22,9 @@ const client = new ImgixClient({
   domain: "mws.imgix.net",
   secureURLToken: "yn9ssSaj42RdpwrS",
 });
-var hostname = Astro.url.hostname;
+
 var url = image.image;
-if (Astro.url.hostname !== "localhost") {
+if (import.meta.env.PROD) {
   url = client.buildURL(
     "https://main.d1zmfe0n09d1c4.amplifyapp.com" + image.image,
     { w: image.width, h: image.height }
@@ -32,9 +32,6 @@ if (Astro.url.hostname !== "localhost") {
 }
 ---
 
-<script define:vars={{ hostname }}>
-  console.log(hostname);
-</script>
 <figure>
   <a href={image.link}>
     <img src={url} alt={image.alt} width={image.width} height={image.height} />
