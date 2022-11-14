@@ -1,5 +1,6 @@
 ---
 import { GalleryItem } from "../types";
+import ImgixClient from "@imgix/js-core";
 
 export interface Props {
   image: GalleryItem;
@@ -16,16 +17,21 @@ if (image.height) {
 if (image.width) {
   imageWidth = image.width + "px";
 }
+
+const client = new ImgixClient({
+  domain: "mws.imgix.net",
+  secureURLToken: "yn9ssSaj42RdpwrS",
+});
+
+const url = client.buildURL(
+  "https://main.d1zmfe0n09d1c4.amplifyapp.com" + image.image,
+  { w: image.width, h: image.height }
+);
 ---
 
 <figure>
   <a href={image.link}>
-    <img
-      src={image.image}
-      alt={image.alt}
-      width={image.width}
-      height={image.height}
-    />
+    <img src={url} alt={image.alt} width={image.width} height={image.height} />
     {
       (image.title || image.description) && (
         <figcaption>
