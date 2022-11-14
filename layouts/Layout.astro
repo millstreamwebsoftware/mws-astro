@@ -5,6 +5,7 @@ export interface Props {
 
 const { title } = Astro.props;
 
+import { SEO } from "astro-seo";
 import "../styles/styles.scss";
 ---
 
@@ -15,7 +16,12 @@ import "../styles/styles.scss";
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+
+    <SEO
+      title="{title}"
+      description="Cafe on the banks of the Swan River in Bayswater"
+      canonical="https://www.theoarhouse.au"
+    />
 
     <link rel="stylesheet" href="/styles/fonts.css" />
 
