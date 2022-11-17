@@ -89,6 +89,28 @@ section > :is(h1, h2, h3, h4, h5, h6, p, ul, form) + :is(h1, h2, h3, h4, h5, h6,
   margin-top: var(--text-gap);
 }
 
+.social {
+  display: block;
+  width: 24px;
+  height: 24px;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  text-indent: -1000em;
+  background-color: currentColor;
+
+  &.twitter {
+    mask-image: url(/images/icons/twitter.svg);
+  }
+
+  &.facebook {
+    mask-image: url(/images/icons/facebook.svg);
+  }
+
+  &.instagram {
+    mask-image: url(/images/icons/instagram.svg);
+  }
+}
+
 article {
   display: grid;
   grid-template-columns: 1fr;
@@ -96,7 +118,42 @@ article {
   grid-auto-flow: row;
 
   // Layout styles
+  & > header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+
+    background-image: linear-gradient(to bottom, rgb(var(--header-background-color)), transparent);
+
+    * {
+      color: rgb(var(--header-color));
+    }
+
+    a {
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: rgb(var(--header-color));
+      fill: rgb(var(--header-color));
+    }
+
+  }
+
+  // Layout styles
   &.centered {
     display: flex;
     flex-direction: column;
