@@ -19,7 +19,7 @@ export const SITE = {
     {
       name: 'instagram',
       title: 'Instagram',
-      link: 'https://www.instagram.com/theoarhouse.au',
+      link: 'https://www.instagram.com/the_oarhouse',
     },
     {
       name: 'twitter',
