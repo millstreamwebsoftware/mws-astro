@@ -1,11 +1,18 @@
 ---
 layout: ../layouts/MdPanel.astro
-background: rgb(186, 232, 232)
-color: rgb(186, 232, 232)
-panelLayout: "two-column"
+background: rgb(50 50 50)
+foreground: rgb(230 230 230)
+panelLayout: "two-one-one"
 weight: 10
 ---
 
 export const year = new Date().getFullYear();
+import Social from "../components/Social.astro";
 
-<section>Copyright © {year} The Oar House</section>
+<section>
+  <p>Copyright © {year} The Oar House</p>
+</section>
+
+<section class="right">
+  <Social />
+</section>

@@ -5,7 +5,7 @@ import { SITE } from "../config";
 <ul class="social">
   {
     SITE.social.map((s) =>
-      s.link ? (
+      s.title ? (
         <li>
           <a
             href={s.link}
@@ -22,32 +22,64 @@ import { SITE } from "../config";
     )
   }
 </ul>
-<style>
+
+<style lang="scss">
   .social {
     display: flex;
+    align-items: center;
     list-style-type: none;
     column-gap: var(--text-gap);
   }
 
   a {
-    display: block;
-    width: 24px;
-    height: 24px;
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    text-indent: -1000em;
-    background-color: currentColor;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+
+    // Insert the container for the icon
+    &::before {
+      content: "";
+      display: block;
+      background-color: currentColor;
+      width: 24px;
+      height: 24px;
+      mask-size: contain;
+      mask-repeat: no-repeat;
+    }
+
+    // Accessible hiding of label text by default
+    span {
+      position: absolute;
+      clip: rect(1px, 1px, 1px, 1px);
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+    }
   }
 
-  .twitter {
+  .telephone {
+    span {
+      all: unset;
+    }
+
+    &::before {
+      mask-image: url(/images/icons/phone.svg);
+      mask-size: 80%;
+      mask-position: center;
+    }
+  }
+
+  .twitter::before {
     mask-image: url(/images/icons/twitter.svg);
   }
 
-  .facebook {
+  .facebook::before {
     mask-image: url(/images/icons/facebook.svg);
   }
 
-  .instagram {
+  .instagram::before {
     mask-image: url(/images/icons/instagram.svg);
   }
 </style>

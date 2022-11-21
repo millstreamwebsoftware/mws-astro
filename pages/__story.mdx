@@ -5,9 +5,19 @@ panelLayout: "one-two-one"
 background: rgb(245 245 245)
 ---
 
-<section>
+import Image from "../components/Image.astro";
+
+<section class="centered">
 
 # Our Story
+
+<Image
+  image={{
+    image: "/images/icons/TOHC-wriggly-line-blk.svg",
+    height: 4,
+    imageFit: "contain",
+  }}
+/>
 
 </section>
 
