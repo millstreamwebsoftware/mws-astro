@@ -1,0 +1,53 @@
+---
+import { SITE } from "../config";
+---
+
+<ul class="social">
+  {
+    SITE.social.map((s) =>
+      s.link ? (
+        <li>
+          <a
+            href={s.link}
+            class={s.name}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <span>{s.title}</span>
+          </a>
+        </li>
+      ) : (
+        ""
+      )
+    )
+  }
+</ul>
+<style>
+  .social {
+    display: flex;
+    list-style-type: none;
+    column-gap: var(--text-gap);
+  }
+
+  a {
+    display: block;
+    width: 24px;
+    height: 24px;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    text-indent: -1000em;
+    background-color: currentColor;
+  }
+
+  .twitter {
+    mask-image: url(/images/icons/twitter.svg);
+  }
+
+  .facebook {
+    mask-image: url(/images/icons/facebook.svg);
+  }
+
+  .instagram {
+    mask-image: url(/images/icons/instagram.svg);
+  }
+</style>
