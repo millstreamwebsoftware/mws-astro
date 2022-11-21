@@ -7,10 +7,13 @@ weight: 10
 ---
 
 export const year = new Date().getFullYear();
+import { SITE } from "../config";
 import Social from "../components/Social.astro";
 
 <section>
-  <p>Copyright © {year} The Oar House</p>
+  <p>
+    Copyright © {year} {SITE.title}
+  </p>
 </section>
 
 <section class="right">
