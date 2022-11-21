@@ -4,11 +4,9 @@ import Layout from "../layouts/Layout.astro";
 const panels = await Astro.glob("./__*.(md|mdx)");
 let onlinePanels = panels.filter((a) => !a.frontmatter.draft);
 onlinePanels.sort((a, b) => a.frontmatter.weight - b.frontmatter.weight);
-
-const title = "The Oar House | Cafe on the Swan River Bayswater";
 ---
 
-<Layout title={title}>
+<Layout>
   <main>
     {onlinePanels.map((panel) => <panel.Content />)}
   </main>

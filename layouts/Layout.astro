@@ -3,9 +3,9 @@ export interface Props {
   title: string;
 }
 
-const { title } = Astro.props;
-
+import { SITE } from "../config";
 import { SEO } from "astro-seo";
+
 import "../styles/styles.scss";
 import "../styles/layouts.scss";
 ---
@@ -19,9 +19,9 @@ import "../styles/layouts.scss";
     <meta name="generator" content={Astro.generator} />
 
     <SEO
-      title={title}
-      description="Cafe on the banks of the Swan River in Bayswater"
-      canonical="https://www.theoarhouse.au"
+      title={SITE.title}
+      description={SITE.description}
+      canonical={SITE.canonical}
     />
 
     <link rel="stylesheet" href="/styles/fonts.css" />
