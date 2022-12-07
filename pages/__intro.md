@@ -9,5 +9,5 @@ weight: 1
   <img src="/images/opening-soon.svg" class="opening-soon">
 
   <h2>The Oarhouse Cafe, on the banks of the Swan River, Bayswater — opening this December.</h2>
-  <p style="max-width: 80%">Serving fantastic locally roasted coffee from Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers Artisan, and all of our cakes and slices will be made on site.</p>
+  <p style="max-width: 80%">Serving fantastic locally roasted coffee from Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers Artisan, and a handpicked selection of freshly made cakes and slices.</p>
 </section>
