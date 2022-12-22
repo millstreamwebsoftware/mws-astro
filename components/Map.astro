@@ -271,4 +271,20 @@ const src =
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBs8yBYBYtUCy9yd0CqO-C3o0RbAK9qW-w&callback=initMap"
 ></script>
 
-<div id="map" style="height: 50rem"></div>
+<div id="map" class="map"></div>
+
+<style lang="scss">
+  .map {
+    height: 50vh;
+
+    @media (min-width: 480px) {
+      position: absolute;
+      top: calc(var(--indent) * -1);
+      bottom: calc(var(--indent) * -1);
+      right: calc(var(--indent) * -1);
+
+      width: calc(100% + var(--indent));
+      height: calc(100% + var(--indent) * 2);
+    }
+  }
+</style>

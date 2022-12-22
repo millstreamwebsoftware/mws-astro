@@ -158,6 +158,8 @@ article {
 }
 
 section {
+  position: relative;
+
   &.right {
     text-align: right;
     display: flex;
