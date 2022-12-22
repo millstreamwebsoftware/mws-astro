@@ -21,7 +21,18 @@ import "../styles/layouts.scss";
     <SEO
       title={SITE.title}
       description={SITE.description}
-      canonical={SITE.canonical}
+      openGraph={{
+        basic: {
+          title: SITE.ogTitle,
+          type: SITE.imageType,
+          image: SITE.canonical + SITE.image,
+        },
+        image: {
+          alt: SITE.imageAlt,
+          height: SITE.imageHeight,
+          width: SITE.imageWidth,
+        },
+      }}
     />
 
     <link rel="stylesheet" href="/styles/fonts.css" />

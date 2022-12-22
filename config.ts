@@ -3,8 +3,14 @@
 
 export const SITE = {
   title: 'The Oar House | Cafe on the Swan River Bayswater',
+  ogTitle: 'The Oar House',
   description: 'Cafe on the banks of the Swan River in Bayswater',
   canonical: 'https://www.theoarhouse.au',
+  image: '/share.jpg',
+  imageType: 'image/jpeg',
+  imageAlt: 'The Oarhouse logo on a photo of food and coffee',
+  imageHeight: 630,
+  imageWidth: 1200,
   social: [
     {
       name: 'telephone',
