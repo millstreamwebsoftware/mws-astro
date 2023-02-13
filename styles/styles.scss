@@ -56,11 +56,17 @@ table {
   font-family: var(--default-font-family);
   font-size: var(--text-size-medium);
   margin-bottom: 2em;
+
+  & th {
+    text-align: right;
+    padding-right: 0.5em;
+  }
+
+  & td {
+    text-align: left;
+  }
 }
 
-th {
-  text-align: right;
-}
 
 h1,
 h2,
@@ -87,6 +93,10 @@ h2 {
 h3 {
   font-size: var(--text-size-large);
   font-family: var(--feature-font-family);
+
+  &.highlight1 {
+    color: rgb(var(--color-accent) / 0.7);
+  }
 }
 
 hr {
