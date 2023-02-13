@@ -51,6 +51,17 @@ select {
   color: rgb(var(--text-color));
 }
 
+table {
+  line-height: 1.6;
+  font-family: var(--default-font-family);
+  font-size: var(--text-size-medium);
+  margin-bottom: 2em;
+}
+
+th {
+  text-align: right;
+}
+
 h1,
 h2,
 h3,
@@ -124,6 +135,8 @@ section > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address) + :is(h1, h2, h3, h4
   margin: 0 auto 20px auto;
 }
 
+.openhours {}
+
 .dot {
   padding: 0;
   background-color: rgba(white, 0.7);
@@ -138,8 +151,6 @@ section > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address) + :is(h1, h2, h3, h4
   justify-content: center;
   gap: 6%;
   backdrop-filter: blur(4px);
-
-
 
   & > img {
     width: 60%;
