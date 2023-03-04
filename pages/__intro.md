@@ -11,7 +11,8 @@ weight: 1
   <h3 class="highlight1">Open 7 days per week as follows...</h3>
 <table class="openhours">
 <tr><th>Monday + Tuesday</th><td><time datetime="06:00">6.00am</time> – <time datetime="11:00">11.00am</time></td></tr>
-<tr><th>Wednesday – Sunday</th><td><time datetime="06:00">6.00am</time> – <time datetime="13:00">1.00pm</time></td></tr>
+<tr><th>Wednesday + Thursday</th><td><time datetime="06:00">6.00am</time> – <time datetime="13:00">1.00pm</time></td></tr>
+<tr><th>Friday – Sunday</th><td><time datetime="06:00">6.00am</time> – <time datetime="14:00">2.00pm</time></td></tr>
 </table>
 
   <h2>The Oarhouse Cafe, on the banks of the Swan River, Bayswater.</h2>
