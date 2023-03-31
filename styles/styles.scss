@@ -97,6 +97,13 @@ h3 {
   &.highlight1 {
     color: rgb(var(--color-accent) / 0.7);
   }
+
+  &.highlight2 {
+    color: white;
+    background-color: rgb(var(--color-accent) / 0.9);
+    padding: 3px 10px;
+    margin: 0 0 5px 0;
+  }
 }
 
 hr {
