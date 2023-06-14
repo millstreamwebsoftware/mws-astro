@@ -1,7 +1,8 @@
 ---
+_schema: default
 title: Home
-status: online
 content_blocks:
   - _bookshop_name: sample
-    text: Test component
+    text: Test component here
 ---
+## Hello
