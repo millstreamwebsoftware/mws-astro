@@ -1,0 +1,13 @@
+spec:
+  structures:
+    - content_blocks
+  label: My Component
+  description: A very simple component
+  icon: nature_people
+
+blueprint:
+  text: "Hello World!"
+  color: "#034AD8"
+  image:
+    image_url: "/image.png"
+    image_alt: "My alternate text"
