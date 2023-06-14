@@ -1,0 +1,7 @@
+---
+import Page from "../shared/astro/page.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<Page bookshop:live contentBlocks={frontmatter.content_blocks} />
