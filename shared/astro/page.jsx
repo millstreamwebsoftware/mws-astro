@@ -1,3 +1,5 @@
+import { CloudCannonConnect } from '@cloudcannon/react-connector'
+
 const components = {};
 const componentImports = import.meta.glob("../../components/**/*.jsx", {
   eager: true,
@@ -15,7 +17,7 @@ export default function Page({ contentBlocks }) {
   return (
     <main>
       {contentBlocks.map((block, i) => {
-        const Component = components[block._bookshop_name];
+        const Component = CloudCannonConnect(components[block._bookshop_name]);
         return <Component {...block} key={i} />;
       })}
     </main>
