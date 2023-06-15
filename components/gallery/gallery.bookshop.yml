@@ -11,7 +11,7 @@ spec:
 blueprint:
   images:
     - image:
-        file: /images/hero/espresso.jpg
+        file:
         title: Title
         description: Description
 
