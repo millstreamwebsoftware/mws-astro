@@ -1,6 +1,6 @@
 var components: Record<string, any>;
 
-function getComponents(): Record<string, any> {
+export function getComponents(): Record<string, any> {
   if (!components) {
     components = {};
 
