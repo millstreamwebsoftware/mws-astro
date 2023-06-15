@@ -1,13 +1,14 @@
 ---
 export interface Props {
   title: string;
+  content_blocks: Array<Record<string, any>>;
 }
 
-import { SITE } from "../config";
-import { SEO } from "astro-seo";
+// import { SITE } from "../config";
+// import { SEO } from "astro-seo";
 
-import "../styles/styles.scss";
-import "../styles/layouts.scss";
+// import "../styles/styles.scss";
+// import "../styles/layouts.scss";
 ---
 
 <!DOCTYPE html>
@@ -15,37 +16,7 @@ import "../styles/layouts.scss";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-
-    <SEO
-      title={SITE.title}
-      description={SITE.description}
-      openGraph={{
-        basic: {
-          title: SITE.ogTitle,
-          type: SITE.imageType,
-          image: SITE.canonical + SITE.image,
-        },
-        image: {
-          alt: SITE.imageAlt,
-          height: SITE.imageHeight,
-          width: SITE.imageWidth,
-        },
-      }}
-    />
-
-    <link rel="stylesheet" href="/styles/fonts.css" />
-
-    <!-- Swiper -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css"
-    />
-    <script
-      is:inline
-      src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"
-    ></script>
   </head>
   <body>
     <article>

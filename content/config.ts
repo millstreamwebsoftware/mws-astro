@@ -3,6 +3,7 @@ import { defineCollection, z } from "astro:content";
 const pagesCollection = defineCollection({
   type: "content", // v2.5.0 and later
   schema: z.object({
+    _schema: z.any().optional(),
     title: z.string(),
     description: z.string().optional(),
     browserTitle: z.string().optional(),

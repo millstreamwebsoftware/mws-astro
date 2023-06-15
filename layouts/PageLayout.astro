@@ -1,7 +1,20 @@
 ---
-import Page from "../shared/astro/page.jsx";
+import Page from "@shared/page";
+import Layout from "./Layout.astro";
 
-const { frontmatter } = Astro.props;
+type Props = {
+  frontmatter: {
+    title: string;
+    content_blocks: Array<Record<string, any>>;
+  };
+};
+
+if (!Astro.props.frontmatter) {
+  throw new Error("Page frontmatter must be defined");
+}
+const props = Astro.props.frontmatter;
 ---
 
-<Page bookshop:live contentBlocks={frontmatter.content_blocks} />
+<Layout {...props}>
+  <Page bookshop:live contentBlocks={props.content_blocks} />
+</Layout>
