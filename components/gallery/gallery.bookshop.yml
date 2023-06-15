@@ -10,10 +10,9 @@ spec:
 # Defines the structure of this component, as well as the default values
 blueprint:
   images:
-    - image:
-        image_path:
-        title: Title
-        description: Description
+    - image_path:
+      title: Title
+      description: Description
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
