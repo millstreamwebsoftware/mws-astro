@@ -10,4 +10,10 @@ content_blocks:
         text: Test component here
       - _bookshop_name: sample
         text: Test component here
+  - _bookshop_name: gallery
+    images:
+      - image:
+          image_path: /uploads/512.png
+          title: Title
+          description: Description
 ---
