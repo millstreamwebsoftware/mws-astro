@@ -11,7 +11,7 @@ spec:
 blueprint:
   images:
     - image:
-        file:
+        image_path:
         title: Title
         description: Description
 
@@ -19,7 +19,10 @@ blueprint:
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
-  file:
-    type: image
+  image_path:
+    options:
+      width:
+      height:
+      resize_style: cover
   description:
     type: markdown
