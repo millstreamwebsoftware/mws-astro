@@ -14,9 +14,10 @@ content_blocks:
       <h3 class="align-center">Open 7 days per week as follows...</h3>
 
 
-      <table><tbody><tr><th>Monday + Tuesday</th><td>6.00am –
-      11.00am</td></tr><tr><th>Wednesday + Thursday</th><td>6.00am –
-      1.00pm</td></tr><tr><th>Friday – Sunday</th><td>6.00am –
+      <table><tbody><tr><th class="align-right">Monday + Tuesday</th><td>6.00am
+      – 11.00am</td></tr><tr><th class="align-right">Wednesday +
+      Thursday</th><td>6.00am – 1.00pm</td></tr><tr><th
+      class="align-right">Friday – Sunday</th><td>6.00am –
       2.00pm</td></tr></tbody></table>
 
 
