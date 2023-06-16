@@ -33,12 +33,10 @@ content_blocks:
         title: Title
         description: Description
   - _bookshop_name: richtext
-    markdown: >-
+    markdown: |-
       <h1 class="align-center">Our Story</h1>
 
-
-      <p class="align-center"><img src="/uploads/tohc-wriggly-line-blk-2.svg"
-      width="356" /></p>
+      ---
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
