@@ -1,5 +1,4 @@
 export default function Gallery(gallery) {
-  console.log(gallery.images);
   return (
     <div className="gallery">
       {
