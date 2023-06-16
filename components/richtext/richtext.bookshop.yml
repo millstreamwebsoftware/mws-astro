@@ -2,14 +2,14 @@
 spec:
   structures:
     - content_blocks
-  label: Text
-  description: Text
+  label: Markdown
+  description: Rich text element.
   icon: edit_note
   tags: []
 
 # Defines the structure of this component, as well as the default values
 blueprint:
-  text: Text
+  markdown:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
