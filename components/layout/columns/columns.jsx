@@ -16,7 +16,6 @@ export default function Columns(block) {
     <section className="columns" style={{"--column-count": block.content_blocks.length}}>
       { block.content_blocks.map((column, i) => {
         const Component = components[column._bookshop_name];
-        console.log(column);
         return (
           <div className={`column${i}`}>
             <Component {...column} key={i} />
