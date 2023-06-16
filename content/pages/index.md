@@ -4,14 +4,15 @@ title: Home
 content_blocks:
   - _bookshop_name: richtext
     markdown: >-
-      <p class="align-center"><img src="/images/now-open.svg" alt="Now Open"
-      width="305" height="79" /></p>
+      <p class="align-center"><img alt="Now Open" width="305" height="79"
+      src="/images/now-open.svg" /></p>
 
 
       <h2 class="align-center">Open Hours</h2>
 
 
-      <h3 class="align-center">Open 7 days per week as follows...</h3>
+      <h3 class="highlight-1 align-center">Open 7 days per week as
+      follows...</h3>
 
 
       <table><tbody><tr><th class="align-right">Monday + Tuesday</th><td>6.00am
