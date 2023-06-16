@@ -4,7 +4,7 @@ spec:
     - content_blocks
   label: Gallery
   description: Display images in a gallery.
-  icon: "gallery_thumbnail"
+  icon: collections
   tags: ["image", "collection"]
 
 # Defines the structure of this component, as well as the default values
@@ -18,6 +18,8 @@ blueprint:
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
+  images:
+    icon: image
   image_path:
     options:
       width:
