@@ -4,50 +4,59 @@ title: Home
 content_blocks:
   - _bookshop_name: richtext
     markdown: >-
-      # Test component here
+      <p class="align-center"><img src="/images/now-open.svg" alt="Now Open"
+      width="305" height="79" /></p>
 
 
-      Body text too...
+      <h2 class="align-center">Open Hours</h2>
 
 
+      <h3 class="align-center">Open 7 days per week as follows...</h3>
 
 
-      ### Lorem Ipsum
+      <table><tbody><tr><th>Monday + Tuesday</th><td>6.00am –
+      11.00am</td></tr><tr><th>Wednesday + Thursday</th><td>6.00am –
+      1.00pm</td></tr><tr><th>Friday – Sunday</th><td>6.00am –
+      2.00pm</td></tr></tbody></table>
 
 
-      <a target="_blank" rel="noopener nofollow"
-      href="https://loremipsum.io/">Lorem ipsum</a> dolor sit amet, consectetur
-      adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-      magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-      laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-      reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-      pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
-      qui officia deserunt mollit anim id est laborum.
+      <h2 class="align-center">The Oarhouse Cafe, on the banks of the Swan
+      River, Bayswater.</h2>
 
 
-      > Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-      dolore eu fugiat nulla pariatur.
+      <p class="align-center">Serving fantastic locally roasted coffee from
+      Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers
+      Artisan, and a handpicked selection of freshly made cakes and slices.</p>
+  - _bookshop_name: gallery
+    images:
+      - image_path: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
+        title: Title
+        description: Description
+  - _bookshop_name: richtext
+    markdown: >-
+      <h1 class="align-center">Our Story</h1>
 
 
-      Consectetur adipiscing elit pellentesque habitant morbi tristique senectus
-      et netus. Leo vel orci porta non pulvinar neque laoreet suspendisse. In
-      nisl nisi scelerisque eu ultrices vitae auctor eu. Libero nunc consequat
-      interdum varius sit amet mattis. Semper viverra nam libero justo laoreet
-      sit. Mi proin sed libero enim sed faucibus. Vel elit scelerisque mauris
-      pellentesque pulvinar. Ut sem nulla pharetra diam sit. Nibh ipsum
-      consequat nisl vel pretium lectus quam id leo. Donec pretium vulputate
-      sapien nec sagittis aliquam malesuada. Lorem sed risus ultricies
-      tristique. Eros in cursus turpis massa tincidunt. Urna cursus eget nunc
-      scelerisque viverra mauris in aliquam sem.
+      <p class="align-center"><img src="/uploads/tohc-wriggly-line-blk-2.svg"
+      width="356" /></p>
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
-        markdown: Test component here
+        markdown: >-
+          The idea of a cafe on the banks of our beautiful Swan River was first
+          hatched on a cold and wet morning more than 20 years ago after having
+          had a great row with some good mates, and thinking the only thing that
+          could make this better was a warm spot with a great coffee and a good
+          feed. Since then we have had a life full of adventures and another
+          fulfilling career but that lingering desire to create a space where
+          everyone would be welcome and where we could share this beautiful
+          location has never left us.
       - _bookshop_name: richtext
-        markdown: Test component here
-  - _bookshop_name: gallery
-    images:
-      - image_path: /uploads/512.png
-        title: Title
-        description: Description
+        markdown: >-
+          We have worked incredibly hard and had wonderful support from everyone
+          to finally create this wonderful space that we hope you love as much
+          as we do. Our goal is to create a space where everyone feels welcome
+          and we provide a sense of community for everyone. Of course we love
+          our coffee and food and will endeavour to bring you great tasting
+          ethically sourced offerings.
 ---
