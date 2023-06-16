@@ -1,0 +1,10 @@
+.align-left { text-align: left; }
+.align-center { text-align: center; }
+.align-right { text-align: right; }
+.align-justify { text-align: justify; }
+
+a.button {
+  outline: 1px solid black;
+  border-radius: 0.25em;
+  padding: 0.25em;
+}
