@@ -9,6 +9,11 @@ export interface Props {
 
 import "../styles/styles.scss";
 // import "../styles/layouts.scss";
+
+const { title, content_blocks } = Astro.props;
+import preferences from "data/preferences.json";
+
+const pageTitle = title + preferences.general.browser_window_title_suffix;
 ---
 
 <!DOCTYPE html>
@@ -17,6 +22,7 @@ import "../styles/styles.scss";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
   </head>
   <body>
     <article>
