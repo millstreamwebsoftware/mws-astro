@@ -1,0 +1,37 @@
+---
+export interface Props {
+  contentBlocks: any[];
+}
+
+const contentBlocks = Astro.props.content_blocks;
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+  ["../../**/*.jsx", "../../**/*.astro"],
+  {
+    eager: true,
+  }
+);
+
+Object.entries(componentImports).forEach(([path, obj]) => {
+  const parts = path.replace("../../", "").split(".")[0].split("/");
+  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
+    parts.pop();
+  }
+  const bookshopName = parts.join("/");
+  components[bookshopName] = <any>obj.default;
+});
+---
+
+<section class="columns" style={{ "--column-count": contentBlocks.length }}>
+  {
+    contentBlocks.map((column, i) => {
+      const Component = components[column._bookshop_name];
+      return (
+        <div class={`column${i}`}>
+          <Component {...column} key={i} />
+        </div>
+      );
+    })
+  }
+</section>
