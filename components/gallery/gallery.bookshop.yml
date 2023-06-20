@@ -9,8 +9,9 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
+  height:
   images:
-    - image_path:
+    - image:
       title: Title
       description: Description
 
@@ -18,12 +19,13 @@ blueprint:
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
+  height:
+    type: range
+    options:
+      step: 1
+      max: 100
+      min: 0
   images:
     icon: image
-  image_path:
-    options:
-      width:
-      height:
-      resize_style: cover
   description:
     type: markdown

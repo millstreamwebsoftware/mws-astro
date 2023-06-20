@@ -32,8 +32,12 @@ content_blocks:
       Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers
       Artisan, and a handpicked selection of freshly made cakes and slices.</p>
   - _bookshop_name: gallery
+    height: 40
     images:
-      - image_path: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
+      - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
+        title: Title
+        description: Description
+      - image: /images/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
         title: Title
         description: Description
   - _bookshop_name: richtext
