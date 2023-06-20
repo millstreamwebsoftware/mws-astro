@@ -2,6 +2,8 @@
 _schema: default
 title: Home
 content_blocks:
+  - _bookshop_name: astrotest
+    text: test!
   - _bookshop_name: richtext
     markdown: >-
       <p class="align-center"><img alt="Now Open" width="305" height="79"

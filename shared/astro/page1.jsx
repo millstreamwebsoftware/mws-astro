@@ -1,8 +1,9 @@
 // import { CloudCannonConnect } from '@cloudcannon/react-connector'
 const components = {};
-const componentImports = import.meta.glob("../../components/**/*.jsx", {
+const componentImports = import.meta.glob(["../../components/**/*.jsx","../../components/**/*.astro"], {
   eager: true,
 });
+
 Object.entries(componentImports).forEach(([path, obj]) => {
   const parts = path.replace("../../components/", "").split(".")[0].split("/");
   if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
