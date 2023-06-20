@@ -27,7 +27,6 @@ Object.entries(componentImports).forEach(([path, obj]) => {
   {
     contentBlocks.map((block, i) => {
       const Component = components[block._bookshop_name];
-      console.log(block);
       return <Component {...block} key={i} />;
     })
   }
