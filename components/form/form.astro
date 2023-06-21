@@ -1,0 +1,38 @@
+---
+export interface Props {
+  action: string;
+  name: string;
+  form_blocks: any[];
+}
+
+const { action, name, form_blocks } = Astro.props;
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+  ["./inputs/**/*.jsx", "./inputs/**/*.astro"],
+  {
+    eager: true,
+  }
+);
+
+Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
+  const parts = path.replace("./inputs/", "").split(".")[0].split("/");
+  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
+    parts.pop();
+  }
+  const bookshopName = parts.join("/");
+  components[bookshopName] = obj.default;
+});
+---
+
+<section class="form">
+  <form method="post" action={action}>
+    {
+      form_blocks.map((block: any, i: any) => {
+        const Component = components[block._bookshop_name];
+        return <Component {...block} />;
+      })
+    }
+    <input type="submit" value="Submit" />
+  </form>
+</section>

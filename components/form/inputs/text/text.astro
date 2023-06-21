@@ -1,0 +1,23 @@
+---
+export interface Props {
+  name: string;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  minlength: number;
+  maxlength: number;
+}
+
+const { name, label, placeholder, required, minlength, maxlength } =
+  Astro.props;
+---
+
+<label for={name}>{label}</label>
+<input
+  type="text"
+  name={name}
+  {required}
+  placeholder={placeholder}
+  minlength={minlength}
+  maxlength={maxlength}
+/>
