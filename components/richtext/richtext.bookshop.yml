@@ -13,6 +13,7 @@ blueprint:
 
 _inputs:
   content:
+    type: markdown
     options:
       blockquote: true
       bold: true

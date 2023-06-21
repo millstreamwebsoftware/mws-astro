@@ -1,4 +1,7 @@
 ---
+import MarkdownIt from "markdown-it";
+const md = new MarkdownIt({ html: true });
+
 export interface Props {
   images: any[];
   height: number;
@@ -14,7 +17,7 @@ const { images, height } = Astro.props;
         <img src={img.image} />
         <figcaption>
           <h3>{img.title}</h3>
-          <p>{img.description}</p>
+          <div set:html={md.render(img.description)} />
         </figcaption>
       </figure>
     ))
