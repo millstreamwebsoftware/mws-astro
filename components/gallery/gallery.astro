@@ -15,7 +15,7 @@ const { images, height } = Astro.props;
     images.map((img) => (
       <figure class="gallery-item">
         <img src={img.image} />
-        {img.title && img.description && (
+        {(img.title || img.description) && (
           <figcaption>
             {img.title && <h3>{img.title}</h3>}
             {img.description && <div set:html={md.render(img.description)} />}
