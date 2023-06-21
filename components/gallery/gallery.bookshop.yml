@@ -10,6 +10,7 @@ spec:
 # Defines the structure of this component, as well as the default values
 blueprint:
   height:
+  columns: 0
   images:
     - image:
       title:
@@ -19,6 +20,11 @@ blueprint:
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
+  columns:
+    type: number
+    options:
+      step: 1
+      min: 0
   height:
     type: range
     options:

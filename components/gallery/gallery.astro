@@ -5,9 +5,15 @@ const md = new MarkdownIt({ html: true });
 export interface Props {
   images: any[];
   height: number;
+  columns: number;
 }
 
-const { images, height } = Astro.props;
+const { images, height, columns } = Astro.props;
+var newColumns;
+
+if (!columns) {
+  newColumns = images.length;
+}
 ---
 
 <section class="gallery">
@@ -29,7 +35,7 @@ const { images, height } = Astro.props;
 <style lang="scss">
   .gallery {
     display: grid;
-    grid-template-columns: repeat(var(--columns), 1fr);
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     grid-auto-flow: column;
     gap: var(--columnGap);
@@ -68,8 +74,9 @@ const { images, height } = Astro.props;
   }
 </style>
 
-<style define:vars={{ height }}>
+<style define:vars={{ height, columns: newColumns }}>
   section.gallery {
     /* height: calc(var(--height) * 1vh); */
+    grid-template-columns: repeat(var(--columns), 1fr);
   }
 </style>
