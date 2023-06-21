@@ -38,7 +38,19 @@ content_blocks:
       - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
         title: Title
         description: Description
+      - image: /images/gallery/tohc-experiment-oct-2022.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-raspberry-coconut-oct-2022.jpeg
+        title:
+        description:
       - image: /images/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-dolngait-slice-oct-2022.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-lemon-tart-experiments-oct-2022.jpeg
         title:
         description:
   - _bookshop_name: richtext
