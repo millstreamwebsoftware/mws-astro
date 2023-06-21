@@ -8,12 +8,8 @@ export interface Props {
   columns: number;
 }
 
-const { images, height, columns } = Astro.props;
-var newColumns;
-
-if (!columns) {
-  newColumns = images.length;
-}
+const { images, height } = Astro.props;
+const columns = Astro.props.columns || images.length;
 ---
 
 <section class="gallery">
@@ -35,26 +31,27 @@ if (!columns) {
 <style lang="scss">
   .gallery {
     display: grid;
-    grid-template-columns: 1fr;
+    // grid-template-columns: 1fr;
     grid-template-rows: 1fr;
-    grid-auto-flow: column;
-    gap: var(--columnGap);
-    padding: var(--columnGap);
+    // grid-auto-rows: 1fr;
+    grid-auto-flow: row;
+    // gap: var(--columnGap);
+    // padding: var(--columnGap);
     // height: 100%;
   }
 
   .gallery-item {
-    aspect-ratio: 1;
-    line-height: 0;
+    // aspect-ratio: 1;
+    // line-height: 0;
     position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    // width: 100%;
+    // height: 100%;
+    // overflow: hidden;
 
     img {
-      aspect-ratio: 1;
+      // aspect-ratio: 1;
       width: 100%;
-      max-width: 100%;
+      height: 100%;
       object-fit: cover;
       object-position: center;
     }
@@ -74,7 +71,7 @@ if (!columns) {
   }
 </style>
 
-<style define:vars={{ height, columns: newColumns }}>
+<style define:vars={{ height, columns }}>
   section.gallery {
     /* height: calc(var(--height) * 1vh); */
     grid-template-columns: repeat(var(--columns), 1fr);
