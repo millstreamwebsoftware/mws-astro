@@ -5,7 +5,7 @@ content_blocks:
   - _bookshop_name: astrotest
     text: test!
   - _bookshop_name: richtext
-    markdown: >-
+    content: >-
       <p class="align-center"><img alt="Now Open" width="305" height="79"
       src="/images/now-open.svg" /></p>
 
@@ -41,14 +41,14 @@ content_blocks:
         title: Title
         description: Description
   - _bookshop_name: richtext
-    markdown: |-
+    content: |-
       <h1 class="align-center">Our Story</h1>
 
       ---
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
-        markdown: >-
+        content: >-
           The idea of a cafe on the banks of our beautiful Swan River was first
           hatched on a cold and wet morning more than 20 years ago after having
           had a great row with some good mates, and thinking the only thing that
@@ -58,7 +58,7 @@ content_blocks:
           everyone would be welcome and where we could share this beautiful
           location has never left us.
       - _bookshop_name: richtext
-        markdown: >-
+        content: >-
           We have worked incredibly hard and had wonderful support from everyone
           to finally create this wonderful space that we hope you love as much
           as we do. Our goal is to create a space where everyone feels welcome

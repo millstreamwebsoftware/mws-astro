@@ -6,7 +6,7 @@ export default function Sample(block) {
     <section className="richtext">
       <div className="richtext-content"
         dangerouslySetInnerHTML={{
-          __html: md.render(block.markdown),
+          __html: md.render(block.content),
         }}
       />
     </section>

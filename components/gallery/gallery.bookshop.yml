@@ -12,8 +12,8 @@ blueprint:
   height:
   images:
     - image:
-      title: Title
-      description: Description
+      title:
+      description:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
@@ -27,5 +27,7 @@ _inputs:
       min: 0
   images:
     icon: image
+  title:
+    type: text
   description:
     type: markdown

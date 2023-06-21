@@ -1,0 +1,12 @@
+---
+import MarkdownIt from "markdown-it";
+const md = new MarkdownIt({ html: true });
+
+export interface Props {
+  content: string;
+}
+
+const htmlContent = md.render(Astro.props.content);
+---
+
+<section set:html={htmlContent} />
