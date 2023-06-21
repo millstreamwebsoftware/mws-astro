@@ -38,8 +38,8 @@ content_blocks:
         title: Title
         description: Description
       - image: /images/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
-        title: Title
-        description: Description
+        title:
+        description:
   - _bookshop_name: richtext
     content: |-
       <h1 class="align-center">Our Story</h1>

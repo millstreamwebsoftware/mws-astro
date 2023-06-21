@@ -15,10 +15,12 @@ const { images, height } = Astro.props;
     images.map((img) => (
       <figure class="gallery-item">
         <img src={img.image} />
-        <figcaption>
-          <h3>{img.title}</h3>
-          <div set:html={md.render(img.description)} />
-        </figcaption>
+        {img.title && img.description && (
+          <figcaption>
+            {img.title && <h3>{img.title}</h3>}
+            {img.description && <div set:html={md.render(img.description)} />}
+          </figcaption>
+        )}
       </figure>
     ))
   }
@@ -44,15 +46,30 @@ const { images, height } = Astro.props;
     overflow: hidden;
 
     img {
+      aspect-ratio: 1;
+      width: 100%;
       max-width: 100%;
       object-fit: cover;
       object-position: center;
+    }
+
+    figcaption {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      // inset: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      background: linear-gradient(to right, #ffffffdd, #ffffff99);
     }
   }
 </style>
 
 <style define:vars={{ height }}>
   section.gallery {
-    height: calc(var(--height) * 1vh);
+    /* height: calc(var(--height) * 1vh); */
   }
 </style>
