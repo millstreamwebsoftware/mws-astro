@@ -11,6 +11,7 @@ spec:
 blueprint:
   height:
   columns: 0
+  indent: true
   images:
     - image:
       title:
@@ -20,18 +21,20 @@ blueprint:
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
-  columns:
-    type: number
-    comment: Set the number of columns. 0 puts all images in one row.
-    options:
-      step: 1
-      min: 0
   height:
     type: range
     options:
       step: 1
       max: 100
       min: 0
+  columns:
+    type: number
+    comment: Set the number of columns. 0 puts all images in one row.
+    options:
+      step: 1
+      min: 0
+  indent:
+    type: switch
   images:
     icon: image
   title:

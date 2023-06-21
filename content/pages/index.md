@@ -34,6 +34,7 @@ content_blocks:
   - _bookshop_name: gallery
     height: 40
     columns: 3
+    indent: false
     images:
       - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
         title: Title

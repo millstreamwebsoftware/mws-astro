@@ -6,13 +6,14 @@ export interface Props {
   images: any[];
   height: number;
   columns: number;
+  indent: boolean;
 }
 
-const { images, height } = Astro.props;
+const { images, height, indent } = Astro.props;
 const columns = Astro.props.columns || images.length;
 ---
 
-<section class="gallery">
+<section class={`gallery ${indent ? "" : "no-indent"}`}>
   {
     images.map((img) => (
       <figure class="gallery-item">
