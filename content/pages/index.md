@@ -33,6 +33,7 @@ content_blocks:
       Artisan, and a handpicked selection of freshly made cakes and slices.</p>
   - _bookshop_name: gallery
     height: 40
+    columns: 0
     images:
       - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
         title: Title

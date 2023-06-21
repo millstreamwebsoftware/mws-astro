@@ -22,6 +22,7 @@ preview:
 _inputs:
   columns:
     type: number
+    comment: Set the number of columns. 0 puts all images in one row.
     options:
       step: 1
       min: 0
