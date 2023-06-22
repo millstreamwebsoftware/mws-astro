@@ -4,6 +4,17 @@ title: Home
 content_blocks:
   - _bookshop_name: astrotest
     text: test!
+  - _bookshop_name: form
+    name: contact-us
+    action: /
+    form_blocks:
+      - _bookshop_name: text
+        name: name
+        label: Name
+        placeholder: Your Name
+        required: true
+        minlength: 2
+        maxlength: 32
   - _bookshop_name: richtext
     content: >-
       <p class="align-center"><img alt="Now Open" width="305" height="79"
