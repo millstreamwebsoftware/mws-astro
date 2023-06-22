@@ -1,0 +1,49 @@
+---
+export interface Props {
+  legend: string;
+  form_blocks: any[];
+}
+
+const { legend, form_blocks } = Astro.props;
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+  [
+    "/src/components/form/inputs/**/*.jsx",
+    "/src/components/form/inputs/**/*.astro",
+  ],
+  {
+    eager: true,
+  }
+);
+
+Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
+  const parts = path
+    .replace(/^.*components\//, "")
+    .split(".")[0]
+    .split("/");
+  console.log(path);
+  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
+    parts.pop();
+  }
+  const bookshopName = parts.join("/");
+  components[bookshopName] = obj.default;
+});
+---
+
+<fieldset>
+  <legend>{legend}</legend>
+  {
+    form_blocks.map((block: any, i: any) => {
+      const Component = components[block._bookshop_name];
+      if (Component) {
+        return <Component {...block} />;
+      }
+      return (
+        <div class="missing-component">
+          {`Component ${block._bookshop_name} could not be found!`}
+        </div>
+      );
+    })
+  }
+</fieldset>
