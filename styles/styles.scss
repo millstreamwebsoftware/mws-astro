@@ -209,3 +209,15 @@ hr {
 strong {
   font-family: var(--bold-font-family);
 }
+
+.missing-component {
+  display: none;
+}
+
+.cms-editor-active .missing-component {
+  display: block;
+  background-color: #faa;
+  padding: 2rem;
+  border: 2px solid red;
+  margin: 1rem;
+}
