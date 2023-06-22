@@ -8,6 +8,18 @@ content_blocks:
     name: contact-us
     action: /
     form_blocks:
+      - _bookshop_name: form/info
+        content: This is a test of the form info block; Default style
+        style: Default
+      - _bookshop_name: form/info
+        content: This is a test of the form info block; Info style
+        style: Info
+      - _bookshop_name: form/info
+        content: This is a test of the form info block; Warning style
+        style: Warning
+      - _bookshop_name: form/info
+        content: This is a test of the form info block; Details style
+        style: Details
       - _bookshop_name: form/inputs/text
         name: name
         label: Name

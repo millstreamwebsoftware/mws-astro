@@ -1,0 +1,39 @@
+---
+import MarkdownIt from "markdown-it";
+const md = new MarkdownIt({ html: true });
+
+export interface Props {
+  content: string;
+  style: string;
+  key?: string;
+}
+
+const htmlContent = md.render(Astro.props.content);
+const style = "form-info-" + Astro.props.style.toLowerCase();
+---
+
+<section set:html={htmlContent} class={style} />
+
+<style lang="scss">
+  section {
+    margin-bottom: 2rem;
+  }
+
+  .form-info-info,
+  .form-info-warning,
+  .form-info-details {
+    padding: 1rem;
+    padding-left: 5rem;
+  }
+
+  .form-info-info {
+    background-color: lightblue;
+  }
+  .form-info-warning {
+    background-color: lightyellow;
+  }
+  .form-info-details {
+    background-color: lightgray;
+    font-style: italic;
+  }
+</style>
