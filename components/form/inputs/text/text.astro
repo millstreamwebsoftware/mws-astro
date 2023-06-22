@@ -6,17 +6,20 @@ export interface Props {
   required: boolean;
   minlength: number;
   maxlength: number;
+  key?: string;
 }
 
-const { name, label, placeholder, required } = Astro.props;
+const { name, label, placeholder, required, key } = Astro.props;
 const minlength = Astro.props.minlength ? Astro.props.minlength : undefined;
 const maxlength = Astro.props.maxlength ? Astro.props.maxlength : undefined;
+const id = (name || "") + "-" + (key || "");
 ---
 
-<label for={name}>{label}</label>
+<label for={id}>{label}</label>
 <input
   type="text"
   name={name}
+  {id}
   {required}
   placeholder={placeholder}
   minlength={minlength}

@@ -31,7 +31,7 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
     contentBlocks.map((block: any, i: number) => {
       const Component = components[block._bookshop_name];
       if (Component) {
-        return <Component {...block} />;
+        return <Component {...block} key={String(i)} />;
       }
       return (
         <div class="missing-component">

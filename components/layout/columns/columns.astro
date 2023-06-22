@@ -1,8 +1,10 @@
 ---
 export interface Props {
   content_blocks: any[];
+  key?: string;
 }
 
+const { key } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
@@ -31,7 +33,7 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
     contentBlocks.map((block: any, i: any) => {
       const Component = components[block._bookshop_name];
       if (Component) {
-        return <Component {...block} />;
+        return <Component {...block} key={String(i) + (key || "")} />;
       }
       return (
         <div class="missing-component">

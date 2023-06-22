@@ -3,16 +3,15 @@ export interface Props {
   action: string;
   name: string;
   form_blocks: any[];
+  key?: string;
 }
 
-const { action, name, form_blocks } = Astro.props;
+const { action, name, form_blocks, key } = Astro.props;
+const id = (name || "") + "-" + (key || "");
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  [
-    "/src/components/form/inputs/**/*.jsx",
-    "/src/components/form/inputs/**/*.astro",
-  ],
+  ["/src/components/form/**/*.jsx", "/src/components/form/**/*.astro"],
   {
     eager: true,
   }
@@ -23,7 +22,6 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
     .replace(/^.*components\//, "")
     .split(".")[0]
     .split("/");
-  console.log(path);
   if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
     parts.pop();
   }
@@ -33,12 +31,12 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
 ---
 
 <section class="form">
-  <form method="post" action={action}>
+  <form method="post" {action} {name} {id}>
     {
-      form_blocks.map((block: any, i: any) => {
+      form_blocks.map((block: any, i: number) => {
         const Component = components[block._bookshop_name];
         if (Component) {
-          return <Component {...block} />;
+          return <Component {...block} key={String(i) + (key || "")} />;
         }
         return (
           <div class="missing-component">

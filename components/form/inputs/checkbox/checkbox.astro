@@ -4,11 +4,21 @@ export interface Props {
   label: string;
   checked: boolean;
   required: boolean;
+  key?: string;
 }
 
-const { name, label, required } = Astro.props;
+const { name, label, required, key } = Astro.props;
 const checked = Astro.props.checked ? true : undefined;
+const id = (name || "") + "-" + (key || "");
 ---
 
-<label for={name}>{label}</label>
-<input type="checkbox" name={name} {required} {checked} />
+<div class="checkbox">
+  <input type="checkbox" {name} {id} {required} {checked} />
+  <label for={id}>{label}</label>
+</div>
+<style lang="scss">
+  div {
+    display: flex;
+    gap: 1.5rem;
+  }
+</style>
