@@ -1,4 +1,5 @@
 ---
+const selfName = "form/fieldset";
 export interface Props {
   legend: string;
   form_blocks: any[];
@@ -35,6 +36,9 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   <legend>{legend}</legend>
   {
     form_blocks.map((block: any, i: any) => {
+      if (block._bookshop_name == selfName) {
+        return <Astro.self {...block} key={String(i) + (key || "")} />;
+      }
       const Component = components[block._bookshop_name];
       if (Component) {
         return <Component {...block} key={String(i) + (key || "")} />;
