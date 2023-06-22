@@ -7,14 +7,17 @@ const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["../../**/*.jsx", "../../**/*.astro"],
+  ["/src/components/**/*.jsx", "/src/components/**/*.astro"],
   {
     eager: true,
   }
 );
 
 Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
-  const parts = path.replace("../../", "").split(".")[0].split("/");
+  const parts = path
+    .replace(/^.*components\//, "")
+    .split(".")[0]
+    .split("/");
   if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
     parts.pop();
   }
@@ -25,11 +28,14 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
 
 <section class="columns" style={{ "--column-count": contentBlocks.length }}>
   {
-    contentBlocks.map((column: any, i: any) => {
-      const Component = components[column._bookshop_name];
+    contentBlocks.map((block: any, i: any) => {
+      const Component = components[block._bookshop_name];
+      if (Component) {
+        return <Component {...block} />;
+      }
       return (
-        <div class={`column${i}`}>
-          <Component {...column} key={i} />
+        <div class="missing-component">
+          {`Component ${block._bookshop_name} could not be found!`}
         </div>
       );
     })

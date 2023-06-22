@@ -9,20 +9,29 @@ const { action, name, form_blocks } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["./inputs/**/*.jsx", "./inputs/**/*.astro"],
+  [
+    "/src/components/form/inputs/**/*.jsx",
+    "/src/components/form/inputs/**/*.astro",
+  ],
   {
     eager: true,
   }
 );
 
 Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
-  const parts = path.replace("./inputs/", "").split(".")[0].split("/");
+  const parts = path
+    .replace(/^.*components\//, "")
+    .split(".")[0]
+    .split("/");
+  console.log(path);
   if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
     parts.pop();
   }
   const bookshopName = parts.join("/");
   components[bookshopName] = obj.default;
 });
+console.log(componentImports);
+console.log(components);
 ---
 
 <section class="form">
@@ -30,7 +39,14 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
     {
       form_blocks.map((block: any, i: any) => {
         const Component = components[block._bookshop_name];
-        return <Component {...block} />;
+        if (Component) {
+          return <Component {...block} />;
+        }
+        return (
+          <div class="missing-component">
+            {`Component ${block._bookshop_name} could not be found!`}
+          </div>
+        );
       })
     }
     <input type="submit" value="Submit" />

@@ -8,7 +8,7 @@ content_blocks:
     name: contact-us
     action: /
     form_blocks:
-      - _bookshop_name: text
+      - _bookshop_name: form/inputs/text
         name: name
         label: Name
         placeholder: Your Name
