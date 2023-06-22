@@ -2,9 +2,9 @@
 spec:
   structures:
     - form_blocks
-  label: Text Input
-  description: Short Text Field
-  icon: notes
+  label: Text Area
+  description: Long Text Field
+  icon: subject
   tags: ["form", "input"]
 
 # Defines the structure of this component, as well as the default values

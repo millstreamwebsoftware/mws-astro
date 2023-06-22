@@ -1,0 +1,27 @@
+---
+export interface Props {
+  name: string;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  minlength: number;
+  maxlength: number;
+}
+
+const { name, label, placeholder, required, minlength, maxlength } =
+  Astro.props;
+---
+
+<label for={name}>{label}</label>
+<textarea
+  name={name}
+  {required}
+  placeholder={placeholder}
+  minlength={minlength}
+  maxlength={maxlength}></textarea>
+
+<style lang="scss">
+  input {
+    margin-bottom: 1rem;
+  }
+</style>
