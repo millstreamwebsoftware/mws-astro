@@ -15,13 +15,18 @@ content_blocks:
         required: true
         minlength: 2
         maxlength: 32
-      - _bookshop_name: form/inputs/text
+      - _bookshop_name: form/inputs/email
         name: email
         label: Email
         placeholder: your@email.here
+        required:
+      - _bookshop_name: form/inputs/textarea
+        name: description
+        label: Details
+        placeholder: Get in contact!
         required: true
-        minlength: 7
-        maxlength: 32
+        minlength: 0
+        maxlength: 0
   - _bookshop_name: richtext
     content: >-
       <p class="align-center"><img alt="Now Open" width="305" height="79"
