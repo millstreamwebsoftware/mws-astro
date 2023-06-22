@@ -30,8 +30,6 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   const bookshopName = parts.join("/");
   components[bookshopName] = obj.default;
 });
-console.log(componentImports);
-console.log(components);
 ---
 
 <section class="form">

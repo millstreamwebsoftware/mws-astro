@@ -35,14 +35,14 @@ _inputs:
   minlength:
     type: number
     label: Minimum Length
-    comment: Minimum number of characters in submitted text
+    comment: Minimum number of characters in submitted text. Set to 0 to disable.
     options:
       step: 1
       min: 0
   maxlength:
     type: number
     label: Maximum Length
-    comment: Maximum number of characters in submitted text
+    comment: Maximum number of characters in submitted text. Set to 0 to disable.
     options:
       step: 1
       min: 0
