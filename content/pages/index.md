@@ -27,6 +27,19 @@ content_blocks:
         required: true
         minlength: 0
         maxlength: 0
+      - _bookshop_name: form/fieldset
+        legend: Checkboxes!
+        form_blocks:
+          - _bookshop_name: form/inputs/checkbox
+            name: terms-and-conditions
+            label: Do you agree with our terms and conditions?
+            checked:
+            required: true
+          - _bookshop_name: form/inputs/checkbox
+            name: newsletter
+            label: Would you like to recieve our newsletter?
+            checked: true
+            required:
   - _bookshop_name: richtext
     content: >-
       <p class="align-center"><img alt="Now Open" width="305" height="79"
