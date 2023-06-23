@@ -1,6 +1,7 @@
 ---
 import MarkdownIt from "markdown-it";
-import { Icon } from "astro-icon";
+import IconInformation from "~icons/carbon/information-filled";
+import IconWarning from "~icons/carbon/warning-square-filled";
 const md = new MarkdownIt({ html: true });
 
 export interface Props {
@@ -14,16 +15,16 @@ const htmlContent = md.render(Astro.props.content);
 const style = Astro.props.style
   ? "form-info-" + Astro.props.style.toLowerCase()
   : undefined;
-const icon = style
+const Icon = style
   ? {
-      "form-info-info": "carbon:information-filled",
-      "form-info-warning": "carbon:warning-square-filled",
+      "form-info-info": IconInformation,
+      "form-info-warning": IconWarning,
     }[style]
   : undefined;
 ---
 
 <section class={style}>
-  {icon && <Icon name={icon} />}
+  {Icon && <Icon class="icon" />}
   <Fragment set:html={htmlContent} />
 </section>
 
@@ -46,13 +47,13 @@ const icon = style
 
   .form-info-info {
     background-color: #daeaef;
-    svg[astro-icon] {
+    svg.icon {
       color: #1c6077;
     }
   }
   .form-info-warning {
     background-color: #fafad2;
-    svg[astro-icon] {
+    svg.icon {
       color: #d2a72c;
     }
   }
@@ -62,10 +63,11 @@ const icon = style
     padding-left: 1.5rem;
   }
 
-  svg[astro-icon] {
+  svg.icon {
     position: absolute;
     width: 2.5rem;
     left: 1.2rem;
     margin-top: 0.2em;
+    height: auto;
   }
 </style>
