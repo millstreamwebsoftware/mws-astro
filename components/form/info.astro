@@ -1,21 +1,35 @@
 ---
 import MarkdownIt from "markdown-it";
+import { Icon } from "astro-icon";
 const md = new MarkdownIt({ html: true });
 
 export interface Props {
   content: string;
-  style: string;
+  style?: string;
   key?: string;
 }
 
 const htmlContent = md.render(Astro.props.content);
-const style = "form-info-" + Astro.props.style.toLowerCase();
+
+const style = Astro.props.style
+  ? "form-info-" + Astro.props.style.toLowerCase()
+  : undefined;
+const icon = style
+  ? {
+      "form-info-info": "carbon:information-filled",
+      "form-info-warning": "carbon:warning-square-filled",
+    }[style]
+  : undefined;
 ---
 
-<section set:html={htmlContent} class={style} />
+<section class={style}>
+  {icon && <Icon name={icon} />}
+  <Fragment set:html={htmlContent} />
+</section>
 
 <style lang="scss">
   section {
+    position: relative;
     margin-bottom: 2rem;
   }
 
@@ -23,17 +37,35 @@ const style = "form-info-" + Astro.props.style.toLowerCase();
   .form-info-warning,
   .form-info-details {
     padding: 1rem;
-    padding-left: 5rem;
+  }
+
+  .form-info-info,
+  .form-info-warning {
+    padding-left: 5.5rem;
   }
 
   .form-info-info {
-    background-color: lightblue;
+    background-color: #daeaef;
+    *[astro-icon] {
+      color: #1c6077;
+    }
   }
   .form-info-warning {
-    background-color: lightyellow;
+    background-color: #fafad2;
+    *[astro-icon] {
+      color: #d2a72c;
+    }
   }
   .form-info-details {
-    background-color: lightgray;
+    background-color: #efefef;
     font-style: italic;
+    padding-left: 1.5rem;
+  }
+
+  *[astro-icon] {
+    position: absolute;
+    width: 2.5rem;
+    left: 1.2rem;
+    margin-top: 0.2em;
   }
 </style>
