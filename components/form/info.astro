@@ -40,22 +40,22 @@ const style = Astro.props.style
   .form-info-warning,
   .form-info-details {
     padding: 1rem;
-  }
-
-  .form-info-info,
-  .form-info-warning {
-    padding-left: 5.5rem;
+    border-radius: 0.3rem;
+    padding-left: 1.5rem;
+    border-left: 0.5rem solid rgb(207, 207, 207);
   }
 
   .form-info-info {
     background-color: #daeaef;
+    border-color: #93cddf;
   }
   /* .form-info-info svg.icon {
     color: #1c6077;
   } */
 
   .form-info-warning {
-    background-color: #fafad2;
+    background-color: #faefd2;
+    border-color: #e9cd73;
   }
   /* .form-info-warning svg.icon {
     color: #d2a72c;
@@ -63,8 +63,6 @@ const style = Astro.props.style
 
   .form-info-details {
     background-color: #efefef;
-    font-style: italic;
-    padding-left: 1.5rem;
   }
 
   /* svg.icon {
