@@ -1,0 +1,18 @@
+---
+export interface Props {
+  name: string;
+  label: string;
+  required: boolean;
+  options: string[];
+  key?: string;
+}
+
+const { name, label, required, key, options } = Astro.props;
+const id = (name || "") + "-" + (key || "");
+---
+
+<label for={id}>{label}</label>
+<select {name} {id} {required}>
+  <option value="">-- Select --</option>
+  {options.map((opt, i) => <option value={opt}>{opt}</option>)}
+</select>
