@@ -6,7 +6,7 @@ content_blocks:
     text: test!
   - _bookshop_name: form
     name: contact-us
-    action: /
+    action: https://usebasin.com/f/88179f198898
     form_blocks:
       - _bookshop_name: form/info
         content: This is a test of the form info block; Default style
