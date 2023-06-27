@@ -52,6 +52,15 @@ content_blocks:
             label: Would you like to recieve our newsletter?
             checked: true
             required:
+      - _bookshop_name: form/inputs/select
+        name: dropdown
+        label: Dropdown Select
+        options:
+          - test
+          - options
+          - for
+          - dropdown
+        required: true
   - _bookshop_name: richtext
     content: >-
       <p class="align-center"><img alt="Now Open" width="305" height="79"
