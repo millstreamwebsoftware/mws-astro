@@ -14,5 +14,5 @@ const id = (name || "") + "-" + (key || "");
 <label for={id}>{label}</label>
 <select {name} {id} {required}>
   <option value="">-- Select --</option>
-  {options.map((opt, i) => <option value={opt}>{opt}</option>)}
+  {options && options.map((opt, i) => <option value={opt}>{opt}</option>)}
 </select>
