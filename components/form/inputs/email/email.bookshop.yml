@@ -3,7 +3,7 @@ spec:
   structures:
     - form_blocks
   label: Email Input
-  description: Email input field
+  description: Email Input Field
   icon: email
   tags: ["form", "input"]
 

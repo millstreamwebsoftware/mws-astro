@@ -2,8 +2,8 @@
 spec:
   structures:
     - form_blocks
-  label: Info text
-  description: Add extra information inside the form
+  label: Info
+  description: Instructions or Other Text
   icon: info
   tags: ["form"]
 

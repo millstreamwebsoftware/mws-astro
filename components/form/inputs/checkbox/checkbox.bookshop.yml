@@ -3,7 +3,7 @@ spec:
   structures:
     - form_blocks
   label: Checkbox
-  description: Yes or No toggle
+  description: Yes or No Toggle
   icon: check_box
   tags: ["form", "input"]
 
