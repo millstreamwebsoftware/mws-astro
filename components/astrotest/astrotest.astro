@@ -2,6 +2,15 @@
 export interface Props {
   text: string;
 }
+
+const liveEditor = import.meta.env.ENV_BOOKSHOP_LIVE ? true : false;
 ---
 
-<p>{Astro.props.text}</p>
+<div style="padding: 2rem;">
+  <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
+  <p>
+    Live editing status: <span style="font-weight: bold;">
+      {liveEditor ? "On" : "Off"}
+    </span>
+  </p>
+</div>
