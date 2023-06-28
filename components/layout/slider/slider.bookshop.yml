@@ -1,0 +1,7 @@
+spec:
+  structures:
+    - content_blocks
+  label: Slider
+  description: Rotating Carousel
+  icon: view_column
+  tags: []
