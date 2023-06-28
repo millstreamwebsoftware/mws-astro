@@ -10,7 +10,7 @@ export interface Props {
   <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
   <p>
     Live editing status: <span style="font-weight: bold;">
-      {import.meta.env.ENV_BOOKSHOP_LIVE ? "On" : "Off"}
+      {ENV_BOOKSHOP_LIVE ? "On" : "Off"}
     </span>
   </p>
 </div>
