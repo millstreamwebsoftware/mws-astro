@@ -14,16 +14,11 @@ export interface Props {
 // </div>
 ---
 
-{
-  ENV_BOOKSHOP_LIVE ? (
-    <>
-      <p>I am being edited live!</p>
-      <h1>Fallback Title</h1>
-    </>
-  ) : (
-    <>
-      <p>Standard build output</p>
-      <h1>{"Test " + " Test"}</h1>
-    </>
-  )
-}
+<p id="astro-test">Not in editor mode.</p>
+
+<script>
+  let astrotest = document.querySelector("#astro-test");
+  if (window.inEditorMode && astrotest) {
+    astrotest.innerHTML = "Editor mode";
+  }
+</script>
