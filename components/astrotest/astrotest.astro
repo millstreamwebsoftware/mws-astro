@@ -3,6 +3,7 @@ export interface Props {
   text: string;
 }
 
+const { text } = Astro.props;
 // const liveEditor = import.meta.env.ENV_BOOKSHOP_LIVE ? true : false;
 // <div style="padding: 2rem;">
 //   <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
@@ -14,11 +15,12 @@ export interface Props {
 // </div>
 ---
 
-<p id="astro-test">Not in editor mode.</p>
+<p id="astro-test">{text}</p>
 
 <script>
-  let astrotest = document.querySelector("#astro-test");
-  if (window.inEditorMode && astrotest) {
-    astrotest.innerHTML = "Editor mode";
+  if (window.inEditorMode) {
+    alert("Inside CloudCannon!");
+  } else {
+    alert("Not in CloudCannon.");
   }
 </script>
