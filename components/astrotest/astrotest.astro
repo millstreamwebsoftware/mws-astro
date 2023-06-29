@@ -16,7 +16,8 @@ const { text } = Astro.props;
 // </div>
 
 const envEditor = !(
-  typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE
+  // @ts-expect-error TS2304
+  (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
 );
 ---
 

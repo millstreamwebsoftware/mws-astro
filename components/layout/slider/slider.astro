@@ -3,7 +3,11 @@ export interface Props {
   time: number;
   key?: string;
 }
-const liveEditor = import.meta.env.ENV_BOOKSHOP_LIVE ? true : false;
+
+const envEditor = !(
+  // @ts-expect-error TS2304
+  (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
+);
 
 const { time, key } = Astro.props;
 const id = "glide" + "-" + (key || "");
@@ -18,7 +22,7 @@ const id = "glide" + "-" + (key || "");
 ---
 
 {
-  liveEditor ? (
+  envEditor ? (
     <h1>Live Editor!</h1>
   ) : (
     <section class="slider">
@@ -51,16 +55,18 @@ const id = "glide" + "-" + (key || "");
 <script>
   import Glide from "@glidejs/glide";
 
-  document.querySelectorAll("div[data-glide]").forEach((e, i) => {
-    if (!e) {
-      return;
-    }
+  if (!window.inEditorMode) {
+    document.querySelectorAll("div[data-glide]").forEach((e, i) => {
+      if (!e) {
+        return;
+      }
 
-    let id = e.getAttribute("id");
+      let id = e.getAttribute("id");
 
-    new Glide(`#${id}`, {
-      autoplay: 4000,
-      focusAt: "center",
-    }).mount();
-  });
+      new Glide(`#${id}`, {
+        autoplay: 4000,
+        focusAt: "center",
+      }).mount();
+    });
+  }
 </script>

@@ -4,6 +4,7 @@ title: Home
 content_blocks:
   - _bookshop_name: astrotest
     text: test!
+  - _bookshop_name: layout/slider
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898
