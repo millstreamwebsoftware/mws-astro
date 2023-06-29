@@ -4,6 +4,7 @@ export interface Props {
 }
 
 const { text } = Astro.props;
+
 // const liveEditor = import.meta.env.ENV_BOOKSHOP_LIVE ? true : false;
 // <div style="padding: 2rem;">
 //   <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
@@ -15,12 +16,45 @@ const { text } = Astro.props;
 // </div>
 ---
 
-<p id="astro-test">{text}</p>
+<div>
+  <p>Live Editing Status: <span id="astro-test">Unknown</span></p>
+  <p>Test data: <span>{text}</span></p>
+</div>
 
-<script>
-  if (window.inEditorMode) {
-    alert("Inside CloudCannon!");
-  } else {
-    alert("Not in CloudCannon.");
+<script is:inline>
+  let astrotest = document.querySelector("#astro-test");
+  if (window.inEditorMode && astrotest) {
+    astrotest.innerHTML = "On";
+  } else if (astrotest) {
+    astrotest.innerHTML = "Off";
   }
 </script>
+
+<style>
+  #astro-test {
+    background-color: lightcoral;
+    border: 1px solid grey;
+    border-radius: 100%;
+    padding: 0.5rem;
+  }
+
+  .cms-editor-active #astro-test {
+    background-color: greenyellow;
+  }
+
+  div {
+    position: absolute;
+    z-index: 10000;
+    margin: 2rem;
+    padding: 1rem;
+    border: 1px solid #f0f0f0;
+    background-color: white;
+    top: 0;
+    right: 0;
+    box-shadow: 0.5rem 0.5rem 2rem #00000011;
+  }
+
+  span {
+    font-weight: bold;
+  }
+</style>
