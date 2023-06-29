@@ -15,29 +15,21 @@ const { text } = Astro.props;
 //   </p>
 // </div>
 
-const bookType = typeof ENV_BOOKSHOP_LIVE;
+const envEditor = !(
+  typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE
+);
 ---
 
 <div>
-  <p>Live Editing Status: <span id="astro-test">Unknown</span></p>
+  <p>Live Editing Status: <span id="astro-test">{String(envEditor)}</span></p>
   <p>Test data: <span>{text}</span></p>
-  <p>Bookshop env type: <span>{bookType}</span></p>
 </div>
-
-<script is:inline>
-  let astrotest = document.querySelector("#astro-test");
-  if (window.inEditorMode && astrotest) {
-    astrotest.innerHTML = "On";
-  } else if (astrotest) {
-    astrotest.innerHTML = "Off";
-  }
-</script>
 
 <style>
   #astro-test {
     background-color: lightcoral;
     border: 1px solid grey;
-    border-radius: 100%;
+    border-radius: 0.5rem;
     padding: 0.5rem;
   }
 
