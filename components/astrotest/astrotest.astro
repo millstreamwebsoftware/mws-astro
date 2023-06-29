@@ -15,12 +15,13 @@ const { text } = Astro.props;
 //   </p>
 // </div>
 
-console.log(ENV_BOOKSHOP_LIVE);
+const bookType = typeof ENV_BOOKSHOP_LIVE;
 ---
 
 <div>
   <p>Live Editing Status: <span id="astro-test">Unknown</span></p>
   <p>Test data: <span>{text}</span></p>
+  <p>Bookshop env type: <span>{bookType}</span></p>
 </div>
 
 <script is:inline>
