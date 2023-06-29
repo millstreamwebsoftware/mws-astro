@@ -38,10 +38,6 @@ const { text } = Astro.props;
     padding: 0.5rem;
   }
 
-  .cms-editor-active #astro-test {
-    background-color: greenyellow;
-  }
-
   div {
     position: absolute;
     z-index: 10000;
@@ -56,5 +52,10 @@ const { text } = Astro.props;
 
   span {
     font-weight: bold;
+  }
+</style>
+<style is:global>
+  .cms-editor-active #astro-test {
+    background-color: greenyellow;
   }
 </style>
