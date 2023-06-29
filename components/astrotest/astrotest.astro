@@ -4,13 +4,26 @@ export interface Props {
 }
 
 // const liveEditor = import.meta.env.ENV_BOOKSHOP_LIVE ? true : false;
+// <div style="padding: 2rem;">
+//   <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
+//   <p>
+//     Live editing status: <span style="font-weight: bold;">
+//       {import.meta.env.ENV_BOOKSHOP_LIVE ? "On" : "Off"}
+//     </span>
+//   </p>
+// </div>
 ---
 
-<div style="padding: 2rem;">
-  <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
-  <p>
-    Live editing status: <span style="font-weight: bold;">
-      {ENV_BOOKSHOP_LIVE ? "On" : "Off"}
-    </span>
-  </p>
-</div>
+{
+  ENV_BOOKSHOP_LIVE ? (
+    <>
+      <p>I am being edited live!</p>
+      <h1>Fallback Title</h1>
+    </>
+  ) : (
+    <>
+      <p>Standard build output</p>
+      <h1>{"Test " + " Test"}</h1>
+    </>
+  )
+}
