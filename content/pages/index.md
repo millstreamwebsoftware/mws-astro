@@ -5,6 +5,16 @@ content_blocks:
   - _bookshop_name: astrotest
     text: test!
   - _bookshop_name: layout/slider
+    slides:
+      - content: Test Content
+        background_colour: "#ffcece"
+        background_image:
+      - content: More test content!
+        background_colour: "#d1ffc8"
+        background_image:
+      - content: Third test
+        background_colour: "#afedff"
+        background_image:
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898
@@ -137,15 +147,4 @@ content_blocks:
           and we provide a sense of community for everyone. Of course we love
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
-  - _bookshop_name: layout/slider
-    slides:
-      - content: Test Content
-        background_colour: '#ffcece'
-        background_image:
-      - content: More test content!
-        background_colour: '#d1ffc8'
-        background_image:
-      - content: Third test
-        background_colour: '#afedff'
-        background_image:
 ---
