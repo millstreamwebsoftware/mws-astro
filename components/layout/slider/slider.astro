@@ -1,6 +1,9 @@
 ---
+import MarkdownIt from "markdown-it";
+const md = new MarkdownIt({ html: true });
+
 export interface Props {
-  time: number;
+  slides: any[];
   key?: string;
 }
 
@@ -9,8 +12,11 @@ const envEditor = !(
   (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
 );
 
-const { time, key } = Astro.props;
+const { key } = Astro.props;
 const id = "glide" + "-" + (key || "");
+const slides = Astro.props.slides || [];
+
+// const htmlContent = content ? md.render(content) : "";
 
 // const autoplay = true;
 
@@ -19,19 +25,53 @@ const id = "glide" + "-" + (key || "");
 //           return slide;
 //         })
 //       }
+
+// const slides = [];
+// slides[0] = { text: 0 };
+// slides[1] = { text: 1 };
+// slides[2] = { text: 2 };
+// slides[3] = { text: 3 };
+
+//           <label for={id + "_" + i}>{i}</label>
 ---
 
 {
   envEditor ? (
-    <h1>Live Editor!</h1>
+    <section class="slider">
+      {slides.map((slide, i) => (
+        <Fragment>
+          <input
+            type="radio"
+            id={id + "_" + i}
+            name={id}
+            checked={i == 0 ? "checked" : undefined}
+          />
+        </Fragment>
+      ))}
+
+      <div class="glide" data-glide={id} {id}>
+        <div class="glide__track" data-glide-el="track">
+          <ul class="glide__slides">
+            {slides.map((slide, i) => (
+              <>
+                <li
+                  class="glide__slide"
+                  set:html={slide.content ? md.render(slide.content) : ""}
+                />
+              </>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   ) : (
     <section class="slider">
       <div class="glide" data-glide={id} {id}>
         <div class="glide__track" data-glide-el="track">
           <ul class="glide__slides">
-            <li class="glide__slide">0</li>
-            <li class="glide__slide">1</li>
-            <li class="glide__slide">2</li>
+            {slides.map((slide, i) => (
+              <li class="glide__slide">{slide.text}</li>
+            ))}
           </ul>
         </div>
         <div class="glide__arrows" data-glide-el="controls">
@@ -43,19 +83,66 @@ const id = "glide" + "-" + (key || "");
           </button>
         </div>
         <div class="glide__bullets" data-glide-el="controls[nav]">
-          <button class="glide__bullet" data-glide-dir="=0" />
-          <button class="glide__bullet" data-glide-dir="=1" />
-          <button class="glide__bullet" data-glide-dir="=2" />
+          {slides.map((slide, i) => (
+            <button class="glide__bullet" data-glide-dir={`=${i}`} />
+          ))}
         </div>
       </div>
     </section>
   )
 }
 
+<style>
+  /* .glide__slides .glide__slide {
+    display: none;
+  }
+  input:checked + .glide__slide {
+    display: block;
+  }
+
+  label {
+    padding: 1rem;
+  }
+
+  label:target {
+    color: red;
+  } */
+</style>
+
+<style lang="scss">
+  @for $i from 1 to 10 {
+    input:nth-of-type(#{$i}):checked ~ .glide li:nth-of-type(#{$i}) {
+      display: block;
+      // background-color: red;
+    }
+  }
+
+  .glide__slide {
+    display: none;
+  }
+
+  input {
+    display: none;
+  }
+
+  label {
+    background-color: rgb(235, 255, 255);
+    padding: 1rem;
+
+    :hover {
+      background-color: rgb(175, 251, 251);
+    }
+  }
+
+  input:checked + label {
+    background-color: rgb(120, 250, 250);
+  }
+</style>
+
 <script>
   import Glide from "@glidejs/glide";
 
-  if (!window.inEditorMode) {
+  if (!window.hasOwnProperty("inEditorMode") || !(window as any).inEditorMode) {
     document.querySelectorAll("div[data-glide]").forEach((e, i) => {
       if (!e) {
         return;

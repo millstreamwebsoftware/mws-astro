@@ -5,3 +5,14 @@ spec:
   description: Rotating Carousel
   icon: view_column
   tags: []
+
+blueprint:
+  slides:
+    - content:
+      background_colour:
+      background_image:
+
+_inputs:
+  slides:
+    content:
+      type: markdown
