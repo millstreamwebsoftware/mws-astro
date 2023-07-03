@@ -13,6 +13,5 @@ blueprint:
       background_image:
 
 _inputs:
-  slides:
-    content:
-      type: markdown
+  content:
+    type: markdown
