@@ -9,9 +9,42 @@ spec:
 blueprint:
   slides:
     - content:
-      background_colour:
+      background_color:
       background_image:
+  height: 50
+  autoplay: 0
+  perView: 1
+  focusAtCenter: true
+  transition:
 
 _inputs:
   content:
     type: markdown
+  height:
+    type: number
+    comment: Slider height, in percentage of browser window height (vh).
+    options:
+      min: 0
+      max: 100
+  autoplay:
+    type: number
+    comment: Time between automatically switching slides in seconds. (0 to disable autoplay.)
+    options:
+      min: 0
+  perView:
+    type: number
+    comment: Number of slides visible at once.
+    options:
+      min: 1
+      step: 1
+  transition:
+    type: select
+    comment: >
+      Slider rewinds the slider to the start after last slide, 
+      Carousel continues in the same direction with the starting items added after the end. 
+      Fader does not slide and instead slowly fades between items.
+    options:
+      values:
+        - Slider
+        - Carousel
+        - Fade

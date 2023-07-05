@@ -7,13 +7,13 @@ content_blocks:
   - _bookshop_name: layout/slider
     slides:
       - content: Test Content
-        background_colour: "#ffcece"
-        background_image:
+        background_color: "#ffcece"
+        background_image: /images/hero/cafe-001.jpg
       - content: More test content!
-        background_colour: "#d1ffc8"
+        background_color:
         background_image:
       - content: Third test
-        background_colour: "#afedff"
+        background_color: "#afedff"
         background_image:
   - _bookshop_name: form
     name: contact-us
