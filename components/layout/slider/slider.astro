@@ -5,10 +5,12 @@ const md = new MarkdownIt({ html: true });
 export interface Props {
   slides: any[];
   height: number;
+  gap: number;
   autoplay: number;
   perView: number;
   focusAtCenter: boolean;
   focusAt: number;
+  bound: boolean;
   showBullets: boolean;
   showArrows: boolean;
   transition: string;
@@ -24,8 +26,17 @@ const envEditor =
     (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
   );
 
-const { key, showBullets, showArrows, transition, height, perView, indent } =
-  Astro.props;
+const {
+  key,
+  showBullets,
+  showArrows,
+  transition,
+  height,
+  perView,
+  indent,
+  bound,
+  gap,
+} = Astro.props;
 const id = "glide" + "-" + (key || "");
 // const glideId = envEditor ? undefined : id;
 const slides = Astro.props.slides || [];
@@ -88,9 +99,11 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
       {id}
       data-glide={id}
       data-slidertype={sliderType}
+      data-gap={gap}
       data-autoplay={autoplay}
       data-perview={perView}
       data-focus={focusAt}
+      data-bound={bound}
       data-transitionduration={transitionDuration}
     >
       <div
@@ -336,13 +349,15 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
     if (!e) return;
 
     if (!e.matches(".envEditor *")) {
-      let id = e.getAttribute("id");
-      let type: "slider" | "carousel" | undefined;
-      let perView: number | undefined =
+      const id = e.getAttribute("id");
+      const perView: number | undefined =
         Number(e.getAttribute("data-perview")) || undefined;
-      let focusAt: "center" | number | undefined;
-      let transitionDuration =
+      const transitionDuration =
         Number(e.getAttribute("data-transitionduration")) || undefined;
+      const gap = Number(e.getAttribute("data-gap")) || 0;
+      const bound = Boolean(e.getAttribute("data-bound")) || undefined;
+      let type: "slider" | "carousel" | undefined;
+      let focusAt: "center" | number | undefined;
 
       if (e.hasAttribute("data-slidertype")) {
         type =
@@ -359,7 +374,8 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
       new Glide(`#${id}`, {
         autoplay: Number(e.getAttribute("data-autoplay")) || false,
         focusAt,
-        gap: 0,
+        bound,
+        gap,
         type,
         perView,
         animationDuration: transitionDuration,

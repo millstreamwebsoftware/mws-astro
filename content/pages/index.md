@@ -10,12 +10,13 @@ content_blocks:
         background_color: "#ffcece"
         background_image: /images/hero/cafe-001.jpg
       - content: More test content!
-        background_color:
+        background_color: "#fef1f0"
         background_image:
       - content: Third test
         background_color: "#afedff"
         background_image:
     height: 50
+    gap: 0
     autoplay: 4
     perView: 2
     focusAtCenter: false
@@ -23,7 +24,7 @@ content_blocks:
     showBullets: true
     showArrows: true
     indent: false
-    transition: Slider
+    transition: Carousel
     transitionDuration: 0.2
   - _bookshop_name: form
     name: contact-us
