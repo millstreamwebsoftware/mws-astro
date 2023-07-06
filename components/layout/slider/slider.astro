@@ -36,40 +36,33 @@ const {
   indent,
   bound,
   gap,
+  autoplay,
+  transitionDuration,
+  focusAt,
+  focusAtCenter,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
-// const glideId = envEditor ? undefined : id;
 const slides = Astro.props.slides || [];
-const fader = transition.toLowerCase() == "fader";
-const sliderType = transition.toLowerCase();
-const autoplay = Astro.props.autoplay * 1000; // Seconds -> Milliseconds
-const transitionDuration = Astro.props.transitionDuration * 1000; // Seconds -> Milliseconds
-const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
 
-// const focusAtCenter = Astro.props.focusAtCenter && "center";
-// const htmlContent = content ? md.render(content) : "";
+const glideOptions = {
+  "data-glide": envEditor ? undefined : id,
+  "data-slidertype": transition.toLowerCase(),
+  "data-autoplay": autoplay * 1000, // Seconds -> Milliseconds
+  "data-transitionduration": transitionDuration * 1000, // Seconds -> Milliseconds
+  "data-gap": gap,
+  "data-perview": perView,
+  "data-focus": focusAtCenter ? "center" : focusAt,
+  "data-bound": bound,
+};
 
-// const autoplay = true;
-
-// {
-//         slides.map((slide, i) => {
-//           return slide;
-//         })
-//       }
-
-// const slides = [];
-// slides[0] = { text: 0 };
-// slides[1] = { text: 1 };
-// slides[2] = { text: 2 };
-// slides[3] = { text: 3 };
-
-//           <label for={id + "_" + i}>{i}</label>
+// const dataGlideOptions = Object.entries(glideOptions).map(([key, value]) => )
 ---
 
 <section
-  class:list={["slider", { envEditor, fader }]}
-  style={(transitionDuration ? `--transition: ${transitionDuration}ms;` : "") +
-    (indent ? "" : "--indent: 0;")}
+  class:list={["slider", { envEditor }]}
+  style={(glideOptions["data-transitionduration"]
+    ? `--transition: ${glideOptions["data-transitionduration"]}ms;`
+    : "") + (indent ? "" : "--indent: 0;")}
 >
   <>
     {
@@ -94,18 +87,7 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
       )
     }
 
-    <div
-      class="glide"
-      {id}
-      data-glide={id}
-      data-slidertype={sliderType}
-      data-gap={gap}
-      data-autoplay={autoplay}
-      data-perview={perView}
-      data-focus={focusAt}
-      data-bound={bound}
-      data-transitionduration={transitionDuration}
-    >
+    <div class="glide" {id} {...glideOptions}>
       <div
         class="glide__track"
         data-glide-el="track"
@@ -319,7 +301,7 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
     }
   }
 
-  .fader {
+  div[data-slidertype="fader"] {
     .glide__slides {
       transform: translate3d(0, 0, 0) !important;
     }
@@ -368,6 +350,7 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
           Number(e.getAttribute("data-transitionduration")) || undefined,
       };
 
+      // TODO: move out of browser code
       if (e.getAttribute("data-slidertype")?.toLowerCase() == "fader") {
         glideOptions.perView = 1;
         glideOptions.focusAt = 0;
