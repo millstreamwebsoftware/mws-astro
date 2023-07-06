@@ -4,7 +4,7 @@ spec:
     - form_blocks
   label: Select
   description: Drop-down choice menu
-  icon: outline-menu-open
+  icon: baseline-menu-open
   tags: ["form", "input"]
 
 # Defines the structure of this component, as well as the default values
