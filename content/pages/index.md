@@ -5,15 +5,6 @@ content_blocks:
   - _bookshop_name: astrotest
     text: test!
   - _bookshop_name: layout/slider
-    autoplay: 4
-    showBullets: true
-    showArrows: true
-    transition: Slider
-    transitionDuration: 0.2
-    perView: 2
-    focusAtCenter: false
-    height: 50
-    indent: false
     slides:
       - content: Test Content
         background_color: "#ffcece"
@@ -24,6 +15,16 @@ content_blocks:
       - content: Third test
         background_color: "#afedff"
         background_image:
+    height: 50
+    autoplay: 4
+    perView: 2
+    focusAtCenter: false
+    focusAt: 0
+    showBullets: true
+    showArrows: true
+    indent: false
+    transition: Slider
+    transitionDuration: 0.2
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898

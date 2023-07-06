@@ -64,7 +64,7 @@ _inputs:
       values:
         - Slider
         - Carousel
-        - Fade
+        - Fader
   transitionDuration:
     type: number
     comment: Time spent animating between slides in seconds.
