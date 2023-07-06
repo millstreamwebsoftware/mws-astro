@@ -21,11 +21,12 @@ content_blocks:
     perView: 2
     focusAtCenter: false
     focusAt: 0
+    bound: false
     showBullets: true
     showArrows: true
     indent: false
-    transition: Carousel
-    transitionDuration: 0.2
+    transition: Fader
+    transitionDuration: 1
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898

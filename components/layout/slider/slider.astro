@@ -350,36 +350,32 @@ const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
 
     if (!e.matches(".envEditor *")) {
       const id = e.getAttribute("id");
-      const perView: number | undefined =
-        Number(e.getAttribute("data-perview")) || undefined;
-      const transitionDuration =
-        Number(e.getAttribute("data-transitionduration")) || undefined;
-      const gap = Number(e.getAttribute("data-gap")) || 0;
-      const bound = Boolean(e.getAttribute("data-bound")) || undefined;
-      let type: "slider" | "carousel" | undefined;
-      let focusAt: "center" | number | undefined;
 
-      if (e.hasAttribute("data-slidertype")) {
-        type =
+      const glideOptions: Partial<Glide.Options> = {
+        autoplay: Number(e.getAttribute("data-autoplay")) || false,
+        focusAt:
+          e.getAttribute("data-focus") == "center"
+            ? "center"
+            : Number(e.getAttribute("data-focus")) || 0,
+        bound: Boolean(e.getAttribute("data-bound")) || undefined,
+        gap: Number(e.getAttribute("data-gap")) || 0,
+        type:
           e.getAttribute("data-slidertype")?.toLowerCase() == "carousel"
             ? "carousel"
-            : "slider";
+            : "slider",
+        perView: Number(e.getAttribute("data-perview")) || undefined,
+        animationDuration:
+          Number(e.getAttribute("data-transitionduration")) || undefined,
+      };
+
+      if (e.getAttribute("data-slidertype")?.toLowerCase() == "fader") {
+        glideOptions.perView = 1;
+        glideOptions.focusAt = 0;
+        glideOptions.type = "carousel";
+        glideOptions.animationDuration = 0;
       }
 
-      focusAt =
-        e.getAttribute("data-focus") == "center"
-          ? "center"
-          : Number(e.getAttribute("data-focus")) || 0;
-
-      new Glide(`#${id}`, {
-        autoplay: Number(e.getAttribute("data-autoplay")) || false,
-        focusAt,
-        bound,
-        gap,
-        type,
-        perView,
-        animationDuration: transitionDuration,
-      }).mount();
+      new Glide(`#${id}`, glideOptions).mount();
     }
   });
 </script>
