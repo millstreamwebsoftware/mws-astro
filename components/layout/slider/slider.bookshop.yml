@@ -15,7 +15,12 @@ blueprint:
   autoplay: 0
   perView: 1
   focusAtCenter: true
-  transition:
+  focusAt: 0
+  showBullets: true
+  showArrows: true
+  indent: false
+  transition: Slider
+  transitionDuration: 0.4
 
 _inputs:
   content:
@@ -33,18 +38,37 @@ _inputs:
       min: 0
   perView:
     type: number
+    label: Slides Per View
     comment: Number of slides visible at once.
     options:
       min: 1
+      step: 1
+  focusAtCenter:
+    label: Focus Centre Slide
+    comment: The central visible slide is treated as the active slide. Best when slides per view is odd and bigger than 1.
+  focusAt:
+    label: Focus at Slide
+    comment: The nth visible slide is treated as the active slide. Mainly useful when slides per view is bigger than 1. (Leftmost visible slide is slide 0)
+    hidden: focusAtCenter
+    type: number
+    options:
+      min: 0
       step: 1
   transition:
     type: select
     comment: >
       Slider rewinds the slider to the start after last slide, 
       Carousel continues in the same direction with the starting items added after the end. 
-      Fader does not slide and instead slowly fades between items.
+      Fader does not slide and instead slowly fades between items (Fader overwrites some options).
     options:
       values:
         - Slider
         - Carousel
         - Fade
+  transitionDuration:
+    type: number
+    comment: Time spent animating between slides in seconds.
+    options:
+      min: 0
+      step: 0.1
+      max: 10

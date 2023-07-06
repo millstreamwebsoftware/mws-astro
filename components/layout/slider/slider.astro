@@ -4,23 +4,38 @@ const md = new MarkdownIt({ html: true });
 
 export interface Props {
   slides: any[];
+  height: number;
+  autoplay: number;
+  perView: number;
+  focusAtCenter: boolean;
+  focusAt: number;
+  showBullets: boolean;
+  showArrows: boolean;
+  transition: string;
+  transitionDuration: number;
+  indent: boolean;
   key?: string;
 }
 
 const envEditor =
-  true ||
+  false ||
   !(
     // @ts-expect-error TS2304
     (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
   );
 
-const { key } = Astro.props;
+const { key, showBullets, showArrows, transition, height, perView, indent } =
+  Astro.props;
 const id = "glide" + "-" + (key || "");
 // const glideId = envEditor ? undefined : id;
 const slides = Astro.props.slides || [];
+const fader = transition.toLowerCase() == "fader";
+const sliderType = transition.toLowerCase();
+const autoplay = Astro.props.autoplay * 1000; // Seconds -> Milliseconds
+const transitionDuration = Astro.props.transitionDuration * 1000; // Seconds -> Milliseconds
+const focusAt = Astro.props.focusAtCenter ? "center" : Astro.props.focusAt;
 
-const fader = false;
-
+// const focusAtCenter = Astro.props.focusAtCenter && "center";
 // const htmlContent = content ? md.render(content) : "";
 
 // const autoplay = true;
@@ -40,34 +55,55 @@ const fader = false;
 //           <label for={id + "_" + i}>{i}</label>
 ---
 
-<section class:list={["slider", { envEditor, fader }]}>
+<section
+  class:list={["slider", { envEditor, fader }]}
+  style={(transitionDuration ? `--transition: ${transitionDuration}ms;` : "") +
+    (indent ? "" : "--indent: 0;")}
+>
   <>
     {
-      envEditor &&
-        slides.map((slide, i) => (
-          <>
-            <input
-              type="radio"
-              id={id + "_" + i}
-              name={id}
-              checked={i == 0 ? "checked" : undefined}
-            />
-            <label for={id + "_" + i}>{i}</label>
-          </>
-        ))
+      envEditor && (
+        <>
+          {slides.map((slide, i) => (
+            <>
+              <input
+                type="radio"
+                id={id + "_" + i}
+                name={id}
+                checked={i == 0 ? "checked" : undefined}
+              />
+            </>
+          ))}
+          <div class="editor__buttons">
+            {slides.map((slide, i) => (
+              <label for={id + "_" + i}>{i}</label>
+            ))}
+          </div>
+        </>
+      )
     }
 
-    <div class="glide" data-glide={id} {id}>
-      <div class="glide__track" data-glide-el="track">
+    <div
+      class="glide"
+      {id}
+      data-glide={id}
+      data-slidertype={sliderType}
+      data-autoplay={autoplay}
+      data-perview={perView}
+      data-focus={focusAt}
+      data-transitionduration={transitionDuration}
+    >
+      <div
+        class="glide__track"
+        data-glide-el="track"
+        style={`--height:${height}vh;`}
+      >
         <ul class="glide__slides">
           {
             slides.map((slide, i) => (
               <>
                 <li
-                  class:list={[
-                    "glide__slide",
-                    { editor__selected: envEditor && i == 0 },
-                  ]}
+                  class:list={["glide__slide"]}
                   style={
                     (slide.background_color
                       ? `--background-color: ${slide.background_color};`
@@ -83,75 +119,71 @@ const fader = false;
           }
         </ul>
       </div>
-      <div class="glide__arrows" data-glide-el="controls">
-        <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 32 32"
-            ><path
-              fill="currentColor"
-              d="M10 16L20 6l1.4 1.4l-8.6 8.6l8.6 8.6L20 26z"></path></svg
-          >
-        </button>
-        <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 32 32"
-            ><path
-              fill="currentColor"
-              d="M22 16L12 26l-1.4-1.4l8.6-8.6l-8.6-8.6L12 6z"></path></svg
-          >
-        </button>
-      </div>
-      <div class="glide__bullets" data-glide-el="controls[nav]">
-        {
-          slides.map((slide, i) => (
-            <button class="glide__bullet" data-glide-dir={`=${i}`} />
-          ))
-        }
-      </div>
+      {
+        showArrows && (
+          <div class="glide__arrows" data-glide-el="controls">
+            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+              >
+                <path
+                  fill="currentColor"
+                  d="M10 16L20 6l1.4 1.4l-8.6 8.6l8.6 8.6L20 26z"
+                />
+              </svg>
+            </button>
+            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+              >
+                <path
+                  fill="currentColor"
+                  d="M22 16L12 26l-1.4-1.4l8.6-8.6l-8.6-8.6L12 6z"
+                />
+              </svg>
+            </button>
+          </div>
+        )
+      }
+      {
+        showBullets && (
+          <div class="glide__bullets" data-glide-el="controls[nav]">
+            {slides.map((slide, i) => (
+              <button class="glide__bullet" data-glide-dir={`=${i}`} />
+            ))}
+          </div>
+        )
+      }
     </div>
   </>
 </section>
-
-<style>
-  /* .glide__slides .glide__slide {
-    display: none;
-  }
-  input:checked + .glide__slide {
-    display: block;
-  }
-
-  label {
-    padding: 1rem;
-  }
-
-  label:target {
-    color: red;
-  } */
-</style>
 
 <style lang="scss">
   $arrowSize: 3rem;
   $bulletSize: 1rem;
 
-  // @for $i from 1 to 10 {
-  //   input:nth-of-type(#{$i}):checked ~ .glide li:nth-of-type(#{$i}) {
-  //     display: block;
-  //   }
-  // }
+  @for $i from 1 to 20 {
+    input:nth-of-type(#{$i}):checked ~ .glide li:nth-of-type(#{$i}) {
+      display: block;
+    }
+    input:nth-of-type(#{$i}):checked
+      ~ .editor__buttons
+      label:nth-of-type(#{$i}) {
+      background-color: rgb(82, 223, 255);
+    }
+  }
 
   .envEditor {
+    position: relative;
+
     .glide__slide {
       display: none;
-    }
-
-    .glide__slide.editor__selected {
-      display: block;
     }
 
     input {
@@ -160,7 +192,9 @@ const fader = false;
 
     label {
       background-color: rgb(235, 255, 255);
-      padding: 0.5rem 1rem;
+      // padding: 0.5rem 1rem;
+      height: 100%;
+      padding: 0 1rem;
       transition: background-color 0.2s ease-in-out;
 
       &:hover {
@@ -180,8 +214,21 @@ const fader = false;
 
     :hover .glide__arrows,
     :hover .glide__bullets {
-      // opacity: 0;
+      opacity: 0;
     }
+
+    .editor__buttons {
+      height: 3rem;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+  }
+
+  .glide__slides {
+    height: var(--height);
   }
 
   .glide__slide {
@@ -192,6 +239,7 @@ const fader = false;
     background-size: cover;
 
     padding: 4rem;
+    height: 100%;
   }
 
   .glide__arrows {
@@ -269,7 +317,7 @@ const fader = false;
       left: 0;
       order: 2;
       opacity: 0;
-      transition: opacity 1250ms ease-in-out;
+      transition: opacity var(--transition) ease-in-out;
     }
 
     .glide__slide.glide__slide--active {
@@ -284,67 +332,38 @@ const fader = false;
 <script>
   import Glide from "@glidejs/glide";
 
-  // if (!window.hasOwnProperty("inEditorMode") || !(window as any).inEditorMode) {
   document.querySelectorAll("div[data-glide]").forEach((e, i) => {
     if (!e) return;
 
     if (!e.matches(".envEditor *")) {
       let id = e.getAttribute("id");
+      let type: "slider" | "carousel" | undefined;
+      let perView: number | undefined =
+        Number(e.getAttribute("data-perview")) || undefined;
+      let focusAt: "center" | number | undefined;
+      let transitionDuration =
+        Number(e.getAttribute("data-transitionduration")) || undefined;
+
+      if (e.hasAttribute("data-slidertype")) {
+        type =
+          e.getAttribute("data-slidertype")?.toLowerCase() == "carousel"
+            ? "carousel"
+            : "slider";
+      }
+
+      focusAt =
+        e.getAttribute("data-focus") == "center"
+          ? "center"
+          : Number(e.getAttribute("data-focus")) || 0;
 
       new Glide(`#${id}`, {
-        autoplay: 4000,
-        focusAt: "center",
+        autoplay: Number(e.getAttribute("data-autoplay")) || false,
+        focusAt,
         gap: 0,
+        type,
+        perView,
+        animationDuration: transitionDuration,
       }).mount();
-    } else {
-      const editorSelected = "editor__selected";
-      const sliderRoot = e.closest(".glide");
-
-      if (!sliderRoot) return;
-
-      sliderRoot
-        .querySelectorAll("button[data-glide-dir]")
-        .forEach((button, i) => {
-          console.log(button);
-          button.addEventListener(
-            "click",
-            (c) => {
-              if (!c.currentTarget) return;
-              const target = c.currentTarget as HTMLButtonElement;
-              const slideOperation = target.getAttribute("data-glide-dir");
-              if (!slideOperation) return;
-              const slider = target.closest(".glide");
-              const slides = slider?.querySelectorAll(".glide__slide");
-              if (!slides) return;
-              const numSlides = slides.length;
-              const currentSlide = Array.from(slides).findIndex((element) =>
-                element.matches("." + editorSelected)
-              );
-              if (currentSlide < 0) return;
-
-              let newSlide;
-              if (slideOperation.startsWith("=")) {
-                newSlide = Number(slideOperation.replace("=", ""));
-              } else {
-                newSlide =
-                  (currentSlide + (slideOperation.startsWith("<") ? -1 : 1)) %
-                  numSlides;
-              }
-              if (typeof newSlide == "undefined") return;
-              if (newSlide < 0) {
-                newSlide = numSlides + newSlide;
-              }
-
-              if (currentSlide != newSlide) {
-                slides[currentSlide].classList.remove(editorSelected);
-                slides[newSlide].classList.add(editorSelected);
-                console.log(slides[newSlide]);
-              }
-            },
-            { passive: true }
-          );
-        });
     }
   });
-  // }
 </script>

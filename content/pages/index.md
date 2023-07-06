@@ -5,6 +5,15 @@ content_blocks:
   - _bookshop_name: astrotest
     text: test!
   - _bookshop_name: layout/slider
+    autoplay: 4
+    showBullets: true
+    showArrows: true
+    transition: Slider
+    transitionDuration: 0.2
+    perView: 2
+    focusAtCenter: false
+    height: 50
+    indent: false
     slides:
       - content: Test Content
         background_color: "#ffcece"
