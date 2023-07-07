@@ -35,6 +35,61 @@ content_blocks:
     animationDuration: 5
     style:
       - TOHC-Hero
+  - _bookshop_name: richtext
+    content: >-
+      <p class="align-center"><img alt="Now Open" width="305" height="79"
+      src="/images/now-open.svg" /></p>
+
+
+      <h2 class="align-center">Open Hours</h2>
+
+
+      <h3 class="highlight-1 align-center">Open 7 days per week as
+      follows...</h3>
+
+
+      <table><tbody><tr><th class="align-right">Monday + Tuesday</th><td>6.00am
+      – 11.00am</td></tr><tr><th class="align-right">Wednesday +
+      Thursday</th><td>6.00am – 1.00pm</td></tr><tr><th
+      class="align-right">Friday – Sunday</th><td>6.00am –
+      2.00pm</td></tr></tbody></table>
+
+
+      <h2 class="align-center">The Oarhouse Cafe, on the banks of the Swan
+      River, Bayswater.</h2>
+
+
+      <p class="align-center">Serving fantastic locally roasted coffee from
+      Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers
+      Artisan, and a handpicked selection of freshly made cakes and slices.</p>
+  - _bookshop_name: gallery
+    height: 40
+    columns: 3
+    indent: false
+    images:
+      - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
+        title: Title
+        description: Description
+      - image: /images/gallery/tohc-experiment-oct-2022.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-raspberry-coconut-oct-2022.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-dolngait-slice-oct-2022.jpeg
+        title:
+        description:
+      - image: /images/gallery/tohc-lemon-tart-experiments-oct-2022.jpeg
+        title:
+        description:
+  - _bookshop_name: richtext
+    content: |-
+      <h1 class="align-center">Our Story</h1>
+
+      ---
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898
@@ -92,61 +147,6 @@ content_blocks:
           - for
           - dropdown
         required: true
-  - _bookshop_name: richtext
-    content: >-
-      <p class="align-center"><img alt="Now Open" width="305" height="79"
-      src="/images/now-open.svg" /></p>
-
-
-      <h2 class="align-center">Open Hours</h2>
-
-
-      <h3 class="highlight-1 align-center">Open 7 days per week as
-      follows...</h3>
-
-
-      <table><tbody><tr><th class="align-right">Monday + Tuesday</th><td>6.00am
-      – 11.00am</td></tr><tr><th class="align-right">Wednesday +
-      Thursday</th><td>6.00am – 1.00pm</td></tr><tr><th
-      class="align-right">Friday – Sunday</th><td>6.00am –
-      2.00pm</td></tr></tbody></table>
-
-
-      <h2 class="align-center">The Oarhouse Cafe, on the banks of the Swan
-      River, Bayswater.</h2>
-
-
-      <p class="align-center">Serving fantastic locally roasted coffee from
-      Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers
-      Artisan, and a handpicked selection of freshly made cakes and slices.</p>
-  - _bookshop_name: gallery
-    height: 40
-    columns: 3
-    indent: false
-    images:
-      - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
-        title: Title
-        description: Description
-      - image: /images/gallery/tohc-experiment-oct-2022.jpeg
-        title:
-        description:
-      - image: /images/gallery/tohc-raspberry-coconut-oct-2022.jpeg
-        title:
-        description:
-      - image: /images/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
-        title:
-        description:
-      - image: /images/gallery/tohc-dolngait-slice-oct-2022.jpeg
-        title:
-        description:
-      - image: /images/gallery/tohc-lemon-tart-experiments-oct-2022.jpeg
-        title:
-        description:
-  - _bookshop_name: richtext
-    content: |-
-      <h1 class="align-center">Our Story</h1>
-
-      ---
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
@@ -167,4 +167,41 @@ content_blocks:
           and we provide a sense of community for everyone. Of course we love
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
+  - _bookshop_name: layout/columns
+    content_blocks:
+      - _bookshop_name: form
+        name: contact
+        action: https://usebasin.com/f/88179f198898
+        form_blocks:
+          - _bookshop_name: form/info
+            content: |-
+              ## Contact details
+
+              130 Milne Street, Bayswater (AP Hinds Reserve)
+
+              Perth, WA, Australia, Western Australia
+
+              ### Contact us
+            style: Default
+          - _bookshop_name: form/inputs/text
+            name: name
+            label: Name
+            placeholder: ''
+            required: true
+            minlength: 5
+            maxlength: 32
+          - _bookshop_name: form/inputs/email
+            name: email
+            label: Email
+            placeholder: ''
+            required: true
+          - _bookshop_name: form/inputs/textarea
+            name: message
+            label: Message
+            placeholder: ''
+            required: true
+            minlength: 0
+            maxlength: 3000
+      - _bookshop_name: richtext
+        content: Put map here
 ---
