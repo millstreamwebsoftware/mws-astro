@@ -322,6 +322,12 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       transform: translate3d(0, 0, 0) !important;
     }
 
+    .glide__slide:first-child {
+      animation-name: startOpaque;
+      animation-duration: var(--transition);
+      animation-iteration-count: 1;
+    }
+
     .glide__slide {
       position: absolute;
       top: 0;
@@ -336,6 +342,15 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       order: 1;
       opacity: 1;
       z-index: 1;
+    }
+
+    @keyframes startOpaque {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+      }
     }
   }
 </style>
