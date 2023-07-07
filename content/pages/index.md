@@ -26,7 +26,7 @@ content_blocks:
     showArrows: true
     indent: false
     transition: Fader
-    transitionDuration: 1
+    animationDuration: 1
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898

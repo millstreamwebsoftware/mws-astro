@@ -14,7 +14,7 @@ export interface Props {
   showBullets: boolean;
   showArrows: boolean;
   transition: string;
-  transitionDuration: number;
+  animationDuration: number;
   indent: boolean;
   key?: string;
 }
@@ -37,31 +37,47 @@ const {
   bound,
   gap,
   autoplay,
-  transitionDuration,
+  animationDuration,
   focusAt,
   focusAtCenter,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 const slides = Astro.props.slides || [];
 
-const glideOptions = {
-  "data-glide": envEditor ? undefined : id,
-  "data-slidertype": transition.toLowerCase(),
-  "data-autoplay": autoplay * 1000, // Seconds -> Milliseconds
-  "data-transitionduration": transitionDuration * 1000, // Seconds -> Milliseconds
-  "data-gap": gap,
-  "data-perview": perView,
-  "data-focus": focusAtCenter ? "center" : focusAt,
-  "data-bound": bound,
+type glideOptionsType = Record<string, string | number | boolean | undefined>;
+
+const glideOptions: glideOptionsType = {
+  glide: envEditor ? undefined : id,
+  sliderType: transition.toLowerCase(),
+  autoplay: autoplay * 1000, // Seconds -> Milliseconds
+  animationDuration: animationDuration * 1000, // Seconds -> Milliseconds
+  focus: focusAtCenter ? "center" : focusAt,
+  gap,
+  perView,
+  bound,
 };
 
-// const dataGlideOptions = Object.entries(glideOptions).map(([key, value]) => )
+if (glideOptions.sliderType == "fader") {
+  glideOptions.perView = 1;
+  glideOptions.focusAt = 0;
+  glideOptions.animationDuration = 0;
+}
+
+if (envEditor) glideOptions.sliderType = "slider";
+
+const dataGlideOptions = Object.entries(glideOptions).reduce(
+  (obj: glideOptionsType, [k, v]) => {
+    obj[`data-${k.toLowerCase()}`] = v;
+    return obj;
+  },
+  {}
+);
 ---
 
 <section
   class:list={["slider", { envEditor }]}
-  style={(glideOptions["data-transitionduration"]
-    ? `--transition: ${glideOptions["data-transitionduration"]}ms;`
+  style={(animationDuration
+    ? `--transition: ${animationDuration * 1000}ms;`
     : "") + (indent ? "" : "--indent: 0;")}
 >
   <>
@@ -87,7 +103,7 @@ const glideOptions = {
       )
     }
 
-    <div class="glide" {id} {...glideOptions}>
+    <div class="glide" {id} {...dataGlideOptions}>
       <div
         class="glide__track"
         data-glide-el="track"
@@ -347,16 +363,8 @@ const glideOptions = {
             : "slider",
         perView: Number(e.getAttribute("data-perview")) || undefined,
         animationDuration:
-          Number(e.getAttribute("data-transitionduration")) || undefined,
+          Number(e.getAttribute("data-animationDuration")) || undefined,
       };
-
-      // TODO: move out of browser code
-      if (e.getAttribute("data-slidertype")?.toLowerCase() == "fader") {
-        glideOptions.perView = 1;
-        glideOptions.focusAt = 0;
-        glideOptions.type = "carousel";
-        glideOptions.animationDuration = 0;
-      }
 
       new Glide(`#${id}`, glideOptions).mount();
     }

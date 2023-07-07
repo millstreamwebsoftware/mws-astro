@@ -22,7 +22,7 @@ blueprint:
   showArrows: true
   indent: false
   transition: Slider
-  transitionDuration: 0.4
+  animationDuration: 0.4
 
 _inputs:
   content:
@@ -107,7 +107,7 @@ _inputs:
         - Slider
         - Carousel
         - Fader
-  transitionDuration:
+  animationDuration:
     type: number
     comment: Time spent animating between slides in seconds.
     options:
