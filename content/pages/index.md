@@ -6,27 +6,35 @@ content_blocks:
     text: test!
   - _bookshop_name: layout/slider
     slides:
-      - content: Test Content
-        background_color: "#ffcece"
+      - content:
+        background_color:
         background_image: /images/hero/cafe-001.jpg
-      - content: More test content!
-        background_color: "#fef1f0"
-        background_image:
-      - content: Third test
-        background_color: "#afedff"
-        background_image:
-    height: 50
+      - content:
+        background_color:
+        background_image: /images/hero/espresso-001.jpg
+      - content:
+        background_color:
+        background_image: /images/hero/espresso.jpg
+      - content:
+        background_color:
+        background_image: /images/hero/flat-white.jpg
+      - content:
+        background_color:
+        background_image: /images/hero/img-3791.jpg
+    height: 80
     gap: 0
-    autoplay: 4
+    autoplay: 10
     perView: 2
     focusAtCenter: false
     focusAt: 0
     bound: false
-    showBullets: true
-    showArrows: true
+    showBullets: false
+    showArrows: false
     indent: false
     transition: Fader
-    animationDuration: 1
+    animationDuration: 5
+    style:
+      - TOHC-Hero
   - _bookshop_name: form
     name: contact-us
     action: https://usebasin.com/f/88179f198898

@@ -16,6 +16,7 @@ export interface Props {
   transition: string;
   animationDuration: number;
   indent: boolean;
+  style: string[];
   key?: string;
 }
 
@@ -40,6 +41,7 @@ const {
   animationDuration,
   focusAt,
   focusAtCenter,
+  style,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 const slides = Astro.props.slides || [];
@@ -75,7 +77,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 ---
 
 <section
-  class:list={["slider", { envEditor }]}
+  class:list={["slider", { envEditor }, style]}
   style={(animationDuration
     ? `--transition: ${animationDuration * 1000}ms;`
     : "") + (indent ? "" : "--indent: 0;")}
@@ -107,7 +109,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       <div
         class="glide__track"
         data-glide-el="track"
-        style={`--height:${height}vh;`}
+        style={height ? `--height:${height}vh;` : ""}
       >
         <ul class="glide__slides">
           {

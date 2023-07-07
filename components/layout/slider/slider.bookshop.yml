@@ -23,6 +23,7 @@ blueprint:
   indent: false
   transition: Slider
   animationDuration: 0.4
+  style:
 
 _inputs:
   content:
@@ -109,8 +110,14 @@ _inputs:
         - Fader
   animationDuration:
     type: number
-    comment: Time spent animating between slides in seconds.
+    comment: Time spent animating between slides in seconds. If autoplay is enabled, make sure this is shorter.
     options:
       min: 0
       step: 0.1
       max: 10
+  style:
+    type: multiselect
+    options:
+      allow_create: true
+      values:
+        - TOHC-Hero
