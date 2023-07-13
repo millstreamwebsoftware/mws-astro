@@ -1,3 +1,6 @@
+@import "editor";
+@import "custom";
+
 :root {
   --indent: 8vw;
   --text-gap: 2rem;
@@ -43,106 +46,9 @@ section
   margin-top: var(--text-gap);
 }
 
-main > section:not(.no-indent) {
+section:not(.no-indent) {
   margin: var(--indent);
 }
-
-// .panelBackground {
-//   position: absolute;
-//   inset: 0;
-//   z-index: -1;
-
-//   & > * {
-//     position: absolute;
-//     inset: 0;
-//   }
-
-//   img {
-//     object-fit: cover;
-//     object-position: center;
-//   }
-
-//   .swiper figure {
-//     height: 100%;
-//     width: 100%;
-//   }
-// }
-
-// .opening-soon {
-//   display: block;
-//   max-width: 180px;
-//   margin: 0 auto 20px auto;
-// }
-
-// .dot {
-//   padding: 0;
-//   background-color: rgba(white, 0.7);
-//   border-radius: 100%;
-//   aspect-ratio: 1;
-//   height: 50vh;
-//   max-height: 50vw;
-
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   gap: 6%;
-//   backdrop-filter: blur(4px);
-
-//   & > img {
-//     width: 60%;
-//   }
-
-//   & > h3 {
-//     font-size: clamp(16px, 1.5vw, 22px);
-//   }
-// }
-
-// article[data-section-name="hero"] {
-//   .panelBackground {
-//     filter: grayscale(1);
-//   }
-// }
-
-// .swiper:not(.swiper-fade)::after {
-//   content: "";
-//   position: absolute;
-//   inset: 0;
-//   z-index: 1;
-//   background: linear-gradient(
-//     to right,
-//     white 10%,
-//     transparent 40%,
-//     transparent 60%,
-//     white 90%
-//   );
-//   pointer-events: none;
-// }
-
-// .swiper-slide > * {
-//   flex-shrink: 0;
-// }
-
-// .swiper {
-//   margin-bottom: 5rem;
-
-//   @at-root .panelBackground & {
-//     margin-bottom: 0;
-//   }
-// }
-
-// .swiper-button-next,
-// .swiper-button-prev {
-//   color: rgb(var(--color-accent));
-// }
-
-section.columns {
-  display: grid;
-  grid-auto-flow: column;
-}
-
-@import "editor";
-@import "custom";
 
 p,
 li,

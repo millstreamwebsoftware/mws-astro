@@ -143,6 +143,9 @@ content_blocks:
             required: true
             minlength: 0
             maxlength: 3000
-      - _bookshop_name: richtext
-        content: Put map here
+      - _bookshop_name: map
+        lat: -31.930914
+        lng: 115.917333
+        zoom: 16
+        height: 30vh
 ---

@@ -28,7 +28,7 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
 });
 ---
 
-<section class="columns" style={{ "--column-count": contentBlocks.length }}>
+<div class="columns" style={{ "--column-count": contentBlocks.length }}>
   {
     contentBlocks.map((block: any, i: any) => {
       const Component = components[block._bookshop_name];
@@ -42,10 +42,13 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
       );
     })
   }
-</section>
+</div>
 
 <style lang="scss">
   .columns {
-    column-gap: var(--column-gap);
+    // column-gap: var(--column-gap);
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(var(--column-count), 1fr);
   }
 </style>

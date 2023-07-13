@@ -26,12 +26,12 @@ const style = Astro.props.style
 // {Icon && <Icon class="icon" />}
 ---
 
-<section class={style}>
+<div class={style}>
   <Fragment set:html={htmlContent} />
-</section>
+</div>
 
 <style>
-  section {
+  div {
     position: relative;
     margin-bottom: 2rem;
   }

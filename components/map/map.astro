@@ -1,0 +1,61 @@
+---
+// https://www.google.com.au/maps/place/The+Oarhouse/
+// @-31.9310252,115.9161898,18.09z
+//data=!4m6!3m5!1s0x2a32bb37a3a762b7:0x928ca6471325d598!8m2!3d-31.9309816!4d115.9173456!16s%2Fg%2F11tnnk6jk6?hl=en&entry=ttu
+
+export interface props {
+  lat: number;
+  lng: number;
+  zoom?: number;
+  height: number;
+  attribution?: boolean;
+  key?: string;
+}
+
+const { lat, lng, zoom, attribution, key } = Astro.props;
+
+const height = Astro.props.height + "vh";
+const mapId = "map-" + key;
+---
+
+<section class="map">
+  <div
+    id={mapId}
+    data-map={mapId}
+    data-lat={lat}
+    data-lng={lng}
+    data-zoom={zoom}
+  >
+  </div>
+</section>
+
+<script>
+  import { Loader } from "@googlemaps/js-api-loader";
+
+  const loader = new Loader({
+    apiKey: "AIzaSyBs8yBYBYtUCy9yd0CqO-C3o0RbAK9qW-w",
+    version: "weekly",
+  });
+
+  loader.load().then(async () => {
+    const { Map } = (await google.maps.importLibrary(
+      "maps"
+    )) as google.maps.MapsLibrary;
+
+    document.querySelectorAll("[data-map]").forEach((e, i) => {
+      new Map(e as HTMLElement, {
+        center: {
+          lat: Number(e.getAttribute("data-lat")),
+          lng: Number(e.getAttribute("data-lng")),
+        },
+        zoom: Number(e.getAttribute("data-zoom")),
+      });
+    });
+  });
+</script>
+
+<style>
+  [data-map] {
+    min-height: 100%;
+  }
+</style>
