@@ -1,8 +1,8 @@
 @import "/public/styles/fonts.css";
 
-.align-left { text-align: left; }
-.align-center { text-align: center; }
-.align-right { text-align: right; }
+.align-left { text-align: left; align-self: flex-start; }
+.align-center { text-align: center; align-self: center; }
+.align-right { text-align: right; align-self: flex-end; }
 .align-justify { text-align: justify; }
 
 h3.highlight-1 {

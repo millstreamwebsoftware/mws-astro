@@ -226,3 +226,7 @@ strong {
   border: 2px solid red;
   margin: 1rem;
 }
+
+.align-center + table {
+  align-self: center;
+}
