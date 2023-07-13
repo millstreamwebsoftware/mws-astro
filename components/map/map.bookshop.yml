@@ -12,12 +12,12 @@ blueprint:
   lat: -32.0390536
   lng: 115.631223
   zoom: 12
-  height: 
+  height:
 
 _inputs:
   lat:
     label: Latitude
-    comment: Latitude and Longitude can be copied by right clicking a position on the map in Google Maps. 
+    comment: Latitude and Longitude can be copied by right clicking a position on the map in Google Maps.
     type: number
   lng:
     label: Longitude
@@ -26,7 +26,6 @@ _inputs:
     type: slider
     label: Zoom
     comment: "1: World, 5: Continent, 10: City, 15: Streets, 20: Buildings"
-    comment: 
     options:
       min: 0
       max: 18
