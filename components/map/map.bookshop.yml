@@ -23,12 +23,12 @@ _inputs:
     label: Longitude
     type: number
   zoom:
-    type: slider
+    type: range
     label: Zoom
     comment: "1: World, 5: Continent, 10: City, 15: Streets, 20: Buildings"
     options:
       min: 0
-      max: 18
+      max: 20
       step: 0.25
   height:
     type: number
