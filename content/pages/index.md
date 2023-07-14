@@ -148,4 +148,5 @@ content_blocks:
         lng: 115.917333
         zoom: 16
         height: 30
+        indent: false
 ---

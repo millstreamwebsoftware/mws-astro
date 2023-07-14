@@ -13,6 +13,7 @@ blueprint:
   lng: 115.631223
   zoom: 12
   height:
+  indent: true
 
 _inputs:
   lat:
@@ -36,6 +37,8 @@ _inputs:
     options:
       min: 0
       max: 100
+  indent:
+    type: switch
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:

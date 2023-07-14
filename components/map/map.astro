@@ -9,16 +9,17 @@ export interface props {
   zoom?: number;
   height: number;
   attribution?: boolean;
+  indent?: boolean;
   key?: string;
 }
 
-const { lat, lng, zoom, attribution, key } = Astro.props;
+const { lat, lng, zoom, attribution, key, indent } = Astro.props;
 
 const height = Astro.props.height + "vh";
 const mapId = "map-" + key;
 ---
 
-<section class="map">
+<section class:list={["map", { "no-indent": !indent }]}>
   <div
     id={mapId}
     data-map={mapId}
