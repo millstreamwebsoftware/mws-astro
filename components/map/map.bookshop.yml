@@ -14,6 +14,7 @@ blueprint:
   zoom: 12
   height:
   indent: true
+  style:
 
 _inputs:
   lat:
@@ -39,6 +40,10 @@ _inputs:
       max: 100
   indent:
     type: switch
+  style:
+    type: select
+    options:
+      values: preferences.maps.styles
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:

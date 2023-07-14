@@ -149,4 +149,5 @@ content_blocks:
         zoom: 16
         height: 30
         indent: false
+        style:
 ---
