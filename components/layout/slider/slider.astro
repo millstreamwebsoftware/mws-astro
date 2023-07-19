@@ -20,12 +20,8 @@ export interface Props {
   key?: string;
 }
 
-const envEditor =
-  false ||
-  !(
-    // @ts-expect-error TS2304
-    (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
-  );
+// @ts-expect-error TS2304
+const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 
 const {
   key,
@@ -49,7 +45,7 @@ const slides = Astro.props.slides || [];
 type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
 const glideOptions: glideOptionsType = {
-  glide: envEditor ? undefined : id,
+  glide: ENV_EDITOR ? undefined : id,
   sliderType: transition.toLowerCase(),
   autoplay: autoplay * 1000, // Seconds -> Milliseconds
   animationDuration: animationDuration * 1000, // Seconds -> Milliseconds
@@ -65,7 +61,7 @@ if (glideOptions.sliderType == "fader") {
   glideOptions.animationDuration = 0;
 }
 
-if (envEditor) glideOptions.sliderType = "slider";
+if (ENV_EDITOR) glideOptions.sliderType = "slider";
 
 const dataGlideOptions = Object.entries(glideOptions).reduce(
   (obj: glideOptionsType, [k, v]) => {
@@ -77,14 +73,14 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 ---
 
 <section
-  class:list={["slider", { envEditor }, style]}
+  class:list={["slider", { ENV_EDITOR }, style]}
   style={(animationDuration
     ? `--transition: ${animationDuration * 1000}ms;`
     : "") + (indent ? "" : "--indent: 0;")}
 >
   <>
     {
-      envEditor && (
+      ENV_EDITOR && (
         <>
           {slides.map((slide, i) => (
             <>

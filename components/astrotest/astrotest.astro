@@ -5,29 +5,14 @@ export interface Props {
 
 const { text } = Astro.props;
 
-// const liveEditor = import.meta.env.ENV_BOOKSHOP_LIVE ? true : false;
-// <div style="padding: 2rem;">
-//   <p>Test string: <span style="font-weight: bold;">{Astro.props.text}</span></p>
-//   <p>
-//     Live editing status: <span style="font-weight: bold;">
-//       {import.meta.env.ENV_BOOKSHOP_LIVE ? "On" : "Off"}
-//     </span>
-//   </p>
-// </div>
-
-const envEditor = !(
-  // @ts-expect-error TS2304
-  (typeof ENV_BOOKSHOP_LIVE == "boolean" && !ENV_BOOKSHOP_LIVE)
-);
-
-// @ts-expect-error TS2304
-// const bookshop_flag = ENV_BOOKSHOP_LIVE;
-const typeof_bookshop_flag = typeof ENV_BOOKSHOP_LIVE;
+// @ts-expect-error
+const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 ---
 
 <div>
-  <p>Live Editing Status: <span id="astro-test">{String(envEditor)}</span></p>
-  <p>typeof ENV Flag: <span>{typeof_bookshop_flag}</span></p>
+  <p>
+    Live Editing Status: <span id="astro-test">{String(ENV_EDITOR)}</span>
+  </p>
   <p>Test data: <span>{text}</span></p>
 </div>
 
