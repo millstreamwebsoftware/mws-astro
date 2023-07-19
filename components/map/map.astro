@@ -5,13 +5,14 @@ export interface props {
   zoom?: number;
   height: number;
   style?: any;
-  attribution?: boolean;
   indent?: boolean;
   key?: string;
 }
 
-const { lat, lng, zoom, attribution, key, indent } = Astro.props;
+import preferences from "data/preferences.json";
+const { lat, lng, zoom, key, indent } = Astro.props;
 
+const apiKey = preferences.maps.api_key;
 const height = Astro.props.height + "vh";
 const mapId = "map-" + key;
 ---
@@ -19,10 +20,12 @@ const mapId = "map-" + key;
 <section class:list={["map", { "no-indent": !indent }]}>
   <div
     id={mapId}
+    class="map-box"
     data-map={mapId}
     data-lat={lat}
     data-lng={lng}
     data-zoom={zoom}
+    data-api-key={apiKey}
   >
   </div>
 </section>
@@ -30,8 +33,14 @@ const mapId = "map-" + key;
 <script>
   import { Loader } from "@googlemaps/js-api-loader";
 
+  const apiKey = document
+    .querySelector("[data-map][data-api-key]")
+    ?.getAttribute("data-api-key");
+
+  if (!apiKey) throw TypeError("Missing Google Maps API Key");
+
   const loader = new Loader({
-    apiKey: "AIzaSyBs8yBYBYtUCy9yd0CqO-C3o0RbAK9qW-w",
+    apiKey,
     version: "weekly",
   });
 
@@ -53,7 +62,7 @@ const mapId = "map-" + key;
 </script>
 
 <style>
-  [data-map] {
+  .map-box {
     min-height: 100%;
   }
 </style>

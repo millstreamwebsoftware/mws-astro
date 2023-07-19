@@ -57,15 +57,17 @@ const glideOptions: glideOptionsType = {
 
 if (glideOptions.sliderType == "fader") {
   glideOptions.perView = 1;
-  glideOptions.focusAt = 0;
+  glideOptions.focus = 0;
   glideOptions.animationDuration = 0;
 }
 
 if (ENV_EDITOR) glideOptions.sliderType = "slider";
 
+// TODO: Use dataset/DOMStringMap
+
 const dataGlideOptions = Object.entries(glideOptions).reduce(
   (obj: glideOptionsType, [k, v]) => {
-    obj[`data-${k.toLowerCase()}`] = v;
+    obj[`data-${k.replaceAll(/[A-Z]/g, "-$&").toLowerCase()}`] = v;
     return obj;
   },
   {}
@@ -188,7 +190,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
   }
 
-  .envEditor {
+  .ENV_EDITOR {
     position: relative;
 
     .glide__slide {
@@ -315,7 +317,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
   }
 
-  div[data-slidertype="fader"] {
+  div[data-slider-type="fader"] {
     .glide__slides {
       transform: translate3d(0, 0, 0) !important;
     }
@@ -357,27 +359,29 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
   import Glide from "@glidejs/glide";
 
   document.querySelectorAll("div[data-glide]").forEach((e, i) => {
-    if (!e) return;
+    if (!(e instanceof HTMLElement)) return;
 
-    if (!e.matches(".envEditor *")) {
+    if (!e.matches(".ENV_EDITOR *")) {
       const id = e.getAttribute("id");
 
       const glideOptions: Partial<Glide.Options> = {
-        autoplay: Number(e.getAttribute("data-autoplay")) || false,
+        autoplay: Number(e.dataset?.autoplay) || false,
         focusAt:
-          e.getAttribute("data-focus") == "center"
+          e.dataset?.focusAt == "center"
             ? "center"
-            : Number(e.getAttribute("data-focus")) || 0,
-        bound: Boolean(e.getAttribute("data-bound")) || undefined,
-        gap: Number(e.getAttribute("data-gap")) || 0,
+            : Number(e.dataset?.focus) || 0,
+        bound: Boolean(e.dataset?.bound) || undefined,
+        gap: Number(e.dataset?.gap) || 0,
         type:
-          e.getAttribute("data-slidertype")?.toLowerCase() == "carousel"
+          e.dataset?.sliderType?.toLowerCase() == "carousel"
             ? "carousel"
             : "slider",
-        perView: Number(e.getAttribute("data-perview")) || undefined,
-        animationDuration:
-          Number(e.getAttribute("data-animationDuration")) || undefined,
+        perView: Number(e.dataset?.perView) || undefined,
+        animationDuration: Number(e.dataset?.animationDuration) || 0,
       };
+
+      console.log(e.dataset);
+      console.log(glideOptions);
 
       new Glide(`#${id}`, glideOptions).mount();
     }
