@@ -50,12 +50,13 @@ const mapId = "map-" + key;
     )) as google.maps.MapsLibrary;
 
     document.querySelectorAll("[data-map]").forEach((e, i) => {
-      new Map(e as HTMLElement, {
+      if (!(e instanceof HTMLElement)) return;
+      new Map(e, {
         center: {
-          lat: Number(e.getAttribute("data-lat")),
-          lng: Number(e.getAttribute("data-lng")),
+          lat: Number(e.dataset?.lat),
+          lng: Number(e.dataset?.lng),
         },
-        zoom: Number(e.getAttribute("data-zoom")),
+        zoom: Number(e.dataset?.zoom),
       });
     });
   });
