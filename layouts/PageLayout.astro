@@ -7,14 +7,16 @@ type Props = {
     title: string;
     content_blocks: Array<Record<string, any>>;
   };
+  id?: string;
 };
 
 if (!Astro.props.frontmatter) {
   throw new Error("Page frontmatter must be defined");
 }
 const props = Astro.props.frontmatter;
+const { id } = Astro.props;
 ---
 
-<Layout {...props}>
+<Layout {...props} {id}>
   <Page bookshop:live contentBlocks={props.content_blocks} />
 </Layout>

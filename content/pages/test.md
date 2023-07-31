@@ -60,4 +60,6 @@ content_blocks:
           - for
           - dropdown
         required: true
+show_global_header: true
+show_global_footer: true
 ---

@@ -150,4 +150,6 @@ content_blocks:
         height: 30
         indent: false
         style:
+show_global_header: true
+show_global_footer: true
 ---
