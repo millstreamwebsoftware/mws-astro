@@ -1,7 +1,6 @@
 ---
-// import "deepmerge";
 import preferences from "data/preferences.json";
-import { getCollection, getEntry } from "astro:content";
+// import { getCollection, getEntry } from "astro:content";
 import { Debug } from "astro/components";
 
 export interface Props {
@@ -18,33 +17,6 @@ interface PageTree {
   slug?: string;
   id?: string;
 }
-
-// https://stackoverflow.com/a/11433067
-// Function: createNestedObject( base, names[, value] )
-//   base: the object on which to create the hierarchy
-//   names: an array of strings contaning the names of the objects
-//   value (optional): if given, will be the last object in the hierarchy
-// Returns: the last object in the hierarchy
-// var createNestedObject = function (
-//   base: Record<string, any>,
-//   names: string[],
-//   value: any
-// ) {
-//   // If a value is given, remove the last name and keep it for later:
-//   var lastName = arguments.length === 3 ? names.pop() : false;
-
-//   // Walk the hierarchy, creating new objects where needed.
-//   // If the lastName was removed, then the last object is not set yet:
-//   for (var i = 0; i < names.length; i++) {
-//     base = base[names[i]] = base[names[i]] || {};
-//   }
-
-//   // If a value was given, set it to the last name:
-//   if (lastName) base = base[lastName] = value;
-
-//   // Return the last object in the hierarchy:
-//   return base;
-// };
 
 function makeTree(pages: any) {
   const pageTree: PageTree = { children: {}, parent: undefined };
@@ -105,10 +77,12 @@ async function getPageTree(): Promise<any> {
 
 const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
-const pages =
-  typeof Astro.props.pages === "undefined"
-    ? await getPageTree()
-    : Astro.props.pages;
+// const pages =
+//   typeof Astro.props.pages === "undefined"
+//     ? await getPageTree()
+//     : Astro.props.pages;
+
+const pages = {};
 
 const Wrapper = depth ? Fragment : "nav";
 ---
