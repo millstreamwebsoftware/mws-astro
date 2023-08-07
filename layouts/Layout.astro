@@ -7,6 +7,7 @@ export interface Props {
   content_blocks: Array<Record<string, any>>;
   show_global_header?: boolean;
   show_global_footer?: boolean;
+  paths?: any[];
 }
 
 // import { SITE } from "../config";
@@ -17,8 +18,14 @@ import "../styles/styles.scss";
 import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
 // import "node_modules/@glidejs/glide/dist/css/glide.theme.min.css";
 
-const { title, content_blocks, show_global_header, show_global_footer, id } =
-  Astro.props;
+const {
+  title,
+  content_blocks,
+  show_global_header,
+  show_global_footer,
+  id,
+  paths,
+} = Astro.props;
 import preferences from "data/preferences.json";
 
 const pageTitle = title + preferences.general.browser_window_title_suffix;
@@ -33,7 +40,7 @@ const pageTitle = title + preferences.general.browser_window_title_suffix;
     <title>{pageTitle}</title>
   </head>
   <body>
-    {show_global_header && <Navigation {id} />}
+    {show_global_header && <Navigation {id} {paths} />}
     <article>
       <slot />
       {show_global_footer && <section id="footer">Footer!</section>}

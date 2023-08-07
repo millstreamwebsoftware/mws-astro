@@ -1,6 +1,6 @@
 ---
 import preferences from "data/preferences.json";
-// import { getCollection, getEntry } from "astro:content";
+// import { getCollection } from "astro:content";
 import { Debug } from "astro/components";
 
 export interface Props {
@@ -8,6 +8,7 @@ export interface Props {
   id?: string;
   depth?: number;
   currentPath?: string;
+  paths?: any[];
 }
 
 interface PageTree {
@@ -22,7 +23,7 @@ function makeTree(pages: any) {
   const pageTree: PageTree = { children: {}, parent: undefined };
 
   pages.forEach((page: any) => {
-    let path = page.slug.replace(/\/?index$/, "").split("/");
+    let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
 
     let cursor = pageTree;
 
@@ -35,7 +36,7 @@ function makeTree(pages: any) {
         cursor.children[path[i]] = {
           parent: undefined,
           title: path[i]
-            .replaceAll("-", "")
+            .replaceAll("-", " ")
             .replace(
               /\w\S*/g,
               (t: string) =>
@@ -46,7 +47,7 @@ function makeTree(pages: any) {
       cursor = cursor.children[path[i]];
 
       if (i + 1 == path.length) {
-        Object.assign(cursor, page);
+        Object.assign(cursor, page.props.page);
         // if (cursor?.slug === "index") {
         //   cursor.slug = "/";
         // }
@@ -57,32 +58,32 @@ function makeTree(pages: any) {
   return pageTree;
 }
 
-async function getPageTree(): Promise<any> {
-  // Get all online pages
-  const collection = await getCollection("pages", ({ data }) => {
-    return data.status === "online";
-  });
+// async function getPageTree(): Promise<any> {
+//   // Get all online pages
+//   const collection = await getCollection("pages", ({ data }) => {
+//     return data.status === "online";
+//   });
 
-  const pages = collection.map((e, i) => {
-    return {
-      slug: e.slug,
-      title: e.data.title,
-      id: e.id,
-      // path: e.id.replace(/\..*$/, ""),
-    };
-  });
+//   const pages = collection.map((e, i) => {
+//     return {
+//       slug: e.slug,
+//       title: e.data.title,
+//       id: e.id,
+//       // path: e.id.replace(/\..*$/, ""),
+//     };
+//   });
 
-  return makeTree(pages);
-}
+//   return makeTree(pages);
+// }
 
 const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
-// const pages =
-//   typeof Astro.props.pages === "undefined"
-//     ? await getPageTree()
-//     : Astro.props.pages;
+const pages =
+  typeof Astro.props.pages === "undefined"
+    ? makeTree(Astro.props.paths)
+    : Astro.props.pages;
 
-const pages = {};
+// const pages = {};
 
 const Wrapper = depth ? Fragment : "nav";
 ---
