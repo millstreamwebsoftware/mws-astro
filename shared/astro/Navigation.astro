@@ -1,6 +1,5 @@
 ---
 import preferences from "data/preferences.json";
-// import { getCollection } from "astro:content";
 import { Debug } from "astro/components";
 
 export interface Props {
@@ -22,7 +21,11 @@ interface PageTree {
 function makeTree(pages: any) {
   const pageTree: PageTree = { children: {}, parent: undefined };
 
-  pages.forEach((page: any) => {
+  const filteredPages = pages.filter(
+    (page: any) => page.props.page.data.status === "online"
+  );
+
+  filteredPages.forEach((page: any) => {
     let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
 
     let cursor = pageTree;
@@ -47,34 +50,15 @@ function makeTree(pages: any) {
       cursor = cursor.children[path[i]];
 
       if (i + 1 == path.length) {
-        Object.assign(cursor, page.props.page);
-        // if (cursor?.slug === "index") {
-        //   cursor.slug = "/";
-        // }
+        cursor.id = page.props.page.id;
+        cursor.slug = page.params.slug || "";
+        Object.assign(cursor, page.props.page.data);
       }
     }
   });
 
   return pageTree;
 }
-
-// async function getPageTree(): Promise<any> {
-//   // Get all online pages
-//   const collection = await getCollection("pages", ({ data }) => {
-//     return data.status === "online";
-//   });
-
-//   const pages = collection.map((e, i) => {
-//     return {
-//       slug: e.slug,
-//       title: e.data.title,
-//       id: e.id,
-//       // path: e.id.replace(/\..*$/, ""),
-//     };
-//   });
-
-//   return makeTree(pages);
-// }
 
 const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
@@ -83,12 +67,10 @@ const pages =
     ? makeTree(Astro.props.paths)
     : Astro.props.pages;
 
-// const pages = {};
-
 const Wrapper = depth ? Fragment : "nav";
----
 
-{!depth && <Debug {pages} />}
+// {!depth && <Debug {pages} />}
+---
 
 <Wrapper>
   <ul>
