@@ -23,7 +23,7 @@ content_blocks:
         background_image: /images/hero/img-3791.jpg
     height: 80
     gap: 0
-    autoplay: 10
+    autoplay: 5
     perView: 2
     focusAtCenter: false
     focusAt: 0
@@ -32,7 +32,7 @@ content_blocks:
     showArrows: false
     indent: false
     transition: Fader
-    animationDuration: 5
+    animationDuration: 2.5
     style:
       - TOHC-Hero
   - _bookshop_name: richtext
