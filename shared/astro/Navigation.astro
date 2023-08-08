@@ -16,19 +16,32 @@ interface PageTree {
   title?: string;
   slug?: string;
   id?: string;
+  selected?: boolean;
 }
 
-function makeTree(pages: any) {
-  const pageTree: PageTree = { children: {}, parent: undefined };
+function makeTree(pages: any, currentPath?: string) {
+  const pageTree: PageTree = {
+    children: {},
+    parent: undefined,
+    selected: false,
+  };
 
   const filteredPages = pages.filter(
     (page: any) => page.props.page.data.status === "online"
   );
 
-  filteredPages.forEach((page: any) => {
+  const sortedPages = filteredPages.sort(
+    (a: any, b: any) =>
+      (a.params.slug?.split("/").length || 0) -
+        (b.params.slug?.split("/").length || 0) ||
+      a.props.page.data.order - b.props.page.data.order
+  );
+
+  sortedPages.forEach((page: any) => {
     let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
 
     let cursor = pageTree;
+    let selected = page.params.slug === currentPath;
 
     for (var i = 0; i < path.length; i++) {
       if (!("children" in cursor)) {
@@ -45,8 +58,12 @@ function makeTree(pages: any) {
               (t: string) =>
                 t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
             ),
+          selected,
         };
       }
+
+      cursor.selected = selected;
+
       cursor = cursor.children[path[i]];
 
       if (i + 1 == path.length) {
@@ -64,7 +81,7 @@ const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
 const pages =
   typeof Astro.props.pages === "undefined"
-    ? makeTree(Astro.props.paths)
+    ? makeTree(Astro.props.paths, Astro.props.currentPath)
     : Astro.props.pages;
 
 const Wrapper = depth ? Fragment : "nav";
@@ -77,8 +94,14 @@ const Wrapper = depth ? Fragment : "nav";
     {
       "children" in pages &&
         Object.values(pages.children).map((page: any, i) => (
-          <li>
-            <a href={page?.slug && `/${page?.slug.replace(/index$/, "")}`}>
+          <li class:list={[{ selected: page.selected }, `depth-${depth}`]}>
+            <a
+              href={
+                typeof page?.slug !== "undefined"
+                  ? `/${page.slug.replace(/index$/, "")}`
+                  : undefined
+              }
+            >
               {page?.title}
             </a>
             {"children" in page && <Astro.self depth={depth} pages={page} />}

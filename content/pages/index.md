@@ -1,6 +1,8 @@
 ---
 _schema: default
 title: Home
+status: online
+order: 0
 content_blocks:
   - _bookshop_name: layout/slider
     slides:

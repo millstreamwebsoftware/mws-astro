@@ -8,6 +8,7 @@ export interface Props {
   show_global_header?: boolean;
   show_global_footer?: boolean;
   paths?: any[];
+  currentPath?: string;
 }
 
 // import { SITE } from "../config";
@@ -25,6 +26,7 @@ const {
   show_global_footer,
   id,
   paths,
+  currentPath,
 } = Astro.props;
 import preferences from "data/preferences.json";
 
@@ -40,7 +42,7 @@ const pageTitle = title + preferences.general.browser_window_title_suffix;
     <title>{pageTitle}</title>
   </head>
   <body>
-    {show_global_header && <Navigation {id} {paths} />}
+    {show_global_header && <Navigation {id} {paths} {currentPath} />}
     <article>
       <slot />
       {show_global_footer && <section id="footer">Footer!</section>}

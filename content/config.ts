@@ -13,6 +13,7 @@ const pagesCollection = defineCollection({
     publishDate: z.date().optional(),
     expiryDate: z.date().optional(),
     status: z.enum(["online", "hidden", "offline"]).default("online"),
+    order: z.number().default(256),
     content_blocks: z.array(z.any()),
     show_global_header: z.boolean().default(true),
     show_global_footer: z.boolean().default(true),
