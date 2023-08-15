@@ -30,6 +30,7 @@ content_blocks:
     bound: false
     showBullets: false
     showArrows: false
+    hoverpause: false
     indent: false
     transition: Fader
     animationDuration: 2.5

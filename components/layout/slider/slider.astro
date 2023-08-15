@@ -6,18 +6,19 @@ const md = new MarkdownIt({ html: true });
 export interface Props {
   slides: any[];
   height: number;
-  gap: number;
-  autoplay: number;
-  perView: number;
-  focusAtCenter: boolean;
-  focusAt: number;
-  bound: boolean;
-  showBullets: boolean;
-  showArrows: boolean;
-  transition: string;
-  animationDuration: number;
-  indent: boolean;
-  style: string[];
+  gap?: number;
+  autoplay?: number;
+  perView?: number;
+  focusAtCenter?: boolean;
+  focusAt?: number;
+  bound?: boolean;
+  showBullets?: boolean;
+  showArrows?: boolean;
+  transition?: string;
+  animationDuration?: number;
+  hoverpause?: boolean;
+  indent?: boolean;
+  style?: string[];
   key?: string;
 }
 
@@ -38,6 +39,7 @@ const {
   animationDuration,
   focusAt,
   focusAtCenter,
+  hoverpause,
   style,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
@@ -47,13 +49,14 @@ type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
 const glideOptions: glideOptionsType = {
   glide: ENV_EDITOR ? undefined : id,
-  sliderType: transition.toLowerCase(),
-  autoplay: autoplay * 1000, // Seconds -> Milliseconds
-  animationDuration: animationDuration * 1000, // Seconds -> Milliseconds
+  sliderType: transition?.toLowerCase(),
+  autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
+  animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
   focus: focusAtCenter ? "center" : focusAt,
   gap,
   perView,
   bound,
+  hoverpause,
 };
 
 if (glideOptions.sliderType == "fader") {
@@ -178,8 +181,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 <script>
   import Glide from "@glidejs/glide";
 
-  console.log("test");
-
   document.querySelectorAll("div[data-glide]").forEach((e, i) => {
     if (!(e instanceof HTMLElement)) return;
 
@@ -192,7 +193,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
           e.dataset?.focusAt == "center"
             ? "center"
             : Number(e.dataset?.focus) || 0,
-        bound: Boolean(e.dataset?.bound) || undefined,
+        bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
         gap: Number(e.dataset?.gap) || 0,
         type:
           e.dataset?.sliderType?.toLowerCase() == "carousel"
@@ -200,6 +201,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             : "slider",
         perView: Number(e.dataset?.perView) || undefined,
         animationDuration: Number(e.dataset?.animationDuration) || 0,
+        hoverpause:
+          "hoverpause" in e.dataset
+            ? e.dataset?.hoverpause === "true"
+            : undefined,
       };
 
       new Glide(`#${id}`, glideOptions).mount();
