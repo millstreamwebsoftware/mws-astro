@@ -39,6 +39,7 @@ const pageTitle = title + preferences.general.browser_window_title_suffix;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="revision" content={import.meta.env.PUBLIC_GITVER} />
     <title>{pageTitle}</title>
   </head>
   <body>
