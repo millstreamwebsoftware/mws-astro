@@ -16,14 +16,14 @@ interface PageTree {
   title?: string;
   slug?: string;
   id?: string;
-  selected?: boolean;
+  selected?: number;
 }
 
 function makeTree(pages: any, currentPath?: string) {
   const pageTree: PageTree = {
     children: {},
     parent: undefined,
-    selected: false,
+    selected: 0,
   };
 
   const filteredPages = pages.filter(
@@ -41,7 +41,7 @@ function makeTree(pages: any, currentPath?: string) {
     let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
 
     let cursor = pageTree;
-    let selected = page.params.slug === currentPath;
+    let selected = Number(page.params.slug === currentPath);
 
     for (var i = 0; i < path.length; i++) {
       if (!("children" in cursor)) {
@@ -67,6 +67,7 @@ function makeTree(pages: any, currentPath?: string) {
       cursor = cursor.children[path[i]];
 
       if (i + 1 == path.length) {
+        cursor.selected = cursor.selected ? 2 : 0;
         cursor.id = page.props.page.id;
         cursor.slug = page.params.slug || "";
         Object.assign(cursor, page.props.page.data);
@@ -90,12 +91,25 @@ const Wrapper = depth ? Fragment : "nav";
 ---
 
 <Wrapper>
-  <ul>
+  {!depth && <div class="logo">Logo!</div>}
+
+  <ul class:list={[`depth-${depth}`]}>
     {
       "children" in pages &&
         Object.values(pages.children).map((page: any, i) => (
-          <li class:list={[{ selected: page.selected }, `depth-${depth}`]}>
+          <li
+            tabindex="0"
+            class:list={[
+              {
+                active: page.selected,
+                selected: page.selected === 2,
+                children: "children" in page,
+              },
+              `depth-${depth}`,
+            ]}
+          >
             <a
+              aria-selected={page.selected === 2 ? "true" : "false"}
               href={
                 typeof page?.slug !== "undefined"
                   ? `/${page.slug.replace(/index$/, "")}`
@@ -110,3 +124,140 @@ const Wrapper = depth ? Fragment : "nav";
     }
   </ul>
 </Wrapper>
+
+<script>
+  import {
+    computePosition,
+    ComputePositionConfig,
+    autoUpdate,
+    offset,
+    shift,
+    flip,
+  } from "@floating-ui/dom";
+  import hoverintent from "hoverintent";
+
+  const anchors = document.querySelectorAll("nav li");
+
+  const popin = function (e: Event) {
+    if (!(e.target instanceof HTMLElement)) {
+      return;
+    }
+    const anchor = e.target.closest("li");
+    if (!anchor) return;
+    const dropdown = anchor.querySelector("ul");
+    if (!dropdown) return;
+    dropdown.classList.add("dropdown-open");
+    const options: ComputePositionConfig = anchor.matches(".depth-0")
+      ? {
+          placement: "bottom-start",
+          middleware: [shift(), offset({ crossAxis: -10 })],
+        }
+      : {
+          placement: "right-start",
+          middleware: [flip(), offset({ crossAxis: -10 })],
+        };
+
+    anchor.cleanup = autoUpdate(anchor, dropdown, () => {
+      computePosition(anchor, dropdown, options).then(({ x, y }) => {
+        Object.assign(dropdown.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+        });
+      });
+    });
+  };
+
+  const popout = function (e: Event) {
+    console.log(e);
+    if (!(e.target instanceof HTMLElement)) {
+      return;
+    }
+    const anchor = e.target.closest("li");
+    // if (
+    //   "relatedTarget" in e &&
+    //   e.relatedTarget instanceof Node &&
+    //   anchor.contains(e.relatedTarget)
+    // ) {
+    //   return;
+    // }
+    const dropdown = anchor.querySelector("ul");
+    if (!dropdown) {
+      return;
+    }
+    dropdown.classList.remove("dropdown-open");
+    if ("cleanup" in anchor && anchor.cleanup instanceof Function) {
+      anchor.cleanup();
+    }
+  };
+
+  anchors.forEach((anchor) => {
+    // anchor.addEventListener("focusin", popin);
+    // anchor.addEventListener("pointerenter", popin);
+    // anchor.addEventListener("focusout", popout);
+    // anchor.addEventListener("pointerleave", popout);
+
+    hoverintent(anchor, popin, popout).options({
+      handleFocus: true,
+    });
+  });
+</script>
+
+<style>
+  nav {
+    display: grid;
+    grid-template-areas: "logo navigation";
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: #fffd;
+  }
+
+  .logo {
+    grid-area: logo;
+  }
+
+  ul.depth-0 {
+    grid-area: navigation;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-right: 4rem;
+
+    gap: 2rem;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .depth-0 ul {
+    position: absolute;
+    width: max-content;
+    top: 0;
+    left: 0;
+    background-color: white;
+    display: none;
+    padding: 10px;
+  }
+
+  .depth-1 li {
+    width: max-content;
+  }
+
+  .depth-0 ul:not(ul.dropdown-open) {
+    display: none;
+  }
+
+  ul.dropdown-open {
+    display: block;
+  }
+
+  .active {
+    background-color: #dff;
+  }
+
+  .selected {
+    background-color: #aff;
+  }
+</style>
