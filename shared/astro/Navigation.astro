@@ -138,12 +138,8 @@ const Wrapper = depth ? Fragment : "nav";
 
   const anchors = document.querySelectorAll("nav li");
 
-  const popin = function (e: Event) {
-    if (!(e.target instanceof HTMLElement)) {
-      return;
-    }
-    const anchor = e.target.closest("li");
-    if (!anchor) return;
+  const popin = function (this: HTMLElement, e: Event) {
+    const anchor = this;
     const dropdown = anchor.querySelector("ul");
     if (!dropdown) return;
     dropdown.classList.add("dropdown-open");
@@ -157,6 +153,7 @@ const Wrapper = depth ? Fragment : "nav";
           middleware: [flip(), offset({ crossAxis: -10 })],
         };
 
+    // @ts-ignore
     anchor.cleanup = autoUpdate(anchor, dropdown, () => {
       computePosition(anchor, dropdown, options).then(({ x, y }) => {
         Object.assign(dropdown.style, {
@@ -167,19 +164,15 @@ const Wrapper = depth ? Fragment : "nav";
     });
   };
 
-  const popout = function (e: Event) {
-    console.log(e);
-    if (!(e.target instanceof HTMLElement)) {
+  const popout = function (this: HTMLElement, e: Event) {
+    const anchor = this;
+    if (
+      "relatedTarget" in e &&
+      e.relatedTarget instanceof Node &&
+      anchor.contains(e.relatedTarget)
+    ) {
       return;
     }
-    const anchor = e.target.closest("li");
-    // if (
-    //   "relatedTarget" in e &&
-    //   e.relatedTarget instanceof Node &&
-    //   anchor.contains(e.relatedTarget)
-    // ) {
-    //   return;
-    // }
     const dropdown = anchor.querySelector("ul");
     if (!dropdown) {
       return;
@@ -191,11 +184,6 @@ const Wrapper = depth ? Fragment : "nav";
   };
 
   anchors.forEach((anchor) => {
-    // anchor.addEventListener("focusin", popin);
-    // anchor.addEventListener("pointerenter", popin);
-    // anchor.addEventListener("focusout", popout);
-    // anchor.addEventListener("pointerleave", popout);
-
     hoverintent(anchor, popin, popout).options({
       handleFocus: true,
     });
