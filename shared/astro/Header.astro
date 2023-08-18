@@ -1,0 +1,30 @@
+---
+import preferences from "data/preferences.json";
+import Navigation from "./Navigation.astro";
+import Social from "@components/social/social.astro";
+
+export interface Props {
+  id?: string;
+  currentPath?: string;
+  paths?: any[];
+}
+
+const { id, currentPath, paths } = Astro.props;
+---
+
+<header>
+  {preferences.header.show_logo && <p>Your Logo Here</p>}
+  {
+    preferences.header.show_navigation && (
+      <Navigation {id} {paths} {currentPath} />
+    )
+  }
+  {preferences.header.show_socials && <Social />}
+</header>
+
+<style>
+  header {
+    display: grid;
+    grid-template-areas: "logo navigation social";
+  }
+</style>

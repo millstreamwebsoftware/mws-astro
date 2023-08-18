@@ -1,6 +1,5 @@
 ---
 import preferences from "data/preferences.json";
-import { Debug } from "astro/components";
 
 export interface Props {
   pages?: any;
@@ -91,8 +90,6 @@ const Wrapper = depth ? Fragment : "nav";
 ---
 
 <Wrapper>
-  {!depth && <div class="logo">Logo!</div>}
-
   <ul class:list={[`depth-${depth}`]}>
     {
       "children" in pages &&
@@ -135,6 +132,9 @@ const Wrapper = depth ? Fragment : "nav";
     flip,
   } from "@floating-ui/dom";
   import hoverintent from "hoverintent";
+
+  // TODO: Replace individual event listeners with a single event listener
+  // TODO: Mobile Navigation
 
   const anchors = document.querySelectorAll("nav li");
 
@@ -192,10 +192,10 @@ const Wrapper = depth ? Fragment : "nav";
 
 <style>
   nav {
-    display: grid;
-    grid-template-areas: "logo navigation";
-    position: sticky;
-    top: 0;
+    /* display: grid;
+    grid-template-areas: "logo navigation social";
+    position: sticky; */
+    /* top: 0; */
     z-index: 999;
     background-color: #fffd;
   }
