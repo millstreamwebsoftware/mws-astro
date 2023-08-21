@@ -146,11 +146,11 @@ const Wrapper = depth ? Fragment : "nav";
     const options: ComputePositionConfig = anchor.matches(".depth-0")
       ? {
           placement: "bottom-start",
-          middleware: [shift(), offset({ crossAxis: -10 })],
+          middleware: [shift(), offset({ crossAxis: 0 })],
         }
       : {
           placement: "right-start",
-          middleware: [flip(), offset({ crossAxis: -10 })],
+          middleware: [flip(), offset({ mainAxis: 0, crossAxis: 0 })],
         };
 
     // @ts-ignore
@@ -192,12 +192,7 @@ const Wrapper = depth ? Fragment : "nav";
 
 <style>
   nav {
-    /* display: grid;
-    grid-template-areas: "logo navigation social";
-    position: sticky; */
-    /* top: 0; */
     z-index: 999;
-    background-color: #fffd;
   }
 
   .logo {
@@ -212,7 +207,7 @@ const Wrapper = depth ? Fragment : "nav";
     margin-right: 4rem;
     height: 100%;
 
-    gap: 2rem;
+    /* gap: 2rem; */
   }
 
   li.depth-0 {
@@ -221,6 +216,11 @@ const Wrapper = depth ? Fragment : "nav";
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  li.depth-0 > a {
+    padding: 20px;
+    color: rgb(var(--header-color));
   }
 
   li.depth-0.children::after {
@@ -246,11 +246,15 @@ const Wrapper = depth ? Fragment : "nav";
     left: 0;
     background-color: white;
     display: none;
-    padding: 10px;
   }
 
   .depth-1 li {
     width: max-content;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .depth-1 a {
+    padding: 10px 20px;
   }
 
   .depth-0 ul:not(ul.dropdown-open) {
@@ -261,11 +265,35 @@ const Wrapper = depth ? Fragment : "nav";
     display: block;
   }
 
-  .active {
-    background-color: #dff;
+  /* .active {
+    background-color: #eee;
+  } */
+
+  /* .selected {
+    background-color: #ddd;
+  } */
+
+  .active > a {
+    font-weight: bold;
   }
 
-  .selected {
-    background-color: #aff;
+  a {
+    display: block;
+    text-decoration: none;
+    color: rgb(0 0 0);
+    cursor: default;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  a:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  a[href] {
+    cursor: pointer;
+  }
+
+  a[href]:hover {
+    background-color: rgba(0, 0, 0, 0.15);
   }
 </style>

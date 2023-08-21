@@ -12,10 +12,10 @@ export interface Props {
 const { id, currentPath, paths } = Astro.props;
 ---
 
-<header>
+<header class:list={{ pinned: preferences.header.pin_header }}>
   {
     preferences.header.show_logo && (
-      <a href="/">
+      <a class="logo" href="/">
         <img src={preferences.header.logo_image} />
       </a>
     )
@@ -30,7 +30,26 @@ const { id, currentPath, paths } = Astro.props;
 
 <style>
   header {
+    color: rgb(var(--header-color));
     display: grid;
     grid-template-areas: "logo navigation social";
+    z-index: 9999;
+    height: var(--header-height);
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--header-background-color)),
+      rgba(var(--header-background-color-bottom))
+    );
+  }
+
+  header.pinned {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+
+  .logo {
+    padding: 10px;
   }
 </style>
