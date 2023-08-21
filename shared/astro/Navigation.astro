@@ -210,8 +210,28 @@ const Wrapper = depth ? Fragment : "nav";
     flex-direction: row;
     justify-content: flex-end;
     margin-right: 4rem;
+    height: 100%;
 
     gap: 2rem;
+  }
+
+  li.depth-0 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  li.depth-0.children::after {
+    content: "";
+    position: absolute;
+    bottom: 5px;
+    left: calc(50% - 3px);
+    width: 6px;
+    height: 6px;
+    border-radius: 1rem;
+    background-color: #eee;
   }
 
   ul {

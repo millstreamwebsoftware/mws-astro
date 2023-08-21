@@ -13,7 +13,13 @@ const { id, currentPath, paths } = Astro.props;
 ---
 
 <header>
-  {preferences.header.show_logo && <p>Your Logo Here</p>}
+  {
+    preferences.header.show_logo && (
+      <a href="/">
+        <img src={preferences.header.logo_image} />
+      </a>
+    )
+  }
   {
     preferences.header.show_navigation && (
       <Navigation {id} {paths} {currentPath} />
