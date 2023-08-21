@@ -12,7 +12,7 @@ export interface props {
 import preferences from "data/preferences.json";
 const { lat, lng, zoom, key, indent } = Astro.props;
 
-const apiKey = preferences.maps.api_key;
+const apiKey = preferences.API.google_maps.api_key;
 const height = Astro.props.height + "vh";
 const mapId = "map-" + key;
 ---
