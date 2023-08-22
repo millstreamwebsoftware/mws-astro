@@ -90,12 +90,10 @@ content_blocks:
         title:
         description:
   - _bookshop_name: richtext
-    content: >-
+    content: |-
       <h1 class="align-center">Our Story</h1>
 
-
       ![](/images/icons/TOHC-wriggly-line-blk.svg)
-      ![](/images/tohc-banner-idea-rob-supplied.jpeg)![](/images/icons/phone.svg)
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
@@ -116,6 +114,35 @@ content_blocks:
           and we provide a sense of community for everyone. Of course we love
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
+  - _bookshop_name: layout/slider
+    slides:
+      - content: ''
+        background_color:
+        background_image: /images/brands/leftfield-coffee-roasters.png
+        background_fit: contain
+      - content: ''
+        background_color:
+        background_image: /images/brands/loafers-artisan-logo.png
+        background_fit: contain
+      - content: ''
+        background_color:
+        background_image: /images/brands/pietro-gelateria.webp
+        background_fit: contain
+    height: 30
+    gap: 0
+    autoplay: 3
+    perView: 2
+    focusAtCenter: true
+    focusAt: 0
+    bound: false
+    showBullets: true
+    showArrows: true
+    indent: true
+    transition: Carousel
+    animationDuration: 0.4
+    hoverpause: false
+    style:
+      - TOHC-Brands
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: form
@@ -158,35 +185,6 @@ content_blocks:
         height: 30
         indent: false
         style:
-  - _bookshop_name: layout/slider
-    slides:
-      - content: ''
-        background_color:
-        background_image: /images/brands/leftfield-coffee-roasters.png
-        background_fit: contain
-      - content: ''
-        background_color:
-        background_image: /images/brands/loafers-artisan-logo.png
-        background_fit: contain
-      - content: ''
-        background_color:
-        background_image: /images/brands/pietro-gelateria.webp
-        background_fit: contain
-    height: 40
-    gap: 0
-    autoplay: 3
-    perView: 2
-    focusAtCenter: true
-    focusAt: 0
-    bound: false
-    showBullets: true
-    showArrows: true
-    indent: true
-    transition: Carousel
-    animationDuration: 0.4
-    hoverpause: false
-    style:
-      - TOHC-Brands
 show_global_header: true
 show_global_footer: true
 ---
