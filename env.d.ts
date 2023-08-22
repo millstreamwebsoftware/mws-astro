@@ -3,3 +3,4 @@
 /// <reference types="unplugin-icons/types/astro" />
 
 declare module "hoverintent";
+declare module "@bookshop/astro-bookshop/browser";

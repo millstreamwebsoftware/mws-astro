@@ -3,9 +3,9 @@ import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
 
 export interface Props {
-  title: string;
+  title?: string;
   id?: string;
-  content_blocks: Array<Record<string, any>>;
+  content_blocks?: Array<Record<string, any>>;
   show_global_header?: boolean;
   show_global_footer?: boolean;
   paths?: any[];
