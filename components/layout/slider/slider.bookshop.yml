@@ -14,6 +14,7 @@ blueprint:
   height: 50
   gap: 0
   autoplay: 0
+  hoverpause: false
   perView: 1
   focusAtCenter: true
   focusAt: 0
@@ -23,7 +24,6 @@ blueprint:
   indent: false
   transition: Slider
   animationDuration: 0.4
-  hoverpause: false
   style:
 
 _inputs:

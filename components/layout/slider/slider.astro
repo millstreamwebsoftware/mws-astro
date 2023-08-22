@@ -190,7 +190,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       const glideOptions: Partial<Glide.Options> = {
         autoplay: Number(e.dataset?.autoplay) || false,
         focusAt:
-          e.dataset?.focusAt == "center"
+          e.dataset?.focus == "center"
             ? "center"
             : Number(e.dataset?.focus) || 0,
         bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
