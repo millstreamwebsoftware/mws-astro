@@ -108,5 +108,5 @@ _structures:
               - contain
               - cover
       - label: Content Block
-        value:
-          content_block: bookshop:structure:content_blocks
+        options:
+          structures: content_blocks
