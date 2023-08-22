@@ -11,6 +11,7 @@ blueprint:
     - content:
       background_color:
       background_image:
+      background_fit: cover
   height: 50
   gap: 0
   autoplay: 0
@@ -27,6 +28,13 @@ blueprint:
   style:
 
 _inputs:
+  slides:
+    values:
+      background_fit:
+        type: select
+        values:
+          - cover
+            contain
   content:
     type: markdown
     options:
