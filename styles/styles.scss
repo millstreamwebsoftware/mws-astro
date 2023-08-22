@@ -168,3 +168,7 @@ strong {
 .rich-text img {
   max-width: 100%;
 }
+
+.rich-text > * {
+  width: 100%;
+}
