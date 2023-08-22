@@ -164,17 +164,19 @@ content_blocks:
         background_image: /images/brands/pietro-gelateria.webp
     height: 40
     gap: 0
-    autoplay: 0
-    perView: 1
+    autoplay: 3
+    perView: 2
     focusAtCenter: true
     focusAt: 0
     bound: false
     showBullets: true
     showArrows: true
-    indent: false
+    indent: true
     transition: Carousel
     animationDuration: 0.4
     hoverpause: false
+    style:
+      - TOHC-Brands
 show_global_header: true
 show_global_footer: true
 ---
