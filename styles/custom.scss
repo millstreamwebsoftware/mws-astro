@@ -1,26 +1,49 @@
-// .TOHC-Hero {
-//   position: relative;
+.TOHC-Hero {
+  .glide__track {
+    position: relative;
+  }
 
-//   &::after {
-//     content: "";
-//     position: absolute;
-//     top: 50%;
-//     left: 50%;
+  .glide__overlay {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    // inset: 33vw;
 
-//     height: 50vh;
-//     max-height: 50vw;
-//     width: 50vh;
-//     max-width: 50vw;
+    // top: calc(var(--header-height) + 20%);
+    // bottom: 20%;
+    margin-top: var(--header-height);
+    inset: 0;
 
-//     background-image: url("/images/hero/tohc-logo-distressed-blk.svg");
-//     background-position: center;
-//     background-size: 30%;
-//     background-repeat: no-repeat;
-//     background-color: #aaaacc66;
-//     border-radius: 100%;
-//   }
+    &::after {
+      content: "";
 
-//   .glide__slide {
-//     filter: grayscale(1);
-//   }
-// }
+      height: min(80vw, 55vh);
+      width: min(80vw, 55vh);
+
+      background-image: url("/images/hero/tohc-logo-distressed-blk.svg");
+      background-position: center;
+      background-size: 60%;
+      background-repeat: no-repeat;
+      background-color: #ffffffb3;
+      border-radius: 100%;
+    }
+  }
+
+  .glide__slide {
+    filter: grayscale(1);
+  }
+}
+
+.TOHC-Brands .glide__overlay {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    white,
+    transparent 33%,
+    transparent 66%,
+    white
+  );
+}
