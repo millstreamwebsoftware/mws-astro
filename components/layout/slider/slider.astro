@@ -124,7 +124,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                       : "") +
                     (slide.background_image
                       ? `--background-image: url("${slide.background_image}");`
-                      : "")
+                      : "") +
+                    (slide.background_fit === "contain"
+                      ? "--background-fit: contain;"
+                      : "--background-fit: cover;")
                   }
                   set:html={slide.content ? md.render(slide.content) : ""}
                 />

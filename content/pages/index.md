@@ -7,18 +7,23 @@ content_blocks:
       - content:
         background_color:
         background_image: /images/hero/cafe-001.jpg
+        background_fit: cover
       - content:
         background_color:
         background_image: /images/hero/espresso-001.jpg
+        background_fit: cover
       - content:
         background_color:
         background_image: /images/hero/espresso.jpg
+        background_fit: cover
       - content:
         background_color:
         background_image: /images/hero/flat-white.jpg
+        background_fit: cover
       - content:
         background_color:
         background_image: /images/hero/img-3791.jpg
+        background_fit: cover
     height: 80
     gap: 0
     autoplay: 5
@@ -128,19 +133,19 @@ content_blocks:
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ''
+            placeholder: ""
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ''
+            placeholder: ""
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ''
+            placeholder: ""
             required: true
             minlength: 0
             maxlength: 3000
@@ -153,15 +158,18 @@ content_blocks:
         style:
   - _bookshop_name: layout/slider
     slides:
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/leftfield-coffee-roasters.png
-      - content: ''
+        background_fit: contain
+      - content: ""
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
-      - content: ''
+        background_fit: contain
+      - content: ""
         background_color:
         background_image: /images/brands/pietro-gelateria.webp
+        background_fit: contain
     height: 40
     gap: 0
     autoplay: 3
