@@ -3,7 +3,7 @@ spec:
     - content_blocks
   label: Slider
   description: Rotating Carousel
-  icon: view_column
+  icon: view_carousel
   tags: []
 
 blueprint:
@@ -125,3 +125,8 @@ _inputs:
       allow_create: true
       values:
         - TOHC-Hero
+
+_structures:
+  content_slide:
+
+  image_slide:
