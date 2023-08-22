@@ -123,10 +123,20 @@ _inputs:
     type: multiselect
     options:
       allow_create: true
-      values:
-        - TOHC-Hero
 
 _structures:
-  content_slide:
-
-  image_slide:
+  slides:
+    values:
+      - label: Image
+        icon: image
+        value:
+          image:
+          caption:
+          image_fit:
+            type: select
+            values:
+              - contain
+              - cover
+      - label: Content Block
+        value:
+          content_block: bookshop:structure:content_blocks
