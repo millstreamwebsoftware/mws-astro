@@ -64,7 +64,6 @@ if (glideOptions.sliderType == "fader") {
   glideOptions.perView = 1;
   glideOptions.focus = 0;
   glideOptions.animationDuration = 0;
-  fader = true;
 }
 
 if (ENV_EDITOR) glideOptions.sliderType = "slider";
@@ -80,7 +79,12 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 ---
 
 <section
-  class:list={["slider", { ENV_EDITOR, fader }, style]}
+  class:list={[
+    "slider",
+    { ENV_EDITOR },
+    `slider-${glideOptions.sliderType}`,
+    style,
+  ]}
   style={(animationDuration
     ? `--transition: ${animationDuration * 1000}ms;`
     : "") + (indent ? "" : "--indent: 0;")}
@@ -198,40 +202,38 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 </script>
 
 <style>
-  .slider.ENV_EDITOR {
-    .glide__slide {
-      position: relative;
-      border-right: 1px solid black;
-    }
+  .ENV_EDITOR .glide__slide {
+    position: relative;
+    border-right: 1px solid black;
+  }
 
-    .glide__slide::before {
-      content: attr(data-slide-number);
-      position: absolute;
-      top: 0;
-      left: 0;
-      margin-top: 4px;
-      border: 1px solid white;
-      border-left: none;
-      background-color: black;
-      color: white;
-      padding: 2px 5px;
-    }
+  .ENV_EDITOR .glide__slide::before {
+    content: attr(data-slide-number);
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 4px;
+    border: 1px solid white;
+    border-left: none;
+    background-color: black;
+    color: white;
+    padding: 2px 5px;
+  }
 
-    .glide__slides {
-      overflow-x: scroll;
-    }
+  .ENV_EDITOR .glide__slides {
+    overflow-x: scroll;
+  }
 
-    .glide__arrows,
-    .glide__bullets {
-      opacity: 0.5;
-      transition: opacity 0.4s ease-in-out;
-      pointer-events: none;
-    }
+  .ENV_EDITOR .glide__arrows,
+  .ENV_EDITOR .glide__bullets {
+    opacity: 0.5;
+    transition: opacity 0.4s ease-in-out;
+    pointer-events: none;
+  }
 
-    :hover .glide__arrows,
-    :hover .glide__bullets {
-      opacity: 0;
-    }
+  .ENV_EDITOR :hover .glide__arrows,
+  .ENV_EDITOR :hover .glide__bullets {
+    opacity: 0;
   }
 
   .slider {
@@ -326,17 +328,17 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     box-shadow: 0 0 0.2rem #00000088;
   }
 
-  .fader .glide__slides {
+  .slider-fader .glide__slides {
     transform: translate3d(0, 0, 0) !important;
   }
 
-  .fader .glide__slide:first-child {
+  .slider-fader .glide__slide:first-child {
     animation-name: startOpaque;
     animation-duration: var(--transition);
     animation-iteration-count: 1;
   }
 
-  .fader .glide__slide {
+  .slider-fader .glide__slide {
     position: absolute;
     top: 0;
     left: 0;
@@ -345,7 +347,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     transition: opacity var(--transition) ease-in-out;
   }
 
-  .fader .glide__slide.glide__slide--active {
+  .slider-fader .glide__slide.glide__slide--active {
     position: relative;
     order: 1;
     opacity: 1;
