@@ -9,7 +9,7 @@ export interface Props {
 const htmlContent = md.render(Astro.props.content);
 ---
 
-<section set:html={htmlContent} />
+<section class="rich-text" set:html={htmlContent} />
 
 <style>
   section {
