@@ -90,10 +90,12 @@ content_blocks:
         title:
         description:
   - _bookshop_name: richtext
-    content: |-
+    content: >-
       <h1 class="align-center">Our Story</h1>
 
-      ![](/images/icons/TOHC-wriggly-line-blk.svg)&nbsp;
+
+      ![](/images/icons/TOHC-wriggly-line-blk.svg)
+      ![](/images/tohc-banner-idea-rob-supplied.jpeg)![](/images/icons/phone.svg)
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
