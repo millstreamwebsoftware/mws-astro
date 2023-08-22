@@ -1,8 +1,6 @@
 ---
 _schema: default
 title: Home
-status: online
-order: 0
 content_blocks:
   - _bookshop_name: layout/slider
     slides:
@@ -130,19 +128,19 @@ content_blocks:
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ""
+            placeholder: ''
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 0
             maxlength: 3000
@@ -153,6 +151,30 @@ content_blocks:
         height: 30
         indent: false
         style:
+  - _bookshop_name: layout/slider
+    slides:
+      - content: ''
+        background_color:
+        background_image: /images/brands/leftfield-coffee-roasters.png
+      - content: ''
+        background_color:
+        background_image: /images/brands/loafers-artisan-logo.png
+      - content: ''
+        background_color:
+        background_image: /images/brands/pietro-gelateria.webp
+    height: 40
+    gap: 0
+    autoplay: 0
+    perView: 1
+    focusAtCenter: true
+    focusAt: 0
+    bound: false
+    showBullets: true
+    showArrows: true
+    indent: false
+    transition: Carousel
+    animationDuration: 0.4
+    hoverpause: false
 show_global_header: true
 show_global_footer: true
 ---
