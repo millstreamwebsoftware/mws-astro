@@ -44,6 +44,7 @@ const {
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 const slides = Astro.props.slides || [];
+let fader;
 
 type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
@@ -63,6 +64,7 @@ if (glideOptions.sliderType == "fader") {
   glideOptions.perView = 1;
   glideOptions.focus = 0;
   glideOptions.animationDuration = 0;
+  fader = true;
 }
 
 if (ENV_EDITOR) glideOptions.sliderType = "slider";
@@ -78,34 +80,12 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 ---
 
 <section
-  class:list={["slider", { ENV_EDITOR }, style]}
+  class:list={["slider", { ENV_EDITOR, fader }, style]}
   style={(animationDuration
     ? `--transition: ${animationDuration * 1000}ms;`
     : "") + (indent ? "" : "--indent: 0;")}
 >
   <>
-    {
-      ENV_EDITOR && (
-        <>
-          {slides.map((slide, i) => (
-            <>
-              <input
-                type="radio"
-                id={id + "_" + i}
-                name={id}
-                checked={i == 0 ? "checked" : undefined}
-              />
-            </>
-          ))}
-          <div class="editor__buttons">
-            {slides.map((slide, i) => (
-              <label for={id + "_" + i}>{i}</label>
-            ))}
-          </div>
-        </>
-      )
-    }
-
     <div class="glide" {id} {...dataGlideOptions}>
       <div
         class="glide__track"
@@ -117,6 +97,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             slides.map((slide, i) => (
               <>
                 <li
+                  data-slide-number={i}
                   class:list={["glide__slide"]}
                   style={
                     (slide.background_color
@@ -215,3 +196,173 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
   });
 </script>
+
+<style>
+  .slider.ENV_EDITOR {
+    .glide__slide {
+      position: relative;
+      border-right: 1px solid black;
+    }
+
+    .glide__slide::before {
+      content: attr(data-slide-number);
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin-top: 4px;
+      border: 1px solid white;
+      border-left: none;
+      background-color: black;
+      color: white;
+      padding: 2px 5px;
+    }
+
+    .glide__slides {
+      overflow-x: scroll;
+    }
+
+    .glide__arrows,
+    .glide__bullets {
+      opacity: 0.5;
+      transition: opacity 0.4s ease-in-out;
+      pointer-events: none;
+    }
+
+    :hover .glide__arrows,
+    :hover .glide__bullets {
+      opacity: 0;
+    }
+  }
+
+  .slider {
+    --arrow-size: 3rem;
+    --bullet-size: 1rem;
+  }
+
+  .glide__slides {
+    height: var(--height);
+  }
+
+  .glide__slide {
+    background-color: var(--background-color);
+    background-image: var(--background-image);
+    background-size: var(--background-fit);
+
+    background-position: center;
+    background-repeat: no-repeat;
+
+    padding: 4rem;
+    height: 100%;
+  }
+
+  .glide__arrows {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .glide__arrow {
+    position: absolute;
+    top: calc(50% - var(--arrow-size) * 0.5);
+    height: var(--arrow-size);
+    width: var(--arrow-size);
+    border: none;
+    background-color: #00000033;
+    border-radius: var(--arrow-size);
+    backdrop-filter: blur(2px);
+  }
+
+  .glide__arrow:hover {
+    background-color: #00000044;
+  }
+
+  .glide__arrow--left {
+    left: 1rem;
+  }
+
+  .glide__arrow--right {
+    right: 1rem;
+  }
+
+  .glide__arrow svg {
+    color: white;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glide__bullets {
+    position: absolute;
+    bottom: 0.8rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .glide__bullet {
+    border: none;
+    padding: 5px;
+    height: var(--bullet-size) * 0.5;
+    width: var(--bullet-size);
+    border-radius: 0.5rem;
+    background-color: #bbbbbb44;
+    box-shadow: 0 0 0.2rem #00000011;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .glide__bullet--active {
+    background-color: #ffffffaa;
+    box-shadow: 0 0 0.2rem #00000044;
+  }
+
+  .glide__bullet:hover {
+    box-shadow: 0 0 0.2rem #00000088;
+  }
+
+  .fader .glide__slides {
+    transform: translate3d(0, 0, 0) !important;
+  }
+
+  .fader .glide__slide:first-child {
+    animation-name: startOpaque;
+    animation-duration: var(--transition);
+    animation-iteration-count: 1;
+  }
+
+  .fader .glide__slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    order: 2;
+    opacity: 0;
+    transition: opacity var(--transition) ease-in-out;
+  }
+
+  .fader .glide__slide.glide__slide--active {
+    position: relative;
+    order: 1;
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .glide__overlay {
+    display: none;
+    pointer-events: none;
+  }
+
+  @keyframes startOpaque {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+</style>
