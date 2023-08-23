@@ -116,6 +116,7 @@ content_blocks:
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
         background_color: "rgb(245, 245, 245)"
+    layout: [0]
     collapse: true
   - _bookshop_name: layout/slider
     slides:
@@ -189,6 +190,7 @@ content_blocks:
         height: 40
         indent: false
         style:
+    layout: [0]
     collapse: true
 show_global_header: true
 show_global_footer: true

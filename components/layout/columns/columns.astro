@@ -2,10 +2,11 @@
 export interface Props {
   content_blocks: any[];
   collapse?: boolean;
+  layout?: number[];
   key?: string;
 }
 
-const { collapse, key } = Astro.props;
+const { collapse, layout, key } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
@@ -27,11 +28,36 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   const bookshopName = parts.join("/");
   components[bookshopName] = obj.default;
 });
+
+const columnCount = contentBlocks.length;
+
+let layoutCount = columnCount;
+let columnLayout = "";
+
+if (layout?.length) {
+  for (let i = 0; i < layout.length; i++) {
+    const n = layout[i];
+
+    if (n) {
+      columnLayout += `repeat(${n}, 1fr) `;
+    } else {
+      columnLayout += `repeat(${layoutCount}, 1fr)`;
+      break;
+    }
+
+    layoutCount -= n;
+    if (layoutCount < 1) {
+      break;
+    }
+  }
+}
+
+// const columnLayout = layout?.layout?.indexOf(0);
 ---
 
 <div
   class:list={["columns", { collapse }]}
-  style={{ "--column-count": contentBlocks.length }}
+  style={{ "--column-count": columnCount, "--column-layout": columnLayout }}
 >
   {
     contentBlocks.map((block: any, i: any) => {
@@ -50,15 +76,15 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
 
 <style>
   .columns {
-    /* column-gap: var(--column-gap); */
+    /* gap: var(--column-gap); */
     display: grid;
     grid-auto-flow: row;
-    grid-template-columns: repeat(var(--column-count), 1fr);
+    grid-template-columns: var(--column-layout);
   }
 
   @media only screen and (max-width: 768px) {
     .collapse {
-      grid-template-columns: repeat(calc(var(--column-count) * 0.5), 1fr);
+      grid-template-columns: 1fr;
     }
   }
 </style>
