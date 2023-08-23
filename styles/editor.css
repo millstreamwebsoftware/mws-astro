@@ -9,16 +9,26 @@ h3.highlight-1 {
   color: rgb(var(--color-accent) / 0.7);
 }
 
-h3.highlight-2 {
-  color: white;
-  background-color: rgb(var(--color-accent) / 0.9);
-  padding: 3px 10px;
-  margin: 0 0 5px 0;
+h1.highlight-2 {
+  position: relative;
 }
 
-.rich-text > * {
-  width: 100%;
+h1.highlight-2::after {
+  position: absolute;
+  content: "";
+  background-image: url("/images/icons/TOHC-wriggly-line-blk.svg");
+  bottom: 0;
+  height: 0.15em;
+  left: 0;
+  right: 0;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
+
+/* .rich-text > :is(h1, h2, h3, h4, h5, h6, p) {
+  width: 100%;
+} */
 
 .rich-text img {
   max-width: 100%;

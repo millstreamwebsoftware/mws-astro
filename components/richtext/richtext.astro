@@ -4,12 +4,15 @@ const md = new MarkdownIt({ html: true });
 
 export interface Props {
   content: string;
+  style?: string[];
 }
 
+const { style } = Astro.props;
 const htmlContent = md.render(Astro.props.content);
+console.log(style);
 ---
 
-<section class="rich-text" set:html={htmlContent} />
+<section class:list={["rich-text", style]} set:html={htmlContent} />
 
 <style>
   section {

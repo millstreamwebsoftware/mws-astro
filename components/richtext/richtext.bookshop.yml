@@ -10,6 +10,7 @@ spec:
 # Defines the structure of this component, as well as the default values
 blueprint:
   content:
+  style:
 
 _inputs:
   content:
@@ -42,6 +43,16 @@ _inputs:
       right: align-right
       justify: align-justify
       image_size_attributes: true
+  style:
+    type: multiselect
+    options:
+      allow_create: true
+      values:
+        - no-indent
+        - no-indent-top
+        - no-indent-bottom
+        - no-indent-left
+        - no-indent-right
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
