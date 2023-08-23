@@ -89,13 +89,11 @@ content_blocks:
       - image: /images/gallery/tohc-lemon-tart-experiments-oct-2022.jpeg
         title:
         description:
-  - _bookshop_name: richtext
-    content: |-
-      <h1 class="align-center highlight-2">Our Story</h1>
-    background_color: "rgb(245, 245, 245)"
-    style: ["no-indent-bottom"]
   - _bookshop_name: layout/columns
     content_blocks:
+      - _bookshop_name: richtext
+        content: <h1 class="highlight-2 align-center">Our Story</h1>
+        background_color: '#f5f5f5'
       - _bookshop_name: richtext
         content: >-
           The idea of a cafe on the banks of our beautiful Swan River was first
@@ -106,7 +104,7 @@ content_blocks:
           fulfilling career but that lingering desire to create a space where
           everyone would be welcome and where we could share this beautiful
           location has never left us.
-        background_color: "rgb(245, 245, 245)"
+        background_color: rgb(245, 245, 245)
       - _bookshop_name: richtext
         content: >-
           We have worked incredibly hard and had wonderful support from everyone
@@ -115,20 +113,22 @@ content_blocks:
           and we provide a sense of community for everyone. Of course we love
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
-        background_color: "rgb(245, 245, 245)"
-    layout: [0]
+        background_color: rgb(245, 245, 245)
+    layout:
+      - 1
+      - 0
     collapse: true
   - _bookshop_name: layout/slider
     slides:
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/leftfield-coffee-roasters.png
         background_fit: contain
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
         background_fit: contain
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/pietro-gelateria.webp
         background_fit: contain
@@ -152,7 +152,7 @@ content_blocks:
       - _bookshop_name: form
         name: contact
         action: https://usebasin.com/f/88179f198898
-        background_color: "rgb(250, 250, 250)"
+        background_color: rgb(250, 250, 250)
         form_blocks:
           - _bookshop_name: form/info
             content: |-
@@ -167,19 +167,19 @@ content_blocks:
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ""
+            placeholder: ''
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 0
             maxlength: 3000
@@ -190,7 +190,8 @@ content_blocks:
         height: 40
         indent: false
         style:
-    layout: [0]
+    layout:
+      - 0
     collapse: true
 show_global_header: true
 show_global_footer: true
