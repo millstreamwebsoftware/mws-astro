@@ -9,7 +9,6 @@ export interface Props {
 
 const { style } = Astro.props;
 const htmlContent = md.render(Astro.props.content);
-console.log(style);
 ---
 
 <section class:list={["rich-text", style]} set:html={htmlContent} />
