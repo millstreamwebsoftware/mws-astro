@@ -1,9 +1,48 @@
 ---
+import colorString from "color-string";
 import Social from "@components/social/social.astro";
+import preferences from "data/preferences.json";
+const currentYear = new Date().getFullYear();
+
+const textColor = colorString.get
+  .rgb(preferences.footer.foreground_color)
+  ?.slice(0, 3)
+  .join(" ");
 ---
 
-<section class="footer">
-  <h1>There is something afoot!</h1>
-  <p>Down here in the footer...</p>
-  <Social />
+<section
+  class="footer"
+  style={`--background-color: ${preferences.footer.background_color};` +
+    `--text-color: ${textColor};`}
+>
+  {
+    preferences.footer.show_copyright && (
+      <p class="copyright">
+        {preferences.footer.copyright.replace("©", "© " + currentYear)}
+      </p>
+    )
+  }
+  {preferences.footer.show_socials && <Social />}
+  {
+    preferences.footer.show_top_button && (
+      <a href="#top" style="color: rgb(var(--text-color))">
+        Back to top
+      </a>
+    )
+  }
 </section>
+
+<style>
+  section.footer {
+    display: grid;
+    gap: 2rem;
+    background-color: var(--background-color);
+    grid-template-columns: auto auto;
+  }
+
+  .copyright {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+</style>

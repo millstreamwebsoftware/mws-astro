@@ -10,9 +10,25 @@ export interface Props {
 }
 
 const { id, currentPath, paths } = Astro.props;
+
+const headerItems: Record<string, boolean> = {
+  logo: preferences.header.show_logo,
+  navigation: preferences.header.show_navigation,
+  social: preferences.header.show_socials,
+};
+const headerAreas =
+  '"' +
+  Object.keys(headerItems)
+    .filter((k) => headerItems[k])
+    .join(" ") +
+  '"';
 ---
 
-<header class:list={{ pinned: preferences.header.pin_header }}>
+<header
+  class:list={{ pinned: preferences.header.pin_header }}
+  style={`--text-color: var(--header-color);` +
+    `--header-areas: ${headerAreas};`}
+>
   {
     preferences.header.show_logo && (
       <a class="logo" href="/">
@@ -32,7 +48,7 @@ const { id, currentPath, paths } = Astro.props;
   header {
     color: rgb(var(--header-color));
     display: grid;
-    grid-template-areas: "logo navigation social";
+    grid-template-areas: var(--header-areas);
     grid-template-rows: 100%;
     z-index: 9999;
     height: var(--header-height);
