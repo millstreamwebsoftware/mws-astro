@@ -49,40 +49,40 @@ section
 }
 
 section {
-  margin: var(--indent);
+  padding: var(--indent);
 }
 
 section.no-indent {
-  margin: 0;
+  padding: 0;
 
   &-top {
-    margin-top: 0;
+    padding-top: 0;
   }
   &-bottom {
-    margin-bottom: 0;
+    padding-bottom: 0;
   }
   &-left {
-    margin-left: 0;
+    padding-left: 0;
   }
   &-right {
-    margin-right: 0;
+    padding-right: 0;
   }
 }
 
 .columns section:not(.no-indent) {
-  margin-left: 0;
-  margin-right: 0;
-  // margin-top: 0;
-  // margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+  // padding-top: 0;
+  // padding: 0;
 
   &:first-child {
-    margin-left: var(--indent);
-    margin-right: var(--column-gap);
+    padding-left: var(--indent);
+    padding-right: var(--column-gap);
   }
 
   &:last-child {
-    margin-left: var(--column-gap);
-    margin-right: var(--indent);
+    padding-left: var(--column-gap);
+    padding-right: var(--indent);
   }
 }
 
