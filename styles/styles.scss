@@ -69,20 +69,22 @@ section.no-indent {
   }
 }
 
-.columns section:not(.no-indent) {
-  padding-left: 0;
-  padding-right: 0;
-  // padding-top: 0;
-  // padding: 0;
+@media only screen and (min-width: 768px) {
+  .columns section:not(.no-indent) {
+    padding-left: 0;
+    padding-right: 0;
+    // padding-top: 0;
+    // padding: 0;
 
-  &:first-child {
-    padding-left: var(--indent);
-    padding-right: var(--column-gap);
-  }
+    &:first-child {
+      padding-left: var(--indent);
+      padding-right: var(--column-gap);
+    }
 
-  &:last-child {
-    padding-left: var(--column-gap);
-    padding-right: var(--indent);
+    &:last-child {
+      padding-left: var(--column-gap);
+      padding-right: var(--indent);
+    }
   }
 }
 

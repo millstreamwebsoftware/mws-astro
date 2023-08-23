@@ -1,10 +1,11 @@
 ---
 export interface Props {
   content_blocks: any[];
+  collapse?: boolean;
   key?: string;
 }
 
-const { key } = Astro.props;
+const { collapse, key } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
@@ -28,7 +29,10 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
 });
 ---
 
-<div class="columns" style={{ "--column-count": contentBlocks.length }}>
+<div
+  class:list={["columns", { collapse }]}
+  style={{ "--column-count": contentBlocks.length }}
+>
   {
     contentBlocks.map((block: any, i: any) => {
       const Component = components[block._bookshop_name];
@@ -48,7 +52,13 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   .columns {
     /* column-gap: var(--column-gap); */
     display: grid;
-    grid-auto-flow: column;
+    grid-auto-flow: row;
     grid-template-columns: repeat(var(--column-count), 1fr);
+  }
+
+  @media only screen and (max-width: 768px) {
+    .collapse {
+      grid-template-columns: repeat(calc(var(--column-count) * 0.5), 1fr);
+    }
   }
 </style>

@@ -113,6 +113,7 @@ content_blocks:
           and we provide a sense of community for everyone. Of course we love
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
+    collapse: true
   - _bookshop_name: layout/slider
     slides:
       - content: ""
@@ -181,9 +182,10 @@ content_blocks:
         lat: -31.930914
         lng: 115.917333
         zoom: 16
-        height: 30
+        height: 40
         indent: false
         style:
+    collapse: true
 show_global_header: true
 show_global_footer: true
 ---
