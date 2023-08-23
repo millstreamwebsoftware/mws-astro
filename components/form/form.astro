@@ -1,12 +1,14 @@
 ---
+import { convertColorString } from "src/util";
 export interface Props {
   action: string;
   name: string;
   form_blocks: any[];
+  background_color?: string;
   key?: string;
 }
 
-const { action, name, form_blocks, key } = Astro.props;
+const { action, name, form_blocks, background_color, key } = Astro.props;
 const id = (name || "") + "-" + (key || "");
 
 const components: Record<string, any> = {};
@@ -28,9 +30,11 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   const bookshopName = parts.join("/");
   components[bookshopName] = obj.default;
 });
+
+const background = convertColorString(background_color);
 ---
 
-<section class="form">
+<section style=`--background-color: ${background};` class="form">
   <form method="post" {action} {name} {id}>
     {
       form_blocks.map((block: any, i: number) => {

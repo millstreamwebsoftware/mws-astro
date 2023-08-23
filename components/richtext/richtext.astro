@@ -1,17 +1,24 @@
 ---
 import MarkdownIt from "markdown-it";
+import { convertColorString } from "src/util";
 const md = new MarkdownIt({ html: true });
 
 export interface Props {
   content: string;
+  background_color?: string;
   style?: string[];
 }
 
-const { style } = Astro.props;
+const { background_color, style } = Astro.props;
 const htmlContent = md.render(Astro.props.content);
+const background = convertColorString(background_color);
 ---
 
-<section class:list={["rich-text", style]} set:html={htmlContent} />
+<section
+  style=`--background-color: ${background};`
+  class:list={["rich-text", style]}
+  set:html={htmlContent}
+/>
 
 <style>
   section {

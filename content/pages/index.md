@@ -92,6 +92,7 @@ content_blocks:
   - _bookshop_name: richtext
     content: |-
       <h1 class="align-center highlight-2">Our Story</h1>
+    background_color: "rgb(245, 245, 245)"
     style: ["no-indent-bottom"]
   - _bookshop_name: layout/columns
     content_blocks:
@@ -105,6 +106,7 @@ content_blocks:
           fulfilling career but that lingering desire to create a space where
           everyone would be welcome and where we could share this beautiful
           location has never left us.
+        background_color: "rgb(245, 245, 245)"
       - _bookshop_name: richtext
         content: >-
           We have worked incredibly hard and had wonderful support from everyone
@@ -113,6 +115,7 @@ content_blocks:
           and we provide a sense of community for everyone. Of course we love
           our coffee and food and will endeavour to bring you great tasting
           ethically sourced offerings.
+        background_color: "rgb(245, 245, 245)"
     collapse: true
   - _bookshop_name: layout/slider
     slides:
@@ -148,6 +151,7 @@ content_blocks:
       - _bookshop_name: form
         name: contact
         action: https://usebasin.com/f/88179f198898
+        background_color: "rgb(250, 250, 250)"
         form_blocks:
           - _bookshop_name: form/info
             content: |-
