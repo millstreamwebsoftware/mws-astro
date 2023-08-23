@@ -1,13 +1,10 @@
 ---
-import colorString from "color-string";
+import { convertColorString } from "src/util";
 import Social from "@components/social/social.astro";
 import preferences from "data/preferences.json";
 const currentYear = new Date().getFullYear();
 
-const textColor = colorString.get
-  .rgb(preferences.footer.foreground_color)
-  ?.slice(0, 3)
-  .join(" ");
+const textColor = convertColorString(preferences.footer.foreground_color);
 ---
 
 <section

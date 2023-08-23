@@ -1,4 +1,5 @@
 ---
+import { convertColorString } from "src/util";
 import preferences from "data/preferences.json";
 import Navigation from "./Navigation.astro";
 import Social from "@components/social/social.astro";
@@ -22,12 +23,22 @@ const headerAreas =
     .filter((k) => headerItems[k])
     .join(" ") +
   '"';
+
+const headerBackgroundColor = convertColorString(
+  preferences.header.background_top_color
+);
+const headerBackgroundColorBottom = convertColorString(
+  preferences.header.background_bottom_color
+);
 ---
 
 <header
   class:list={{ pinned: preferences.header.pin_header }}
   style={`--text-color: var(--header-color);` +
-    `--header-areas: ${headerAreas};`}
+    `--header-height: ${preferences.header.height}px;` +
+    `--header-areas: ${headerAreas};` +
+    `--header-background-color: ${headerBackgroundColor};` +
+    `--header-background-color-bottom: ${headerBackgroundColorBottom};`}
 >
   {
     preferences.header.show_logo && (
@@ -46,11 +57,15 @@ const headerAreas =
 
 <style>
   header {
-    color: rgb(var(--header-color));
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
     display: grid;
+    z-index: 9999;
+    color: rgb(var(--header-color));
     grid-template-areas: var(--header-areas);
     grid-template-rows: 100%;
-    z-index: 9999;
     height: var(--header-height);
     background: linear-gradient(
       to bottom,
