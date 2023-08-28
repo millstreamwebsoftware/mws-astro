@@ -11,7 +11,7 @@ spec:
 blueprint:
   content_blocks: [bookshop:structure:content_blocks]
   collapse: true
-  layout: [0]
+  layout: [1]
 
 _inputs:
   collapse:
@@ -19,12 +19,13 @@ _inputs:
     comment: Restrict to one column at small screen sizes
   layout:
     type: array
-    comment: Set a fixed number of columns per row (0 is no limit, rows after a zero are ignored).
+    comment: Set a fixed number of columns per row. The last row will be repeated in case of extra items.
   layout[*]:
-    type: number
+    type: range
     options:
-      min: 0
+      min: 1
       step: 1
+      max: 6
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
