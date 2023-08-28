@@ -5,10 +5,12 @@ export interface Props {
   name: string;
   form_blocks: any[];
   background_color?: string;
+  classes?: any;
   key?: string;
 }
 
-const { action, name, form_blocks, background_color, key } = Astro.props;
+const { action, name, form_blocks, background_color, classes, key } =
+  Astro.props;
 const id = (name || "") + "-" + (key || "");
 
 const components: Record<string, any> = {};
@@ -34,7 +36,10 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
 const background = convertColorString(background_color);
 ---
 
-<section style=`--background-color: ${background};` class="form">
+<section
+  style=`--background-color: ${background};`
+  class:list={["form", classes]}
+>
   <form method="post" {action} {name} {id}>
     {
       form_blocks.map((block: any, i: number) => {

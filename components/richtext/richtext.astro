@@ -6,17 +6,18 @@ const md = new MarkdownIt({ html: true });
 export interface Props {
   content: string;
   background_color?: string;
-  style?: string[];
+  classes?: any;
+  style?: Record<string, string>;
 }
 
-const { background_color, style } = Astro.props;
+const { background_color, style, classes } = Astro.props;
 const htmlContent = md.render(Astro.props.content);
 const background = convertColorString(background_color);
 ---
 
 <section
-  style=`--background-color: ${background};`
-  class:list={["rich-text", style]}
+  style={Object.assign({ "--background-color": background }, style)}
+  class:list={["rich-text", classes]}
   set:html={htmlContent}
 />
 

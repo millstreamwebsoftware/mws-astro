@@ -37,7 +37,7 @@ content_blocks:
     indent: false
     transition: Fader
     animationDuration: 2.5
-    style:
+    classes:
       - TOHC-Hero
   - _bookshop_name: richtext
     content: >-
@@ -93,7 +93,7 @@ content_blocks:
     content_blocks:
       - _bookshop_name: richtext
         content: <h1 class="highlight-2 align-center">Our Story</h1>
-        background_color: '#f5f5f5'
+        background_color: "#f5f5f5"
       - _bookshop_name: richtext
         content: >-
           The idea of a cafe on the banks of our beautiful Swan River was first
@@ -116,19 +116,19 @@ content_blocks:
         background_color: rgb(245, 245, 245)
     layout:
       - 1
-      - 0
+      - 2
     collapse: true
   - _bookshop_name: layout/slider
     slides:
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/leftfield-coffee-roasters.png
         background_fit: contain
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
         background_fit: contain
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/pietro-gelateria.webp
         background_fit: contain
@@ -145,7 +145,7 @@ content_blocks:
     transition: Carousel
     animationDuration: 0.4
     hoverpause: false
-    style:
+    classes:
       - TOHC-Brands
   - _bookshop_name: layout/columns
     content_blocks:
@@ -167,19 +167,19 @@ content_blocks:
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ''
+            placeholder: ""
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ''
+            placeholder: ""
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ''
+            placeholder: ""
             required: true
             minlength: 0
             maxlength: 3000
@@ -191,7 +191,7 @@ content_blocks:
         indent: false
         style:
     layout:
-      - 0
+      - 2
     collapse: true
 show_global_header: true
 show_global_footer: true

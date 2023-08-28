@@ -29,41 +29,94 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   components[bookshopName] = obj.default;
 });
 
-const columnCount = contentBlocks.length;
+// const columnCount = contentBlocks.length;
 
-let layoutCount = columnCount;
-let columnLayout = "";
+// let layoutCount = columnCount;
+// let columnLayout = "";
+
+// if (layout?.length) {
+//   for (let i = 0; i < layout.length; i++) {
+//     const n = layout[i];
+
+//     if (n === 1) {
+//       columnLayout += "1fr ";
+//     } else if (n) {
+//       columnLayout += `repeat(${n}, 1fr) `;
+//     } else {
+//       columnLayout += `repeat(${layoutCount}, 1fr)`;
+//       break;
+//     }
+
+//     layoutCount -= n;
+//     if (layoutCount < 1) {
+//       break;
+//     }
+//   }
+// }
+
+// Calculate the lowest common multiple to get the minimum number of columns
+const gcd = (a: number, b: number): number => (b == 0 ? a : gcd(b, a % b));
+const lcm = (a: number, b: number): number => (a / gcd(a, b)) * b;
+const lcmAll = (ns: number[]): number => ns.reduce(lcm, 1);
+
+let layoutBlocks: any[] = [];
+let columns = contentBlocks.length;
 
 if (layout?.length) {
-  for (let i = 0; i < layout.length; i++) {
-    const n = layout[i];
+  columns = lcmAll(layout);
 
-    if (n) {
-      columnLayout += `repeat(${n}, 1fr) `;
-    } else {
-      columnLayout += `repeat(${layoutCount}, 1fr)`;
-      break;
-    }
+  let row = 0;
+  let i = 0;
+  while (i < contentBlocks.length) {
+    const rowLayout = layout.at(row++) || layout.at(-1); // Use last item in array if out of bounds
+    if (typeof rowLayout === "undefined")
+      throw Error("Undefined value in layout");
+    const subcolumn = columns / rowLayout;
 
-    layoutCount -= n;
-    if (layoutCount < 1) {
-      break;
+    for (let j = 0; j < rowLayout; j++) {
+      const block = contentBlocks.at(i++);
+      if (!block) break;
+      const start = j * subcolumn + 1;
+      const columnString = `${start} / span ${subcolumn}`;
+      const rowString = `${row} / span 1`;
+      const cell = {
+        "first-in-row": start === 1,
+        "last-in-row": j + 1 === rowLayout,
+        "first-in-column": row === 1,
+        "last-in-column": contentBlocks.length - i <= rowLayout - j,
+      };
+
+      Object.assign(block, { columnString, rowString, cell });
+      layoutBlocks.push(block);
     }
   }
 }
 
+let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
+// console.log(items);
+// console.log(columnLayout);
 // const columnLayout = layout?.layout?.indexOf(0);
 ---
 
 <div
   class:list={["columns", { collapse }]}
-  style={{ "--column-count": columnCount, "--column-layout": columnLayout }}
+  style={{ "--column-count": columns }}
 >
   {
-    contentBlocks.map((block: any, i: any) => {
+    items.map((block: any, i: any) => {
       const Component = components[block._bookshop_name];
       if (Component) {
-        return <Component {...block} key={String(i) + (key || "")} />;
+        return (
+          <Component
+            style={{
+              "grid-row": block.rowString,
+              "grid-column": block.columnString,
+            }}
+            classes={block.cell}
+            {...block}
+            key={String(i) + (key || "")}
+          />
+        );
       }
       return (
         <div class="missing-component">
@@ -79,7 +132,7 @@ if (layout?.length) {
     /* gap: var(--column-gap); */
     display: grid;
     grid-auto-flow: row;
-    grid-template-columns: var(--column-layout);
+    grid-template-columns: repeat(var(--column-count), 1fr);
   }
 
   @media only screen and (max-width: 768px) {
