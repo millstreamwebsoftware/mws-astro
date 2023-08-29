@@ -35,15 +35,21 @@
   }
 }
 
-.TOHC-Brands .glide__overlay {
-  display: block;
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    white,
-    transparent 33%,
-    transparent 66%,
-    white
-  );
+.TOHC-Brands {
+  .glide__slide {
+    background-size: 60%;
+  }
+
+  .glide__overlay {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      white,
+      transparent 33%,
+      transparent 66%,
+      white
+    );
+  }
 }

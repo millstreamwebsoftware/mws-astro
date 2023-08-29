@@ -133,7 +133,7 @@ content_blocks:
         background_image: /images/brands/pietro-gelateria.webp
         background_fit: contain
     height: 30
-    gap: 0
+    gap: 10
     autoplay: 3
     perView: 2
     focusAtCenter: true

@@ -154,6 +154,7 @@ form {
   input,
   textarea {
     width: 100%;
+    background-color: white;
   }
 }
 
@@ -224,6 +225,9 @@ strong {
   font-family: var(--bold-font-family);
 }
 
+button {
+  cursor: pointer;
+}
 // .missing-component {
 //   display: none;
 // }
