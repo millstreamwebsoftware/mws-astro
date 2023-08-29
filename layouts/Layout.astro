@@ -32,10 +32,13 @@ const {
 import preferences from "data/preferences.json";
 
 const pageTitle = title + preferences.general.browser_window_title_suffix;
+const style: any = {};
+const pageWidth = preferences.page.maximum_page_width;
+pageWidth && (style["--page-max-width"] = pageWidth + "px");
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style={style}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
