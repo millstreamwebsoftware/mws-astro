@@ -65,4 +65,14 @@ const background = convertColorString(background_color);
     flex-direction: column;
     gap: var(--text-gap);
   }
+
+  input[type="submit"] {
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  input[type="submit"]:hover {
+    background-color: rgb(0 0 0 / 0.2);
+  }
 </style>
