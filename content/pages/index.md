@@ -158,9 +158,9 @@ content_blocks:
             content: |-
               ## Contact details
 
-              130 Milne Street, Bayswater (AP Hinds Reserve)
+              _130 Milne Street, Bayswater (AP Hinds Reserve)_
 
-              Perth, WA, Australia, Western Australia
+              _Perth, WA, Australia, Western Australia_
 
               ### Contact us
             style: Default

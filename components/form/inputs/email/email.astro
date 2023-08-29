@@ -11,12 +11,14 @@ const { name, label, placeholder, required, key } = Astro.props;
 const id = (name || "") + "-" + (key || "");
 ---
 
-<label for={id}>{label}</label>
-<input
-  type="email"
-  name={name}
-  {id}
-  {required}
-  placeholder={placeholder}
-  maxlength="254"
-/>
+<div class="input email">
+  <label for={id}>{label}</label>
+  <input
+    type="email"
+    name={name}
+    {id}
+    {required}
+    placeholder={placeholder}
+    maxlength="254"
+  />
+</div>

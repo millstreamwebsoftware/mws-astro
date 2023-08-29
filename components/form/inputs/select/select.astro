@@ -11,8 +11,10 @@ const { name, label, required, key, options } = Astro.props;
 const id = (name || "") + "-" + (key || "");
 ---
 
-<label for={id}>{label}</label>
-<select {name} {id} {required}>
-  <option value="">-- Select --</option>
-  {options && options.map((opt, i) => <option value={opt}>{opt}</option>)}
-</select>
+<div class="input select">
+  <label for={id}>{label}</label>
+  <select {name} {id} {required}>
+    <option value="">-- Select --</option>
+    {options && options.map((opt, i) => <option value={opt}>{opt}</option>)}
+  </select>
+</div>

@@ -15,13 +15,15 @@ const maxlength = Astro.props.maxlength ? Astro.props.maxlength : undefined;
 const id = (name || "") + "-" + (key || "");
 ---
 
-<label for={id}>{label}</label>
-<input
-  type="text"
-  name={name}
-  {id}
-  {required}
-  placeholder={placeholder}
-  minlength={minlength}
-  maxlength={maxlength}
-/>
+<div class="input text">
+  <label for={id}>{label}</label>
+  <input
+    type="text"
+    name={name}
+    {id}
+    {required}
+    placeholder={placeholder}
+    minlength={minlength}
+    maxlength={maxlength}
+  />
+</div>
