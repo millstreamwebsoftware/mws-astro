@@ -35,6 +35,7 @@ const mapId = "map-" + key;
 
 <script>
   import { Loader } from "@googlemaps/js-api-loader";
+  import { styles } from "@styles/map.json";
 
   const apiKey = document
     .querySelector("[data-map][data-api-key]")
@@ -60,6 +61,7 @@ const mapId = "map-" + key;
           lng: Number(e.dataset?.lng),
         },
         zoom: Number(e.dataset?.zoom),
+        styles,
       });
     });
   });
