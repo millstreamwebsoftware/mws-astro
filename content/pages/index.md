@@ -160,7 +160,7 @@ content_blocks:
 
               *130 Milne Street, Bayswater 6053 (AP Hinds Reserve)*
 
-              *Perth, WA, Australia, Western Australia*
+              *Perth, Western Australia*
 
               ### Contact us
             style: Default
