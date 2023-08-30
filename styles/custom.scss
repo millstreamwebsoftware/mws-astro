@@ -36,8 +36,8 @@
 }
 
 .TOHC-Brands {
-  .glide__slide {
-    background-size: 60%;
+  .glide__slide .slide__background {
+    padding: var(--column-gap);
   }
 
   .glide__overlay {

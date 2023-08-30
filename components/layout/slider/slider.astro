@@ -98,24 +98,30 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         <ul class="glide__slides">
           {
             slides.map((slide, i) => (
-              <>
-                <li
-                  data-slide-number={i}
-                  class:list={["glide__slide"]}
-                  style={
-                    (slide.background_color
-                      ? `--background-color: ${slide.background_color};`
-                      : "") +
-                    (slide.background_image
-                      ? `--background-image: url("${slide.background_image}");`
-                      : "") +
-                    (slide.background_fit === "contain"
-                      ? "--background-fit: contain;"
-                      : "--background-fit: cover;")
-                  }
-                  set:html={slide.content ? md.render(slide.content) : ""}
-                />
-              </>
+              <li
+                data-slide-number={i}
+                class:list={["glide__slide"]}
+                style={
+                  slide.background_color
+                    ? `--background-color: ${slide.background_color};`
+                    : ""
+                }
+              >
+                {slide.background_image && (
+                  <img
+                    class="slide__background"
+                    src={slide.background_image}
+                    style={
+                      slide.background_fit === "contain"
+                        ? "--background-fit: contain;"
+                        : "--background-fit: cover;"
+                    }
+                  />
+                )}
+                {slide.content && (
+                  <Fragment set:html={md.render(slide.content)} />
+                )}
+              </li>
             ))
           }
         </ul>
@@ -246,14 +252,21 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
   .glide__slide {
     background-color: var(--background-color);
-    background-image: var(--background-image);
-    background-size: var(--background-fit);
 
-    background-position: center;
-    background-repeat: no-repeat;
+    position: relative;
 
     padding: 4rem;
     height: 100%;
+  }
+
+  .glide__slide .slide__background {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--background-fit);
+    object-position: center;
   }
 
   .glide__arrows {
