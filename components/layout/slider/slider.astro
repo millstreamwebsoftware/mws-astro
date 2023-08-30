@@ -195,10 +195,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             : "slider",
         perView: Number(e.dataset?.perView) || undefined,
         animationDuration: Number(e.dataset?.animationDuration) || 0,
-        hoverpause:
-          "hoverpause" in e.dataset
-            ? e.dataset?.hoverpause === "true"
-            : undefined,
+        hoverpause: "hoverpause" in e.dataset,
       };
 
       new Glide(`#${id}`, glideOptions).mount();

@@ -139,12 +139,12 @@ content_blocks:
     focusAtCenter: true
     focusAt: 0
     bound: false
-    showBullets: true
+    showBullets: false
     showArrows: true
     indent: true
     transition: Carousel
     animationDuration: 0.4
-    hoverpause: false
+    hoverpause: true
     classes:
       - TOHC-Brands
   - _bookshop_name: layout/columns

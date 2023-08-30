@@ -8,10 +8,6 @@
     position: absolute;
     justify-content: center;
     align-items: center;
-    // inset: 33vw;
-
-    // top: calc(var(--header-height) + 20%);
-    // bottom: 20%;
     margin-top: var(--header-height);
     inset: 0;
 
@@ -37,7 +33,7 @@
 
 .TOHC-Brands {
   .glide__slide .slide__background {
-    padding: var(--column-gap);
+    padding: calc(var(--indent) * 0.25);
   }
 
   .glide__overlay {
