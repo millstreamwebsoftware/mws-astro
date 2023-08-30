@@ -93,7 +93,7 @@ content_blocks:
     content_blocks:
       - _bookshop_name: richtext
         content: <h1 class="highlight-2 align-center">Our Story</h1>
-        background_color: "#f5f5f5"
+        background_color: '#f5f5f5'
       - _bookshop_name: richtext
         content: >-
           The idea of a cafe on the banks of our beautiful Swan River was first
@@ -120,15 +120,15 @@ content_blocks:
     collapse: true
   - _bookshop_name: layout/slider
     slides:
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/leftfield-coffee-roasters.png
         background_fit: contain
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
         background_fit: contain
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/pietro-gelateria.webp
         background_fit: contain
@@ -158,28 +158,28 @@ content_blocks:
             content: |-
               ## Contact details
 
-              _130 Milne Street, Bayswater (AP Hinds Reserve)_
+              *130 Milne Street, Bayswater 6053 (AP Hinds Reserve)*
 
-              _Perth, WA, Australia, Western Australia_
+              *Perth, WA, Australia, Western Australia*
 
               ### Contact us
             style: Default
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ""
+            placeholder: ''
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 0
             maxlength: 3000
