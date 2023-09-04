@@ -362,7 +362,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     z-index: 1;
   }
 
-  .glide__overlay {
+  :where(.glide__overlay) {
     display: none;
     pointer-events: none;
   }
