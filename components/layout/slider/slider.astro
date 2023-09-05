@@ -22,8 +22,9 @@ export interface Props {
   key?: string;
 }
 
-// @ts-expect-error TS2304
-const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
+declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
+const ENV_EDITOR: boolean =
+  typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
 
 const {
   key,

@@ -74,26 +74,26 @@ content_blocks:
       - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
         title:
         description:
-      - image: /images/gallery/tohc-experiment-oct-2022.jpeg
+      - image: /src/assets/gallery/tohc-experiment-oct-2022.jpeg
         title:
         description:
-      - image: /images/gallery/tohc-raspberry-coconut-oct-2022.jpeg
+      - image: /src/assets/gallery/tohc-raspberry-coconut-oct-2022.jpeg
         title:
         description:
-      - image: /images/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
+      - image: /src/assets/gallery/tohc-cinnamon-scrolls-type-icing-001.jpeg
         title:
         description:
-      - image: /images/gallery/tohc-dolngait-slice-oct-2022.jpeg
+      - image: /src/assets/gallery/tohc-dolngait-slice-oct-2022.jpeg
         title:
         description:
-      - image: /images/gallery/tohc-lemon-tart-experiments-oct-2022.jpeg
+      - image: /src/assets/gallery/tohc-lemon-tart-experiments-oct-2022.jpeg
         title:
         description:
   - _bookshop_name: layout/columns
     content_blocks:
       - _bookshop_name: richtext
         content: <h1 class="highlight-2 align-center">Our Story</h1>
-        background_color: '#f5f5f5'
+        background_color: "#f5f5f5"
       - _bookshop_name: richtext
         content: >-
           The idea of a cafe on the banks of our beautiful Swan River was first
@@ -120,15 +120,15 @@ content_blocks:
     collapse: true
   - _bookshop_name: layout/slider
     slides:
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/leftfield-coffee-roasters.png
         background_fit: contain
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
         background_fit: contain
-      - content: ''
+      - content: ""
         background_color:
         background_image: /images/brands/pietro-gelateria.webp
         background_fit: contain
@@ -167,19 +167,19 @@ content_blocks:
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ''
+            placeholder: ""
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ''
+            placeholder: ""
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ''
+            placeholder: ""
             required: true
             minlength: 0
             maxlength: 3000

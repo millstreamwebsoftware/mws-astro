@@ -1,5 +1,6 @@
 ---
 import MarkdownIt from "markdown-it";
+import { Image } from "astro:assets";
 const md = new MarkdownIt({ html: true });
 
 export interface Props {
@@ -10,14 +11,24 @@ export interface Props {
 }
 
 const { images, height, indent } = Astro.props;
+// const imagePaths = images.map((i) => i.image);
+const assets = await Astro.glob("/src/assets/**/*");
+
+const imageAssets = images.map((img) => {
+  const k = assets.findIndex((j) => j.default.src.includes(img.image));
+  const i = Object.assign({}, img);
+  if (k >= 0) i.image = assets[k].default;
+  return i;
+});
+
 const columns = Astro.props.columns || images.length;
 ---
 
 <section class={`gallery ${indent ? "" : "no-indent"}`}>
   {
-    images.map((img) => (
+    imageAssets.map((img) => (
       <figure class="gallery-item">
-        <img src={img.image} />
+        <Image src={img.image} alt="" height={512} width={512} />
         {(img.title || img.description) && (
           <figcaption>
             {img.title && <h3>{img.title}</h3>}
