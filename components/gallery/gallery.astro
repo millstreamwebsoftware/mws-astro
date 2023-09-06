@@ -29,6 +29,14 @@ const columns = Astro.props.columns || images.length;
     imageAssets.map((img) => (
       <figure class="gallery-item">
         <Image src={img.image} alt="" height={512} width={512} />
+        <img
+          src={img.image?.src || img.image}
+          alt=""
+          data-lightbox=""
+          loading="lazy"
+          decoding="async"
+        />
+
         {(img.title || img.description) && (
           <figcaption>
             {img.title && <h3>{img.title}</h3>}
@@ -89,3 +97,229 @@ const columns = Astro.props.columns || images.length;
     grid-template-columns: repeat(var(--columns), 1fr);
   }
 </style>
+
+<style is:global>
+  [data-lightbox] {
+    display: none;
+  }
+
+  #lightbox {
+    position: fixed;
+    z-index: 10000;
+    inset: 0;
+    display: flex;
+    background-color: #000d;
+    backdrop-filter: blur(4px);
+    padding: 8rem;
+    animation: lightbox 0.2s ease;
+    justify-content: center;
+  }
+
+  #lightbox [data-lightbox] {
+    /* width: 100%;
+    height: 100%; */
+    object-fit: contain;
+    animation: lightbox-image 0.3s ease;
+    max-width: 100%;
+    z-index: 2;
+  }
+
+  #lightbox.select-next [data-lightbox] {
+    animation: lightbox-next 0.3s ease;
+  }
+
+  #lightbox.select-previous [data-lightbox] {
+    animation: lightbox-previous 0.3s ease;
+  }
+
+  #lightbox [data-lightbox].selected {
+    display: block;
+  }
+
+  #lightbox-buttons {
+    z-index: 2;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  #lightbox button {
+    /* border: 0; */
+    position: absolute;
+    pointer-events: all;
+    /* z-index: 3; */
+  }
+
+  #lightbox button[data-action="<"] {
+    left: 0;
+    top: 8rem;
+    bottom: 8rem;
+    width: calc(50% - min(16rem, 16vw));
+  }
+
+  #lightbox button[data-action=">"] {
+    right: 0;
+    top: 8rem;
+    bottom: 8rem;
+    width: calc(50% - min(16rem, 16vw));
+  }
+
+  #lightbox button[data-action="x"] {
+    top: 0;
+    right: 0;
+    width: 8rem;
+    height: 8rem;
+  }
+
+  @keyframes lightbox {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes lightbox-image {
+    0% {
+      transform: scale(0.5, 0.5);
+    }
+
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+
+  @keyframes lightbox-next {
+    0% {
+      opacity: 0;
+      transform: translate(50px, 0);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+
+  @keyframes lightbox-previous {
+    0% {
+      opacity: 0;
+      transform: translate(-50px, 0);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+</style>
+
+<script>
+  const galleries = document.querySelectorAll(".gallery");
+
+  function lightbox(elements: Element[], index = 0) {
+    document.getElementById("lightbox")?.remove();
+    let box = document.createElement("div");
+    const buttons = document.createElement("div");
+    const buttonBack = document.createElement("button");
+    const buttonNext = document.createElement("button");
+    const buttonClose = document.createElement("button");
+
+    const select = (direction: number) => {
+      if (direction === 0) return;
+      let children = Array.from(box.children).filter((child) =>
+        child.matches("[data-lightbox]")
+      );
+
+      let index = children.findIndex((child) => child.matches(".selected"));
+      let newIndex = (index + direction) % children.length;
+
+      if (direction > 0) {
+        box.classList.add("select-next");
+        box.classList.remove("select-previous");
+      } else {
+        box.classList.remove("select-next");
+        box.classList.add("select-previous");
+      }
+
+      children.at(index)?.classList.remove("selected");
+      children.at(newIndex)?.classList.add("selected");
+    };
+
+    buttonBack.dataset.action = "<";
+    buttonNext.dataset.action = ">";
+    buttonClose.dataset.action = "x";
+
+    buttons.append(buttonBack, buttonNext, buttonClose);
+    buttons.id = "lightbox-buttons";
+    box.id = "lightbox";
+
+    elements.forEach((element) => {
+      box.appendChild(element.cloneNode(true));
+    });
+
+    box.children[index].classList.add("selected");
+    box.appendChild(buttons);
+
+    box = document.body.appendChild(box);
+    box.setAttribute("tabindex", "0");
+    box.focus();
+
+    box.addEventListener("click", (e) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      let action = e.target.dataset?.action;
+      if (action === "<" || action === ">") {
+        select(action === "<" ? -1 : 1);
+        return;
+      }
+      if (e.target.matches("[data-lightbox]")) return;
+      box.remove();
+    });
+
+    box.addEventListener("keydown", (e) => {
+      e.preventDefault();
+      switch (e.key) {
+        case "ArrowLeft":
+          select(-1);
+          break;
+        case "ArrowRight":
+          select(1);
+          break;
+        case "ArrowUp":
+          select(-1);
+          break;
+        case "ArrowDown":
+          select(1);
+          break;
+        case "Escape":
+          box.remove();
+          break;
+      }
+    });
+
+    console.log(box);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    galleries.forEach((gallery) => {
+      const lightboxItems = Array.from(
+        gallery.querySelectorAll("[data-lightbox]")
+      );
+      if (!lightboxItems.length) return;
+
+      gallery.addEventListener("click", (e) => {
+        if (!(e.target instanceof Element)) return;
+
+        let clicked =
+          e.target.parentNode?.querySelector("[data-lightbox]") ||
+          e.target.closest("[data-lightbox]");
+
+        if (!clicked) return;
+
+        lightbox(lightboxItems, lightboxItems.indexOf(clicked));
+      });
+    });
+  });
+</script>
