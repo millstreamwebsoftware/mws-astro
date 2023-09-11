@@ -98,24 +98,21 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 // const columnLayout = layout?.layout?.indexOf(0);
 ---
 
-<div
-  class:list={["columns", { collapse }]}
-  style={{ "--column-count": columns }}
->
+<div class:list={["columns", { collapse }]} style={{ "--columns": columns }}>
   {
     items.map((block: any, i: any) => {
       const Component = components[block._bookshop_name];
       if (Component) {
         return (
-          <Component
+          <div
             style={{
               "grid-row": block.rowString,
               "grid-column": block.columnString,
             }}
-            classes={block.cell}
-            {...block}
-            key={String(i) + (key || "")}
-          />
+            class:list={["columns-item", block.cell]}
+          >
+            <Component {...block} key={String(i) + (key || "")} />
+          </div>
         );
       }
       return (
@@ -132,6 +129,53 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     /* gap: var(--column-gap); */
     display: grid;
     grid-auto-flow: row;
-    grid-template-columns: repeat(var(--column-count), 1fr);
+    grid-template-columns: repeat(var(--columns), 1fr);
+  }
+</style>
+
+<style is:global lang="scss">
+  .columns-item > section {
+    height: 100%;
+    padding: calc(var(--column-gap));
+  }
+
+  .columns > {
+    .first-in-row > section {
+      padding-left: var(--indent);
+    }
+    .last-in-row > section {
+      padding-right: var(--indent);
+    }
+    .first-in-column > section {
+      padding-top: var(--indent);
+    }
+    .last-in-column > section {
+      padding-bottom: var(--indent);
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    .columns.collapse {
+      --columns: 1 !important;
+
+      > .columns-item {
+        grid-column: 1 / 2 !important;
+        grid-row: auto !important;
+
+        > section {
+          padding-left: var(--indent);
+          padding-right: var(--indent);
+          padding-top: var(--column-gap);
+          padding-bottom: var(--column-gap);
+
+          &:first-child {
+            padding-top: var(--indent);
+          }
+          &:last-child {
+            padding-bottom: var(--indent);
+          }
+        }
+      }
+    }
   }
 </style>

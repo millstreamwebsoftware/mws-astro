@@ -85,7 +85,7 @@ section {
   padding: var(--indent);
 }
 
-section.no-indent.no-indent.no-indent {
+section:not(#\9).no-indent {
   padding: 0;
 
   &-top {
@@ -99,47 +99,6 @@ section.no-indent.no-indent.no-indent {
   }
   &-right {
     padding-right: 0;
-  }
-}
-
-.columns > section {
-  padding: calc(var(--column-gap));
-}
-
-.columns > {
-  .first-in-row {
-    padding-left: var(--indent);
-  }
-  .last-in-row {
-    padding-right: var(--indent);
-  }
-  .first-in-column {
-    padding-top: var(--indent);
-  }
-  .last-in-column {
-    padding-bottom: var(--indent);
-  }
-}
-
-.columns.collapse {
-  @media only screen and (max-width: 768px) {
-    grid-template-columns: 1fr;
-
-    > * {
-      grid-column: 1 / 2 !important;
-      grid-row: auto !important;
-      padding-left: var(--indent);
-      padding-right: var(--indent);
-      padding-top: var(--column-gap);
-      padding-bottom: var(--column-gap);
-
-      &:first-child {
-        padding-top: var(--indent);
-      }
-      &:last-child {
-        padding-bottom: var(--indent);
-      }
-    }
   }
 }
 
