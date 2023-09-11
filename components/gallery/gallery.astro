@@ -1,6 +1,7 @@
 ---
 import MarkdownIt from "markdown-it";
 import { Image } from "astro:assets";
+
 const md = new MarkdownIt({ html: true });
 
 export interface Props {
@@ -24,7 +25,10 @@ const imageAssets = images.map((img) => {
 const columns = Astro.props.columns || images.length;
 ---
 
-<section class={`gallery ${indent ? "" : "no-indent"}`}>
+<section
+  class={`gallery ${indent ? "" : "no-indent"}`}
+  style={{ "--height": height, "--columns": columns }}
+>
   {
     imageAssets.map((img) => (
       <figure class="gallery-item">
@@ -49,6 +53,11 @@ const columns = Astro.props.columns || images.length;
 </section>
 
 <style lang="scss">
+  section.gallery {
+    /* height: calc(var(--height) * 1vh); */
+    grid-template-columns: repeat(var(--columns), 1fr);
+  }
+
   .gallery {
     display: grid;
     // grid-template-columns: 1fr;
@@ -88,13 +97,6 @@ const columns = Astro.props.columns || images.length;
       padding: 2rem;
       background: linear-gradient(to right, #ffffffdd, #ffffff99);
     }
-  }
-</style>
-
-<style define:vars={{ height, columns }}>
-  section.gallery {
-    /* height: calc(var(--height) * 1vh); */
-    grid-template-columns: repeat(var(--columns), 1fr);
   }
 </style>
 
@@ -298,8 +300,6 @@ const columns = Astro.props.columns || images.length;
           break;
       }
     });
-
-    console.log(box);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
