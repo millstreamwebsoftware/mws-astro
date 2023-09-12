@@ -27,6 +27,7 @@ const socials: Record<string, string>[] = preferences.general.social.map(
             class={s.name}
             rel="noopener noreferrer"
             target="_blank"
+            title={s.title}
           >
             {s.icon && <Icon name={s.icon} height={"1.8em"} />}
             <span>{s.title}</span>
