@@ -1,0 +1,267 @@
+---
+import Icon from "@shared/icon.astro";
+
+export interface Props {
+  /** Element ID to attach mouse click hook to */
+  collection?: string;
+  children: any;
+}
+
+const { collection } = Astro.props;
+---
+
+<template class="lightbox-template" data-lightbox-collection={collection}>
+  <div id="lightbox">
+    <div class="items">
+      <slot />
+    </div>
+    <div class="buttons">
+      <button data-action="<"><Icon name="carbon:chevron-left" /></button>
+      <button data-action=">"><Icon name="carbon:chevron-right" /></button>
+      <button data-action="x"><Icon name="carbon:close" /></button>
+    </div>
+  </div>
+</template>
+
+<script>
+  function showLightbox(lightboxTemplate: HTMLTemplateElement, target: string) {
+    document.getElementById("lightbox")?.remove();
+
+    // const lightboxTemplate = document.getElementById("lightbox-template");
+    // if (!(lightboxTemplate instanceof HTMLTemplateElement)) return;
+
+    let box = (lightboxTemplate.content.cloneNode(true) as DocumentFragment)
+      ?.children[0] as HTMLElement;
+
+    const select = (direction: number) => {
+      if (direction === 0) return;
+      let children = Array.from(box.children[0].children);
+
+      let index = children.findIndex((child) => child.matches(".selected"));
+      let newIndex = (index + direction) % children.length;
+
+      if (direction > 0) {
+        box.classList.add("select-next");
+        box.classList.remove("select-previous");
+      } else {
+        box.classList.remove("select-next");
+        box.classList.add("select-previous");
+      }
+
+      children.at(index)?.classList.remove("selected");
+      children.at(newIndex)?.classList.add("selected");
+    };
+
+    const selected =
+      box.querySelector(`.items [data-lightbox="${target}"]`) ||
+      box.querySelector(".items")?.children[0];
+
+    if (!selected) return;
+    selected.classList.add("selected");
+
+    box = document.body.appendChild(box);
+    box.setAttribute("tabindex", "0");
+    box.focus();
+
+    box.addEventListener("click", (e) => {
+      // console.log(e.target instanceof HTMLElement);
+      // if (!(e.target instanceof HTMLElement)) return;
+      if (!e.target) return;
+      let target = e.target as HTMLElement;
+      let action = target.closest("button")?.dataset?.action;
+      if (action === "<" || action === ">") {
+        select(action === "<" ? -1 : 1);
+        return;
+      }
+      if (target.matches("[data-lightbox]")) return;
+      box.remove();
+    });
+
+    box.addEventListener("keydown", (e) => {
+      if (!(e instanceof KeyboardEvent)) return;
+      e.preventDefault();
+      switch (e.key) {
+        case "ArrowLeft":
+          select(-1);
+          break;
+        case "ArrowRight":
+          select(1);
+          break;
+        case "ArrowUp":
+          select(-1);
+          break;
+        case "ArrowDown":
+          select(1);
+          break;
+        case "Escape":
+          box.remove();
+          break;
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const lightboxes = document.querySelectorAll("template.lightbox-template");
+
+    lightboxes.forEach((lightbox) => {
+      if (!(lightbox instanceof HTMLTemplateElement)) return;
+
+      const collection = document.getElementById(
+        lightbox.getAttribute("data-lightbox-collection") || ""
+      );
+
+      if (!collection) return;
+      collection.addEventListener("click", (e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+
+        let clicked = e.target.closest("[data-lightbox]") as HTMLElement;
+        if (!clicked) return;
+
+        showLightbox(lightbox, clicked.dataset.lightbox || "");
+      });
+    });
+  });
+</script>
+
+<style is:global>
+  #lightbox .items > * {
+    display: none;
+    object-fit: contain;
+    animation: lightbox-image 0.3s ease;
+    max-width: 100%;
+    z-index: 2;
+  }
+
+  #lightbox .items > .selected {
+    display: block;
+  }
+
+  #lightbox.select-next .items > * {
+    animation: lightbox-next 0.3s ease;
+  }
+
+  #lightbox.select-previous .items > * {
+    animation: lightbox-previous 0.3s ease;
+  }
+
+  #lightbox button svg {
+    position: absolute;
+    height: var(--icon-size);
+  }
+
+  #lightbox [data-action="<"] svg {
+    top: calc(50% - var(--icon-size) * 0.5);
+    left: calc(4rem - var(--icon-size) * 0.5);
+  }
+
+  #lightbox [data-action=">"] svg {
+    top: calc(50% - var(--icon-size) * 0.5);
+    right: calc(4rem - var(--icon-size) * 0.5);
+  }
+
+  #lightbox [data-action="x"] svg {
+    top: calc(50% - var(--icon-size) * 0.5);
+    left: calc(50% - var(--icon-size) * 0.5);
+  }
+
+  @keyframes lightbox {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes lightbox-image {
+    0% {
+      transform: scale(0.5, 0.5);
+    }
+
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+
+  @keyframes lightbox-next {
+    0% {
+      opacity: 0;
+      transform: translate(50px, 0);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+
+  @keyframes lightbox-previous {
+    0% {
+      opacity: 0;
+      transform: translate(-50px, 0);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+</style>
+
+<style>
+  #lightbox {
+    position: fixed;
+    z-index: 10000;
+    inset: 0;
+    background-color: #000d;
+    backdrop-filter: blur(4px);
+    padding: 0 8rem;
+    animation: lightbox 0.4s ease;
+  }
+
+  .items {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    max-height: 100%;
+  }
+
+  .buttons {
+    z-index: 2;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  button {
+    border: 0;
+    position: absolute;
+    pointer-events: all;
+    color: white;
+
+    --icon-size: 5rem;
+    /* z-index: 3; */
+  }
+
+  button[data-action="<"] {
+    left: 0;
+    top: 8rem;
+    bottom: 8rem;
+    width: calc(50% - min(16rem, 16vw));
+  }
+
+  button[data-action=">"] {
+    right: 0;
+    top: 8rem;
+    bottom: 8rem;
+    width: calc(50% - min(16rem, 16vw));
+  }
+
+  button[data-action="x"] {
+    top: 0;
+    right: 0;
+    width: 8rem;
+    height: 8rem;
+  }
+</style>
