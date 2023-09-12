@@ -35,20 +35,16 @@ const id = `gallery${key}`;
   style={{ "--height": height, "--columns": columns }}
 >
   {
-    imageAssets.map((img, i) => (
-      <figure class="gallery-item">
-        <Image
-          data-lightbox={`${id}-${i}`}
-          src={img.image}
-          alt=""
-          height={512}
-          width={512}
-        />
+    imageAssets.map((asset, i) => (
+      <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
+        <Image src={asset.image} alt="" height={512} width={512} />
 
-        {(img.title || img.description) && (
+        {(asset.title || asset.description) && (
           <figcaption>
-            {img.title && <h3>{img.title}</h3>}
-            {img.description && <div set:html={md.render(img.description)} />}
+            {asset.title && <h3>{asset.title}</h3>}
+            {asset.description && (
+              <div set:html={md.render(asset.description)} />
+            )}
           </figcaption>
         )}
       </figure>
@@ -58,21 +54,34 @@ const id = `gallery${key}`;
     lightbox && (
       <Lightbox collection={id}>
         {imageAssets.map((asset, i) => (
-          <img
-            src={asset.image?.src || asset.image}
-            alt=""
+          <figure
             data-lightbox={`${id}-${i}`}
-            loading="lazy"
-            decoding="async"
-            style={{
-              ...(asset.image?.width && {
-                "max-width": `${asset.image?.width}px`,
-              }),
-              ...(asset.image?.height && {
-                "max-height": `${asset.image?.height}px`,
-              }),
-            }}
-          />
+            class:list={{ caption: asset.title || asset.description }}
+          >
+            <img
+              src={asset.image?.src || asset.image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              style={{
+                ...(asset.image?.width && {
+                  "max-width": `${asset.image?.width}px`,
+                }),
+                ...(asset.image?.height && {
+                  "max-height": `${asset.image?.height}px`,
+                }),
+              }}
+            />
+
+            {(asset.title || asset.description) && (
+              <figcaption>
+                {asset.title && <h3>{asset.title}</h3>}
+                {asset.description && (
+                  <div set:html={md.render(asset.description)} />
+                )}
+              </figcaption>
+            )}
+          </figure>
         ))}
       </Lightbox>
     )

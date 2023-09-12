@@ -16,6 +16,7 @@ const { collection } = Astro.props;
       <slot />
     </div>
     <div class="buttons">
+      <p class="counter">0/0</p>
       <button data-action="<"><Icon name="carbon:chevron-left" /></button>
       <button data-action=">"><Icon name="carbon:chevron-right" /></button>
       <button data-action="x"><Icon name="carbon:close" /></button>
@@ -30,12 +31,21 @@ const { collection } = Astro.props;
     let box = (lightboxTemplate.content.cloneNode(true) as DocumentFragment)
       ?.children[0] as HTMLElement;
 
-    const select = (direction: number) => {
-      if (direction === 0) return;
-      let children = Array.from(box.children[0].children);
+    const setCounter = (i: number, l: number) => {
+      const counter = box.querySelector(".buttons .counter");
+      if (!counter) return;
+      if (++i < 1) i += l;
+      counter.innerHTML = `${i}/${l}`;
+      counter.classList.toggle("hidden", l < 2);
+    };
 
+    const select = (direction: number) => {
+      let children = Array.from(box.children[0].children);
       let index = children.findIndex((child) => child.matches(".selected"));
       let newIndex = (index + direction) % children.length;
+      setCounter(newIndex, children.length);
+
+      if (direction === 0) return;
 
       if (direction > 0) {
         box.classList.add("select-next");
@@ -56,8 +66,10 @@ const { collection } = Astro.props;
     if (!selected) return;
     selected.classList.add("selected");
 
-    box = document.body.appendChild(box);
+    select(0); //Update Counter
+
     box.setAttribute("tabindex", "0");
+    box = document.body.appendChild(box);
     box.focus();
 
     box.addEventListener("click", (e) => {
@@ -74,19 +86,16 @@ const { collection } = Astro.props;
 
     box.addEventListener("keydown", (e) => {
       if (!(e instanceof KeyboardEvent)) return;
-      e.preventDefault();
       switch (e.key) {
         case "ArrowLeft":
-          select(-1);
-          break;
-        case "ArrowRight":
-          select(1);
-          break;
         case "ArrowUp":
           select(-1);
+          e.preventDefault();
           break;
+        case "ArrowRight":
         case "ArrowDown":
           select(1);
+          e.preventDefault();
           break;
         case "Escape":
           box.remove();
@@ -121,15 +130,44 @@ const { collection } = Astro.props;
 <style is:global>
   #lightbox .items > * {
     display: none;
-    object-fit: contain;
-    object-position: center;
     animation: lightbox-image 0.3s ease;
     width: 100%;
+    height: 100%;
+    flex-direction: column;
     z-index: 2;
   }
 
+  #lightbox .items img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    flex: 1 1 100%;
+  }
+
+  #lightbox .items .caption img {
+    /* padding-bottom: 8rem; */
+  }
+
+  #lightbox .items figure {
+    position: relative;
+  }
+
+  #lightbox .items figcaption {
+    /* position: absolute; */
+    /* bottom: 0;
+    left: 0;
+    right: 0; */
+    /* height: 6rem; */
+    margin: 2rem;
+    flex: 1 0 0;
+
+    --text-color: 255 255 255;
+    --heading-color: 255 255 255;
+  }
+
   #lightbox .items > .selected {
-    display: block;
+    display: flex;
   }
 
   #lightbox.select-next .items > * {
@@ -211,7 +249,7 @@ const { collection } = Astro.props;
     z-index: 10000;
     inset: 0;
     background-color: #000d;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px) contrast(60%);
     padding: 0 8rem;
     animation: lightbox 0.4s ease;
   }
@@ -231,14 +269,36 @@ const { collection } = Astro.props;
     pointer-events: none;
   }
 
+  .counter {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8rem;
+    height: 8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: var(--bold-font-family);
+    font-size: 2rem;
+  }
+
+  .counter.hidden {
+    display: none;
+  }
+
   button {
     border: 0;
     position: absolute;
     pointer-events: all;
-    color: white;
+    color: #ffffff;
+    transition: color 0.2s ease;
 
     --icon-size: 5rem;
-    /* z-index: 3; */
+  }
+
+  button:hover {
+    color: #aaaaaa;
   }
 
   button[data-action="<"] {
