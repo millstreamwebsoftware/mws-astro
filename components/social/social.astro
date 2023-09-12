@@ -1,10 +1,25 @@
 ---
 import preferences from "../../../data/preferences.json";
+import Icon from "@shared/icon.astro";
+
+const icons: Record<string, string> = {
+  twitter: "fa6-brands:square-x-twitter",
+  facebook: "fa6-brands:square-facebook",
+  instagram: "fa6-brands:square-instagram",
+  telephone: "fa6-solid:square-phone",
+};
+
+const socials: Record<string, string>[] = preferences.general.social.map(
+  (s) => {
+    let social = { icon: icons[s.name] };
+    return Object.assign(social, s);
+  }
+);
 ---
 
 <ul class="social">
   {
-    preferences.general.social.map((s) =>
+    socials.map((s) =>
       s.title ? (
         <li>
           <a
@@ -13,6 +28,7 @@ import preferences from "../../../data/preferences.json";
             rel="noopener noreferrer"
             target="_blank"
           >
+            {s.icon && <Icon name={s.icon} height={"1.8em"} />}
             <span>{s.title}</span>
           </a>
         </li>
@@ -44,17 +60,6 @@ import preferences from "../../../data/preferences.json";
     gap: 5px;
     text-decoration: none;
 
-    // Insert the container for the icon
-    &::before {
-      content: "";
-      display: block;
-      background-color: currentColor;
-      width: 24px;
-      height: 24px;
-      mask-size: contain;
-      mask-repeat: no-repeat;
-    }
-
     // Accessible hiding of label text by default
     span {
       position: absolute;
@@ -71,23 +76,5 @@ import preferences from "../../../data/preferences.json";
     span {
       all: unset;
     }
-
-    &::before {
-      mask-image: url(/images/icons/phone.svg);
-      mask-size: 80%;
-      mask-position: center;
-    }
-  }
-
-  .twitter::before {
-    mask-image: url(/images/icons/twitter.svg);
-  }
-
-  .facebook::before {
-    mask-image: url(/images/icons/facebook.svg);
-  }
-
-  .instagram::before {
-    mask-image: url(/images/icons/instagram.svg);
   }
 </style>
