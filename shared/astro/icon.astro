@@ -1,0 +1,33 @@
+---
+import { getIconData, iconToSVG } from "@iconify/utils";
+
+export interface Props {
+  name: string;
+  height?: string;
+}
+
+const { name } = Astro.props;
+const height = Astro.props.height || "unset";
+var [iconSetName, iconName] = name.split(":");
+const iconSetPath = `/node_modules/@iconify-json/${iconSetName}/icons.json`;
+
+const iconSets: Record<string, Function> = import.meta.glob(
+  "/node_modules/@iconify-json/*/icons.json"
+);
+
+if (!(iconSetPath in iconSets)) {
+  throw Error(
+    `Icon Collection "${iconSetName}" not found. Is it installed?\n> npm i @iconify-json/${iconSetName}`
+  );
+}
+
+const iconSet = await iconSets[iconSetPath]();
+const icon = getIconData(iconSet, iconName);
+
+if (!icon)
+  throw Error(`Icon "${iconName}" not found in collection ${iconSetName}.`);
+
+const iconData = iconToSVG(icon, { height });
+---
+
+<svg {...iconData.attributes} set:html={iconData.body} />
