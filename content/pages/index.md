@@ -70,6 +70,7 @@ content_blocks:
     height: 40
     columns: 3
     indent: false
+    lightbox: true
     images:
       - image: /images/gallery/tohc-choc-experiment-oct-10-2022.jpeg
         title:

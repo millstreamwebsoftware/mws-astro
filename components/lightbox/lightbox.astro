@@ -27,9 +27,6 @@ const { collection } = Astro.props;
   function showLightbox(lightboxTemplate: HTMLTemplateElement, target: string) {
     document.getElementById("lightbox")?.remove();
 
-    // const lightboxTemplate = document.getElementById("lightbox-template");
-    // if (!(lightboxTemplate instanceof HTMLTemplateElement)) return;
-
     let box = (lightboxTemplate.content.cloneNode(true) as DocumentFragment)
       ?.children[0] as HTMLElement;
 
@@ -64,8 +61,6 @@ const { collection } = Astro.props;
     box.focus();
 
     box.addEventListener("click", (e) => {
-      // console.log(e.target instanceof HTMLElement);
-      // if (!(e.target instanceof HTMLElement)) return;
       if (!e.target) return;
       let target = e.target as HTMLElement;
       let action = target.closest("button")?.dataset?.action;
@@ -127,8 +122,9 @@ const { collection } = Astro.props;
   #lightbox .items > * {
     display: none;
     object-fit: contain;
+    object-position: center;
     animation: lightbox-image 0.3s ease;
-    max-width: 100%;
+    width: 100%;
     z-index: 2;
   }
 
@@ -223,6 +219,7 @@ const { collection } = Astro.props;
   .items {
     display: flex;
     justify-content: center;
+    align-items: center;
     height: 100%;
     max-height: 100%;
   }

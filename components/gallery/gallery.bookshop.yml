@@ -12,6 +12,7 @@ blueprint:
   height:
   columns: 0
   indent: true
+  lightbox: true
   images:
     - image:
       title:
@@ -41,3 +42,5 @@ _inputs:
     type: text
   description:
     type: markdown
+  lightbox:
+    type: checkbox

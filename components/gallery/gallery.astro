@@ -10,10 +10,11 @@ export interface Props {
   height: number;
   columns: number;
   indent: boolean;
+  lightbox?: boolean;
   key?: string;
 }
 
-const { images, height, indent, key } = Astro.props;
+const { images, height, indent, lightbox, key } = Astro.props;
 // const imagePaths = images.map((i) => i.image);
 const assets = await Astro.glob("/src/assets/**/*");
 
@@ -53,49 +54,46 @@ const id = `gallery${key}`;
       </figure>
     ))
   }
-
-  <Lightbox collection={id}>
-    {
-      imageAssets.map((img, i) => (
-        <img
-          src={img.image?.src || img.image}
-          alt=""
-          data-lightbox={`${id}-${i}`}
-          loading="lazy"
-          decoding="async"
-        />
-      ))
-    }
-  </Lightbox>
+  {
+    lightbox && (
+      <Lightbox collection={id}>
+        {imageAssets.map((asset, i) => (
+          <img
+            src={asset.image?.src || asset.image}
+            alt=""
+            data-lightbox={`${id}-${i}`}
+            loading="lazy"
+            decoding="async"
+            style={{
+              ...(asset.image?.width && {
+                "max-width": `${asset.image?.width}px`,
+              }),
+              ...(asset.image?.height && {
+                "max-height": `${asset.image?.height}px`,
+              }),
+            }}
+          />
+        ))}
+      </Lightbox>
+    )
+  }
 </section>
 
 <style lang="scss">
   section.gallery {
-    /* height: calc(var(--height) * 1vh); */
     grid-template-columns: repeat(var(--columns), 1fr);
   }
 
   .gallery {
     display: grid;
-    // grid-template-columns: 1fr;
     grid-template-rows: 1fr;
-    // grid-auto-rows: 1fr;
     grid-auto-flow: row;
-    // gap: var(--columnGap);
-    // padding: var(--columnGap);
-    // height: 100%;
   }
 
   .gallery-item {
-    // aspect-ratio: 1;
-    // line-height: 0;
     position: relative;
-    // width: 100%;
-    // height: 100%;
-    // overflow: hidden;
 
     img {
-      // aspect-ratio: 1;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -107,7 +105,6 @@ const id = `gallery${key}`;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      // inset: 0;
       bottom: 0;
       left: 0;
       right: 0;
