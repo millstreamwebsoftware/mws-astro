@@ -2,6 +2,11 @@
 import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
 
+import "sanitize.css";
+import "sanitize.css/forms.css";
+import "sanitize.css/typography.css";
+import "../styles/styles.scss";
+
 export interface Props {
   title?: string;
   id?: string;
@@ -12,17 +17,12 @@ export interface Props {
   currentPath?: string;
 }
 
-// import { SITE } from "../config";
-// import { SEO } from "astro-seo";
-
-import "sanitize.css";
-import "sanitize.css/forms.css";
-import "sanitize.css/typography.css";
-
-import "../styles/styles.scss";
-// import "../styles/layouts.scss";
-// import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
-// import "node_modules/@glidejs/glide/dist/css/glide.theme.min.css";
+const mimetypes: any = {
+  ico: "image/vnd.microsoft.icon",
+  png: "image/png",
+  jpeg: "image/jpeg",
+  svg: "image/svg+xml",
+};
 
 const {
   title,
@@ -38,6 +38,10 @@ import preferences from "data/preferences.json";
 const pageTitle = title + preferences.general.browser_window_title_suffix;
 const style: any = {};
 const pageWidth = preferences.page.maximum_page_width;
+const favicon = preferences.general.favicon;
+const appleTouchIcon = preferences.general["apple-touch-icon"];
+const faviconType = mimetypes[favicon.substring(favicon.lastIndexOf(".") + 1)];
+
 pageWidth && (style["--page-max-width"] = pageWidth + "px");
 ---
 
@@ -47,6 +51,8 @@ pageWidth && (style["--page-max-width"] = pageWidth + "px");
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href={favicon} type={faviconType} />
+    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
     <title>{pageTitle}</title>
   </head>
   <body>
