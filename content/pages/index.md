@@ -128,10 +128,6 @@ content_blocks:
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
         background_fit: contain
-      - content: ""
-        background_color:
-        background_image: /images/brands/pietro-gelateria.webp
-        background_fit: contain
     height: 30
     gap: 10
     autoplay: 3
