@@ -101,7 +101,8 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 <div class:list={["columns", { collapse }]} style={{ "--columns": columns }}>
   {
     items.map((block: any, i: any) => {
-      const Component = components[block._bookshop_name];
+      var Component = components[block._bookshop_name];
+      if (block._bookshop_name === "layout/columns") Component = Astro.self;
       if (Component) {
         return (
           <div
