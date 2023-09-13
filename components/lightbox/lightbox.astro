@@ -145,10 +145,6 @@ const { collection } = Astro.props;
     flex: 1 1 100%;
   }
 
-  #lightbox .items .caption img {
-    /* padding-bottom: 8rem; */
-  }
-
   #lightbox .items figure {
     position: relative;
   }
@@ -293,6 +289,7 @@ const { collection } = Astro.props;
     pointer-events: all;
     color: #ffffff;
     transition: color 0.2s ease;
+    touch-action: manipulation;
 
     --icon-size: 5rem;
   }
