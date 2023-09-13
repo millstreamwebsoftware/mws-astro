@@ -64,7 +64,7 @@ content_blocks:
 
 
       <p class="align-center">Serving fantastic locally roasted coffee from
-      Leftfield, delicious Gelato from Pietro Gelataria, breads from Loafers
+      Leftfield, breads from Loafers
       Artisan, and a handpicked selection of freshly made cakes and slices.</p>
   - _bookshop_name: gallery
     height: 40
