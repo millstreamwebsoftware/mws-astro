@@ -1,7 +1,7 @@
 ---
 import MarkdownIt from "markdown-it";
 import Lightbox from "@components/lightbox/lightbox.astro";
-import { Image } from "astro:assets";
+// import { Image } from "astro:assets";
 
 const md = new MarkdownIt({ html: true });
 
@@ -16,14 +16,14 @@ export interface Props {
 
 const { images, height, indent, lightbox, key } = Astro.props;
 // const imagePaths = images.map((i) => i.image);
-const assets = await Astro.glob("/src/assets/**/*");
+// const assets = await Astro.glob("/src/assets/**/*");
 
-const imageAssets = images.map((img) => {
-  const k = assets.findIndex((j) => j.default.src.includes(img.image));
-  const i = Object.assign({}, img);
-  if (k >= 0) i.image = assets[k].default;
-  return i;
-});
+// const imageAssets = images.map((img) => {
+//   const k = assets.findIndex((j) => j.default.src.includes(img.image));
+//   const i = Object.assign({}, img);
+//   if (k >= 0) i.image = assets[k].default;
+//   return i;
+// });
 
 const columns = Astro.props.columns || images.length;
 const id = `gallery${key}`;
@@ -35,9 +35,22 @@ const id = `gallery${key}`;
   style={{ "--height": height, "--columns": columns }}
 >
   {
-    imageAssets.map((asset, i) => (
+    images.map((asset, i) => (
       <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
-        <Image src={asset.image} alt="" height={512} width={512} />
+        <img
+          src={asset.image?.src || asset.image}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          style={{
+            ...(asset.image?.width && {
+              "max-width": `${asset.image?.width}px`,
+            }),
+            ...(asset.image?.height && {
+              "max-height": `${asset.image?.height}px`,
+            }),
+          }}
+        />
 
         {(asset.title || asset.description) && (
           <figcaption>
@@ -53,7 +66,7 @@ const id = `gallery${key}`;
   {
     lightbox && (
       <Lightbox collection={id}>
-        {imageAssets.map((asset, i) => (
+        {images.map((asset, i) => (
           <figure
             data-lightbox={`${id}-${i}`}
             class:list={{ caption: asset.title || asset.description }}
