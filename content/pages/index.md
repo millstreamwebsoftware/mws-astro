@@ -52,11 +52,14 @@ content_blocks:
       follows...</h3>
 
 
-      <table><tbody><tr><th class="align-right">Monday + Tuesday</th><td>6.00am
+      <table><tbody><tr><th class="align-right">Monday* + Tuesday</th><td>6.00am
       – 11.00am</td></tr><tr><th class="align-right">Wednesday +
       Thursday</th><td>6.00am – 1.00pm</td></tr><tr><th
       class="align-right">Friday – Sunday</th><td>6.00am –
       2.00pm</td></tr></tbody></table>
+
+
+      <p class="align-center"><em>*Closed on Monday public holidays</em></p>
 
 
       <h2 class="align-center">The Oarhouse Cafe, on the banks of the Swan
@@ -64,8 +67,8 @@ content_blocks:
 
 
       <p class="align-center">Serving fantastic locally roasted coffee from
-      Leftfield, breads from Loafers
-      Artisan, and a handpicked selection of freshly made cakes and slices.</p>
+      Leftfield, breads from Loafers Artisan, and a handpicked selection of
+      freshly made cakes and slices.</p>
   - _bookshop_name: gallery
     height: 40
     columns: 3
@@ -94,7 +97,7 @@ content_blocks:
     content_blocks:
       - _bookshop_name: richtext
         content: <h1 class="highlight-2 align-center">Our Story</h1>
-        background_color: "#f5f5f5"
+        background_color: '#f5f5f5'
       - _bookshop_name: richtext
         content: >-
           The idea of a cafe on the banks of our beautiful Swan River was first
@@ -121,11 +124,11 @@ content_blocks:
     collapse: true
   - _bookshop_name: layout/slider
     slides:
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/leftfield-coffee-roasters.png
         background_fit: contain
-      - content: ""
+      - content: ''
         background_color:
         background_image: /images/brands/loafers-artisan-logo.png
         background_fit: contain
@@ -164,19 +167,19 @@ content_blocks:
           - _bookshop_name: form/inputs/text
             name: name
             label: Name
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 5
             maxlength: 32
           - _bookshop_name: form/inputs/email
             name: email
             label: Email
-            placeholder: ""
+            placeholder: ''
             required: true
           - _bookshop_name: form/inputs/textarea
             name: message
             label: Message
-            placeholder: ""
+            placeholder: ''
             required: true
             minlength: 0
             maxlength: 3000
