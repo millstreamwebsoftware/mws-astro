@@ -2,6 +2,8 @@
 import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
 
+import * as git from "git-rev-sync";
+
 import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
@@ -34,6 +36,7 @@ const {
   currentPath,
 } = Astro.props;
 import preferences from "data/preferences.json";
+import { getIconsTree } from "@iconify/utils";
 
 const pageTitle = title + preferences.general.browser_window_title_suffix;
 const style: any = {};
@@ -51,6 +54,7 @@ pageWidth && (style["--page-max-width"] = pageWidth + "px");
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="revision" content={git.long("./")} />
     <link rel="icon" href={favicon} type={faviconType} />
     <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
     <title>{pageTitle}</title>
