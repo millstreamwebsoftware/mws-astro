@@ -8,7 +8,7 @@ const { contentBlocks } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/components/**/*.jsx", "/src/components/**/*.astro"],
+  ["../../components/**/*.jsx", "../../components/**/*.astro"],
   {
     eager: true,
   }

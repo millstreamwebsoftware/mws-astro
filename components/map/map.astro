@@ -9,7 +9,7 @@ export interface props {
   key?: string;
 }
 
-import preferences from "data/preferences.json";
+import preferences from "@data/preferences.json";
 const { lat, lng, zoom, key, indent } = Astro.props;
 
 const apiKey = preferences.API.google_maps.api_key;

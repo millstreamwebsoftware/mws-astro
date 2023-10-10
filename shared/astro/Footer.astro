@@ -1,7 +1,7 @@
 ---
 import { convertColorString } from "src/util";
 import Social from "@components/social/social.astro";
-import preferences from "data/preferences.json";
+import preferences from "@data/preferences.json";
 const currentYear = new Date().getFullYear();
 
 const textColor = convertColorString(preferences.footer.foreground_color);

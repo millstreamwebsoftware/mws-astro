@@ -7,7 +7,7 @@ import * as git from "git-rev-sync";
 import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
-import "../styles/styles.scss";
+import "@styles/styles.scss";
 
 export interface Props {
   title?: string;
@@ -35,7 +35,7 @@ const {
   paths,
   currentPath,
 } = Astro.props;
-import preferences from "data/preferences.json";
+import preferences from "@data/preferences.json";
 
 const pageTitle = title + preferences.general.browser_window_title_suffix;
 const style: any = {};
