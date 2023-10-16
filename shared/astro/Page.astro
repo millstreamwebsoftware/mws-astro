@@ -1,6 +1,6 @@
 ---
 export interface Props {
-  "bookshop:live"?: any;
+
   contentBlocks: any[];
 }
 
@@ -8,7 +8,7 @@ const { contentBlocks } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["../../components/**/*.jsx", "../../components/**/*.astro"],
+  ["../../mws-astro/components/**/*.jsx", "../../mws-astro/components/**/*.astro"],
   {
     eager: true,
   }
