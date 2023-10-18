@@ -37,3 +37,7 @@ h1.highlight-2::after {
 .align-center + table {
   align-self: center;
 }
+
+a.button {
+  border: 1px solid black;
+}
