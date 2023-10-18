@@ -11,7 +11,7 @@ const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/mws-astro/components/**/*.jsx", "/src/mws-astro/components/**/*.astro"],
+  ["/src/mws-astro/src/components/**/*.jsx", "/src/mws-astro/src/components/**/*.astro"],
   {
     eager: true,
   }

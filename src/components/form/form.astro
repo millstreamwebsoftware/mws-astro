@@ -15,7 +15,7 @@ const id = (name || "") + "-" + (key || "");
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/mws-astro/components/form/**/*.jsx", "/src/mws-astro/components/form/**/*.astro"],
+  ["/src/mws-astro/src/components/form/**/*.jsx", "/src/mws-astro/src/components/form/**/*.astro"],
   {
     eager: true,
   }
