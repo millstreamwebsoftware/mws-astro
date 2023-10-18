@@ -7,11 +7,13 @@ const icons: Record<string, string> = {
   facebook: "fa6-brands:square-facebook",
   instagram: "fa6-brands:square-instagram",
   telephone: "fa6-solid:square-phone",
+  email: "fa6-solid:square-envelope"
 };
 
 const socials: Record<string, string>[] = preferences.general.social.map(
   (s) => {
     let social = { icon: icons[s.name] };
+    if (!social.icon) social.icon = "fa6-solid:square-up-right";
     return Object.assign(social, s);
   }
 );
