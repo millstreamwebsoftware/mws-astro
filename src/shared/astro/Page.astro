@@ -34,9 +34,11 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
       if (Component) {
         return <Component {...block} key={String(i)} />;
       }
+      const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+      console.warn(warnstring);
       return (
         <div class="missing-component">
-          {`Component ${block._bookshop_name} could not be found!`}
+          {warnstring}
         </div>
       );
     })
