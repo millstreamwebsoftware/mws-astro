@@ -1,7 +1,6 @@
 ---
-import MarkdownIt from "markdown-it";
 import { convertColorString } from "@mws-astro/util";
-const md = new MarkdownIt({ html: true });
+import Markdown from "@shared/Markdown.astro";
 
 export interface Props {
   content: string;
@@ -10,16 +9,16 @@ export interface Props {
   style?: Record<string, string>;
 }
 
-const { background_color, style, classes } = Astro.props;
-const htmlContent = md.render(Astro.props.content);
+const { background_color, style, classes, content } = Astro.props;
 const background = convertColorString(background_color);
 ---
 
 <section
   style={Object.assign({ "--background-color": background }, style)}
   class:list={["rich-text", classes]}
-  set:html={htmlContent}
-/>
+>
+  <Markdown {content} />
+</section>
 
 <style>
   section {

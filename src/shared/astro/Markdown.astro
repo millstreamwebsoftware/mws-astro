@@ -1,0 +1,13 @@
+---
+import { Markdown as RemoteMarkdown } from "astro-remote";
+import Blockquote from "@components/Blockquote/Blockquote.astro";
+import Icon from "@shared/Icon.astro";
+
+const { content } = Astro.props;
+---
+
+<RemoteMarkdown
+  {content}
+  sanitize={{ allowComponents: true }}
+  components={{ blockquote: Blockquote, icon: Icon }}
+/>

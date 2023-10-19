@@ -1,0 +1,48 @@
+---
+import Markdown from "@shared/Markdown.astro";
+import Icon from "@shared/Icon.astro";
+
+export interface Props {
+  html: string;
+}
+
+// const { html } = Astro.props;
+// <Fragment set:html={html} />
+
+const content = await Astro.slots.render("default");
+---
+
+<blockquote>
+  <Icon name="fa6-solid:circle-check" height="1.8em" />
+  <Markdown {content} />
+</blockquote>
+
+<style is:global>
+  blockquote > .icon {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: rgb(var(--blockquote-color) / 0.6);
+  }
+
+  blockquote {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin: 20px auto;
+    padding: 1em 1em 1em 60px;
+    font-size: 1.4em;
+    font-style: italic;
+    line-height: 1.6;
+    border-left: 3px solid rgb(var(--blockquote-color) / 0.4);
+    background-color: rgb(var(--blockquote-color) / 0.1);
+    border-radius: var(--border-radius);
+  }
+
+  blockquote span {
+    display: block;
+    margin-top: 0.5em;
+    font-style: normal;
+    font-weight: bold;
+  }
+</style>

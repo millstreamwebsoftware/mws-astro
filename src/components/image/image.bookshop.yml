@@ -1,0 +1,42 @@
+# Metadata about this component, to be used in the CMS
+spec:
+  structures:
+    - content_blocks
+  label: Image
+  description: Display a single image.
+  icon: collections
+  tags: ["image", "collection"]
+
+# Defines the structure of this component, as well as the default values
+blueprint:
+  image:
+  title:
+  description:
+  height: 50
+  indent: true
+  lightbox: true
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint
+_inputs:
+  height:
+    type: range
+    options:
+      step: 1
+      max: 100
+      min: 0
+  columns:
+    type: number
+    comment: Set the number of columns. 0 puts all images in one row.
+    options:
+      step: 1
+      min: 0
+  indent:
+    type: switch
+  title:
+    type: text
+  description:
+    type: markdown
+  lightbox:
+    type: checkbox

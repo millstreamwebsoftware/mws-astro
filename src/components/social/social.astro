@@ -11,7 +11,7 @@ const icons: Record<string, string> = {
 };
 
 const socials: Record<string, string>[] = preferences.general.social.map(
-  (s) => {
+  (s: any) => {
     let social = { icon: icons[s.name] };
     if (!social.icon) social.icon = "fa6-solid:square-up-right";
     return Object.assign(social, s);

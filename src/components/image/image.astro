@@ -1,0 +1,131 @@
+---
+import MarkdownIt from "markdown-it";
+import Lightbox from "@components/lightbox/lightbox.astro";
+// import { Image } from "astro:assets";
+
+const md = new MarkdownIt({ html: true });
+
+export interface Props {
+  image: any[];
+  title?: string;
+  description?: string;
+  height: number;
+  columns: number;
+  indent: boolean;
+  lightbox?: boolean;
+  key?: string;
+}
+
+const { image, title, description, height, indent, lightbox, key } = Astro.props;
+
+const id = `image${key}`;
+---
+
+<section
+  {id}
+  class={`image ${indent ? "" : "no-indent"}`}
+  style={height && { "--height": height }}
+>
+      <figure data-lightbox={id}>
+        <img
+          src={image?.src || image}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          style={{
+            ...(image?.width && {
+              "max-width": `${image?.width}px`,
+            }),
+            ...(image?.height && {
+              "max-height": `${image?.height}px`,
+            }),
+          }}
+        />
+
+        {(title || description) && (
+          <figcaption>
+            {title && <h3>{title}</h3>}
+            {description && (
+              <div set:html={md.render(description)} />
+            )}
+          </figcaption>
+        )}
+      </figure>
+
+  {
+    lightbox && (
+      <Lightbox collection={id}>
+          <figure
+            data-lightbox={id}
+            class:list={{ caption: title || description }}
+          >
+            <img
+              src={image?.src || image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              style={{
+                ...(image?.width && {
+                  "max-width": `${image?.width}px`,
+                }),
+                ...(image?.height && {
+                  "max-height": `${image?.height}px`,
+                }),
+              }}
+            />
+
+            {(title || description) && (
+              <figcaption>
+                {title && <h3>{title}</h3>}
+                {description && (
+                  <div set:html={md.render(description)} />
+                )}
+              </figcaption>
+            )}
+          </figure>
+      </Lightbox>
+    )
+  }
+</section>
+
+<style lang="scss">
+  section {
+    height: calc(var(--height) * 1vh);
+    overflow: hidden;
+  }
+
+  figure {
+    height: 100%;
+    width: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .gallery-item {
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    figcaption {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      background: linear-gradient(to right, #ffffffdd, #ffffff99);
+    }
+  }
+</style>

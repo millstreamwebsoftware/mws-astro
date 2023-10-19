@@ -30,4 +30,9 @@ if (!icon)
 const iconData = iconToSVG(icon, { height });
 ---
 
-<svg {...iconData.attributes} set:html={iconData.body} />
+<svg
+  class="icon"
+  data-icon-name={name}
+  {...iconData.attributes}
+  set:html={iconData.body}
+/>
