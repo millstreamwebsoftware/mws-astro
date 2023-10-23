@@ -11,6 +11,8 @@ spec:
 blueprint:
   height:
   columns: 0
+  gap: true
+  aspect: 1
   indent: true
   lightbox: true
   images:
@@ -34,6 +36,12 @@ _inputs:
     options:
       step: 1
       min: 0
+  aspect:
+    type: range
+    options:
+      step: 0.1
+      max: 2
+      min: 0.5
   indent:
     type: switch
   images:

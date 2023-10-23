@@ -9,6 +9,8 @@ export interface Props {
   images: any[];
   height: number;
   columns: number;
+  gap: boolean;
+  aspect: number;
   indent: boolean;
   lightbox?: boolean;
   key?: string;
@@ -26,13 +28,15 @@ const { images, height, indent, lightbox, key } = Astro.props;
 // });
 
 const columns = Astro.props.columns || images.length;
+const aspect = Astro.props.aspect ?? 1.0;
+const gap = Astro.props.gap ?? true;
 const id = `gallery${key}`;
 ---
 
 <section
   {id}
   class={`gallery ${indent ? "" : "no-indent"}`}
-  style={{ "--height": height, "--columns": columns }}
+  style={{ "--height": height, "--columns": columns, "--aspect": aspect, ...(!gap && {"--gallery-gap": 0}) }}
 >
   {
     images.map((asset, i) => (
@@ -110,6 +114,7 @@ const id = `gallery${key}`;
     display: grid;
     grid-template-rows: 1fr;
     grid-auto-flow: row;
+    gap: var(--gallery-gap);
   }
 
   .gallery-item {
@@ -120,6 +125,7 @@ const id = `gallery${key}`;
       height: 100%;
       object-fit: cover;
       object-position: center;
+      aspect-ratio: var(--aspect);
     }
 
     figcaption {
