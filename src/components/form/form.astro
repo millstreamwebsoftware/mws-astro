@@ -37,7 +37,7 @@ const background = convertColorString(background_color);
 ---
 
 <section
-  style=`--background-color: ${background};`
+  style={{...(background && { "--background-color": background })}}
   class:list={["form", classes]}
 >
   <form method="post" {action} {name} {id}>

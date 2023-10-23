@@ -14,7 +14,7 @@ const background = convertColorString(background_color);
 ---
 
 <section
-  style={Object.assign({ "--background-color": background }, style)}
+  style={{...(background && { "--background-color": background })}}
   class:list={["rich-text", classes]}
 >
   <Markdown {content} />
