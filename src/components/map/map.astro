@@ -3,6 +3,8 @@ export interface props {
   lat: number;
   lng: number;
   zoom?: number;
+  mapType?: string;
+  marker?: boolean;
   height: number;
   style?: any;
   indent?: boolean;
@@ -10,10 +12,11 @@ export interface props {
 }
 
 import preferences from "@data/preferences.json";
-const { lat, lng, zoom, key, indent } = Astro.props;
+const { lat, lng, zoom, marker, key, indent } = Astro.props;
 
 const apiKey = preferences.API.google_maps.api_key;
 const height = Astro.props.height + "vh";
+const mapType = Astro.props.mapType ?? "hybrid";
 const mapId = "map-" + key;
 ---
 
@@ -28,6 +31,8 @@ const mapId = "map-" + key;
     data-lat={lat}
     data-lng={lng}
     data-zoom={zoom}
+    data-marker={marker}
+    data-map-type={mapType}
     data-api-key={apiKey}
   >
   </div>
@@ -35,7 +40,7 @@ const mapId = "map-" + key;
 
 <script>
   import { Loader } from "@googlemaps/js-api-loader";
-  import { styles } from "@styles/map.json";
+  import { styles } from "@custom/map.json";
 
   const apiKey = document
     .querySelector("[data-map][data-api-key]")
@@ -52,17 +57,26 @@ const mapId = "map-" + key;
     const { Map } = (await google.maps.importLibrary(
       "maps"
     )) as google.maps.MapsLibrary;
+    const { Marker } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
 
     document.querySelectorAll("[data-map]").forEach((e, i) => {
       if (!(e instanceof HTMLElement)) return;
-      new Map(e, {
-        center: {
-          lat: Number(e.dataset?.lat),
-          lng: Number(e.dataset?.lng),
-        },
+
+      const position = {lat: Number(e.dataset?.lat), lng: Number(e.dataset?.lng)};
+
+      const map = new Map(e, {
+        center: position,
         zoom: Number(e.dataset?.zoom),
-        styles,
+        mapTypeId: e.dataset?.mapType,
+        ...(e.dataset?.mapType == "roadmap" && {styles: styles}),
       });
+
+      if ("marker" in e.dataset) {
+        new Marker({
+          position,
+          map
+        })
+      }
     });
   });
 </script>
@@ -73,6 +87,7 @@ const mapId = "map-" + key;
   }
 
   section {
-    min-height: var(--height);
+    /* min-height: var(--height); */
+    height: var(--height);
   }
 </style>
