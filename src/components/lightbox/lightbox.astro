@@ -36,7 +36,8 @@ const { collection } = Astro.props;
       if (!counter) return;
       if (++i < 1) i += l;
       counter.innerHTML = `${i}/${l}`;
-      counter.classList.toggle("hidden", l < 2);
+      // counter.classList.toggle("hidden", l < 2);
+      box.classList.toggle("single", l < 2);
     };
 
     const select = (direction: number) => {
@@ -45,7 +46,7 @@ const { collection } = Astro.props;
       let newIndex = (index + direction) % children.length;
       setCounter(newIndex, children.length);
 
-      if (direction === 0) return;
+      if (direction === 0 || children.length < 2) return;
 
       if (direction > 0) {
         box.classList.add("select-next");
@@ -279,8 +280,12 @@ const { collection } = Astro.props;
     font-size: 2rem;
   }
 
-  .counter.hidden {
+  #lightbox.single > .buttons > * {
     display: none;
+  }
+
+  #lightbox.single > .buttons > [data-action="x"] {
+    display: block;
   }
 
   button {
