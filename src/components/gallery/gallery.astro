@@ -35,7 +35,7 @@ const id = `gallery${key}`;
 
 <section
   {id}
-  class={`gallery ${indent ? "" : "no-indent"}`}
+  class:list={["gallery", {"no-indent": !indent}, {lightbox}]}
   style={{ "--height": height, "--columns": columns, "--aspect": aspect, ...(!gap && {"--gallery-gap": 0}) }}
 >
   {
@@ -117,6 +117,14 @@ const id = `gallery${key}`;
     gap: var(--gallery-gap);
   }
 
+  .gallery.no-indent {
+    padding: var(--gallery-gap);
+  }
+
+  .lightbox [data-lightbox] {
+    cursor: pointer;
+  }
+
   .gallery-item {
     position: relative;
 
@@ -137,7 +145,7 @@ const id = `gallery${key}`;
       left: 0;
       right: 0;
       padding: 2rem;
-      background: linear-gradient(to right, #ffffffdd, #ffffff99);
+      background: linear-gradient(to right, rgb(var(--background-color) / 0.7), rgb(var(--background-color) / 0.5));
     }
   }
 </style>

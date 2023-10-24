@@ -24,6 +24,7 @@ const id = `image${key}`;
 <section
   {id}
   class={`image ${indent ? "" : "no-indent"}`}
+  class:list={["image", {"no-indent": !indent}, {lightbox}]}
   style={height && { "--height": height }}
 >
       <figure data-lightbox={id}>
@@ -106,26 +107,7 @@ const id = `image${key}`;
     object-position: center;
   }
 
-  .gallery-item {
-    position: relative;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    figcaption {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 2rem;
-      background: linear-gradient(to right, #ffffffdd, #ffffff99);
-    }
+  .lightbox [data-lightbox] {
+    cursor: pointer;
   }
 </style>

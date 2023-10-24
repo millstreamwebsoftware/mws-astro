@@ -38,7 +38,7 @@ _inputs:
       redo: true
       removeformat: true
       copyformatting: true
-      styles: src/styles/editor.css
+      styles: src/mws-astro/src/styles/editor.css
       left: align-left
       center: align-center
       right: align-right

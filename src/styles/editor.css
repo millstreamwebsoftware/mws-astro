@@ -1,4 +1,5 @@
 @import "/public/styles/fonts.css";
+@import "src/styles/custom.editor.css";
 
 .align-left { text-align: left; align-self: flex-start; }
 .align-center { text-align: center; align-self: center; }

@@ -3,10 +3,11 @@ export interface Props {
   content_blocks: any[];
   collapse?: boolean;
   layout?: number[];
+  classes?: any;
   key?: string;
 }
 
-const { collapse, layout, key } = Astro.props;
+const { collapse, layout, classes, key } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
@@ -98,7 +99,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 // const columnLayout = layout?.layout?.indexOf(0);
 ---
 
-<div class:list={["columns", { collapse }]} style={{ "--columns": columns }}>
+<div class:list={["columns", { collapse }, classes]} style={{ "--columns": columns }}>
   {
     items.map((block: any, i: any) => {
       var Component = components[block._bookshop_name];
@@ -127,35 +128,59 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   }
 </div>
 
-<style>
+<style lang="scss">
   .columns {
     /* gap: var(--column-gap); */
     display: grid;
     grid-auto-flow: row;
     grid-template-columns: repeat(var(--columns), 1fr);
+    overflow: hidden;
+  }
+
+  .columns.no-indent {
+    padding: 0;
+
+    &-top {
+      padding-top: 0;
+    }
+    &-bottom {
+      padding-bottom: 0;
+    }
+    &-left {
+      padding-left: 0;
+    }
+    &-right {
+      padding-right: 0;
+    }
   }
 </style>
 
 <style is:global lang="scss">
   .columns-item > section {
     height: 100%;
-    padding: calc(var(--column-gap));
+    // padding: calc(var(--column-gap));
+    padding: 0;
   }
 
-  .columns > {
-    .first-in-row > section {
-      padding-left: var(--indent);
-    }
-    .last-in-row > section {
-      padding-right: var(--indent);
-    }
-    .first-in-column > section {
-      padding-top: var(--indent);
-    }
-    .last-in-column > section {
-      padding-bottom: var(--indent);
-    }
+  .columns {
+    gap: var(--column-gap);
+    padding: calc(var(--indent) * 0.5) var(--indent);
   }
+
+  // .columns > {
+  //   .first-in-row > section {
+  //     padding-left: var(--indent);
+  //   }
+  //   .last-in-row > section {
+  //     padding-right: var(--indent);
+  //   }
+  //   .first-in-column > section {
+  //     padding-top: var(--indent);
+  //   }
+  //   .last-in-column > section {
+  //     padding-bottom: var(--indent);
+  //   }
+  // }
 
   @media only screen and (max-width: 768px) {
     .columns.collapse {
@@ -181,4 +206,34 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
       }
     }
   }
+
+  .columns-item section {
+    position: relative;
+    z-index: 1;
+  }
+
+  .columns-item section::after {
+    content: "";
+    position: absolute;
+    inset: calc(var(--column-gap) * -.5);
+    background-color: rgb(var(--background-color));
+    z-index: -1;
+  }
+
+  .columns-item.first-in-column section::after {
+    top: calc(var(--indent) * -.5);
+  }
+
+  .columns-item.last-in-column section::after {
+    bottom: calc(var(--indent) * -.5);
+  }
+
+  .columns-item.first-in-row section::after {
+    left: calc(var(--indent) * -1);
+  }
+
+  .columns-item.last-in-row section::after {
+    right: calc(var(--indent) * -1);
+  }
+
 </style>

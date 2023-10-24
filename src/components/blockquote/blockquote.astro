@@ -3,26 +3,40 @@ import Markdown from "@shared/Markdown.astro";
 import Icon from "@shared/Icon.astro";
 
 export interface Props {
-  html: string;
+  type?: string;
 }
 
 // const { html } = Astro.props;
 // <Fragment set:html={html} />
 
+const icons = {
+  "default": {"before": "fa6-solid:quote-left", "after": "fa6-solid:quote-right"},
+  "correct": {"before": "fa6-solid:circle-check", "after": ""}
+}[Astro.props.type ?? "default"];
+
 const content = await Astro.slots.render("default");
 ---
 
 <blockquote>
-  <Icon name="fa6-solid:circle-check" height="1.8em" />
-  <Markdown {content} />
+  {icons?.before && <Icon name={icons.before} height="1.8em" />}
+  <span><Markdown {content} /></span>
+  {icons?.after && <Icon name={icons.after} height="1.8em" />}
 </blockquote>
 
 <style is:global>
   blockquote > .icon {
     position: absolute;
+    color: rgb(var(--blockquote-color) / 0.6);
+  }
+
+  blockquote > .icon:first-child {
     top: 15px;
     left: 15px;
-    color: rgb(var(--blockquote-color) / 0.6);
+  }
+
+  blockquote > .icon:last-child {
+    bottom: 15px;
+    right: 15px;
   }
 
   blockquote {
@@ -30,7 +44,7 @@ const content = await Astro.slots.render("default");
     overflow: hidden;
     width: 100%;
     margin: 20px auto;
-    padding: 1em 1em 1em 60px;
+    padding: 1em 50px 1em 50px;
     font-size: 1.4em;
     font-style: italic;
     line-height: 1.6;
