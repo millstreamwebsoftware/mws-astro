@@ -11,8 +11,8 @@ const { legend, form_blocks, key } = Astro.props;
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
   [
-    "/src/components/form/inputs/**/*.jsx",
-    "/src/components/form/inputs/**/*.astro",
+    "/src/mws-astro/src/components/form/**/*.jsx",
+    "/src/mws-astro/src/components/form/**/*.astro"
   ],
   {
     eager: true,
@@ -58,9 +58,12 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
     flex-direction: column;
     margin-top: 1.5rem;
     margin-bottom: 1rem;
+    border-radius: var(--border-radius);
+    border: var(--form-border);
   }
 
   legend {
     font-size: larger;
+    color: rgb(var(--text-color));
   }
 </style>

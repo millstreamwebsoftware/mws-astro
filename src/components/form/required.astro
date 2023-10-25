@@ -1,0 +1,14 @@
+---
+import Icon from '@shared/icon.astro';
+---
+<abbr class="--required" title="required">
+  <Icon name="fa6-solid:asterisk" height="1ch"/>
+</abbr>
+
+<style>
+  abbr {
+    color: rgb(var(--error-color));
+    margin: .5ch;
+    line-height: 1;
+  }
+</style>

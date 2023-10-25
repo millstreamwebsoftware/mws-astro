@@ -22,11 +22,12 @@ const textColor = convertColorString(preferences.footer.foreground_color);
   {preferences.footer.show_socials && <Social />}
   {
     preferences.footer.show_top_button && (
-      <a href="#top" style="color: rgb(var(--text-color))">
+      <a href="#top">
         Back to top
       </a>
     )
   }
+  <p class="brand">Website by <a href="https://www.millstream.com.au/" target="_blank" rel="noopener noreferrer">Millstream Creative</a></p>
 </section>
 
 <style>
@@ -36,12 +37,20 @@ const textColor = convertColorString(preferences.footer.foreground_color);
     background-color: var(--background-color);
     grid-template-rows: auto;
     grid-template-columns: auto auto;
+    color: rgb(var(--text-color));
   }
 
   .copyright {
     height: 100%;
     display: flex;
     align-items: center;
+  }
+
+  .brand {
+    margin: 0;
+    grid-column: 2 / 3;
+    text-align: right;
+    opacity: 0.5;
   }
 
   @media only screen and (max-width: 768px) {

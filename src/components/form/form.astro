@@ -1,5 +1,8 @@
 ---
 import { convertColorString } from "@mws-astro/util";
+import Required from "./required.astro";
+
+
 export interface Props {
   action: string;
   name: string;
@@ -33,6 +36,19 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
   components[bookshopName] = obj.default;
 });
 
+// function getNested(obj, ...args) {
+//   return args.reduce((obj, level) => obj && obj[level], obj)
+// }
+
+// Recurse form_blocks to check for any required fields. 
+function checkRequired(obj: any[]): boolean {
+  return obj.some((element: any) => {
+    if ("form_blocks" in element) return checkRequired(element.form_blocks);
+    return element?.required;
+  });
+}
+const required = checkRequired(form_blocks);
+
 const background = convertColorString(background_color);
 ---
 
@@ -41,6 +57,7 @@ const background = convertColorString(background_color);
   class:list={["form", classes]}
 >
   <form method="post" {action} {name} {id}>
+    {required && <p>Fields marked with an asterisk (<Required />) are required.</p>}
     {
       form_blocks.map((block: any, i: number) => {
         const Component = components[block._bookshop_name];
@@ -70,11 +87,19 @@ const background = convertColorString(background_color);
 
   input[type="submit"] {
     cursor: pointer;
-    background-color: transparent;
+    width: 100%;
+    background-color: rgb(var(--background-color));
+    border-radius: var(--border-radius);
     transition: background-color 0.2s ease-in-out;
   }
 
   input[type="submit"]:hover {
-    background-color: rgb(0 0 0 / 0.2);
+    background-color: rgb(var(--text-color) / 0.2);
+  }
+</style>
+
+<style is:global>
+  input::placeholder, textarea::placeholder {
+    color: rgb(var(--placeholder-color));
   }
 </style>

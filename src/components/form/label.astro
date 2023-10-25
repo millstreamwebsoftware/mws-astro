@@ -1,0 +1,27 @@
+---
+import Required from './required.astro';
+export interface Props {
+  for: string;
+  required?: boolean;
+}
+
+const { for: labelFor, required } = Astro.props;
+
+---
+
+<label for={labelFor} class:list={[{required}]}>
+  <span>
+    <slot />
+  </span>
+  {required && <Required /> }
+</label>
+
+<style>
+  label {
+    display: flex;
+  }
+  
+  span {
+    order: 1;
+  }
+</style>

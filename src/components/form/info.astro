@@ -1,9 +1,10 @@
 ---
-import MarkdownIt from "markdown-it";
-// import IconInformation from "~icons/carbon/information-filled";
-// import IconWarning from "~icons/carbon/warning-square-filled";
+// import MarkdownIt from "markdown-it";
 
-const md = new MarkdownIt({ html: true });
+import Markdown from '@shared/Markdown.astro';
+import Icon from '@shared/icon.astro';
+
+// const md = new MarkdownIt({ html: true });
 
 export interface Props {
   content: string;
@@ -11,64 +12,104 @@ export interface Props {
   key?: string;
 }
 
-const htmlContent = md.render(Astro.props.content);
+// const htmlContent = md.render(Astro.props.content);
 
-const style = Astro.props.style
-  ? "form-info-" + Astro.props.style.toLowerCase()
+const content = Astro.props.content;
+
+const style = Astro.props.style?.toLowerCase();
+
+const icon = style
+  ? {
+      "info": "fa6-solid:circle-info",
+      "warning": "fa6-solid:triangle-exclamation",
+      "error": "fa6-solid:circle-xmark"
+    }[style]
   : undefined;
-// const Icon = style
-//   ? {
-//       "form-info-info": IconInformation,
-//       "form-info-warning": IconWarning,
-//     }[style]
-//   : undefined;
 
 // {Icon && <Icon class="icon" />}
+// <Fragment set:html={htmlContent} />
 ---
 
-<div class={style}>
-  <Fragment set:html={htmlContent} />
+<div class:list={["form-info", style, {"has-icon": !!icon}]}>
+  <span class="icon-container">{icon && <Icon name={icon} height="2rem"/>}</span>
+  <span><Markdown {content}></span>
 </div>
 
 <style>
   div {
     position: relative;
+    color: var(--text-color);
   }
 
-  .form-info-info,
-  .form-info-warning,
-  .form-info-details {
+  span {
+    z-index: 1;
+  }
+
+  div.form-info.has-icon {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 2rem;
+    padding-left: 1rem;
+  }
+
+  .icon-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .form-info.info,
+  .form-info.warning,
+  .form-info.details,
+  .form-info.error {
     padding: 1rem;
-    border-radius: 0.3rem;
+    border-radius: var(--border-radius);
     padding-left: 1.5rem;
-    border-left: 0.5rem solid rgb(207, 207, 207);
+    border-left: 0.5rem solid rgb(207 207 207);
+
+    background-color: rgb(var(--form-info-color) / 0.3);
+    border-color: rgb(var(--form-info-color) / 0.6);
+    color: rgb(var(--form-info-color));
   }
 
-  .form-info-info {
-    background-color: #daeaef;
-    border-color: #93cddf;
-  }
-  /* .form-info-info svg.icon {
-    color: #1c6077;
-  } */
-
-  .form-info-warning {
-    background-color: #faefd2;
-    border-color: #e9cd73;
-  }
-  /* .form-info-warning svg.icon {
-    color: #d2a72c;
-  } */
-
-  .form-info-details {
-    background-color: #efefef;
+  .form-info.info {
+    --form-info-color: var(--info-color);
   }
 
-  /* svg.icon {
+  .form-info.warning {
+    --form-info-color: var(--warning-color);
+  }
+
+  .form-info.details {
+    --form-info-color: var(--details-color);
+  }
+
+  .form-info.error {
+    --form-info-color: var(--error-color);
+    background-color: transparent;
+  }
+
+  .form-info.error::after {
+    content: "";
     position: absolute;
-    width: 2.5rem;
-    left: 1.2rem;
-    margin-top: 0.2em;
-    height: auto;
-  } */
+    opacity: .3;
+    z-index: 0;
+    inset: 0px;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+
+    background: 
+      repeating-linear-gradient(
+        45deg,
+        rgb(var(--form-info-color)),
+        rgb(var(--form-info-color)) .5rem, 
+        rgb(var(--form-info-color) / 0.5) .5rem, 
+        rgb(var(--form-info-color) / 0.5) 1rem
+      ), linear-gradient(
+        to right, 
+        transparent, 
+        rgb(var(--form-info-color)) 5rem
+      );
+  }
+
 </style>
