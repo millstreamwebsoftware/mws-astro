@@ -40,5 +40,10 @@ h1.highlight-2::after {
 }
 
 a.button {
-  border: 1px solid black;
+  display: inline-block;
+  padding: .5em 1em;
+  border: 1px solid rgb(var(--text-color));
+  border-radius: var(--border-radius);
+  margin: var(--text-gap) 0;
+  text-decoration: none;
 }

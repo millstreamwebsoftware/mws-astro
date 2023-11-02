@@ -28,6 +28,7 @@
 
   --page-background-color: 255 255 255;
   --page-background-shadow: 0 0 0 / 0.3;
+  --article-background-color: var(--page-background-color);
 
   --header-background-color: 0 0 0 / 0.6;
   --header-background-color-bottom: 0 0 0 / 0;
@@ -75,10 +76,11 @@ html {
 
 article {
   box-shadow: 0 0 10rem rgb(var(--page-background-shadow));
+  background-color: rgb(var(--article-background-color));
 }
 
 body {
-  background-color: white;
+  // background-color: white;
   max-width: var(--page-max-width);
   position: relative;
   grid-column: 2 / 3;
@@ -128,8 +130,12 @@ section.no-indent {
   }
 }
 
-main > :first-child {
-  padding-top: calc(var(--indent) + var(--header-height));
+// main > :first-child {
+//   padding-top: calc(var(--indent) + var(--header-height));
+// }
+
+main {
+  padding-top: var(--header-height);
 }
 
 form {

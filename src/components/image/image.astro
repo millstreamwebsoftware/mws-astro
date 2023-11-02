@@ -1,33 +1,30 @@
 ---
-import MarkdownIt from "markdown-it";
+import Markdown from "@shared/Markdown.astro";
 import Lightbox from "@components/lightbox/lightbox.astro";
-// import { Image } from "astro:assets";
-
-const md = new MarkdownIt({ html: true });
 
 export interface Props {
-  image: any[];
+  image: any;
   title?: string;
   description?: string;
   height: number;
   columns: number;
   indent: boolean;
+  "background-color"?: string;
   lightbox?: boolean;
   key?: string;
 }
 
-const { image, title, description, height, indent, lightbox, key } = Astro.props;
+const { image, title, description, height, indent, "background-color": background, lightbox, key } = Astro.props;
 
 const id = `image${key}`;
 ---
 
 <section
   {id}
-  class={`image ${indent ? "" : "no-indent"}`}
   class:list={["image", {"no-indent": !indent}, {lightbox}]}
-  style={height && { "--height": height }}
+  style={{...(height && {"--height": height})}}
 >
-      <figure data-lightbox={id}>
+      <figure data-lightbox={lightbox && id}>
         <img
           src={image?.src || image}
           alt=""
@@ -44,10 +41,10 @@ const id = `image${key}`;
         />
 
         {(title || description) && (
-          <figcaption>
+          <figcaption style="">
             {title && <h3>{title}</h3>}
             {description && (
-              <div set:html={md.render(description)} />
+              <Markdown content={description} />
             )}
           </figcaption>
         )}
@@ -79,7 +76,7 @@ const id = `image${key}`;
               <figcaption>
                 {title && <h3>{title}</h3>}
                 {description && (
-                  <div set:html={md.render(description)} />
+                  <Markdown content={description} />
                 )}
               </figcaption>
             )}
@@ -90,23 +87,26 @@ const id = `image${key}`;
 </section>
 
 <style lang="scss">
-  section {
-    position: relative;
+  figure {
     height: calc(var(--height) * 1vh);
-    overflow: hidden;
+    background-color: rgb(var(--background-color));
+    display: flex;
+    flex-direction: column;
+    gap: var(--column-gap);
+    width: 100%;
   }
 
-  figure {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  figcaption {
+    flex: 1 1 0;
+    padding: 0 var(--indent);
+    padding-bottom: calc(var(--indent) * .5);
   }
 
   img {
     width: 100%;
-    height: 100%;
+    height: 0;
+    flex: 1 1 100%;
+
     object-fit: cover;
     object-position: center;
   }
