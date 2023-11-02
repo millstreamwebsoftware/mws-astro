@@ -1,0 +1,17 @@
+---
+import preferences from "@data/preferences.json";
+
+
+const facebookURL = preferences?.general?.social.find((e) => e?.name == "facebook")?.link;
+const target = facebookURL && encodeURIComponent(facebookURL);
+const embedURL = target && `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
+
+console.log(embedURL);
+---
+
+{embedURL && <iframe src={embedURL} width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>}
+<style>
+  iframe {
+    margin-top: var(--text-gap);
+  }
+</style>
