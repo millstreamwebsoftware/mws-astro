@@ -1,6 +1,7 @@
 ---
 import Markdown from "@shared/Markdown.astro";
 import Lightbox from "@components/lightbox/lightbox.astro";
+import { convertColorString } from "@mws-astro/util";
 
 export interface Props {
   image: any;
@@ -9,78 +10,96 @@ export interface Props {
   height: number;
   columns: number;
   indent: boolean;
-  "background-color"?: string;
+  background_color?: string;
   lightbox?: boolean;
   key?: string;
+  classes?: any;
 }
 
-const { image, title, description, height, indent, "background-color": background, lightbox, key } = Astro.props;
+const {
+  image,
+  title,
+  description,
+  height,
+  indent,
+  foreground_color,
+  background_color,
+  lightbox,
+  key,
+  classes,
+} = Astro.props;
 
+const foreground = convertColorString(foreground_color);
+const background = convertColorString(background_color);
 const id = `image${key}`;
 ---
 
 <section
   {id}
-  class:list={["image", {"no-indent": !indent}, {lightbox}]}
-  style={{...(height && {"--height": height})}}
+  class:list={["image", { "no-indent": !indent }, { lightbox }, classes]}
+  style={{ ...(height && { "--height": height }) }}
 >
-      <figure data-lightbox={lightbox && id}>
-        <img
-          src={image?.src || image}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          style={{
-            ...(image?.width && {
-              "max-width": `${image?.width}px`,
-            }),
-            ...(image?.height && {
-              "max-height": `${image?.height}px`,
-            }),
-          }}
-        />
+  <figure data-lightbox={lightbox && id}>
+    <img
+      src={image?.src || image}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      style={{
+        ...(image?.width && {
+          "max-width": `${image?.width}px`,
+        }),
+        ...(image?.height && {
+          "max-height": `${image?.height}px`,
+        }),
+      }}
+    />
 
-        {(title || description) && (
-          <figcaption style="">
-            {title && <h3>{title}</h3>}
-            {description && (
-              <Markdown content={description} />
-            )}
-          </figcaption>
-        )}
-      </figure>
+    {
+      (title || description) && (
+        <figcaption
+          style={{
+            ...(background && { "--background-color": background }),
+            ...(foreground && { "--text-color": foreground }),
+            ...(foreground && { "--heading-color": foreground }),
+          }}
+        >
+          {title && <h3>{title}</h3>}
+          {description && <Markdown content={description} />}
+        </figcaption>
+      )
+    }
+  </figure>
 
   {
     lightbox && (
       <Lightbox collection={id}>
-          <figure
-            data-lightbox={id}
-            class:list={{ caption: title || description }}
-          >
-            <img
-              src={image?.src || image}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              style={{
-                ...(image?.width && {
-                  "max-width": `${image?.width}px`,
-                }),
-                ...(image?.height && {
-                  "max-height": `${image?.height}px`,
-                }),
-              }}
-            />
+        <figure
+          data-lightbox={id}
+          class:list={{ caption: title || description }}
+        >
+          <img
+            src={image?.src || image}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={{
+              ...(image?.width && {
+                "max-width": `${image?.width}px`,
+              }),
+              ...(image?.height && {
+                "max-height": `${image?.height}px`,
+              }),
+            }}
+          />
 
-            {(title || description) && (
-              <figcaption>
-                {title && <h3>{title}</h3>}
-                {description && (
-                  <Markdown content={description} />
-                )}
-              </figcaption>
-            )}
-          </figure>
+          {(title || description) && (
+            <figcaption>
+              {title && <h3>{title}</h3>}
+              {description && <Markdown content={description} />}
+            </figcaption>
+          )}
+        </figure>
       </Lightbox>
     )
   }
@@ -88,8 +107,8 @@ const id = `image${key}`;
 
 <style lang="scss">
   figure {
+    position: relative;
     height: calc(var(--height) * 1vh);
-    background-color: rgb(var(--background-color));
     display: flex;
     flex-direction: column;
     gap: var(--column-gap);
@@ -99,7 +118,8 @@ const id = `image${key}`;
   figcaption {
     flex: 1 1 0;
     padding: 0 var(--indent);
-    padding-bottom: calc(var(--indent) * .5);
+    padding-bottom: calc(var(--indent) * 0.5);
+    background-color: rgb(var(--background-color));
   }
 
   img {
@@ -109,6 +129,27 @@ const id = `image${key}`;
 
     object-fit: cover;
     object-position: center;
+  }
+
+  .description-right,
+  .description-left {
+    figcaption {
+      padding: var(--column-gap);
+      padding-right: var(--indent);
+      position: absolute;
+
+      top: var(--indent);
+      bottom: var(--indent);
+      width: 33%;
+    }
+  }
+
+  .description-left figcaption {
+    left: 0;
+  }
+
+  .description-right figcaption {
+    right: 0;
   }
 
   .lightbox [data-lightbox] {
