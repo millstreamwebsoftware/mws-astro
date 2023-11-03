@@ -1,15 +1,32 @@
 ---
 import { Markdown as RemoteMarkdown } from "astro-remote";
+import MarkdownIt from "markdown-it";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Icon from "@shared/icon.astro";
 import Mailbuild from "@components/mailbuild/mailbuild.astro";
-import Facebook from "@components/facebook/facebook.astro"
-
+import Facebook from "@components/facebook/facebook.astro";
 const { content } = Astro.props;
+var md;
+
+// @ts-ignore
+if (ENV_BOOKSHOP_LIVE) {
+  md = new MarkdownIt({ html: true });
+}
 ---
 
-<RemoteMarkdown
-  {content}
-  sanitize={{ allowComponents: true }}
-  components={{ blockquote: Blockquote, icon: Icon, Newsletter: Mailbuild, Facebook }}
-/>
+{
+  md ? (
+    <Fragment set:html={md.render(content)} />
+  ) : (
+    <RemoteMarkdown
+      {content}
+      sanitize={{ allowComponents: true }}
+      components={{
+        blockquote: Blockquote,
+        icon: Icon,
+        Newsletter: Mailbuild,
+        Facebook,
+      }}
+    />
+  )
+}
