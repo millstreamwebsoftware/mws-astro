@@ -140,7 +140,8 @@ const id = `image${key}`;
 
       top: var(--indent);
       bottom: var(--indent);
-      width: 33%;
+      width: 40%;
+      height: fit-content;
     }
   }
 
@@ -150,6 +151,16 @@ const id = `image${key}`;
 
   .description-right figcaption {
     right: 0;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .description-right,
+    .description-left {
+      figcaption {
+        width: 100%;
+        // height: fit-content;
+      }
+    }
   }
 
   .lightbox [data-lightbox] {

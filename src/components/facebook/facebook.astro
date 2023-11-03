@@ -1,17 +1,37 @@
 ---
 import preferences from "@data/preferences.json";
 
-
-const facebookURL = preferences?.general?.social.find((e) => e?.name == "facebook")?.link;
+const facebookURL = preferences?.general?.social.find(
+  (e) => e?.name == "facebook"
+)?.link;
 const target = facebookURL && encodeURIComponent(facebookURL);
-const embedURL = target && `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
-
-console.log(embedURL);
+const embedURL =
+  target &&
+  `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
 ---
 
-{embedURL && <iframe src={embedURL} width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>}
+<div class="facebox">
+  {
+    embedURL && (
+      <iframe
+        data-target={facebookURL}
+        src={embedURL}
+        width="340"
+        height="500"
+        style="border:none;overflow:hidden"
+        scrolling="no"
+        frameborder="0"
+        allowfullscreen="true"
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+      />
+    )
+  }
+</div>
 <style>
-  iframe {
+  div {
+    display: flex;
+    justify-content: center;
     margin-top: var(--text-gap);
+    width: 100%;
   }
 </style>

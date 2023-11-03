@@ -241,6 +241,14 @@ section {
   background-color: rgb(var(--background-color));
 }
 
+a.button {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgb(var(--text-color) / 0.2);
+  }
+}
+
 // Site specific custom styling
 @import "@custom/custom.editor";
 @import "@custom/custom";

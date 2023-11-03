@@ -12,7 +12,10 @@ const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/**/*.jsx", "/src/mws-astro/src/components/**/*.astro"],
+  [
+    "/src/mws-astro/src/components/**/*.jsx",
+    "/src/mws-astro/src/components/**/*.astro",
+  ],
   {
     eager: true,
   }
@@ -99,7 +102,10 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 // const columnLayout = layout?.layout?.indexOf(0);
 ---
 
-<div class:list={["columns", { collapse }, classes]} style={{ "--columns": columns }}>
+<div
+  class:list={["columns", { collapse }, classes]}
+  style={{ "--columns": columns }}
+>
   {
     items.map((block: any, i: any) => {
       var Component = components[block._bookshop_name];
@@ -119,11 +125,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
       }
       const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
       console.warn(warnstring);
-      return (
-        <div class="missing-component">
-          {warnstring}
-        </div>
-      );
+      return <div class="missing-component">{warnstring}</div>;
     })
   }
 </div>
@@ -185,6 +187,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   @media only screen and (max-width: 768px) {
     .columns.collapse {
       --columns: 1 !important;
+      gap: 0;
 
       > .columns-item {
         grid-column: 1 / 2 !important;
@@ -203,6 +206,11 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
             padding-bottom: var(--indent);
           }
         }
+
+        section::after {
+          left: calc(var(--indent) * -1) !important;
+          right: calc(var(--indent) * -1) !important;
+        }
       }
     }
   }
@@ -215,17 +223,17 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   .columns-item section::after {
     content: "";
     position: absolute;
-    inset: calc(var(--column-gap) * -.5);
+    inset: calc(var(--column-gap) * -0.5);
     background-color: rgb(var(--background-color));
     z-index: -1;
   }
 
   .columns-item.first-in-column section::after {
-    top: calc(var(--indent) * -.5);
+    top: calc(var(--indent) * -0.5);
   }
 
   .columns-item.last-in-column section::after {
-    bottom: calc(var(--indent) * -.5);
+    bottom: calc(var(--indent) * -0.5);
   }
 
   .columns-item.first-in-row section::after {
@@ -235,5 +243,4 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   .columns-item.last-in-row section::after {
     right: calc(var(--indent) * -1);
   }
-
 </style>

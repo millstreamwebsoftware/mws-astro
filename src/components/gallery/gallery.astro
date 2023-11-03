@@ -35,8 +35,13 @@ const id = `gallery${key}`;
 
 <section
   {id}
-  class:list={["gallery", {"no-indent": !indent}, {lightbox}]}
-  style={{ "--height": height, "--columns": columns, "--aspect": aspect, ...(!gap && {"--gallery-gap": 0}) }}
+  class:list={["gallery", { "no-indent": !indent }, { lightbox }]}
+  style={{
+    "--height": height,
+    "--columns": columns,
+    "--aspect": aspect,
+    ...(!gap && { "--gallery-gap": 0 }),
+  }}
 >
   {
     images.map((asset, i) => (
@@ -145,7 +150,17 @@ const id = `gallery${key}`;
       left: 0;
       right: 0;
       padding: 2rem;
-      background: linear-gradient(to right, rgb(var(--background-color, var(--article-background-color)) / 0.7), rgb(var(--background-color, var(--article-background-color)) / 0.5));
+      background: linear-gradient(
+        to right,
+        rgb(var(--background-color, var(--article-background-color)) / 0.7),
+        rgb(var(--background-color, var(--article-background-color)) / 0.5)
+      );
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    section.gallery {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 </style>
