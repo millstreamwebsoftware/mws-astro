@@ -1,6 +1,6 @@
 ---
 import Markdown from "@shared/Markdown.astro";
-import Icon from "@shared/Icon.astro";
+import Icon from "@shared/icon.astro";
 
 export interface Props {
   type?: string;
@@ -10,8 +10,8 @@ export interface Props {
 // <Fragment set:html={html} />
 
 const icons = {
-  "default": {"before": "fa6-solid:quote-left", "after": "fa6-solid:quote-right"},
-  "correct": {"before": "fa6-solid:circle-check", "after": ""}
+  default: { before: "fa6-solid:quote-left", after: "fa6-solid:quote-right" },
+  correct: { before: "fa6-solid:circle-check", after: "" },
 }[Astro.props.type ?? "default"];
 
 const content = await Astro.slots.render("default");
