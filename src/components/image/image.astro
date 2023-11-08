@@ -113,6 +113,7 @@ const id = `image${key}`;
     flex-direction: column;
     gap: var(--column-gap);
     width: 100%;
+    overflow: hidden;
   }
 
   figcaption {
@@ -133,24 +134,37 @@ const id = `image${key}`;
 
   .description-right,
   .description-left {
+    figure {
+      height: auto;
+      padding: var(--indent);
+    }
+
     figcaption {
+      // display: block;
       padding: var(--column-gap);
       padding-right: var(--indent);
-      position: absolute;
-
-      top: var(--indent);
-      bottom: var(--indent);
-      width: 40%;
+      width: 50%;
       height: fit-content;
+      z-index: 1;
+      // margin: var(--indent);
+    }
+
+    img {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      z-index: 0;
     }
   }
 
-  .description-left figcaption {
-    left: 0;
+  .description-left figure {
+    padding-left: 0;
+    align-items: start;
   }
 
-  .description-right figcaption {
-    right: 0;
+  .description-right figure {
+    padding-right: 0;
+    align-items: end;
   }
 
   @media only screen and (max-width: 768px) {
@@ -158,7 +172,10 @@ const id = `image${key}`;
     .description-left {
       figcaption {
         width: 100%;
-        // height: fit-content;
+        padding: var(--indent);
+      }
+      figure {
+        padding: 0;
       }
     }
   }

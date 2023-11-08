@@ -210,6 +210,16 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         section::after {
           left: calc(var(--indent) * -1) !important;
           right: calc(var(--indent) * -1) !important;
+          top: 0;
+          bottom: 0;
+        }
+
+        &:first-child section::after {
+          top: calc(var(--indent) * -0.5);
+        }
+
+        &:last-child section::after {
+          bottom: calc(var(--indent) * -0.5);
         }
       }
     }

@@ -87,7 +87,7 @@ body {
 }
 
 section
-  > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address)
+  > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address, script)
   + :is(h1, h2, h3, h4, h5, h6, p, ul, form, address) {
   margin-top: var(--text-gap);
 }
