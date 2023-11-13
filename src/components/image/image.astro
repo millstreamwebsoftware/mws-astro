@@ -10,6 +10,7 @@ export interface Props {
   height: number;
   columns: number;
   indent: boolean;
+  foreground_color?: string;
   background_color?: string;
   lightbox?: boolean;
   key?: string;
@@ -32,6 +33,7 @@ const {
 const foreground = convertColorString(foreground_color);
 const background = convertColorString(background_color);
 const id = `image${key}`;
+const figcaption = title || description;
 ---
 
 <section
@@ -56,7 +58,7 @@ const id = `image${key}`;
     />
 
     {
-      (title || description) && (
+      figcaption && (
         <figcaption
           style={{
             ...(background && { "--background-color": background }),
@@ -93,7 +95,7 @@ const id = `image${key}`;
             }}
           />
 
-          {(title || description) && (
+          {figcaption && (
             <figcaption>
               {title && <h3>{title}</h3>}
               {description && <Markdown content={description} />}
