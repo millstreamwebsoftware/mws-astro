@@ -6,6 +6,7 @@ import Blockquote from "@components/blockquote/blockquote.astro";
 import Icon from "@shared/icon.astro";
 import Mailbuild from "@components/mailbuild/mailbuild.astro";
 import Facebook from "@components/facebook/facebook.astro";
+import Social from "@components/social/social.astro";
 const content = await replaceCmsEmbeds(Astro.props.content);
 
 var md;
@@ -28,6 +29,7 @@ if (ENV_BOOKSHOP_LIVE) {
         icon: Icon,
         Newsletter: Mailbuild,
         Facebook,
+        Social,
       }}
     />
   )

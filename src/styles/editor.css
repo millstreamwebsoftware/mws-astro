@@ -5,6 +5,9 @@
 .align-right { text-align: right; align-self: flex-end; }
 .align-justify { text-align: justify; }
 
+img.align-left { float: left; margin-right: 5rem; }
+img.align-right { float: right; margin-left: 5rem; }
+
 h3.highlight-1 {
   color: rgb(var(--color-accent) / 0.7);
 }

@@ -32,3 +32,16 @@ export async function replaceCmsEmbeds(content: string) {
     return he.decode(atob(g1));
   });
 }
+
+export function bookshopName(p: string) {
+  const parts = p
+    .replace(/^.*components\//, "")
+    .split(".")[0]
+    .split("/");
+
+  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
+    parts.pop();
+  }
+
+  return parts.join("/");
+}

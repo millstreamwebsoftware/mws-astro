@@ -1,4 +1,6 @@
 ---
+import { bookshopName } from "@mws-astro/util";
+
 export interface Props {
   "bookshop:live"?: any;
   contentBlocks: any[];
@@ -7,24 +9,34 @@ export interface Props {
 const { contentBlocks } = Astro.props;
 
 const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["../../components/**/*.jsx", "../../components/**/*.astro"],
-  {
-    eager: true,
-  }
+const componentImports = import.meta.glob(["../../components/**/*.astro"], {
+  eager: true,
+});
+
+const componentOverrides = import.meta.glob(
+  ["../../../../components/**/*.astro"],
+  { eager: true }
 );
 
-Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
-  const parts = path
-    .replace(/^.*components\//, "")
-    .split(".")[0]
-    .split("/");
-  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
-    parts.pop();
-  }
-  const bookshopName = parts.join("/");
-  components[bookshopName] = obj.default;
-});
+Object.entries(componentImports).forEach(
+  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+);
+
+Object.entries(componentOverrides).forEach(
+  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+);
+
+// Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
+//   const parts = path
+//     .replace(/^.*components\//, "")
+//     .split(".")[0]
+//     .split("/");
+//   if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
+//     parts.pop();
+//   }
+//   const bookshopName = parts.join("/");
+//   components[bookshopName] = obj.default;
+// });
 ---
 
 <main>
@@ -36,11 +48,7 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
       }
       const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
       console.warn(warnstring);
-      return (
-        <div class="missing-component">
-          {warnstring}
-        </div>
-      );
+      return <div class="missing-component">{warnstring}</div>;
     })
   }
 </main>
