@@ -1,7 +1,6 @@
 ---
-import { convertColorString } from "@mws-astro/util";
+import { bookshopName, convertColorString } from "@mws-astro/util";
 import Required from "./required.astro";
-
 
 export interface Props {
   action: string;
@@ -18,29 +17,31 @@ const id = (name || "") + "-" + (key || "");
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/form/**/*.jsx", "/src/mws-astro/src/components/form/**/*.astro"],
+  ["/src/mws-astro/src/components/form/**/*.astro"],
   {
     eager: true,
   }
 );
 
-Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
-  const parts = path
-    .replace(/^.*components\//, "")
-    .split(".")[0]
-    .split("/");
-  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
-    parts.pop();
+const componentOverrides = import.meta.glob(
+  ["/src/components/form/**/*.astro"],
+  {
+    eager: true,
   }
-  const bookshopName = parts.join("/");
-  components[bookshopName] = obj.default;
-});
+);
 
+Object.entries(componentImports).forEach(
+  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+);
+
+Object.entries(componentOverrides).forEach(
+  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+);
 // function getNested(obj, ...args) {
 //   return args.reduce((obj, level) => obj && obj[level], obj)
 // }
 
-// Recurse form_blocks to check for any required fields. 
+// Recurse form_blocks to check for any required fields.
 function checkRequired(obj: any[]): boolean {
   return obj.some((element: any) => {
     if ("form_blocks" in element) return checkRequired(element.form_blocks);
@@ -53,11 +54,17 @@ const background = convertColorString(background_color);
 ---
 
 <section
-  style={{...(background && { "--background-color": background })}}
+  style={{ ...(background && { "--background-color": background }) }}
   class:list={["form", classes]}
 >
   <form method="post" {action} {name} {id}>
-    {required && <p>Fields marked with an asterisk (<Required />) are required.</p>}
+    {
+      required && (
+        <p>
+          Fields marked with an asterisk (<Required />) are required.
+        </p>
+      )
+    }
     {
       form_blocks.map((block: any, i: number) => {
         const Component = components[block._bookshop_name];
@@ -66,11 +73,7 @@ const background = convertColorString(background_color);
         }
         const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
         console.warn(warnstring);
-        return (
-          <div class="missing-component">
-            {warnstring}
-          </div>
-        );
+        return <div class="missing-component">{warnstring}</div>;
       })
     }
     <input type="hidden" name="_gotcha" />
@@ -99,7 +102,8 @@ const background = convertColorString(background_color);
 </style>
 
 <style is:global>
-  input::placeholder, textarea::placeholder {
+  input::placeholder,
+  textarea::placeholder {
     color: rgb(var(--placeholder-color));
   }
 </style>

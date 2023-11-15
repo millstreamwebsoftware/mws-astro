@@ -9,14 +9,16 @@ export interface Props {
 const { contentBlocks } = Astro.props;
 
 const components: Record<string, any> = {};
-const componentImports = import.meta.glob(["../../components/**/*.astro"], {
+const componentImports = import.meta.glob(
+  ["/src/mws-astro/src/components/**/*.astro"],
+  {
+    eager: true,
+  }
+);
+
+const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
   eager: true,
 });
-
-const componentOverrides = import.meta.glob(
-  ["../../../../components/**/*.astro"],
-  { eager: true }
-);
 
 Object.entries(componentImports).forEach(
   ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
