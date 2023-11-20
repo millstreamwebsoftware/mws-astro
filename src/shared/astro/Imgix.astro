@@ -1,0 +1,28 @@
+---
+import ImgixClient from "@imgix/js-core";
+import preferences from "@data/preferences.json";
+
+export interface Props {
+  image: string;
+  alt?: string;
+  loading?: "lazy" | "eager" | null | undefined;
+  decoding?: "async" | "auto" | "sync" | null | undefined;
+  style?: string;
+}
+
+const imgix = new ImgixClient({
+  domain: "mws.imgix.net",
+  secureURLToken: preferences.API.imgix.token,
+});
+
+const { image, alt, style } = Astro.props;
+const loading = Astro.props.loading ?? "lazy";
+const decoding = Astro.props.decoding ?? "async";
+
+const path = Astro.site ? new URL(image, Astro.site) : image;
+
+const src = imgix.buildURL(path.toString(), { fit: "crop" });
+console.log(src);
+---
+
+<img {src} {alt} {loading} {decoding} {style} />
