@@ -1,8 +1,15 @@
 ---
 import ImgixClient from "@imgix/js-core";
 import preferences from "@data/preferences.json";
-import fs from "node:fs/promises";
-import { getPlaiceholder } from "plaiceholder";
+
+let fs: any, getPlaiceholder: any;
+// @ts-expect-error
+if (!ENV_BOOKSHOP_LIVE) {
+  fs = await import("node:fs/promises");
+  ({ getPlaiceholder } = await import("plaiceholder"));
+}
+// import fs from "node:fs/promises";
+// import { getPlaiceholder } from "plaiceholder";
 
 export interface Props {
   image: string;
@@ -81,7 +88,7 @@ let width = tWidth || metadata?.width;
 let height = ar ? Math.floor(width / ar) : tHeight || metadata?.height;
 ---
 
-{placeholder && <img class="placeholder" src={base64} />}
+{placeholder && <img class="placeholder" src={base64} {width} {height} />}
 <img {srcset} {src} {alt} {loading} {decoding} {sizes} {width} {height} />
 
 <style>
