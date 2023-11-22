@@ -1,13 +1,24 @@
 ---
 import ImgixClient from "@imgix/js-core";
 import preferences from "@data/preferences.json";
+import fs from "node:fs/promises";
+import { getPlaiceholder } from "plaiceholder";
 
 export interface Props {
   image: string;
+  width?: number;
+  height?: number;
   alt?: string;
   loading?: "lazy" | "eager" | null | undefined;
   decoding?: "async" | "auto" | "sync" | null | undefined;
   style?: string;
+  crop?: string;
+  fit?: string;
+  sizes?: string;
+  ar?: number;
+  q?: number;
+  auto?: string;
+  placeholder?: boolean;
 }
 
 const imgix = new ImgixClient({
@@ -15,14 +26,69 @@ const imgix = new ImgixClient({
   secureURLToken: preferences.API.imgix.token,
 });
 
-const { image, alt, style } = Astro.props;
+const {
+  image,
+  alt,
+  style,
+  sizes,
+  placeholder,
+  width: tWidth,
+  height: tHeight,
+  ar,
+} = Astro.props;
 const loading = Astro.props.loading ?? "lazy";
 const decoding = Astro.props.decoding ?? "async";
 
-const path = Astro.site ? new URL(image, Astro.site) : image;
+const opts = {
+  fit: Astro.props.fit ?? "crop",
+  crop: Astro.props.crop ?? "center",
+  ar: ar ? `${ar}:1` : undefined,
+  q: Astro.props.q ?? undefined,
+  auto: Astro.props.auto ?? "compress,format",
+  w: tWidth ?? undefined,
+  h: tHeight ?? undefined,
+};
 
-const src = imgix.buildURL(path.toString(), { fit: "crop" });
-console.log(src);
+const path = Astro.site ? new URL(image, Astro.site) : image;
+const maxw = preferences.page.maximum_page_width;
+
+const file = "public" + image;
+// const { width: filew, height: fileh } = await (async () => {
+//   try {
+//     return sizeOf(file);
+//   } catch (err) {
+//     console.log(err);
+//     return { width: undefined, height: undefined };
+//   }
+// })();
+
+// const width = filew ? Math.min(filew, maxw) : maxw;
+
+const src = imgix.buildURL(path.toString(), opts); // Fallback
+const srcset = imgix.buildSrcSet(path.toString(), opts);
+
+let base64, metadata;
+
+try {
+  const f = await fs.readFile(file);
+
+  ({ base64, metadata } = await getPlaiceholder(f));
+} catch (err) {
+  console.log(err);
+}
+
+let width = tWidth || metadata?.width;
+let height = ar ? Math.floor(width / ar) : tHeight || metadata?.height;
 ---
 
-<img {src} {alt} {loading} {decoding} {style} />
+{placeholder && <img class="placeholder" src={base64} />}
+<img {srcset} {src} {alt} {loading} {decoding} {sizes} {width} {height} />
+
+<style>
+  .placeholder {
+    filter: blur(5rem);
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+</style>

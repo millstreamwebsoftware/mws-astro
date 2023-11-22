@@ -1,7 +1,7 @@
 ---
 import MarkdownIt from "markdown-it";
 import Lightbox from "@components/lightbox/lightbox.astro";
-// import { Image } from "astro:assets";
+import Imgix from "@shared/Imgix.astro";
 
 const md = new MarkdownIt({ html: true });
 
@@ -31,6 +31,10 @@ const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;
 const gap = Astro.props.gap ?? true;
 const id = `gallery${key}`;
+
+const sizes = `(max-width: 768px) calc((100vw / 2) - (${
+  gap ? "2rem" : "0"
+} * 2)), calc((100vw / ${columns}) - (${gap ? "2rem" : "0"} * ${columns}))`;
 ---
 
 <section
@@ -46,19 +50,16 @@ const id = `gallery${key}`;
   {
     images.map((asset, i) => (
       <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
-        <img
-          src={asset.image?.src || asset.image}
+        <Imgix
+          image={asset.image?.src || asset.image}
           alt=""
           loading="lazy"
           decoding="async"
-          style={{
-            ...(asset.image?.width && {
-              "max-width": `${asset.image?.width}px`,
-            }),
-            ...(asset.image?.height && {
-              "max-height": `${asset.image?.height}px`,
-            }),
-          }}
+          fit="crop"
+          crop="faces,entropy"
+          ar={aspect}
+          {sizes}
+          placeholder={true}
         />
 
         {(asset.title || asset.description) && (
@@ -80,19 +81,13 @@ const id = `gallery${key}`;
             data-lightbox={`${id}-${i}`}
             class:list={{ caption: asset.title || asset.description }}
           >
-            <img
-              src={asset.image?.src || asset.image}
+            <Imgix
+              image={asset.image?.src || asset.image}
               alt=""
               loading="lazy"
               decoding="async"
-              style={{
-                ...(asset.image?.width && {
-                  "max-width": `${asset.image?.width}px`,
-                }),
-                ...(asset.image?.height && {
-                  "max-height": `${asset.image?.height}px`,
-                }),
-              }}
+              q={80}
+              placeholder={true}
             />
 
             {(asset.title || asset.description) && (
@@ -110,51 +105,50 @@ const id = `gallery${key}`;
   }
 </section>
 
-<style lang="scss">
+<style lang="scss" is:global>
   section.gallery {
     grid-template-columns: repeat(var(--columns), 1fr);
-  }
-
-  .gallery {
     display: grid;
     grid-template-rows: 1fr;
     grid-auto-flow: row;
     gap: var(--gallery-gap);
-  }
 
-  .gallery.no-indent {
-    padding: var(--gallery-gap);
-  }
-
-  .lightbox [data-lightbox] {
-    cursor: pointer;
-  }
-
-  .gallery-item {
-    position: relative;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      aspect-ratio: var(--aspect);
+    &.no-indent {
+      padding: var(--gallery-gap);
     }
 
-    figcaption {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 2rem;
-      background: linear-gradient(
-        to right,
-        rgb(var(--background-color, var(--article-background-color)) / 0.7),
-        rgb(var(--background-color, var(--article-background-color)) / 0.5)
-      );
+    &.lightbox [data-lightbox] {
+      cursor: pointer;
+    }
+
+    .gallery-item {
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        aspect-ratio: var(--aspect);
+      }
+
+      figcaption {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        background: linear-gradient(
+          to right,
+          rgb(var(--background-color, var(--article-background-color)) / 0.7),
+          rgb(var(--background-color, var(--article-background-color)) / 0.5)
+        );
+      }
     }
   }
 

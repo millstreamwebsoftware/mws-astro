@@ -48,14 +48,7 @@ const figcaption = title || description;
       alt=""
       loading="lazy"
       decoding="async"
-      style={{
-        ...(image?.width && {
-          "max-width": `${image?.width}px`,
-        }),
-        ...(image?.height && {
-          "max-height": `${image?.height}px`,
-        }),
-      }}
+      placeholder={true}
     />
 
     {
@@ -81,19 +74,13 @@ const figcaption = title || description;
           data-lightbox={id}
           class:list={{ caption: title || description }}
         >
-          <img
-            src={image?.src || image}
+          <Imgix
+            image={image?.src || image}
             alt=""
             loading="lazy"
             decoding="async"
-            style={{
-              ...(image?.width && {
-                "max-width": `${image?.width}px`,
-              }),
-              ...(image?.height && {
-                "max-height": `${image?.height}px`,
-              }),
-            }}
+            q={80}
+            placeholder={true}
           />
 
           {figcaption && (
@@ -108,82 +95,84 @@ const figcaption = title || description;
   }
 </section>
 
-<style lang="scss">
-  figure {
-    position: relative;
-    height: calc(var(--height) * 1vh);
-    display: flex;
-    flex-direction: column;
-    gap: var(--column-gap);
-    width: 100%;
-    overflow: hidden;
-  }
-
-  figcaption {
-    flex: 1 1 0;
-    padding: 0 var(--indent);
-    padding-bottom: calc(var(--indent) * 0.5);
-    background-color: rgb(var(--background-color));
-  }
-
-  img {
-    width: 100%;
-    height: 0;
-    flex: 1 1 100%;
-
-    object-fit: cover;
-    object-position: center;
-  }
-
-  .description-right,
-  .description-left {
+<style lang="scss" is:global>
+  section.image {
     figure {
-      height: auto;
-      padding: var(--indent);
+      position: relative;
+      height: calc(var(--height) * 1vh);
+      display: flex;
+      flex-direction: column;
+      gap: var(--column-gap);
+      width: 100%;
+      overflow: hidden;
     }
 
     figcaption {
-      // display: block;
-      padding: var(--column-gap);
-      padding-right: var(--indent);
-      width: 50%;
-      height: fit-content;
-      z-index: 1;
-      // margin: var(--indent);
+      flex: 1 1 0;
+      padding: 0 var(--indent);
+      padding-bottom: calc(var(--indent) * 0.5);
+      background-color: rgb(var(--background-color));
     }
 
     img {
-      position: absolute;
-      inset: 0;
-      height: 100%;
-      z-index: 0;
+      width: 100%;
+      height: 0;
+      flex: 1 1 100%;
+
+      object-fit: cover;
+      object-position: center;
     }
-  }
 
-  .description-left figure {
-    padding-left: 0;
-    align-items: start;
-  }
-
-  .description-right figure {
-    padding-right: 0;
-    align-items: end;
-  }
-
-  @media only screen and (max-width: 768px) {
-    .description-right,
-    .description-left {
-      figcaption {
-        width: 100%;
+    &.description-right,
+    &.description-left {
+      figure {
+        height: auto;
         padding: var(--indent);
       }
-      figure {
-        padding: 0;
+
+      figcaption {
+        // display: block;
+        padding: var(--column-gap);
+        padding-right: var(--indent);
+        width: 50%;
+        height: fit-content;
+        z-index: 1;
+        // margin: var(--indent);
+      }
+
+      img {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        z-index: 0;
       }
     }
-  }
 
-  .lightbox [data-lightbox] {
-    cursor: pointer;
+    &.description-left figure {
+      padding-left: 0;
+      align-items: start;
+    }
+
+    &.description-right figure {
+      padding-right: 0;
+      align-items: end;
+    }
+
+    @media only screen and (max-width: 768px) {
+      &.description-right,
+      &.description-left {
+        figcaption {
+          width: 100%;
+          padding: var(--indent);
+        }
+        figure {
+          padding: 0;
+        }
+      }
+    }
+
+    &.lightbox [data-lightbox] {
+      cursor: pointer;
+    }
   }
 </style>
