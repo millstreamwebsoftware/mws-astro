@@ -159,6 +159,10 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
       padding-right: 0;
     }
   }
+
+  .columns-item {
+    min-width: 0;
+  }
 </style>
 
 <style is:global lang="scss">
@@ -236,7 +240,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     z-index: 1;
   }
 
-  .columns-item section::after {
+  .columns-item section.background-color::after {
     content: "";
     position: absolute;
     inset: calc(var(--column-gap) * -0.5);
