@@ -25,6 +25,7 @@ export async function replaceCmsEmbeds(content: string) {
   //     },
   //   }),
   // ]);
+  if (!content) return content;
 
   const embedRe = /<div[^>]*data-cms-embed="([^>"]*)"[^>]*>[^>]*\/div>/gm;
 

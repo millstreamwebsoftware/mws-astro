@@ -30,10 +30,12 @@ if (ENV_BOOKSHOP_LIVE) {
   md ? (
     <Fragment set:html={md.render(content)} />
   ) : (
-    <RemoteMarkdown
-      {content}
-      sanitize={{ allowComponents: true }}
-      components={substitutions}
-    />
+    content && (
+      <RemoteMarkdown
+        {content}
+        sanitize={{ allowComponents: true }}
+        components={substitutions}
+      />
+    )
   )
 }
