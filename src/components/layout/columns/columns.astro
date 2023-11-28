@@ -122,7 +122,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
               }}
               class:list={["columns-item", block.cell]}
             >
-              <Component {...block} key={String(i) + "-" + (key || "")} />
+              <Component {...block} key={(key || "") + "-" + i.toString()} />
             </div>
           );
         }
