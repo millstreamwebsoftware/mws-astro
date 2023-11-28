@@ -1,4 +1,5 @@
 ---
+import Section from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
 export interface Props {
@@ -96,38 +97,38 @@ if (layout?.length) {
 }
 
 let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
+
 // console.log(items);
 // console.log(columnLayout);
 // const columnLayout = layout?.layout?.indexOf(0);
 ---
 
-<div
-  class:list={["columns", { collapse }, classes]}
-  style={{ "--columns": columns }}
->
-  {
-    items.map((block: any, i: any) => {
-      var Component = components[block._bookshop_name];
-      if (block._bookshop_name === "layout/columns") Component = Astro.self;
-      if (Component) {
-        return (
-          <div
-            style={{
-              "grid-row": block.rowString,
-              "grid-column": block.columnString,
-            }}
-            class:list={["columns-item", block.cell]}
-          >
-            <Component {...block} key={String(i) + (key || "")} />
-          </div>
-        );
-      }
-      const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-      console.warn(warnstring);
-      return <div class="missing-component">{warnstring}</div>;
-    })
-  }
-</div>
+<Section component="columns" {...Astro.props}>
+  <div class:list={["columns", { collapse }]} style={{ "--columns": columns }}>
+    {
+      items.map((block: any, i: any) => {
+        var Component = components[block._bookshop_name];
+        if (block._bookshop_name === "layout/columns") Component = Astro.self;
+        if (Component) {
+          return (
+            <div
+              style={{
+                "grid-row": block.rowString,
+                "grid-column": block.columnString,
+              }}
+              class:list={["columns-item", block.cell]}
+            >
+              <Component {...block} key={String(i) + "-" + (key || "")} />
+            </div>
+          );
+        }
+        const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+        console.warn(warnstring);
+        return <div class="missing-component">{warnstring}</div>;
+      })
+    }
+  </div>
+</Section>
 
 <style lang="scss">
   .columns {

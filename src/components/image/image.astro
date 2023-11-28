@@ -2,6 +2,7 @@
 import Imgix from "@shared/Imgix.astro";
 import Markdown from "@shared/Markdown.astro";
 import Lightbox from "@components/lightbox/lightbox.astro";
+import Section from "@layouts/Section.astro";
 import { convertColorString } from "@mws-astro/util";
 
 export interface Props {
@@ -33,15 +34,11 @@ const {
 
 const foreground = convertColorString(foreground_color);
 const background = convertColorString(background_color);
-const id = `image${key}`;
+const id = `image-${key}`;
 const figcaption = title || description;
 ---
 
-<section
-  {id}
-  class:list={["image", { "no-indent": !indent }, { lightbox }, classes]}
-  style={{ ...(height && { "--height": height }) }}
->
+<Section component="image" classes={{ lightbox, ...classes }} {...Astro.props}>
   <figure data-lightbox={lightbox && id}>
     <Imgix
       image={image?.src || image}
@@ -93,13 +90,13 @@ const figcaption = title || description;
       </Lightbox>
     )
   }
-</section>
+</Section>
 
 <style lang="scss" is:global>
-  section.image {
+  [data-component="image"] {
     figure {
       position: relative;
-      height: calc(var(--height) * 1vh);
+      height: var(--height);
       display: flex;
       flex-direction: column;
       gap: var(--column-gap);

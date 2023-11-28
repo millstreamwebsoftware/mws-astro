@@ -1,0 +1,51 @@
+---
+import Sticker from "@components/sticker/sticker.astro";
+import clsx from "clsx";
+import { convertColorString } from "@mws-astro/util";
+
+export interface Props {
+  component: string;
+  height?: number;
+  background_color?: string;
+  classes?: any;
+  style?: Record<string, string>;
+  indent?: boolean;
+  key?: string;
+}
+
+const { component, height, background_color, classes, style, key } =
+  Astro.props;
+
+const background = convertColorString(background_color);
+const id = `${component}-${key}`;
+const indent = Astro.props.indent ?? true;
+
+const stickers = clsx(classes) // Resolve classes like class:list
+  .split(" ")
+  .filter((cl) => cl.startsWith("sticker-"));
+---
+
+<section
+  style={{
+    ...(background && { "--background-color": background }),
+    ...(height && { "--height": height + "vh" }),
+    ...style,
+  }}
+  class:list={[component, classes, { "no-indent": !indent }]}
+  data-component={component}
+  {id}
+>
+  <slot />
+  {
+    stickers.map((sticker) => {
+      return <Sticker name={sticker.replace(/^sticker-/, "")} />;
+    })
+  }
+</section>
+
+<style>
+  section {
+    position: relative;
+    height: var(--height);
+  }
+</style>

@@ -2,6 +2,7 @@
 import MarkdownIt from "markdown-it";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Imgix from "@shared/Imgix.astro";
+import Section from "@layouts/Section.astro";
 
 const md = new MarkdownIt({ html: true });
 
@@ -13,6 +14,7 @@ export interface Props {
   aspect: number;
   indent: boolean;
   lightbox?: boolean;
+  classes?: any;
   key?: string;
 }
 
@@ -30,16 +32,16 @@ const { images, height, indent, lightbox, key } = Astro.props;
 const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;
 const gap = Astro.props.gap ?? true;
-const id = `gallery${key}`;
+const id = `gallery-${key}`;
 
 const sizes = `(max-width: 768px) calc((100vw / 2) - (${
   gap ? "2rem" : "0"
 } * 2)), calc((100vw / ${columns}) - (${gap ? "2rem" : "0"} * ${columns}))`;
 ---
 
-<section
-  {id}
-  class:list={["gallery", { "no-indent": !indent }, { lightbox }]}
+<Section
+  component="gallery"
+  classes={{ lightbox, ...classes }}
   style={{
     "--height": height,
     "--columns": columns,
@@ -103,7 +105,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
       </Lightbox>
     )
   }
-</section>
+</Section>
 
 <style lang="scss" is:global>
   section.gallery {

@@ -13,13 +13,11 @@ const icons = {
   default: { before: "fa6-solid:quote-left", after: "fa6-solid:quote-right" },
   correct: { before: "fa6-solid:circle-check", after: "" },
 }[Astro.props.type ?? "default"];
-
-const content = await Astro.slots.render("default");
 ---
 
 <blockquote>
   {icons?.before && <Icon name={icons.before} height="1.8em" />}
-  <span><Markdown {content} /></span>
+  <span><slot /></span>
   {icons?.after && <Icon name={icons.after} height="1.8em" />}
 </blockquote>
 

@@ -96,6 +96,10 @@ section {
   padding: var(--indent);
 }
 
+[data-component="columns"] {
+  padding: 0;
+}
+
 // section:not(#\9).no-indent {
 //   padding: 0;
 
@@ -250,5 +254,4 @@ a.button {
 }
 
 // Site specific custom styling
-@import "@custom/custom.editor";
 @import "@custom/custom";

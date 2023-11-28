@@ -8,44 +8,6 @@
 img.align-left { float: left; margin-right: 5rem; }
 img.align-right { float: right; margin-left: 5rem; }
 
-h3.highlight-1 {
-  color: rgb(var(--color-accent) / 0.7);
-}
-
-h1.highlight-2 {
-  position: relative;
-}
-
-h1.highlight-2::after {
-  position: absolute;
-  content: "";
-  background-image: url("/images/icons/TOHC-wriggly-line-blk.svg");
-  bottom: 0;
-  height: 0.15em;
-  left: 0;
-  right: 0;
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-/* .rich-text > :is(h1, h2, h3, h4, h5, h6, p) {
-  width: 100%;
-} */
-
-.rich-text img {
-  max-width: 100%;
-}
-
-.align-center + table {
-  align-self: center;
-}
-
 a.button {
-  display: inline-block;
-  padding: .5em 1em;
-  border: 1px solid rgb(var(--text-color));
-  border-radius: var(--border-radius);
-  margin: var(--text-gap) 0;
-  text-decoration: none;
+
 }

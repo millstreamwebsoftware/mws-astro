@@ -1,0 +1,17 @@
+---
+export interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+---
+
+<div class:list={["sticker", `sticker-${name}`]} data-sticker={name}></div>
+
+<style>
+  .sticker {
+    pointer-events: none;
+    position: absolute;
+    z-index: 10;
+  }
+</style>

@@ -19,10 +19,12 @@ export interface Props {
   placeholder?: boolean;
 }
 
-const imgix = new ImgixClient({
-  domain: "mws.imgix.net",
-  secureURLToken: preferences.API.imgix.token,
-});
+var ix =
+  preferences.API.imgix?.domain &&
+  new ImgixClient({
+    domain: preferences.API.imgix?.domain,
+    secureURLToken: preferences.API.imgix?.token,
+  });
 
 const {
   image,
@@ -47,9 +49,7 @@ const opts = {
   h: tHeight ?? undefined,
 };
 
-const path = Astro.site ? new URL(image, Astro.site) : image;
-const maxw = preferences.page.maximum_page_width;
-
+const url = Astro.site ? new URL(image, Astro.site) : image;
 const file = "public" + image;
 
 let fs: any, getPlaiceholder: any;
@@ -66,11 +66,13 @@ if (!ENV_BOOKSHOP_LIVE) {
     ({ base64, metadata } = await getPlaiceholder(f));
   } catch (err) {
     console.log(err);
+  } finally {
+    ix = false;
   }
 }
 
-const src = imgix.buildURL(path.toString(), opts); // Fallback
-const srcset = imgix.buildSrcSet(path.toString(), opts);
+const src = ix ? ix.buildURL(url.toString(), opts) : image; // Fallback
+const srcset = ix ? ix.buildSrcSet(url.toString(), opts) : undefined;
 
 let width = tWidth || metadata?.width;
 let height = ar && width ? Math.floor(width / ar) : tHeight || metadata?.height;
