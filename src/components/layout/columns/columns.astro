@@ -104,7 +104,11 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 ---
 
 <Section component="columns" {...Astro.props}>
-  <div class:list={["columns", { collapse }]} style={{ "--columns": columns }}>
+  <div
+    class:list={["columns", { collapse }]}
+    style={{ "--columns": columns }}
+    data-columns={columns}
+  >
     {
       items.map((block: any, i: any) => {
         var Component = components[block._bookshop_name];
@@ -131,7 +135,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 </Section>
 
 <style lang="scss">
-  .columns {
+  div.columns {
     /* gap: var(--column-gap); */
     display: grid;
     grid-auto-flow: row;
@@ -164,7 +168,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     padding: 0;
   }
 
-  .columns {
+  div.columns {
     gap: var(--column-gap);
     padding: calc(var(--indent) * 0.5) var(--indent);
     background-color: rgb(var(--background-color));
@@ -186,9 +190,10 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   // }
 
   @media only screen and (max-width: 768px) {
-    .columns.collapse {
+    div.columns.collapse {
       --columns: 1 !important;
       gap: 0;
+      grid-template-columns: repeat(var(--columns), 1fr) !important;
 
       > .columns-item {
         grid-column: 1 / 2 !important;

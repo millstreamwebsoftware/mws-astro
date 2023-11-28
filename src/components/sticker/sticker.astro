@@ -6,7 +6,7 @@ export interface Props {
 const { name } = Astro.props;
 ---
 
-<div class:list={["sticker", `sticker-${name}`]} data-sticker={name}></div>
+<div class:list={["sticker"]} data-sticker={name}></div>
 
 <style>
   .sticker {
