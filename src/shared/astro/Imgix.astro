@@ -13,18 +13,18 @@ export interface Props {
   crop?: string;
   fit?: string;
   sizes?: string;
-  ar?: number;
+  aspect?: number;
   q?: number;
   auto?: string;
   placeholder?: boolean;
 }
 
-var ix =
-  preferences.API.imgix?.domain &&
-  new ImgixClient({
-    domain: preferences.API.imgix?.domain,
-    secureURLToken: preferences.API.imgix?.token,
-  });
+var ix: ImgixClient | undefined = preferences.API.imgix?.domain
+  ? new ImgixClient({
+      domain: preferences.API.imgix?.domain,
+      secureURLToken: preferences.API.imgix?.token,
+    })
+  : undefined;
 
 const {
   image,
@@ -34,15 +34,15 @@ const {
   placeholder,
   width: tWidth,
   height: tHeight,
-  ar,
 } = Astro.props;
+var { aspect } = Astro.props;
 const loading = Astro.props.loading ?? "lazy";
 const decoding = Astro.props.decoding ?? "async";
 
 const opts = {
   fit: Astro.props.fit ?? "crop",
   crop: Astro.props.crop ?? "center",
-  ar: ar ? `${ar}:1` : undefined,
+  ar: aspect ? `${aspect}:1` : undefined,
   q: Astro.props.q ?? undefined,
   auto: Astro.props.auto ?? "compress,format",
   w: tWidth ?? undefined,
@@ -67,7 +67,7 @@ if (!ENV_BOOKSHOP_LIVE) {
   } catch (err) {
     console.log(err);
   } finally {
-    ix = false;
+    ix = undefined;
   }
 }
 
@@ -75,28 +75,58 @@ const src = ix ? ix.buildURL(url.toString(), opts) : image; // Fallback
 const srcset = ix ? ix.buildSrcSet(url.toString(), opts) : undefined;
 
 let width = tWidth || metadata?.width;
-let height = ar && width ? Math.floor(width / ar) : tHeight || metadata?.height;
+let height =
+  aspect && width ? Math.floor(width / aspect) : tHeight || metadata?.height;
+
+aspect = width / height;
+
+// {placeholder && base64 && <img class="placeholder" src={base64} />}
 ---
 
-{
-  placeholder && base64 && (
-    <img class="placeholder" src={base64} {width} {height} />
-  )
-}
-{
-  // @ts-expect-error
-  ENV_BOOKSHOP_LIVE ? (
-    <img src={image} {alt} {loading} {decoding} {width} {height} />
-  ) : (
-    <img {srcset} {src} {alt} {loading} {decoding} {sizes} {width} {height} />
-  )
-}
+<>
+  {
+    // @ts-expect-error
+    ENV_BOOKSHOP_LIVE ? (
+      <img src={image} {alt} {loading} {decoding} {width} {height} />
+    ) : (
+      <img
+        {srcset}
+        {src}
+        {alt}
+        {loading}
+        {decoding}
+        {sizes}
+        {width}
+        {height}
+        style={{
+          "background-image": `url("${base64}")`,
+        }}
+      />
+    )
+  }
+</>
 
 <style>
-  .placeholder {
+  /* .placeholder {
     filter: blur(5rem);
     position: absolute;
+    width: 100%;
+    height: 100%;
     inset: 0;
     z-index: -1;
+    clip-path: border-box;
+  } */
+
+  img {
+    max-width: 100%;
+    height: auto;
+    background-size: cover;
+    object-fit: cover;
+  }
+</style>
+
+<style define:vars={{ aspect }}>
+  .placeholder {
+    aspect-ratio: var(--aspect);
   }
 </style>

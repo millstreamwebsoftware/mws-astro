@@ -18,7 +18,7 @@ export interface Props {
   key?: string;
 }
 
-const { images, height, indent, lightbox, key } = Astro.props;
+const { images, height, indent, lightbox, key, classes } = Astro.props;
 // const imagePaths = images.map((i) => i.image);
 // const assets = await Astro.glob("/src/assets/**/*");
 
@@ -41,6 +41,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
 
 <Section
   component="gallery"
+  {...Astro.props}
   classes={{ lightbox, ...classes }}
   style={{
     "--height": height,

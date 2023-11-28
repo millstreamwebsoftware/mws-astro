@@ -16,7 +16,7 @@ export interface Props {
 const { component, height, background_color, classes, style, key } =
   Astro.props;
 
-const background = convertColorString(background_color);
+const background = background_color && convertColorString(background_color);
 const id = `${component}-${key}`;
 const indent = Astro.props.indent ?? true;
 
@@ -31,7 +31,12 @@ const stickers = clsx(classes) // Resolve classes like class:list
     ...(height && { "--height": height + "vh" }),
     ...style,
   }}
-  class:list={[component, classes, { "no-indent": !indent }]}
+  class:list={[
+    component,
+    classes,
+    { "no-indent": !indent },
+    { "background-color": background },
+  ]}
   data-component={component}
   {id}
 >
