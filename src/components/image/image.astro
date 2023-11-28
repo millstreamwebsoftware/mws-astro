@@ -11,6 +11,7 @@ export interface Props {
   description?: string;
   height: number;
   columns: number;
+  aspect?: number;
   indent: boolean;
   foreground_color?: string;
   background_color?: string;
@@ -24,6 +25,7 @@ const {
   title,
   description,
   height,
+  aspect,
   indent,
   foreground_color,
   background_color,
@@ -39,13 +41,19 @@ const figcaption = title || description;
 ---
 
 <Section component="image" classes={{ lightbox, ...classes }} {...Astro.props}>
-  <figure data-lightbox={lightbox && id}>
+  <figure
+    data-lightbox={lightbox && id}
+    style={{
+      ...(aspect && { "--aspect": aspect }),
+    }}
+  >
     <Imgix
       image={image?.src || image}
       alt=""
       loading="lazy"
       decoding="async"
       placeholder={true}
+      aspect={aspect}
     />
 
     {
@@ -92,7 +100,21 @@ const figcaption = title || description;
   }
 </Section>
 
+<style>
+  /* figure {
+    width: 100%;
+    height: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  } */
+</style>
+
 <style lang="scss" is:global>
+  /*
   [data-component="image"] {
     figure {
       position: relative;
@@ -118,6 +140,7 @@ const figcaption = title || description;
 
       object-fit: cover;
       object-position: center;
+      aspect-ratio: var(--aspect);
     }
 
     &.description-right,
@@ -171,5 +194,5 @@ const figcaption = title || description;
     &.lightbox [data-lightbox] {
       cursor: pointer;
     }
-  }
+  }*/
 </style>
