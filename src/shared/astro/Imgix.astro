@@ -1,7 +1,7 @@
 ---
 import ImgixClient from "@imgix/js-core";
 import preferences from "@data/preferences.json";
-import Sharp from "sharp";
+// import Sharp from "sharp";
 
 export interface Props {
   image: string;
@@ -53,18 +53,20 @@ const opts = {
 const url = Astro.site ? new URL(image, Astro.site) : image;
 const file = "public" + image;
 
-let fs: any, getPlaiceholder: any;
-let base64, metadata, plData;
+let fs: any, Sharp: any;
+let metadata, plData, dominant;
 
 // @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE) {
   fs = await import("node:fs/promises");
+  Sharp = (await import("sharp")).default;
 
   try {
     const f = await fs.readFile(file);
 
     let sh = Sharp(f);
     metadata = await sh.metadata();
+    // ({ dominant } = await sh.stats());
 
     const plSize = 16;
 
@@ -92,22 +94,6 @@ let height =
 aspect = width && height ? width / height : undefined;
 
 let placeholderString = `data:image/webp;base64,${plData}`;
-
-// console.log(plString);
-
-// const rect = (opts: any) => {
-//   return `<rect fill="${opts.fill}" width="${opts.width}" height="${opts.height}" x="${opts.x}" y="${opts.y}" />`;
-// };
-// const svgString =
-//   `background-image: url('data:image/svg+xml;base64,` +
-//   btoa(
-//     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg[1].viewBox}"><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="5" /></filter><g filter="url(#blur)">` +
-//       svg[2].reduce((s: string, r: any) => {
-//         return s + rect(r[1]);
-//       }, "") +
-//       "</g></svg>"
-//   ) +
-//   "');";
 ---
 
 <>
@@ -126,7 +112,9 @@ let placeholderString = `data:image/webp;base64,${plData}`;
         {width}
         {height}
         data-aspect={aspect}
-        style={{ "background-image": `url('${placeholderString}')` }}
+        style={{
+          "background-image": `url('${placeholderString}')`,
+        }}
       />
     )
   }
