@@ -1,6 +1,7 @@
 ---
 import ImgixClient from "@imgix/js-core";
 import preferences from "@data/preferences.json";
+import Sharp from "sharp";
 
 export interface Props {
   image: string;
@@ -53,17 +54,27 @@ const url = Astro.site ? new URL(image, Astro.site) : image;
 const file = "public" + image;
 
 let fs: any, getPlaiceholder: any;
-let base64, metadata;
+let base64, metadata, plData;
 
 // @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE) {
   fs = await import("node:fs/promises");
-  ({ getPlaiceholder } = await import("plaiceholder"));
 
   try {
     const f = await fs.readFile(file);
 
-    ({ base64, metadata } = await getPlaiceholder(f));
+    let sh = Sharp(f);
+    metadata = await sh.metadata();
+
+    const plSize = 16;
+
+    let pl = await sh
+      .resize(plSize, undefined, { fit: "inside" })
+      .blur()
+      .webp()
+      .toBuffer();
+
+    plData = pl.toString("base64");
   } catch (err) {
     console.log(err);
   } finally {
@@ -78,9 +89,25 @@ let width = tWidth || metadata?.width;
 let height =
   aspect && width ? Math.floor(width / aspect) : tHeight || metadata?.height;
 
-aspect = width / height;
+aspect = width && height ? width / height : undefined;
 
-// {placeholder && base64 && <img class="placeholder" src={base64} />}
+let placeholderString = `data:image/webp;base64,${plData}`;
+
+// console.log(plString);
+
+// const rect = (opts: any) => {
+//   return `<rect fill="${opts.fill}" width="${opts.width}" height="${opts.height}" x="${opts.x}" y="${opts.y}" />`;
+// };
+// const svgString =
+//   `background-image: url('data:image/svg+xml;base64,` +
+//   btoa(
+//     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg[1].viewBox}"><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="5" /></filter><g filter="url(#blur)">` +
+//       svg[2].reduce((s: string, r: any) => {
+//         return s + rect(r[1]);
+//       }, "") +
+//       "</g></svg>"
+//   ) +
+//   "');";
 ---
 
 <>
@@ -98,35 +125,53 @@ aspect = width / height;
         {sizes}
         {width}
         {height}
-        style={{
-          "background-image": `url("${base64}")`,
-        }}
+        data-aspect={aspect}
+        style={{ "background-image": `url('${placeholderString}')` }}
       />
     )
   }
 </>
 
 <style>
-  /* .placeholder {
-    filter: blur(5rem);
-    position: absolute;
+  /* .img-wrapper {
+    position: relative;
     width: 100%;
     height: 100%;
-    inset: 0;
-    z-index: -1;
-    clip-path: border-box;
   } */
 
-  img {
+  /* .img-wrapper.cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  } */
+
+  /* .img-wrapper img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  } */
+
+  .placeholder {
+    position: absolute;
+    /* inset: 0; */
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: -1;
+    /* object-fit: cover; */
+  }
+
+  img,
+  .placeholder {
     max-width: 100%;
     height: auto;
-    background-size: cover;
+    /* object-position: 99999px 99999px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover; */
     object-fit: cover;
-  }
-</style>
 
-<style define:vars={{ aspect }}>
-  .placeholder {
-    aspect-ratio: var(--aspect);
+    background-size: cover;
   }
 </style>
