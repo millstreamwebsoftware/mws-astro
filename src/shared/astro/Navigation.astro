@@ -1,5 +1,6 @@
 ---
 import preferences from "@data/preferences.json";
+import Icon from "./icon.astro";
 
 export interface Props {
   pages?: any;
@@ -92,7 +93,22 @@ const Wrapper = depth ? Fragment : "nav";
 // {!depth && <Debug {pages} />}
 ---
 
-<Wrapper>
+<Wrapper role="navigation" aria-label="Main menu">
+  {
+    !depth && (
+      <>
+        <div id="mobile-nav-buttons">
+          <button id="mobile-nav-menu" aria-expanded="false">
+            <Icon name="fa6-solid:bars" height="2rem" />
+          </button>
+          <a id="mobile-nav-home" href="/">
+            <Icon name="fa6-solid:house" height="2rem" />
+          </a>
+        </div>
+        <div id="mobile-nav-overlay" />
+      </>
+    )
+  }
   <ul class:list={[`depth-${depth}`]}>
     {
       "children" in pages &&
@@ -191,15 +207,151 @@ const Wrapper = depth ? Fragment : "nav";
       handleFocus: true,
     });
   });
+
+  document.getElementById("mobile-nav-menu")?.addEventListener("click", (e) => {
+    let t = e?.currentTarget as HTMLElement;
+    let nav = t.closest("nav");
+    let state = t.getAttribute("aria-expanded") === "false";
+    t.setAttribute("aria-expanded", state.toString());
+
+    nav?.classList.toggle("expanded", state);
+  });
+
+  document
+    .getElementById("mobile-nav-overlay")
+    ?.addEventListener("click", (e) => {
+      let t = document.getElementById("mobile-nav-menu") as HTMLElement;
+      let nav = t.closest("nav");
+      t.setAttribute("aria-expanded", "false");
+      nav?.classList.toggle("expanded", false);
+    });
 </script>
 
-<style>
+<style lang="scss">
   nav {
     z-index: 999;
   }
 
-  .logo {
-    grid-area: logo;
+  #mobile-nav-buttons {
+    display: none;
+    z-index: 1000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 9rem;
+    grid-template-areas: "left centre right";
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+  }
+
+  #mobile-nav-buttons :is(button, a) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--header-color);
+
+    padding: 2rem;
+    border-radius: 6rem;
+    bottom: 0.5rem;
+    width: 8rem;
+    height: 8rem;
+  }
+
+  #mobile-nav-menu {
+    grid-area: centre;
+    background-color: rgb(var(--header-background-color));
+    // left: calc(50% - 4rem);
+    box-shadow: 0 0 2rem #0005;
+    border: 0;
+    z-index: 1;
+  }
+
+  #mobile-nav-home {
+    opacity: 0;
+    pointer-events: none;
+    grid-area: left;
+    border: 0.5px solid #eee;
+    transform: translate(calc(25vw + 3rem)) scale(0.5);
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+    z-index: 0;
+  }
+
+  #mobile-nav-overlay {
+    display: none;
+    pointer-events: none;
+    // border: 1px solid red;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-color: #0000;
+    transition: background-color 0.3s ease;
+  }
+
+  @media only screen and (max-width: 768px) {
+    #mobile-nav-buttons {
+      display: grid;
+    }
+
+    #mobile-nav-overlay {
+      display: block;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      // top: 40%;
+      height: fit-content;
+
+      ul.depth-0 {
+        padding: 2rem 2rem 10rem;
+        // padding-bottom: 10rem;
+        // padding-top: 2rem;
+        background: linear-gradient(
+          to bottom,
+          rgb(var(--header-background-color)),
+          rgb(var(--header-background-color-bottom))
+        );
+        box-shadow: 0 0 10rem #0003;
+        margin-right: 0;
+        flex-direction: column;
+        transition:
+          clip-path 0.3s ease-in-out,
+          opacity 0.3s ease-out,
+          transform 0.3s ease;
+
+        pointer-events: none;
+        clip-path: circle(2rem at 50% calc(100% - 12rem));
+        opacity: 0;
+        transform: translate(0 10rem);
+      }
+    }
+
+    nav.expanded {
+      #mobile-nav-home {
+        pointer-events: initial;
+        transform: translate(0) scale(1);
+        opacity: 1;
+      }
+
+      ul.depth-0 {
+        clip-path: circle(150% at 50% calc(100% - 4.5rem));
+        pointer-events: initial;
+        transform: translate(0 0);
+        opacity: 1;
+      }
+
+      #mobile-nav-overlay {
+        display: block;
+        pointer-events: all;
+        background-color: #0004;
+      }
+    }
   }
 
   ul.depth-0 {

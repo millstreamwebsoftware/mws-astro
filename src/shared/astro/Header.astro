@@ -78,7 +78,8 @@ const headerBackgroundColorBottom = convertColorString(
     left: 0;
     right: 0;
     top: 0;
-    bottom: calc(100% - var(--header-height));
+    /* bottom: calc(100% - var(--header-height)); */
+    /* height: var(--header-height); */
   }
 
   .logo {
@@ -90,5 +91,15 @@ const headerBackgroundColorBottom = convertColorString(
     object-position: left;
     width: 100%;
     height: 100%;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .logo {
+      display: none;
+    }
+
+    :root {
+      --header-height: 0 !important;
+    }
   }
 </style>

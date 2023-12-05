@@ -38,7 +38,7 @@ const {
 import preferences from "@data/preferences.json";
 
 const pageTitle = title + preferences.general.browser_window_title_suffix;
-const headerHeight = preferences.header.height;
+const headerHeight = undefined; //preferences.header.height;
 const style: any = {};
 const pageWidth = preferences.page.maximum_page_width;
 const favicon = preferences.general.favicon;
@@ -49,7 +49,7 @@ pageWidth && (style["--page-max-width"] = pageWidth + "px");
 headerHeight && (style["--header-height"] = headerHeight + "px");
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" style={style}>
   <head>
     <meta charset="UTF-8" />
