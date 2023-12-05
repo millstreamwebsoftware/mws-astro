@@ -1,4 +1,5 @@
 ---
+import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 
@@ -11,53 +12,49 @@ const embedURL =
   `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
 ---
 
-<div class="facebox">
+<Section component="facebook">
   {
     embedURL && (
-      <iframe
-        data-target={facebookURL}
-        src={embedURL}
-        width="340"
-        height="500"
-        style="border:none;overflow:hidden"
-        scrolling="no"
-        frameborder="0"
-        allowfullscreen="true"
-        loading="lazy"
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-        onload="this.nextElementSibling.classList.add('hidden')"
-      />
+      <div class="facebox-wrapper">
+        <div class="facebox">
+          <div class="facebox-info">
+            <a href={facebookURL}>
+              <Icon name="fa6-brands:square-facebook" height="1.5em" />
+              <p>View on Facebook</p>
+            </a>
+          </div>
+          <div class="facebox-loading">
+            <span>
+              <Icon name="svg-spinners:90-ring-with-bg" height="2rem" />
+            </span>
+          </div>
+
+          <iframe
+            data-target={facebookURL}
+            src={embedURL}
+            width="340"
+            height="500"
+            style="border:none;overflow:hidden;"
+            scrolling="no"
+            frameborder="0"
+            allowfullscreen="true"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            onload="this.closest('.facebox')?.classList.add('loaded')"
+          />
+        </div>
+      </div>
     )
   }
-  <div id="facebox-loading">
-    <div class="error">
-      <span>
-        <Icon name="fa6-solid:circle-xmark" height="2rem" />
-        <Icon name="fa6-brands:square-facebook" height="5rem" />
-      </span>
-      <h2>Facebook failed to load.</h2>
-      <p>Your browser or network may be blocking social media embeds.</p>
-      <a href={facebookURL}><p>View on Facebook</p></a>
-    </div>
-    <div class="loading">
-      <span>
-        <Icon name="svg-spinners:90-ring-with-bg" height="2rem" />
-        <Icon name="fa6-brands:square-facebook" height="5rem" />
-      </span>
-    </div>
-  </div>
-</div>
+</Section>
 
 <style lang="scss">
-  .facebox {
+  .facebox-wrapper {
     display: grid;
-    // justify-content: center;
     justify-content: center;
     justify-items: center;
     grid-template-columns: 1fr 340px 1fr;
-    margin-top: var(--text-gap);
     width: 100%;
-    min-height: 10rem;
 
     > * {
       grid-column: 2 / 3;
@@ -65,79 +62,39 @@ const embedURL =
     }
   }
 
-  #facebox-loading {
-    position: relative;
-    padding: 2rem;
-    background-color: #fefefe;
-    --text-color: 0 0 0;
-    --heading-color: 0 0 0;
+  .facebox {
+    padding: 1rem 2rem 2rem;
+    background-color: white;
     border-radius: var(--border-radius);
-    width: 340px;
-    height: 500px;
+    min-width: 340px;
+    min-height: 500px;
+  }
 
-    span {
-      display: block;
-      position: relative;
-      height: 6rem;
-      width: 6rem;
+  .facebox-info {
+    font-size: var(--text-size-medium);
+    --text-color: black;
+    margin-bottom: 1rem;
+
+    a {
       display: flex;
-      justify-content: center;
+      gap: 1em;
       align-items: center;
-      padding-right: 1rem;
-      padding-bottom: 1rem;
-    }
-
-    .loading {
-      position: absolute;
-      top: 2rem;
-      animation: loading;
-      animation-delay: 10s;
-      animation-iteration-count: 1;
-      animation-fill-mode: forwards;
-    }
-
-    .error {
-      animation: error;
-      visibility: hidden;
-      animation-delay: 10s;
-      animation-iteration-count: 1;
-      animation-fill-mode: forwards;
+      justify-content: space-between;
     }
   }
 
-  #facebox-loading.hidden {
-    display: none;
-  }
-
-  @keyframes loading {
-    to {
-      visibility: hidden;
-    }
-  }
-
-  @keyframes error {
-    to {
-      visibility: visible;
-    }
-  }
-</style>
-
-<style is:global lang="scss">
-  #facebox-loading span svg {
+  .facebox-loading {
     position: absolute;
+    width: 2rem;
+    height: 2rem;
 
-    &:first-child {
-      color: red;
-      z-index: 1;
-      bottom: 0.4rem;
-      right: 0.4rem;
-      background-color: white;
-      border-radius: 100%;
-      padding: 0.2rem;
-    }
+    top: calc(50% - 1rem);
+    left: calc(50% - 1rem);
+    z-index: 1;
   }
 
-  #facebox-loading .loading span svg:first-child {
-    color: #4267b2;
+  iframe {
+    position: relative;
+    z-index: 2;
   }
 </style>
