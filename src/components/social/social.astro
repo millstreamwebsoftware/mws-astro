@@ -6,8 +6,9 @@ const icons: Record<string, string> = {
   twitter: "fa6-brands:square-x-twitter",
   facebook: "fa6-brands:square-facebook",
   instagram: "fa6-brands:square-instagram",
+  whatsapp: "fa6-brands:square-whatsapp",
   telephone: "fa6-solid:square-phone",
-  email: "fa6-solid:square-envelope"
+  email: "fa6-solid:square-envelope",
 };
 
 const socials: Record<string, string>[] = preferences.general.social.map(
@@ -70,12 +71,19 @@ const socials: Record<string, string>[] = preferences.general.social.map(
       width: 1px;
       height: 1px;
       margin: -1px;
+      text-indent: -100%;
       overflow: hidden;
       white-space: nowrap;
     }
   }
 
   .telephone {
+    span {
+      all: unset;
+    }
+  }
+
+  .social.show-text {
     span {
       all: unset;
     }

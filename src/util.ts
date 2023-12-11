@@ -1,6 +1,4 @@
 import colorString from "color-string";
-// import { transform, html } from "ultrahtml";
-// import swap from "ultrahtml/transformers/swap";
 import he from "he";
 
 export function convertColorString(
@@ -13,18 +11,6 @@ export function convertColorString(
 }
 
 export async function replaceCmsEmbeds(content: string) {
-  // const output = await transform(content, [
-  //   swap({
-  //     div: (props: any, children: any) => {
-  //       if ("data-cms-embed" in props) {
-  //         const decoded = he.decode(atob(props["data-cms-embed"]));
-  //         console.log(decoded);
-  //         return decoded;
-  //       }
-  //       return html``;
-  //     },
-  //   }),
-  // ]);
   if (!content) return content;
 
   const embedRe = /<div[^>]*data-cms-embed="([^>"]*)"[^>]*>[^>]*\/div>/gm;

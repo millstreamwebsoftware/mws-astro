@@ -7,6 +7,8 @@ const { text } = Astro.props;
 
 // @ts-expect-error
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
+
+const middleware = Object.keys(Astro.locals).toString();
 ---
 
 <div>
@@ -14,6 +16,7 @@ const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
     Live Editing Status: <span id="astro-test">{String(ENV_EDITOR)}</span>
   </p>
   <p>Test data: <span>{text}</span></p>
+  <p>Middleware: <span>{middleware}</span></p>
 </div>
 
 <style>

@@ -10,87 +10,93 @@ export interface Props {
   paths?: any[];
 }
 
-interface PageTree {
-  children?: any;
-  parent: PageTree | undefined;
-  title?: string;
-  slug?: string;
-  id?: string;
-  selected?: number;
-}
+// interface PageTree {
+//   children?: any;
+//   parent: PageTree | undefined;
+//   title?: string;
+//   slug?: string;
+//   id?: string;
+//   selected?: number;
+// }
 
-function makeTree(pages: any, currentPath?: string) {
-  const pageTree: PageTree = {
-    children: {},
-    parent: undefined,
-    selected: 0,
-  };
+// function makeTree(pages: any, currentPath?: string) {
+//   const pageTree: PageTree = {
+//     children: {},
+//     parent: undefined,
+//     selected: 0,
+//   };
 
-  const filteredPages = pages.filter((page: any) => {
-    return (
-      page.props.page.data.status === "online" &&
-      (page.params.slug !== undefined || preferences.header.show_home)
-    );
-  });
+//   const filteredPages = pages.filter((page: any) => {
+//     return (
+//       page.props.page.data.status === "online" &&
+//       (page.params.slug !== undefined || preferences.header.show_home)
+//     );
+//   });
 
-  const sortedPages = filteredPages.sort(
-    (a: any, b: any) =>
-      (a.params.slug?.split("/").length || 0) -
-        (b.params.slug?.split("/").length || 0) ||
-      a.props.page.data.order - b.props.page.data.order
-  );
+//   const sortedPages = filteredPages.sort(
+//     (a: any, b: any) =>
+//       (a.params.slug?.split("/").length || 0) -
+//         (b.params.slug?.split("/").length || 0) ||
+//       a.props.page.data.order - b.props.page.data.order
+//   );
 
-  sortedPages.forEach((page: any) => {
-    let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
+//   sortedPages.forEach((page: any) => {
+//     let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
 
-    let cursor = pageTree;
-    let selected = Number(page.params.slug === currentPath);
+//     let cursor = pageTree;
+//     let selected = Number(page.params.slug === currentPath);
 
-    for (var i = 0; i < path.length; i++) {
-      if (!("children" in cursor)) {
-        cursor.children = {};
-      }
+//     for (var i = 0; i < path.length; i++) {
+//       if (!("children" in cursor)) {
+//         cursor.children = {};
+//       }
 
-      if (!(path[i] in cursor?.children)) {
-        cursor.children[path[i]] = {
-          parent: undefined,
-          title: path[i]
-            .replaceAll("-", " ")
-            .replace(
-              /\w\S*/g,
-              (t: string) =>
-                t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
-            ),
-          selected,
-        };
-      }
+//       if (!(path[i] in cursor?.children)) {
+//         cursor.children[path[i]] = {
+//           parent: undefined,
+//           title: path[i]
+//             .replaceAll("-", " ")
+//             .replace(
+//               /\w\S*/g,
+//               (t: string) =>
+//                 t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
+//             ),
+//           selected,
+//         };
+//       }
 
-      cursor.selected = selected;
+//       cursor.selected = selected;
 
-      cursor = cursor.children[path[i]];
+//       cursor = cursor.children[path[i]];
 
-      if (i + 1 == path.length) {
-        cursor.selected = cursor.selected ? 2 : 0;
-        cursor.id = page.props.page.id;
-        cursor.slug = page.params.slug || "";
-        Object.assign(cursor, page.props.page.data);
-      }
-    }
-  });
+//       if (i + 1 == path.length) {
+//         cursor.selected = cursor.selected ? 2 : 0;
+//         cursor.id = page.props.page.id;
+//         cursor.slug = page.params.slug || "";
+//         Object.assign(cursor, page.props.page.data);
+//       }
+//     }
+//   });
 
-  return pageTree;
-}
+//   return pageTree;
+// }
 
 const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
-const pages =
-  typeof Astro.props.pages === "undefined"
-    ? makeTree(Astro.props.paths, Astro.props.currentPath)
-    : Astro.props.pages;
+// const pages =
+//   typeof Astro.props.pages === "undefined"
+//     ? makeTree(Astro.props.paths, Astro.props.currentPath)
+//     : Astro.props.pages;
+
+const pages = Astro.props.pages ?? Astro.locals.tree;
 
 const Wrapper = depth ? Fragment : "nav";
 
+// !depth && console.log(pages);
+
 // {!depth && <Debug {pages} />}
+
+console.log(Astro.locals.collections);
 ---
 
 <Wrapper role="navigation" aria-label="Main menu">
