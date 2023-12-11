@@ -1,6 +1,9 @@
-/// <reference path="../.astro/types.d.ts" />
-/// <reference types="astro/client" />
-/// <reference types="unplugin-icons/types/astro" />
+import type { CollectionEntry, CollectionKey } from "astro:content";
+import type { TreeNode } from "@mws-astro/middleware";
 
-declare module "hoverintent";
-declare module "@bookshop/astro-bookshop/browser";
+declare namespace App {
+  interface Locals {
+    collections: Record<CollectionKey, CollectionEntry[]>;
+    tree: TreeNode;
+  }
+}

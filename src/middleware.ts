@@ -18,8 +18,7 @@ export const onRequest = defineMiddleware(
 );
 
 async function getAllCollections() {
-  type C = typeof collections;
-  type collectionsKey = keyof C;
+  type collectionsKey = keyof typeof collections;
 
   return Object.keys(collections).reduce(async (c, name) => {
     c[name] = await getCollection(name as collectionsKey);
