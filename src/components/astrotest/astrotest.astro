@@ -1,14 +1,16 @@
 ---
 export interface Props {
   text: string;
+  _content_blocks: any[];
 }
 
-const { text } = Astro.props;
+const { text, _content_blocks } = Astro.props;
 
 // @ts-expect-error
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 
-const middleware = Object.keys(Astro.locals).toString();
+// const middleware = Object.keys(Astro.locals).toString();
+const contentBlocks = JSON.stringify(_content_blocks).substring(0, 32);
 ---
 
 <div>
@@ -16,7 +18,8 @@ const middleware = Object.keys(Astro.locals).toString();
     Live Editing Status: <span id="astro-test">{String(ENV_EDITOR)}</span>
   </p>
   <p>Test data: <span>{text}</span></p>
-  <p>Middleware: <span>{middleware}</span></p>
+  <!-- <p>Middleware: <span>{//middleware}</span></p> -->
+  <p>Content Blocks: <span>{contentBlocks}</span></p>
 </div>
 
 <style>
