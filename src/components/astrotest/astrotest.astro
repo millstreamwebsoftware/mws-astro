@@ -10,7 +10,7 @@ const { text, _content_blocks } = Astro.props;
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 
 // const middleware = Object.keys(Astro.locals).toString();
-const contentBlocks = JSON.stringify(_content_blocks).substring(0, 32);
+const contentBlocks = typeof _content_blocks;
 ---
 
 <div>
