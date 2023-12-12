@@ -1,6 +1,7 @@
 ---
 import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
+import { ViewTransitions } from "astro:transitions";
 
 import * as git from "git-rev-sync";
 
@@ -50,7 +51,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
 ---
 
 <!doctype html>
-<html lang="en" style={style}>
+<html lang="en" style={style} transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -59,10 +60,11 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
     <link rel="icon" href={favicon} type={faviconType} />
     <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
     <title>{pageTitle}</title>
+    <ViewTransitions />
   </head>
   <body>
     {show_global_header && <Header {id} {paths} {currentPath} />}
-    <article>
+    <article transition:animate="slide">
       <slot />
       {show_global_footer && <Footer />}
     </article>

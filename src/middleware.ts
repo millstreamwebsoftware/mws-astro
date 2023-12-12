@@ -2,20 +2,18 @@ import { defineMiddleware } from "astro:middleware";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { collections } from "src/content/config";
 
-export const onRequest = defineMiddleware(
-  async (ctx: Record<string, any>, next) => {
-    const pages = await getCollection("pages", (page) => {
-      return page.data.status === "online";
-    });
+export const onRequest = defineMiddleware(async (ctx, next) => {
+  const pages = await getCollection("pages", (page) => {
+    return page.data.status === "online";
+  });
 
-    const currentPath = ctx.params.slug;
-    ctx.locals.tree = makeTree(pages, currentPath);
+  const currentPath = ctx.params.slug;
+  ctx.locals.tree = makeTree(pages, currentPath);
 
-    ctx.locals.collections = await getAllCollections();
+  ctx.locals.collections = await getAllCollections();
 
-    return next();
-  }
-);
+  return next();
+});
 
 async function getAllCollections() {
   type collectionsKey = keyof typeof collections;
@@ -86,7 +84,7 @@ function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
   );
 
   sorted.forEach((page: any) => {
-    let path = page.href.split("/") || [""];
+    let path = page.slug.split("/") || [""];
 
     // Create a cursor at the tree root
     let cursor = tree;

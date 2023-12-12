@@ -1,0 +1,55 @@
+---
+import Section from "@layouts/Section.astro";
+import { type TreeNode } from "@mws-astro/middleware";
+
+interface Props {
+  target: string;
+  include?: string;
+}
+
+const tree = Astro.locals.tree;
+const data = Astro.locals.collections.pages;
+
+const { target, include } = Astro.props;
+
+// data["pages"]
+
+const targetFragments = target?.split("/");
+let cursor = tree;
+let error;
+
+if (targetFragments !== undefined) {
+  for (let i = 0; i < targetFragments.length; i++) {
+    if (
+      !(cursor?.children !== undefined && targetFragments[i] in cursor.children)
+    ) {
+      error = `Could not resolve path ${target}`;
+      break;
+    }
+
+    cursor = cursor.children[targetFragments[i]];
+  }
+}
+
+const slugs =
+  cursor.children &&
+  Object.values(cursor.children).reduce<Set<string>>((obj, node) => {
+    node?.slug !== undefined && obj.add(node?.slug);
+    return obj;
+  }, new Set());
+const cards = slugs && data.filter((node) => slugs.has(node.slug));
+console.log(cards);
+
+// const cards = Object.values(cursor?.children).map((node) => {
+//   return node?.slug !== undefined && node.slug in data ? data[node.slug]
+// });
+---
+
+<Section component="card-index">
+  {
+    cards &&
+      cards.map((card) => {
+        return <p>{card.data.title}</p>;
+      })
+  }
+</Section>
