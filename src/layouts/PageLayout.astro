@@ -23,5 +23,6 @@ const { id, paths, currentPath, _pages } = Astro.props;
 ---
 
 <Layout {...props} {id} {paths} {currentPath}>
+  <p>{typeof _pages}</p>
   <Page bookshop:live contentBlocks={props.content_blocks} {_pages} />
 </Layout>
