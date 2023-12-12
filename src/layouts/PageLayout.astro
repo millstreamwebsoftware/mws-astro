@@ -1,6 +1,7 @@
 ---
 import Page from "@shared/Page.astro";
 import Layout from "./Layout.astro";
+import { getCollection } from "astro:content";
 
 type Props = {
   frontmatter: {
@@ -17,8 +18,9 @@ if (!Astro.props.frontmatter) {
 }
 const props = Astro.props.frontmatter;
 const { id, paths, currentPath } = Astro.props;
+const _livetest = await getCollection("pages");
 ---
 
 <Layout {...props} {id} {paths} {currentPath}>
-  <Page bookshop:live contentBlocks={props.content_blocks} />
+  <Page bookshop:live contentBlocks={props.content_blocks} {_livetest} />
 </Layout>
