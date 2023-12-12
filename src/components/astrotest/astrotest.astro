@@ -1,16 +1,16 @@
 ---
 export interface Props {
   text: string;
-  _content_blocks: any[];
+  _pages: any[];
 }
 
-const { text, _content_blocks } = Astro.props;
+const { text, _pages } = Astro.props;
 
 // @ts-expect-error
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 
 // const middleware = Object.keys(Astro.locals).toString();
-const contentBlocks = typeof _content_blocks;
+const contentBlocks = typeof _pages;
 ---
 
 <div>
