@@ -2,14 +2,16 @@
 export interface Props {
   text: string;
   _pages: any[];
+  _blocks: any[];
 }
 
-const { text, _pages } = Astro.props;
+const { text, _pages, _blocks } = Astro.props;
 
 // @ts-expect-error
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 
 // const middleware = Object.keys(Astro.locals).toString();
+const pages = typeof _pages;
 const contentBlocks = typeof _pages;
 ---
 
@@ -19,6 +21,7 @@ const contentBlocks = typeof _pages;
   </p>
   <p>Test data: <span>{text}</span></p>
   <!-- <p>Middleware: <span>{//middleware}</span></p> -->
+  <p>Pages: <span>{pages}</span></p>
   <p>Content Blocks: <span>{contentBlocks}</span></p>
 </div>
 

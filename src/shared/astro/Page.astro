@@ -43,11 +43,19 @@ Object.entries(componentOverrides).forEach(
 ---
 
 <main>
+  <p>{typeof _pages}</p>
   {
     contentBlocks.map((block: any, i: number) => {
       const Component = components[block._bookshop_name];
       if (Component) {
-        return <Component {...block} {_pages} key={String(i)} />;
+        return (
+          <Component
+            {...block}
+            {_pages}
+            _blocks={contentBlocks}
+            key={String(i)}
+          />
+        );
       }
       const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
       console.warn(warnstring);
