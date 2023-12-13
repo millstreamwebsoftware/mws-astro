@@ -38,7 +38,6 @@ const slugs =
     return obj;
   }, new Set());
 const cards = slugs && data.filter((node) => slugs.has(node.slug));
-console.log(cards);
 
 // const cards = Object.values(cursor?.children).map((node) => {
 //   return node?.slug !== undefined && node.slug in data ? data[node.slug]

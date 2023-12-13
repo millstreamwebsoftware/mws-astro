@@ -1,102 +1,19 @@
 ---
 import preferences from "@data/preferences.json";
 import Icon from "./icon.astro";
+import type { TreeNode } from "@mws-astro/middleware";
 
 export interface Props {
-  pages?: any;
+  pages?: TreeNode;
   id?: string;
   depth?: number;
   currentPath?: string;
-  paths?: any[];
 }
-
-// interface PageTree {
-//   children?: any;
-//   parent: PageTree | undefined;
-//   title?: string;
-//   slug?: string;
-//   id?: string;
-//   selected?: number;
-// }
-
-// function makeTree(pages: any, currentPath?: string) {
-//   const pageTree: PageTree = {
-//     children: {},
-//     parent: undefined,
-//     selected: 0,
-//   };
-
-//   const filteredPages = pages.filter((page: any) => {
-//     return (
-//       page.props.page.data.status === "online" &&
-//       (page.params.slug !== undefined || preferences.header.show_home)
-//     );
-//   });
-
-//   const sortedPages = filteredPages.sort(
-//     (a: any, b: any) =>
-//       (a.params.slug?.split("/").length || 0) -
-//         (b.params.slug?.split("/").length || 0) ||
-//       a.props.page.data.order - b.props.page.data.order
-//   );
-
-//   sortedPages.forEach((page: any) => {
-//     let path = page.params.slug?.replace(/\/?index$/, "").split("/") || [""];
-
-//     let cursor = pageTree;
-//     let selected = Number(page.params.slug === currentPath);
-
-//     for (var i = 0; i < path.length; i++) {
-//       if (!("children" in cursor)) {
-//         cursor.children = {};
-//       }
-
-//       if (!(path[i] in cursor?.children)) {
-//         cursor.children[path[i]] = {
-//           parent: undefined,
-//           title: path[i]
-//             .replaceAll("-", " ")
-//             .replace(
-//               /\w\S*/g,
-//               (t: string) =>
-//                 t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
-//             ),
-//           selected,
-//         };
-//       }
-
-//       cursor.selected = selected;
-
-//       cursor = cursor.children[path[i]];
-
-//       if (i + 1 == path.length) {
-//         cursor.selected = cursor.selected ? 2 : 0;
-//         cursor.id = page.props.page.id;
-//         cursor.slug = page.params.slug || "";
-//         Object.assign(cursor, page.props.page.data);
-//       }
-//     }
-//   });
-
-//   return pageTree;
-// }
 
 const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
-// const pages =
-//   typeof Astro.props.pages === "undefined"
-//     ? makeTree(Astro.props.paths, Astro.props.currentPath)
-//     : Astro.props.pages;
-
-const pages = Astro.props.pages ?? Astro.locals.tree;
-
+const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
 const Wrapper = depth ? Fragment : "nav";
-
-// !depth && console.log(pages);
-
-// {!depth && <Debug {pages} />}
-
-// console.log(Astro.locals.collections);
 ---
 
 <Wrapper role="navigation" aria-label="Main menu">
@@ -117,32 +34,36 @@ const Wrapper = depth ? Fragment : "nav";
   }
   <ul class:list={[`depth-${depth}`]}>
     {
-      "children" in pages &&
-        Object.values(pages.children).map((page: any, i) => (
-          <li
-            tabindex="0"
-            class:list={[
-              {
-                active: page.selected,
-                selected: page.selected === 2,
-                children: "children" in page,
-              },
-              `depth-${depth}`,
-            ]}
-          >
-            <a
-              aria-selected={page.selected === 2 ? "true" : "false"}
-              href={
-                typeof page?.slug !== "undefined"
-                  ? `/${page.slug.replace(/index$/, "")}`
-                  : undefined
-              }
-            >
-              <span>{page?.title}</span>
-            </a>
-            {"children" in page && <Astro.self depth={depth} pages={page} />}
-          </li>
-        ))
+      pages.children &&
+        Object.values(pages.children).map((page: TreeNode, i) => {
+          // Skip home element if show_home is false
+          if (!preferences.header.show_home && page.href === "") return;
+          return (
+            <Fragment>
+              <li
+                tabindex="0"
+                class:list={[
+                  {
+                    active: page.selected,
+                    selected: page.selected === 2,
+                    children: "children" in page,
+                  },
+                  `depth-${depth}`,
+                ]}
+              >
+                <a
+                  aria-selected={page.selected === 2 ? "true" : "false"}
+                  href={page.href !== undefined ? "/" + page.href : undefined}
+                >
+                  <span>{page?.title}</span>
+                </a>
+                {page.children && Object.values(page.children) && (
+                  <Astro.self depth={depth} pages={page} />
+                )}
+              </li>
+            </Fragment>
+          );
+        })
     }
   </ul>
 </Wrapper>
@@ -161,76 +82,84 @@ const Wrapper = depth ? Fragment : "nav";
   // TODO: Replace individual event listeners with a single event listener
   // TODO: Mobile Navigation
 
-  const anchors = document.querySelectorAll("nav li");
+  document.addEventListener("DOMContentLoaded", setupNavigation);
+  document.addEventListener("astro:after-swap", setupNavigation);
 
-  const popin = function (this: HTMLElement, e: Event) {
-    const anchor = this;
-    const dropdown = anchor.querySelector("ul");
-    if (!dropdown) return;
-    dropdown.classList.add("dropdown-open");
-    const options: ComputePositionConfig = anchor.matches(".depth-0")
-      ? {
-          placement: "bottom-start",
-          middleware: [shift(), offset({ crossAxis: 0 })],
-        }
-      : {
-          placement: "right-start",
-          middleware: [flip(), offset({ mainAxis: 0, crossAxis: 0 })],
-        };
+  function setupNavigation() {
+    const anchors = document.querySelectorAll("nav li");
 
-    // @ts-ignore
-    anchor.cleanup = autoUpdate(anchor, dropdown, () => {
-      computePosition(anchor, dropdown, options).then(({ x, y }) => {
-        Object.assign(dropdown.style, {
-          left: `${x}px`,
-          top: `${y}px`,
+    const popin = function (this: HTMLElement, e: Event) {
+      const anchor = this;
+      const dropdown = anchor.querySelector("ul");
+      if (!dropdown) return;
+      dropdown.classList.add("dropdown-open");
+      const options: ComputePositionConfig = anchor.matches(".depth-0")
+        ? {
+            placement: "bottom-start",
+            middleware: [shift(), offset({ crossAxis: 0 })],
+          }
+        : {
+            placement: "right-start",
+            middleware: [flip(), offset({ mainAxis: 0, crossAxis: 0 })],
+          };
+
+      // @ts-ignore
+      anchor.cleanup = autoUpdate(anchor, dropdown, () => {
+        computePosition(anchor, dropdown, options).then(({ x, y }) => {
+          Object.assign(dropdown.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+          });
         });
       });
+    };
+
+    const popout = function (this: HTMLElement, e: Event) {
+      const anchor = this;
+      if (
+        "relatedTarget" in e &&
+        e.relatedTarget instanceof Node &&
+        anchor.contains(e.relatedTarget)
+      ) {
+        return;
+      }
+      const dropdown = anchor.querySelector("ul");
+      if (!dropdown) {
+        return;
+      }
+      dropdown.classList.remove("dropdown-open");
+      if ("cleanup" in anchor && anchor.cleanup instanceof Function) {
+        anchor.cleanup();
+      }
+    };
+
+    anchors.forEach((anchor) => {
+      hoverintent(anchor, popin, popout).options({
+        handleFocus: true,
+      });
     });
-  };
 
-  const popout = function (this: HTMLElement, e: Event) {
-    const anchor = this;
-    if (
-      "relatedTarget" in e &&
-      e.relatedTarget instanceof Node &&
-      anchor.contains(e.relatedTarget)
-    ) {
-      return;
-    }
-    const dropdown = anchor.querySelector("ul");
-    if (!dropdown) {
-      return;
-    }
-    dropdown.classList.remove("dropdown-open");
-    if ("cleanup" in anchor && anchor.cleanup instanceof Function) {
-      anchor.cleanup();
-    }
-  };
+    // Mobile Nav
+    document
+      .getElementById("mobile-nav-menu")
+      ?.addEventListener("click", (e) => {
+        let t = e?.currentTarget as HTMLElement;
+        let nav = t.closest("nav");
+        let state = t.getAttribute("aria-expanded") === "false";
+        t.setAttribute("aria-expanded", state.toString());
 
-  anchors.forEach((anchor) => {
-    hoverintent(anchor, popin, popout).options({
-      handleFocus: true,
-    });
-  });
+        nav?.classList.toggle("expanded", state);
+      });
 
-  document.getElementById("mobile-nav-menu")?.addEventListener("click", (e) => {
-    let t = e?.currentTarget as HTMLElement;
-    let nav = t.closest("nav");
-    let state = t.getAttribute("aria-expanded") === "false";
-    t.setAttribute("aria-expanded", state.toString());
-
-    nav?.classList.toggle("expanded", state);
-  });
-
-  document
-    .getElementById("mobile-nav-overlay")
-    ?.addEventListener("click", (e) => {
-      let t = document.getElementById("mobile-nav-menu") as HTMLElement;
-      let nav = t.closest("nav");
-      t.setAttribute("aria-expanded", "false");
-      nav?.classList.toggle("expanded", false);
-    });
+    document
+      .getElementById("mobile-nav-overlay")
+      ?.addEventListener("click", (e) => {
+        let t = document.getElementById("mobile-nav-menu") as HTMLElement;
+        let nav = t.closest("nav");
+        t.setAttribute("aria-expanded", "false");
+        nav?.classList.toggle("expanded", false);
+      });
+  }
 </script>
 
 <style lang="scss">
@@ -266,6 +195,7 @@ const Wrapper = depth ? Fragment : "nav";
   }
 
   #mobile-nav-menu {
+    pointer-events: all;
     grid-area: centre;
     background-color: rgb(var(--header-background-color));
     // left: calc(50% - 4rem);
@@ -311,6 +241,7 @@ const Wrapper = depth ? Fragment : "nav";
       bottom: 0;
       left: 0;
       right: 0;
+      pointer-events: none;
       // top: 40%;
 
       ul.depth-0 {
@@ -343,6 +274,7 @@ const Wrapper = depth ? Fragment : "nav";
         pointer-events: initial;
         transform: translate(0) scale(1);
         opacity: 1;
+        pointer-events: all;
       }
 
       ul.depth-0 {
@@ -423,7 +355,7 @@ const Wrapper = depth ? Fragment : "nav";
   }
 
   ul.dropdown-open {
-    display: block;
+    display: block !important;
   }
 
   /* .active {

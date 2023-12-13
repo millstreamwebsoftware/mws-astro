@@ -64,7 +64,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
   </head>
   <body>
     {show_global_header && <Header {id} {paths} {currentPath} />}
-    <article transition:animate="slide">
+    <article transition:animate="fade">
       <slot />
       {show_global_footer && <Footer />}
     </article>

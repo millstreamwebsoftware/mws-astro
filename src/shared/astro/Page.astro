@@ -4,10 +4,9 @@ import { bookshopName } from "@mws-astro/util";
 export interface Props {
   "bookshop:live"?: any;
   contentBlocks: any[];
-  _pages: any;
 }
 
-const { contentBlocks, _pages } = Astro.props;
+const { contentBlocks } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -43,19 +42,11 @@ Object.entries(componentOverrides).forEach(
 ---
 
 <main>
-  <p>{typeof _pages}</p>
   {
     contentBlocks.map((block: any, i: number) => {
       const Component = components[block._bookshop_name];
       if (Component) {
-        return (
-          <Component
-            {...block}
-            {_pages}
-            _blocks={contentBlocks}
-            key={String(i)}
-          />
-        );
+        return <Component {...block} _blocks={contentBlocks} key={String(i)} />;
       }
       const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
       console.warn(warnstring);
