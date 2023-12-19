@@ -14,9 +14,11 @@ const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
 const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
 const Wrapper = depth ? Fragment : "nav";
+
+// depth == 0 && console.log(pages);
 ---
 
-<Wrapper role="navigation" aria-label="Main menu">
+<Wrapper id="navigation" role="navigation" aria-label="Main menu">
   {
     !depth && (
       <>
@@ -34,32 +36,72 @@ const Wrapper = depth ? Fragment : "nav";
   }
   <ul class:list={[`depth-${depth}`]}>
     {
+      pages?.href && (
+        <li
+          class:list={[
+            {
+              selected: pages.selected === 2,
+            },
+            `depth-${depth}`,
+          ]}
+        >
+          <a
+            aria-selected={pages.selected === 2 ? "true" : "false"}
+            href={pages.href !== undefined ? "/" + pages.href : undefined}
+          >
+            <span>{pages?.title}</span>
+          </a>
+        </li>
+      )
+    }
+    {
       pages.children &&
         Object.values(pages.children).map((page: TreeNode, i) => {
           // Skip home element if show_home is false
           if (!preferences.header.show_home && page.href === "") return;
+          const children = page.children && Object.keys(page.children)?.length;
+          const id = `nav-${
+            page.slug || page.title?.toLowerCase().replaceAll(" ", "-")
+          }`;
           return (
             <Fragment>
               <li
-                tabindex="0"
                 class:list={[
                   {
                     active: page.selected,
                     selected: page.selected === 2,
-                    children: "children" in page,
+                    children,
                   },
                   `depth-${depth}`,
                 ]}
+                aria-haspopup={children ? "menu" : undefined}
+                aria-labelledby={id}
               >
                 <a
+                  tabindex="0"
                   aria-selected={page.selected === 2 ? "true" : "false"}
-                  href={page.href !== undefined ? "/" + page.href : undefined}
+                  href={
+                    !children && page.href !== undefined
+                      ? "/" + page.href
+                      : undefined
+                  }
                 >
-                  <span>{page?.title}</span>
+                  <span {id}>{page?.title}</span>
+                  {children && (
+                    <div class="dropdown-caret">
+                      <Icon
+                        name={
+                          !depth
+                            ? "fa6-solid:caret-down"
+                            : "fa6-solid:caret-right"
+                        }
+                        height="2rem"
+                      />
+                    </div>
+                  )}
                 </a>
-                {page.children && Object.values(page.children) && (
-                  <Astro.self depth={depth} pages={page} />
-                )}
+
+                {children && <Astro.self depth={depth} pages={page} />}
               </li>
             </Fragment>
           );
@@ -77,26 +119,68 @@ const Wrapper = depth ? Fragment : "nav";
     shift,
     flip,
   } from "@floating-ui/dom";
+  import { navigate } from "astro:transitions/client";
   import hoverintent from "hoverintent";
-
-  // TODO: Replace individual event listeners with a single event listener
-  // TODO: Mobile Navigation
 
   document.addEventListener("DOMContentLoaded", setupNavigation);
   document.addEventListener("astro:after-swap", setupNavigation);
 
   function setupNavigation() {
-    const anchors = document.querySelectorAll("nav li");
+    const navigation = document.getElementById("navigation");
+    // const navTarget = null;
+    if (!navigation) throw Error("Navigation not found.");
+    document.body.addEventListener("click", handleNavigationEvent);
+    document.body.addEventListener("keydown", handleNavigationEvent);
+    // navigation.addEventListener("focusin", handleNavigationEvent);
+    navigation.addEventListener("focusout", handleNavigationEvent);
 
-    const popin = function (this: HTMLElement, e: Event) {
-      const anchor = this;
-      const dropdown = anchor.querySelector("ul");
+    /**
+     * Close the dropdown of a given element, and cleanup
+     * @param target element to close the dropdown of
+     */
+    function closeNav(target: HTMLElement) {
+      target.classList.remove("dropdown-open");
+      target.setAttribute("aria-expanded", "false");
+      if ("_cleanup" in target && target._cleanup instanceof Function) {
+        target._cleanup();
+      }
+    }
+
+    /**
+     * Close all dropdowns decending from target
+     * @param target defaults to navigation if unset
+     * @param inverse close all dropdowns outside of target
+     */
+    function closeAllNav(target?: HTMLElement | undefined, inverse?: boolean) {
+      if (!navigation) throw Error("Navigation not found.");
+      if (target === undefined) target = navigation;
+      if (inverse) {
+        Array.from(navigation.querySelectorAll<HTMLElement>(".dropdown-open"))
+          .filter((d) => !d.contains(target as Node))
+          .forEach(closeNav);
+      } else
+        target
+          ?.querySelectorAll<HTMLElement>(".dropdown-open")
+          .forEach(closeNav);
+    }
+
+    /**
+     * Open the dropdown of the target element
+     * @param target element to open the dropdown of
+     */
+    function openNav(target: HTMLElement) {
+      // Close all dropdowns that do not contain the new dropdown
+      closeAllNav(target, true);
+
+      const dropdown = target.querySelector(":scope ul") as HTMLElement;
       if (!dropdown) return;
-      dropdown.classList.add("dropdown-open");
-      const options: ComputePositionConfig = anchor.matches(".depth-0")
+
+      const options: ComputePositionConfig = target.classList.contains(
+        "depth-0"
+      )
         ? {
             placement: "bottom-start",
-            middleware: [shift(), offset({ crossAxis: 0 })],
+            middleware: [shift(), offset({ mainAxis: 0, crossAxis: 0 })],
           }
         : {
             placement: "right-start",
@@ -104,40 +188,70 @@ const Wrapper = depth ? Fragment : "nav";
           };
 
       // @ts-ignore
-      anchor.cleanup = autoUpdate(anchor, dropdown, () => {
-        computePosition(anchor, dropdown, options).then(({ x, y }) => {
+      target._cleanup = autoUpdate(target, dropdown, () => {
+        computePosition(target, dropdown, options).then(({ x, y }) => {
           Object.assign(dropdown.style, {
             left: `${x}px`,
             top: `${y}px`,
           });
         });
       });
-    };
 
-    const popout = function (this: HTMLElement, e: Event) {
-      const anchor = this;
+      target.setAttribute("aria-expanded", "true");
+      target.classList.add("dropdown-open");
+    }
+
+    /**
+     * Update dropdown state after event
+     * @param this
+     * @param e
+     */
+    function handleNavigationEvent(this: HTMLElement, e: Event) {
+      if (e instanceof FocusEvent && e.type === "focusout") {
+        if (
+          e.relatedTarget &&
+          !navigation?.contains(e.relatedTarget as Element)
+        )
+          closeAllNav();
+        return;
+      }
+
+      if (e instanceof KeyboardEvent) {
+        switch (e.key) {
+          case "Escape":
+            closeAllNav();
+
+          default:
+            return;
+
+          case " ":
+          case "Enter":
+        }
+      }
+
+      const target: HTMLElement | null = (e.target as HTMLElement).closest(
+        "li, #navigation"
+      );
       if (
-        "relatedTarget" in e &&
-        e.relatedTarget instanceof Node &&
-        anchor.contains(e.relatedTarget)
+        !target ||
+        target.id === "navigation" ||
+        !target.classList.contains("children")
       ) {
+        closeAllNav();
         return;
       }
-      const dropdown = anchor.querySelector("ul");
-      if (!dropdown) {
-        return;
-      }
-      dropdown.classList.remove("dropdown-open");
-      if ("cleanup" in anchor && anchor.cleanup instanceof Function) {
-        anchor.cleanup();
-      }
-    };
 
-    anchors.forEach((anchor) => {
-      hoverintent(anchor, popin, popout).options({
-        handleFocus: true,
-      });
-    });
+      const state = !target.classList.contains("dropdown-open");
+
+      if (state) {
+        // Dropdown Open
+        openNav(target);
+      } else {
+        // Dropdown close
+        closeNav(target);
+        closeAllNav(target);
+      }
+    }
 
     // Mobile Nav
     document
@@ -290,6 +404,12 @@ const Wrapper = depth ? Fragment : "nav";
         background-color: #0004;
       }
     }
+
+    ul.depth-0 ul {
+      position: relative;
+      top: 0 !important;
+      left: 0 !important;
+    }
   }
 
   ul.depth-0 {
@@ -307,25 +427,22 @@ const Wrapper = depth ? Fragment : "nav";
     height: 100%;
     /* padding: 20px; */
     color: rgb(var(--header-color));
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 
   li.depth-0 > a span {
     padding: 10px 20px;
   }
 
-  li.depth-0.children::after {
-    content: "";
-    position: absolute;
-    bottom: 5px;
-    left: calc(50% - 3px);
-    width: 6px;
-    height: 6px;
-    border-radius: 1rem;
-    background-color: #eee;
-  }
+  // li.depth-0.children::after {
+  //   content: "";
+  //   position: absolute;
+  //   bottom: 5px;
+  //   left: calc(50% - 3px);
+  //   width: 6px;
+  //   height: 6px;
+  //   border-radius: 1rem;
+  //   background-color: #eee;
+  // }
 
   ul {
     list-style-type: none;
@@ -343,19 +460,24 @@ const Wrapper = depth ? Fragment : "nav";
 
   .depth-1 li {
     width: max-content;
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+    // box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
   }
 
   .depth-1 a span {
     padding: 10px 20px;
   }
 
-  .depth-0 ul:not(ul.dropdown-open) {
-    display: none;
+  // .depth-0 ul:not(ul.dropdown-open) {
+  //   display: none;
+  // }
+
+  .dropdown-open > ul {
+    display: block !important;
   }
 
-  ul.dropdown-open {
-    display: block !important;
+  .dropdown-open > a .dropdown-caret {
+    transform: rotate(180deg);
+    // border: 2px solid red;
   }
 
   /* .active {
@@ -372,13 +494,17 @@ const Wrapper = depth ? Fragment : "nav";
   }
 
   a {
-    display: block;
+    // display: flex;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
     text-decoration: none;
     color: rgb(0 0 0);
     cursor: default;
   }
 
   a > span {
+    flex: 1 1 100%;
     border: 4px solid #0000;
     transition: background-color 0.1s ease-out;
     border-radius: var(--border-radius);

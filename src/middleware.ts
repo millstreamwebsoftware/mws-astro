@@ -72,7 +72,7 @@ function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
       href: page.slug.replace(/\/?index$/, ""),
       order: page.data.order,
       title: page.data.title,
-      selected: isSelected(page.slug, currentPath || ""),
+      selected: isSelected(page.slug, currentSlug),
     };
   });
 
@@ -107,10 +107,7 @@ function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
               (t: string) =>
                 t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
             ),
-          selected: isSelected(
-            path.slice(0, i + 1).join("/"),
-            currentPath || ""
-          ),
+          selected: isSelected(path.slice(0, i + 1).join("/"), currentSlug),
         };
       }
 
