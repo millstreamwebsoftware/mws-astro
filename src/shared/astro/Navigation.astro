@@ -14,6 +14,7 @@ const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
 const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
 const Wrapper = depth ? Fragment : "nav";
+const Items = depth ? Fragment : "div";
 
 // depth == 0 && console.log(pages);
 ---
@@ -34,80 +35,83 @@ const Wrapper = depth ? Fragment : "nav";
       </>
     )
   }
-  <ul class:list={[`depth-${depth}`]}>
-    {
-      pages?.href && (
-        <li
-          class:list={[
-            {
-              selected: pages.selected === 2,
-            },
-            `depth-${depth}`,
-          ]}
-        >
-          <a
-            aria-selected={pages.selected === 2 ? "true" : "false"}
-            href={pages.href !== undefined ? "/" + pages.href : undefined}
+  <Items id="navigation-items">
+    <ul class:list={[`depth-${depth}`]}>
+      {
+        pages?.href && (
+          <li
+            class:list={[
+              {
+                selected: pages.selected === 2,
+              },
+              `depth-${depth}`,
+            ]}
           >
-            <span>{pages?.title}</span>
-          </a>
-        </li>
-      )
-    }
-    {
-      pages.children &&
-        Object.values(pages.children).map((page: TreeNode, i) => {
-          // Skip home element if show_home is false
-          if (!preferences.header.show_home && page.href === "") return;
-          const children = page.children && Object.keys(page.children)?.length;
-          const id = `nav-${
-            page.slug || page.title?.toLowerCase().replaceAll(" ", "-")
-          }`;
-          return (
-            <Fragment>
-              <li
-                class:list={[
-                  {
-                    active: page.selected,
-                    selected: page.selected === 2,
-                    children,
-                  },
-                  `depth-${depth}`,
-                ]}
-                aria-haspopup={children ? "menu" : undefined}
-                aria-labelledby={id}
-              >
-                <a
-                  tabindex="0"
-                  aria-selected={page.selected === 2 ? "true" : "false"}
-                  href={
-                    !children && page.href !== undefined
-                      ? "/" + page.href
-                      : undefined
-                  }
+            <a
+              aria-selected={pages.selected === 2 ? "true" : "false"}
+              href={pages.href !== undefined ? "/" + pages.href : undefined}
+            >
+              <span>{pages?.title}</span>
+            </a>
+          </li>
+        )
+      }
+      {
+        pages.children &&
+          Object.values(pages.children).map((page: TreeNode, i) => {
+            // Skip home element if show_home is false
+            if (!preferences.header.show_home && page.href === "") return;
+            const children =
+              page.children && Object.keys(page.children)?.length;
+            const id = `nav-${
+              page.slug || page.title?.toLowerCase().replaceAll(" ", "-")
+            }`;
+            return (
+              <Fragment>
+                <li
+                  class:list={[
+                    {
+                      active: page.selected,
+                      selected: page.selected === 2,
+                      children,
+                    },
+                    `depth-${depth}`,
+                  ]}
+                  aria-haspopup={children ? "menu" : undefined}
+                  aria-labelledby={id}
                 >
-                  <span {id}>{page?.title}</span>
-                  {children && (
-                    <div class="dropdown-caret">
-                      <Icon
-                        name={
-                          !depth
-                            ? "fa6-solid:caret-down"
-                            : "fa6-solid:caret-right"
-                        }
-                        height="2rem"
-                      />
-                    </div>
-                  )}
-                </a>
+                  <a
+                    tabindex="0"
+                    aria-selected={page.selected === 2 ? "true" : "false"}
+                    href={
+                      !children && page.href !== undefined
+                        ? "/" + page.href
+                        : undefined
+                    }
+                  >
+                    <span {id}>{page?.title}</span>
+                    {children && (
+                      <div class="dropdown-caret">
+                        <Icon
+                          name={
+                            !depth
+                              ? "fa6-solid:caret-down"
+                              : "fa6-solid:caret-right"
+                          }
+                          height="2rem"
+                        />
+                      </div>
+                    )}
+                  </a>
 
-                {children && <Astro.self depth={depth} pages={page} />}
-              </li>
-            </Fragment>
-          );
-        })
-    }
-  </ul>
+                  {children && <Astro.self depth={depth} pages={page} />}
+                </li>
+              </Fragment>
+            );
+          })
+      }
+    </ul>
+  </Items>
 </Wrapper>
 
 <script>
@@ -127,6 +131,9 @@ const Wrapper = depth ? Fragment : "nav";
 
   function setupNavigation() {
     const navigation = document.getElementById("navigation");
+    const mobileNavButton = document.getElementById("mobile-nav-menu");
+    const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+
     // const navTarget = null;
     if (!navigation) throw Error("Navigation not found.");
     document.body.addEventListener("click", handleNavigationEvent);
@@ -253,32 +260,53 @@ const Wrapper = depth ? Fragment : "nav";
       }
     }
 
+    /**
+     * Opens and closes the mobile navigation menu
+     * @param open optionally override the toggle
+     */
+    function setModalState(open?: boolean) {
+      let newState = navigation?.classList.toggle("expanded", open);
+      if (newState === undefined) return;
+      mobileNavButton?.setAttribute("aria-expanded", newState.toString());
+
+      // Fix/Unfix body to prevent scrolling through the menu
+      if (newState) {
+        document.body.style.top = `-${window.scrollY}px`;
+        document.body.style.position = "fixed";
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+      } else {
+        const scrollY = document.body.style.top;
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+        window.scrollTo({
+          left: 0,
+          top: parseInt(scrollY || "0") * -1,
+          behavior: "instant",
+        });
+      }
+    }
+
     // Mobile Nav
-    document
-      .getElementById("mobile-nav-menu")
-      ?.addEventListener("click", (e) => {
-        let t = e?.currentTarget as HTMLElement;
-        let nav = t.closest("nav");
-        let state = t.getAttribute("aria-expanded") === "false";
-        t.setAttribute("aria-expanded", state.toString());
+    mobileNavButton?.addEventListener("click", (e) => {
+      setModalState();
+    });
 
-        nav?.classList.toggle("expanded", state);
-      });
-
-    document
-      .getElementById("mobile-nav-overlay")
-      ?.addEventListener("click", (e) => {
-        let t = document.getElementById("mobile-nav-menu") as HTMLElement;
-        let nav = t.closest("nav");
-        t.setAttribute("aria-expanded", "false");
-        nav?.classList.toggle("expanded", false);
-      });
+    mobileNavOverlay?.addEventListener("click", (e) => {
+      setModalState(false);
+    });
   }
 </script>
 
 <style lang="scss">
   nav {
     z-index: 999;
+  }
+
+  #navigation-items {
+    height: 100%;
   }
 
   #mobile-nav-buttons {
@@ -356,30 +384,47 @@ const Wrapper = depth ? Fragment : "nav";
       left: 0;
       right: 0;
       pointer-events: none;
+      max-height: 100vh;
+
+      // -webkit-overflow-scrolling: touch;
       // top: 40%;
 
-      ul.depth-0 {
-        height: fit-content;
-        padding: 2rem 2rem 10rem;
-        // padding-bottom: 10rem;
-        // padding-top: 2rem;
+      #navigation-items {
         background: linear-gradient(
           to bottom,
           rgb(var(--header-background-color)),
           rgb(var(--header-background-color-bottom))
         );
+
+        // padding: 2rem 2rem 10rem;
+        position: relative;
+        height: 100%;
+        max-height: 100vh;
+        overflow-y: scroll;
+        overscroll-behavior: contain;
+
         box-shadow: 0 0 10rem #0003;
         margin-right: 0;
-        flex-direction: column;
+
         transition:
           clip-path 0.3s ease-in-out,
           opacity 0.3s ease-out,
           transform 0.3s ease;
 
-        pointer-events: none;
         clip-path: circle(2rem at 50% calc(100% - 12rem));
         opacity: 0;
         transform: translate(0 10rem);
+      }
+
+      ul.depth-0 {
+        margin: 2rem 2rem 10rem;
+
+        height: fit-content;
+        flex-direction: column;
+
+        ul {
+          margin-left: 3vw;
+        }
       }
     }
 
@@ -391,7 +436,7 @@ const Wrapper = depth ? Fragment : "nav";
         pointer-events: all;
       }
 
-      ul.depth-0 {
+      #navigation-items {
         clip-path: circle(150% at 50% calc(100% - 4.5rem));
         pointer-events: initial;
         transform: translate(0 0);
