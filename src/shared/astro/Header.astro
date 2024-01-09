@@ -24,20 +24,22 @@ const headerAreas =
     .join(" ") +
   '"';
 
-const headerBackgroundColor = convertColorString(
-  preferences.header.background_top_color
-);
-const headerBackgroundColorBottom = convertColorString(
-  preferences.header.background_bottom_color
-);
+// const headerBackgroundColor = convertColorString(
+//   preferences.header.background_top_color
+// );
+// const headerBackgroundColorBottom = convertColorString(
+//   preferences.header.background_bottom_color
+// );
+
+// +
+//     `--header-background-color: ${headerBackgroundColor};` +
+//     `--header-background-color-bottom: ${headerBackgroundColorBottom};`
 ---
 
 <header
   class:list={{ pinned: preferences.header.pin_header }}
   style={`--text-color: var(--header-color);` +
-    `--header-areas: ${headerAreas};` +
-    `--header-background-color: ${headerBackgroundColor};` +
-    `--header-background-color-bottom: ${headerBackgroundColorBottom};`}
+    `--header-areas: ${headerAreas};`}
 >
   {
     preferences.header.show_logo && (

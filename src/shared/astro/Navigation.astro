@@ -89,19 +89,21 @@ const Items = depth ? Fragment : "div";
                         : undefined
                     }
                   >
-                    <span {id}>{page?.title}</span>
-                    {children && (
-                      <div class="dropdown-caret">
-                        <Icon
-                          name={
-                            !depth
-                              ? "fa6-solid:caret-down"
-                              : "fa6-solid:caret-right"
-                          }
-                          height="2rem"
-                        />
-                      </div>
-                    )}
+                    <span {id}>
+                      {page?.title}
+                      {children && (
+                        <div class="dropdown-indicator">
+                          <Icon
+                            name={
+                              !depth
+                                ? "fa6-solid:caret-down"
+                                : "fa6-solid:caret-right"
+                            }
+                            height="2rem"
+                          />
+                        </div>
+                      )}
+                    </span>
                   </a>
 
                   {children && <Astro.self depth={depth} pages={page} />}
@@ -110,6 +112,7 @@ const Items = depth ? Fragment : "div";
             );
           })
       }
+      {!!depth && <div class="dropdown-caret" />}
     </ul>
   </Items>
 </Wrapper>
@@ -122,9 +125,11 @@ const Items = depth ? Fragment : "div";
     offset,
     shift,
     flip,
+    size,
+    arrow,
   } from "@floating-ui/dom";
-  import { navigate } from "astro:transitions/client";
-  import hoverintent from "hoverintent";
+  // import { navigate } from "astro:transitions/client";
+  // import hoverintent from "hoverintent";
 
   document.addEventListener("DOMContentLoaded", setupNavigation);
   document.addEventListener("astro:after-swap", setupNavigation);
@@ -133,6 +138,7 @@ const Items = depth ? Fragment : "div";
     const navigation = document.getElementById("navigation");
     const mobileNavButton = document.getElementById("mobile-nav-menu");
     const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+    const caretHeight = 20;
 
     // const navTarget = null;
     if (!navigation) throw Error("Navigation not found.");
@@ -181,31 +187,135 @@ const Items = depth ? Fragment : "div";
 
       const dropdown = target.querySelector(":scope ul") as HTMLElement;
       if (!dropdown) return;
+      const caret = dropdown.querySelector(
+        ":scope > .dropdown-caret"
+      ) as HTMLElement;
+      // console.log(dropdown.getBoundingClientRect());
 
       const options: ComputePositionConfig = target.classList.contains(
         "depth-0"
       )
         ? {
             placement: "bottom-start",
-            middleware: [shift(), offset({ mainAxis: 0, crossAxis: 0 })],
+            strategy: "fixed", // Probably depends on if the menu is fixed or not
+            middleware: [
+              offset({ mainAxis: caretHeight * 0.9, crossAxis: 0 }),
+              size({
+                apply({ elements, availableHeight }) {
+                  if (isMobileNav()) {
+                    Object.assign(elements.floating.style, {
+                      maxHeight: null,
+                    });
+                    return;
+                  }
+                  Object.assign(elements.floating.style, {
+                    maxHeight: `${availableHeight}px`,
+                  });
+                },
+              }),
+              shift(),
+              arrow({ element: caret }),
+            ],
           }
         : {
             placement: "right-start",
-            middleware: [flip(), offset({ mainAxis: 0, crossAxis: 0 })],
+            strategy: "fixed",
+            middleware: [
+              offset({ mainAxis: caretHeight * 0.9, crossAxis: 0 }),
+              shift(),
+              size({
+                apply({ elements, availableHeight }) {
+                  if (isMobileNav()) {
+                    Object.assign(elements.floating.style, {
+                      maxHeight: null,
+                    });
+                    return;
+                  }
+                  Object.assign(elements.floating.style, {
+                    maxHeight: `${availableHeight}px`,
+                  });
+                },
+              }),
+              flip(),
+              arrow({ element: caret }),
+            ],
           };
 
       // @ts-ignore
       target._cleanup = autoUpdate(target, dropdown, () => {
-        computePosition(target, dropdown, options).then(({ x, y }) => {
-          Object.assign(dropdown.style, {
-            left: `${x}px`,
-            top: `${y}px`,
-          });
-        });
+        computePosition(target, dropdown, options).then(
+          ({ x, y, middlewareData, placement }) => {
+            if (isMobileNav()) {
+              Object.assign(dropdown.style, {
+                left: null,
+                top: null,
+              });
+              return;
+            }
+
+            Object.assign(dropdown.style, {
+              left: `${x}px`,
+              top: `${y}px`,
+            });
+            if (middlewareData.arrow) {
+              let turn,
+                top,
+                right,
+                bottom,
+                left = null;
+              let direction = placement.replace(/-.*/, "");
+              let heightOffset = `${-caretHeight}px`;
+              let widthOffset = `${-caretHeight * 1.5}px`;
+
+              // Position arrow based on placement direction
+              switch (direction) {
+                default:
+                case "top":
+                  left = `${middlewareData.arrow.x}px`;
+                  bottom = heightOffset;
+                  turn = 0.5;
+                  break;
+
+                case "bottom":
+                  left = `${middlewareData.arrow.x}px`;
+                  top = heightOffset;
+                  turn = 0;
+                  break;
+
+                case "left":
+                  top = `${middlewareData.arrow.y}px`;
+                  right = widthOffset;
+                  turn = 0.25;
+                  break;
+
+                case "right":
+                  top = `${middlewareData.arrow.y}px`;
+                  left = widthOffset;
+                  turn = 0.75;
+                  break;
+              }
+
+              Object.assign(caret.style, {
+                transform: `rotate(${turn}turn)`,
+                top,
+                right,
+                bottom,
+                left,
+              });
+            }
+          }
+        );
       });
 
       target.setAttribute("aria-expanded", "true");
       target.classList.add("dropdown-open");
+    }
+
+    /**
+     * Media query to test if mobile nav should be shown
+     */
+    function isMobileNav(): boolean {
+      return window.matchMedia("screen and (max-width: 768px)").matches;
     }
 
     /**
@@ -450,88 +560,106 @@ const Items = depth ? Fragment : "div";
       }
     }
 
-    ul.depth-0 ul {
+    .depth-0 ul {
       position: relative;
       top: 0 !important;
       left: 0 !important;
+      display: none;
+    }
+
+    .dropdown-open > ul {
+      display: flex;
+    }
+
+    ul {
+      flex-direction: column;
     }
   }
-
-  ul.depth-0 {
-    grid-area: navigation;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    margin-right: 4rem;
-    height: 100%;
-
-    gap: 1rem;
-  }
-
-  li.depth-0 > a {
-    height: 100%;
-    /* padding: 20px; */
-    color: rgb(var(--header-color));
-  }
-
-  li.depth-0 > a span {
-    padding: 10px 20px;
-  }
-
-  // li.depth-0.children::after {
-  //   content: "";
-  //   position: absolute;
-  //   bottom: 5px;
-  //   left: calc(50% - 3px);
-  //   width: 6px;
-  //   height: 6px;
-  //   border-radius: 1rem;
-  //   background-color: #eee;
-  // }
 
   ul {
     list-style-type: none;
     padding: 0;
   }
 
-  .depth-0 ul {
-    position: absolute;
-    width: max-content;
-    top: 0;
-    left: 0;
-    background-color: white;
-    display: none;
-  }
-
-  .depth-1 li {
-    width: max-content;
-    // box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
-  }
-
   .depth-1 a span {
+    padding: 5px 10px;
+    margin: 10px;
+  }
+
+  li.depth-0 > a span {
     padding: 10px 20px;
   }
 
-  // .depth-0 ul:not(ul.dropdown-open) {
-  //   display: none;
-  // }
+  @media screen and (min-width: 769px) {
+    ul.depth-0 {
+      grid-area: navigation;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      margin-right: 4rem;
+      height: 100%;
 
-  .dropdown-open > ul {
-    display: block !important;
+      gap: 1rem;
+    }
+
+    li.depth-0 > a {
+      height: 100%;
+      /* padding: 20px; */
+      color: rgb(var(--header-color));
+    }
+
+    .depth-0 ul {
+      position: fixed;
+
+      top: 0;
+      left: 0;
+      background-color: white;
+      display: flex;
+
+      // Workaround for https://github.com/philipwalton/flexbugs#flexbug-14
+      flex-direction: row;
+      // flex-direction: column;
+      flex-wrap: wrap;
+      writing-mode: vertical-lr;
+      // text-orientation: upright;
+
+      li {
+        writing-mode: horizontal-tb;
+      }
+
+      background-color: rgb(var(--header-background-color));
+      box-shadow: 2px 2px 16px #00000044;
+      border: 2px solid #88888822;
+      border-radius: var(--border-radius);
+
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .dropdown-open > ul {
+      // display: flex !important;
+      visibility: visible;
+      pointer-events: all;
+    }
+
+    .dropdown-open > a .dropdown-indicator {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-caret {
+      position: absolute;
+      width: 40px;
+      height: 20px;
+      filter: drop-shadow(2px 2px 16px #00000044);
+      z-index: -2;
+
+      // Prevent shadow overlapping own menu
+      background-color: rgb(var(--header-background-color));
+      clip-path: polygon(-200% -200%, 300% -200%, 300% 100%, -200% 100%);
+
+      mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' style='fill-rule:evenodd%3bclip-rule:evenodd%3bstroke-linejoin:round%3bstroke-miterlimit:2' viewBox='0 0 1024 512'%3e%3cpath d='M256 73.901c17.459 0 33.813 15.769 43.788 42.222l103.571 274.664C431.996 466.729 478.946 512 529.067 512H-17.067c50.121 0 97.071-45.271 125.708-121.213l103.571-274.664C222.187 89.67 238.541 73.901 256 73.901' style='fill:currentColor' transform='matrix(1.875 0 0 1.16868 32 -86.367)'/%3e%3c/svg%3e");
+    }
   }
-
-  .dropdown-open > a .dropdown-caret {
-    transform: rotate(180deg);
-    // border: 2px solid red;
-  }
-
-  /* .active {
-    background-color: #eee;
-  } */
-
-  /* .selected {
-    background-color: #ddd;
-  } */
 
   .active > a span {
     font-weight: bold;
@@ -539,20 +667,12 @@ const Items = depth ? Fragment : "div";
   }
 
   a {
-    // display: flex;
     display: flex;
     align-items: center;
     flex-direction: row;
     text-decoration: none;
-    color: rgb(0 0 0);
+    color: rgb(var(--header-color));
     cursor: default;
-  }
-
-  a > span {
-    flex: 1 1 100%;
-    border: 4px solid #0000;
-    transition: background-color 0.1s ease-out;
-    border-radius: var(--border-radius);
   }
 
   a:hover span {
@@ -565,5 +685,19 @@ const Items = depth ? Fragment : "div";
 
   a[href]:hover span {
     background-color: rgba(0, 0, 0, 0.15);
+  }
+
+  a > span {
+    flex: 1 1 100%;
+    border: 4px solid #0000;
+    transition: background-color 0.1s ease-out;
+    border-radius: var(--border-radius);
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+    text-align: center;
   }
 </style>
