@@ -640,6 +640,10 @@ const Items = depth ? Fragment : "div";
       // display: flex !important;
       visibility: visible;
       pointer-events: all;
+
+      & > .dropdown-caret {
+        display: block;
+      }
     }
 
     .dropdown-open > a .dropdown-indicator {
@@ -647,6 +651,7 @@ const Items = depth ? Fragment : "div";
     }
 
     .dropdown-caret {
+      display: none;
       position: absolute;
       width: 40px;
       height: 20px;
