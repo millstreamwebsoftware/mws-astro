@@ -122,6 +122,9 @@ const { collection } = Astro.props;
         let clicked = e.target.closest("[data-lightbox]") as HTMLElement;
         if (!clicked) return;
 
+        // Avoid opening if text is being selected
+        if (document.getSelection()?.type === "Range") return;
+
         showLightbox(lightbox, clicked.dataset.lightbox || "");
       });
     });
