@@ -58,7 +58,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
           alt=""
           loading="lazy"
           decoding="async"
-          fit="crop"
+          resizeFit="crop"
           crop="faces,entropy"
           aspect={aspect}
           {sizes}
@@ -89,6 +89,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
               alt=""
               loading="lazy"
               decoding="async"
+              fit="contain"
               q={80}
               placeholder={true}
             />

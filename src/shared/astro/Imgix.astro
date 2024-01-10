@@ -1,7 +1,17 @@
 ---
 import ImgixClient from "@imgix/js-core";
 import preferences from "@data/preferences.json";
-// import Sharp from "sharp";
+
+type cropOptions =
+  | "center"
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "faces"
+  | "focalpoint"
+  | "edges"
+  | "entropy";
 
 export interface Props {
   image: string;
@@ -11,12 +21,43 @@ export interface Props {
   loading?: "lazy" | "eager" | null | undefined;
   decoding?: "async" | "auto" | "sync" | null | undefined;
   style?: string;
-  crop?: string;
-  fit?: string;
+  /**
+   * Set how the image is cropped by imagix - only applies if resizeFit = "crop"
+   * Defaults to "center"
+   *  For more information on cropping behaviour, see: https://docs.imgix.com/apis/rendering/size/crop
+   */
+  crop?:
+    | cropOptions
+    | `${cropOptions},${cropOptions}`
+    | `${cropOptions},${cropOptions},${cropOptions}`
+    | `${cropOptions},${cropOptions},${cropOptions},${cropOptions}`;
+  /** Set the images' object-fit in browser */
+  fit?: "cover" | "contain";
+  /**
+   * Set how the image is resized by imagix
+   * Defaults to "crop"
+   * For more information on resize behaviour, see: https://docs.imgix.com/apis/rendering/size/fit
+   */
+  resizeFit?:
+    | "clamp"
+    | "clip"
+    | "crop"
+    | "facearea"
+    | "fill"
+    | "fillmax"
+    | "max"
+    | "min"
+    | "scale";
   sizes?: string;
   aspect?: number;
   q?: number;
+  /**
+   * Set which automatic image optimisations imagix uses.
+   * Defaults to "compress,format"
+   * For more information on automatic optimisations, see: https://docs.imgix.com/apis/rendering/auto/auto
+   */
   auto?: string;
+  /** Generate and attach a Low Quality Image Placeholder (LQIP) to the image */
   placeholder?: boolean;
 }
 
@@ -30,6 +71,7 @@ var ix: ImgixClient | undefined = preferences.API.imgix?.domain
 const {
   image,
   alt,
+  fit,
   style,
   sizes,
   placeholder,
@@ -41,7 +83,7 @@ const loading = Astro.props.loading ?? "lazy";
 const decoding = Astro.props.decoding ?? "async";
 
 const opts = {
-  fit: Astro.props.fit ?? "crop",
+  fit: Astro.props.resizeFit ?? "crop",
   crop: Astro.props.crop ?? "center",
   ar: aspect ? `${aspect}:1` : undefined,
   q: Astro.props.q ?? undefined,
@@ -84,28 +126,44 @@ if (!ENV_BOOKSHOP_LIVE) {
   }
 }
 
+// If ix undefined, fallback to serving image from webserver
 const src = ix ? ix.buildURL(url.toString(), opts) : image; // Fallback
 const srcset = ix ? ix.buildSrcSet(url.toString(), opts) : undefined;
 
+// Figure out the size of the served image, if an aspect is provided height is recalculated
 let width = tWidth || metadata?.width;
 let height =
   aspect && width ? Math.floor(width / aspect) : tHeight || metadata?.height;
 
+// Figure out the aspect ratio of the served image
 aspect = width && height ? width / height : undefined;
 
-let placeholderString = `data:image/webp;base64,${plData}`;
+let webpString = `data:image/webp;base64,${plData}`;
+// let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage href='${webpString}' preserveAspectRatio='none' width="100%" height="100%"/%3e%3c/svg%3e`;
+
+// Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
+let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='none' href='${webpString}'/%3e%3c/svg%3e`;
 ---
 
 <>
   {
     // @ts-expect-error
     ENV_BOOKSHOP_LIVE ? (
-      <img src={image} {alt} {loading} {decoding} {width} {height} />
+      <img
+        src={image}
+        {alt}
+        class:list={fit}
+        {loading}
+        {decoding}
+        {width}
+        {height}
+      />
     ) : (
       <img
         {srcset}
         {src}
         {alt}
+        class:list={fit}
         {loading}
         {decoding}
         {sizes}
@@ -113,7 +171,7 @@ let placeholderString = `data:image/webp;base64,${plData}`;
         {height}
         data-aspect={aspect}
         style={{
-          "background-image": `url('${placeholderString}')`,
+          "background-image": `url("${placeholderString}")`,
         }}
       />
     )
@@ -121,45 +179,17 @@ let placeholderString = `data:image/webp;base64,${plData}`;
 </>
 
 <style>
-  /* .img-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  } */
-
-  /* .img-wrapper.cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  } */
-
-  /* .img-wrapper img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  } */
-
-  .placeholder {
-    position: absolute;
-    /* inset: 0; */
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    z-index: -1;
-    /* object-fit: cover; */
-  }
-
-  img,
-  .placeholder {
+  img {
     max-width: 100%;
     height: auto;
-    /* object-position: 99999px 99999px;
-    background-repeat: no-repeat;
+    /* object-position: 9999px !important; */
     background-position: center;
-    background-size: cover; */
-    object-fit: cover;
-
     background-size: cover;
+    object-fit: cover;
+  }
+
+  img.contain {
+    object-fit: contain;
+    background-size: contain;
   }
 </style>
