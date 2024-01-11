@@ -588,7 +588,7 @@ const Items = depth ? Fragment : "div";
   }
 
   li.depth-0 > a span {
-    padding: 10px 20px;
+    padding: calc(var(--indent) * 0.1) calc(var(--indent) * 0.2);
   }
 
   .dropdown-open > a .dropdown-indicator {
@@ -601,10 +601,9 @@ const Items = depth ? Fragment : "div";
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
-      margin-right: 4rem;
       height: 100%;
 
-      gap: 1rem;
+      gap: 0.5vw;
     }
 
     li.depth-0 > a {
@@ -618,7 +617,6 @@ const Items = depth ? Fragment : "div";
 
       top: 0;
       left: 0;
-      background-color: white;
       display: flex;
 
       // Workaround for https://github.com/philipwalton/flexbugs#flexbug-14
@@ -634,7 +632,12 @@ const Items = depth ? Fragment : "div";
 
       background-color: rgb(var(--header-background-color));
       box-shadow: 2px 2px 16px #00000044;
-      border: 2px solid #88888822;
+      border: 2px solid
+        color-mix(
+          in oklab,
+          rgb(var(--header-background-color)) 70%,
+          rgb(var(--header-color))
+        );
       border-radius: var(--border-radius);
 
       visibility: hidden;
@@ -681,7 +684,12 @@ const Items = depth ? Fragment : "div";
 
   .active > a span {
     font-weight: bold;
-    border: 4px solid #0001;
+    border: 4px solid
+      color-mix(
+        in oklab,
+        rgb(var(--header-background-color)) 70%,
+        rgb(var(--header-color))
+      );
   }
 
   a {
@@ -694,11 +702,11 @@ const Items = depth ? Fragment : "div";
   }
 
   a:hover span {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  a[href]:hover span {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: color-mix(
+      in oklab,
+      rgb(var(--header-background-color)) 70%,
+      rgb(var(--header-color))
+    );
   }
 
   a > span {
