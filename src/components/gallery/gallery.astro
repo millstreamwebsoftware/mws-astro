@@ -19,15 +19,6 @@ export interface Props {
 }
 
 const { images, height, indent, lightbox, key, classes } = Astro.props;
-// const imagePaths = images.map((i) => i.image);
-// const assets = await Astro.glob("/src/assets/**/*");
-
-// const imageAssets = images.map((img) => {
-//   const k = assets.findIndex((j) => j.default.src.includes(img.image));
-//   const i = Object.assign({}, img);
-//   if (k >= 0) i.image = assets[k].default;
-//   return i;
-// });
 
 const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;
@@ -42,7 +33,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
 <Section
   component="gallery"
   {...Astro.props}
-  classes={{ lightbox, ...classes }}
+  classes={[{ lightbox }, classes]}
   style={{
     "--height": height,
     "--columns": columns,
@@ -158,7 +149,39 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
 
   @media only screen and (max-width: 768px) {
     section.gallery {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(calc(var(--columns) * 0.5), 1fr);
+    }
+
+    // section.gallery.list figure.gallery-item {
+    //   grid-template-columns: 1fr;
+    //   grid-template-rows: minmax(1fr, auto) auto;
+
+    //   img {
+    //     max-height: 50%;
+    //   }
+    // }
+  }
+
+  section.gallery.list {
+    .gallery-item {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      border-radius: var(--border-radius);
+      background-color: color-mix(
+        in oklab,
+        rgb(var(--background-color)) 95%,
+        rgb(var(--text-color))
+      );
+
+      img {
+        border-radius: var(--border-radius);
+      }
+
+      figcaption {
+        position: relative;
+        justify-content: start;
+        background: none;
+      }
     }
   }
 </style>
