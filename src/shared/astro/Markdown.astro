@@ -1,14 +1,18 @@
 ---
 import { Markdown as RemoteMarkdown } from "astro-remote";
 import MarkdownIt from "markdown-it";
-import { replaceCmsEmbeds } from "@mws-astro/util";
+import { replaceCmsEmbeds, stripTrailingWhitespace } from "@mws-astro/util";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Button from "@components/button/button.astro";
 import Icon from "@shared/icon.astro";
 import Mailbuild from "@components/mailbuild/mailbuild.astro";
 import Facebook from "@components/facebook/facebook.astro";
 import Social from "@components/social/social.astro";
-const content = await replaceCmsEmbeds(Astro.props.content);
+
+// We need to strip whitespace due to a strange bug which removes a character from the start of a line when there is whitespace before the newline.
+const content = await stripTrailingWhitespace(Astro.props.content).then(
+  replaceCmsEmbeds
+);
 
 var substitutions = {
   blockquote: Blockquote,

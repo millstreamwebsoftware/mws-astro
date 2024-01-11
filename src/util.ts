@@ -20,6 +20,14 @@ export async function replaceCmsEmbeds(content: string) {
   });
 }
 
+export async function stripTrailingWhitespace(content: string) {
+  if (!content) return content;
+
+  const whitespaceRe = /[^\S\r\n]$/gm;
+
+  return content.replaceAll(whitespaceRe, "");
+}
+
 export function bookshopName(p: string) {
   const parts = p
     .replace(/^.*components\//, "")
