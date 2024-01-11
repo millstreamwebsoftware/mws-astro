@@ -22,7 +22,7 @@ export interface Props {
   decoding?: "async" | "auto" | "sync" | null | undefined;
   style?: string;
   /**
-   * Set how the image is cropped by imagix - only applies if resizeFit = "crop"
+   * Set how the image is cropped by imgix - only applies if resizeFit = "crop"
    * Defaults to "center"
    *  For more information on cropping behaviour, see: https://docs.imgix.com/apis/rendering/size/crop
    */
@@ -30,7 +30,7 @@ export interface Props {
   /** Set the images' object-fit in browser */
   fit?: "cover" | "contain";
   /**
-   * Set how the image is resized by imagix
+   * Set how the image is resized by imgix
    * Defaults to "crop"
    * For more information on resize behaviour, see: https://docs.imgix.com/apis/rendering/size/fit
    */
@@ -48,7 +48,7 @@ export interface Props {
   aspect?: number;
   q?: number;
   /**
-   * Set which automatic image optimisations imagix uses.
+   * Set which automatic image optimisations imgix uses.
    * Defaults to "compress,format"
    * For more information on automatic optimisations, see: https://docs.imgix.com/apis/rendering/auto/auto
    */
