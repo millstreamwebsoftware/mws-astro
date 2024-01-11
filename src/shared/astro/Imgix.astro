@@ -26,11 +26,7 @@ export interface Props {
    * Defaults to "center"
    *  For more information on cropping behaviour, see: https://docs.imgix.com/apis/rendering/size/crop
    */
-  crop?:
-    | cropOptions
-    | `${cropOptions},${cropOptions}`
-    | `${cropOptions},${cropOptions},${cropOptions}`
-    | `${cropOptions},${cropOptions},${cropOptions},${cropOptions}`;
+  crop?: cropOptions | `${cropOptions},${cropOptions}` | string;
   /** Set the images' object-fit in browser */
   fit?: "cover" | "contain";
   /**
