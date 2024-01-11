@@ -2,10 +2,10 @@
 import Markdown from "@shared/Markdown.astro";
 import Icon from "@shared/icon.astro";
 
-const { href } = Astro.props;
+const { href, target } = Astro.props;
 ---
 
-<a class="button" {href}>
+<a class="button" {target} {href}>
   <span><slot /></span>
   <Icon name="fa6-solid:circle-chevron-right" height="1.8em" />
 </a>
