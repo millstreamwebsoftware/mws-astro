@@ -4,8 +4,8 @@ spec:
     - content_blocks
   label: Image
   description: Display a single image.
-  icon: collections
-  tags: ["image", "collection"]
+  icon: image
+  tags: ["image"]
 
 # Defines the structure of this component, as well as the default values
 blueprint:
