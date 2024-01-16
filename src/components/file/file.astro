@@ -1,0 +1,28 @@
+---
+import Section from "@layouts/Section.astro";
+import Markdown from "@shared/Markdown.astro";
+
+export interface Props {
+  files?: [{ path: string; title: string; description: string }];
+  show_filetype: boolean;
+  show_filesize: boolean;
+}
+
+const { files, show_filetype, show_filesize } = Astro.props;
+---
+
+<Section component="file">
+  <ul>
+    {
+      files &&
+        files.map(({ path, title, description }) => {
+          <li>
+            <a href={path}>
+              <p>{title}</p>
+              <Markdown>{description}</Markdown>
+            </a>
+          </li>;
+        })
+    }
+  </ul>
+</Section>
