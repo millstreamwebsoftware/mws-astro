@@ -216,9 +216,19 @@ h3 {
   font-family: var(--feature-font-family);
 }
 
-a {
+a,
+td,
+th {
   color: rgb(var(--text-color));
 }
+
+// tr:nth-child(even) {
+//   background-color: color-mix(
+//     in oklch,
+//     rgb(var(--background-color)) 95%,
+//     rgb(var(--text-color))
+//   );
+// }
 
 hr {
   height: 1px;
