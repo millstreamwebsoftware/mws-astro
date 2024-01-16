@@ -64,7 +64,8 @@ const embedURL =
 
   .facebox {
     padding: 1rem 2rem 2rem;
-    background-color: white;
+    background-color: rgb(var(--text-color));
+
     border-radius: var(--border-radius);
     min-width: 340px;
     min-height: 500px;
@@ -72,14 +73,21 @@ const embedURL =
 
   .facebox-info {
     font-size: var(--text-size-medium);
-    --text-color: black;
+    // --text-color: black;
+
+    color: inherit;
     margin-bottom: 1rem;
 
     a {
+      color: rgb(var(--background-color));
       display: flex;
       gap: 1em;
       align-items: center;
       justify-content: space-between;
+
+      p {
+        color: inherit;
+      }
     }
   }
 
