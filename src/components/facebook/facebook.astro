@@ -106,3 +106,30 @@ const embedURL =
     z-index: 2;
   }
 </style>
+
+<style is:global lang="scss">
+  facebook {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 570px;
+
+    &::after {
+      content: "Facebook Embed";
+      position: absolute;
+      margin-left: calc(50% - 190px);
+      top: 0;
+      left: 0;
+      width: 380px;
+      height: 570px;
+      color: rgb(var(--background-color));
+      background-color: rgb(var(--text-color));
+      border-radius: var(--border-radius);
+
+      vertical-align: middle;
+      text-align: center;
+      line-height: 570px;
+      font-size: 15px;
+    }
+  }
+</style>
