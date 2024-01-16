@@ -2,6 +2,13 @@
 import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 
+export interface Props {
+  align?: string;
+  "show-text"?: boolean;
+}
+
+const { align, "show-text": text } = Astro.props;
+
 const icons: Record<string, string> = {
   twitter: "fa6-brands:square-x-twitter",
   facebook: "fa6-brands:square-facebook",
@@ -20,7 +27,7 @@ const socials: Record<string, string>[] = preferences.general.social.map(
 );
 ---
 
-<ul class="social">
+<ul class:list={["social", align, { "show-text": text }]}>
   {
     socials.map((s) =>
       s.title ? (
@@ -55,6 +62,26 @@ const socials: Record<string, string>[] = preferences.general.social.map(
     align-items: center;
     list-style-type: none;
     column-gap: var(--text-gap);
+
+    &.left {
+      justify-content: flex-start;
+    }
+
+    &.center {
+      justify-content: center;
+    }
+
+    &.right {
+      justify-content: flex-end;
+    }
+
+    &.space-between {
+      justify-content: space-between;
+    }
+
+    &.space-evenly {
+      justify-content: space-evenly;
+    }
   }
 
   a {
