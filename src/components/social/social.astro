@@ -116,3 +116,47 @@ const socials: Record<string, string>[] = preferences.general.social.map(
     }
   }
 </style>
+
+<style is:global>
+  social {
+    display: inline-block;
+    position: relative;
+    font-size: var(--text-size-medium);
+    height: 1.8em;
+    width: 100%;
+  }
+
+  social::after {
+    position: absolute;
+    content: "";
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 7em;
+
+    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3e%3cpath d='M110 14.58v70.84c0 8.047-6.533 14.58-14.58 14.58H24.58C16.533 100 10 93.467 10 85.42V14.58C10 6.533 16.533 0 24.58 0h70.84C103.467 0 110 6.533 110 14.58'/%3e%3c/svg%3e");
+    mask-repeat: space no-repeat;
+    background-color: currentColor;
+    opacity: 0.7;
+  }
+
+  social[show-text*="true"]::after {
+    width: 19em;
+    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 100'%3e%3cpath d='M110 14.58v70.84c0 8.047-6.533 14.58-14.58 14.58H24.58C16.533 100 10 93.467 10 85.42V14.58C10 6.533 16.533 0 24.58 0h70.84C103.467 0 110 6.533 110 14.58M330 34.6v30.8c0 8.058-6.542 14.6-14.6 14.6H144.6c-8.058 0-14.6-6.542-14.6-14.6V34.6c0-8.058 6.542-14.6 14.6-14.6h170.8c8.058 0 14.6 6.542 14.6 14.6'/%3e%3c/svg%3e");
+  }
+
+  social[align="left"]::after {
+    left: 0;
+  }
+
+  social[align="space-between"]::after,
+  social[align="space-evenly"]::after {
+    width: 100%;
+    mask-size: 33% 100%;
+  }
+
+  social[align="center"]::after {
+    margin-left: calc(50% - 9.5em);
+    margin-right: calc(50% - 9.5em);
+  }
+</style>
