@@ -45,44 +45,50 @@ const mapId = "map-" + key;
     .querySelector("[data-map][data-api-key]")
     ?.getAttribute("data-api-key");
 
-  if (!apiKey) throw TypeError("Missing Google Maps API Key");
+  const mapExists = document.querySelector("[data-map]");
 
-  const loader = new Loader({
-    apiKey,
-    version: "weekly",
-  });
+  // if (!apiKey) throw TypeError("Missing Google Maps API Key");
 
-  loader.load().then(async () => {
-    const { Map } = (await google.maps.importLibrary(
-      "maps"
-    )) as google.maps.MapsLibrary;
-    const { Marker } = (await google.maps.importLibrary(
-      "marker"
-    )) as google.maps.MarkerLibrary;
+  if (mapExists && apiKey) gMapsLoader(apiKey);
 
-    document.querySelectorAll("[data-map]").forEach((e, i) => {
-      if (!(e instanceof HTMLElement)) return;
-
-      const position = {
-        lat: Number(e.dataset?.lat),
-        lng: Number(e.dataset?.lng),
-      };
-
-      const map = new Map(e, {
-        center: position,
-        zoom: Number(e.dataset?.zoom),
-        mapTypeId: e.dataset?.mapType,
-        ...(e.dataset?.mapType == "roadmap" && { styles: styles }),
-      });
-
-      if ("marker" in e.dataset) {
-        new Marker({
-          position,
-          map,
-        });
-      }
+  function gMapsLoader(apiKey: string) {
+    const loader = new Loader({
+      apiKey,
+      version: "weekly",
     });
-  });
+
+    loader.load().then(async () => {
+      const { Map } = (await google.maps.importLibrary(
+        "maps"
+      )) as google.maps.MapsLibrary;
+      const { Marker } = (await google.maps.importLibrary(
+        "marker"
+      )) as google.maps.MarkerLibrary;
+
+      document.querySelectorAll("[data-map]").forEach((e, i) => {
+        if (!(e instanceof HTMLElement)) return;
+
+        const position = {
+          lat: Number(e.dataset?.lat),
+          lng: Number(e.dataset?.lng),
+        };
+
+        const map = new Map(e, {
+          center: position,
+          zoom: Number(e.dataset?.zoom),
+          mapTypeId: e.dataset?.mapType,
+          ...(e.dataset?.mapType == "roadmap" && { styles: styles }),
+        });
+
+        if ("marker" in e.dataset) {
+          new Marker({
+            position,
+            map,
+          });
+        }
+      });
+    });
+  }
 </script>
 
 <style>
