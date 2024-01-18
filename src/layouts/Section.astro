@@ -70,6 +70,10 @@ const expando = classList.includes("expando") ? true : false;
     height: var(--height);
   }
 
+  .component-wrapper {
+    height: 100%;
+  }
+
   section[data-expando] {
     height: calc(30vh + (var(--indent) * 2));
 
@@ -128,24 +132,6 @@ const expando = classList.includes("expando") ? true : false;
       transition: clip-path 0.5s ease;
       clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
     }
-  }
-
-  // section:is(.no-indent, .no-indent-bottom, .columns) > .expando-overlay {
-
-  // }
-
-  // section:not(.columns) > .expando-overlay {
-  //   // margin-top: calc(var(--indent) * -0.5);
-  //   height: 0;
-  //   padding: 0;
-  // }
-
-  section:not([data-expando]) > .expando-overlay {
-    // position: relative;
-
-    // .expando-button {
-    //   bottom: 0;
-    // }
   }
 
   .expando-overlay:hover .expando-button {
