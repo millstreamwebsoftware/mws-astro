@@ -230,6 +230,11 @@ th {
 //   );
 // }
 
+::selection {
+  color: black;
+  background-color: rgb(180 213 255);
+}
+
 hr {
   height: 1px;
   background-color: rgb(var(--color-primary) / 0.25);
