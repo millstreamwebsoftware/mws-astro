@@ -36,3 +36,15 @@ const iconData = iconToSVG(icon, { height });
   {...iconData.attributes}
   set:html={iconData.body}
 />
+
+<style>
+  svg.rot90 {
+    transform: rotate(90deg);
+  }
+  svg.rot180 {
+    transform: rotate(180deg);
+  }
+  svg.rot270 {
+    transform: rotate(270deg);
+  }
+</style>

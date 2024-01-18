@@ -41,79 +41,85 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
     ...(!gap && { "--gallery-gap": 0 }),
   }}
 >
-  {
-    images.map((asset, i) => (
-      <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
-        <Imgix
-          image={asset.image?.src || asset.image}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          resizeFit="crop"
-          crop="faces,entropy"
-          aspect={aspect}
-          {sizes}
-          placeholder={true}
-        />
+  <div class="gallery-grid">
+    {
+      images.map((asset, i) => (
+        <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
+          <Imgix
+            image={asset.image?.src || asset.image}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            resizeFit="crop"
+            crop="faces,entropy"
+            aspect={aspect}
+            {sizes}
+            placeholder={true}
+          />
 
-        {(asset.title || asset.description) && (
-          <figcaption>
-            {asset.title && <h3>{asset.title}</h3>}
-            {asset.description && (
-              <div set:html={md.render(asset.description)} />
-            )}
-          </figcaption>
-        )}
-      </figure>
-    ))
-  }
-  {
-    lightbox && (
-      <Lightbox collection={id}>
-        {images.map((asset, i) => (
-          <figure
-            data-lightbox={`${id}-${i}`}
-            class:list={{ caption: asset.title || asset.description }}
-          >
-            <Imgix
-              image={asset.image?.src || asset.image}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              fit="contain"
-              q={80}
-              placeholder={true}
-            />
+          {(asset.title || asset.description) && (
+            <figcaption>
+              {asset.title && <h3>{asset.title}</h3>}
+              {asset.description && (
+                <div set:html={md.render(asset.description)} />
+              )}
+            </figcaption>
+          )}
+        </figure>
+      ))
+    }
+    {
+      lightbox && (
+        <Lightbox collection={id}>
+          {images.map((asset, i) => (
+            <figure
+              data-lightbox={`${id}-${i}`}
+              class:list={{ caption: asset.title || asset.description }}
+            >
+              <Imgix
+                image={asset.image?.src || asset.image}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                fit="contain"
+                q={80}
+                placeholder={true}
+              />
 
-            {(asset.title || asset.description) && (
-              <figcaption>
-                {asset.title && <h3>{asset.title}</h3>}
-                {asset.description && (
-                  <div set:html={md.render(asset.description)} />
-                )}
-              </figcaption>
-            )}
-          </figure>
-        ))}
-      </Lightbox>
-    )
-  }
+              {(asset.title || asset.description) && (
+                <figcaption>
+                  {asset.title && <h3>{asset.title}</h3>}
+                  {asset.description && (
+                    <div set:html={md.render(asset.description)} />
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          ))}
+        </Lightbox>
+      )
+    }
+  </div>
 </Section>
 
-<style lang="scss" is:global>
-  section.gallery {
+<style lang="scss">
+  .gallery-grid {
     grid-template-columns: repeat(var(--columns), 1fr);
     display: grid;
     grid-template-rows: 1fr;
     grid-auto-flow: row;
     gap: var(--gallery-gap);
+  }
+</style>
 
+<style lang="scss" is:global>
+  section.gallery.lightbox [data-lightbox] {
+    cursor: pointer;
+  }
+
+  section.gallery .gallery-grid {
     &.no-indent {
       padding: var(--gallery-gap);
-    }
-
-    &.lightbox [data-lightbox] {
-      cursor: pointer;
     }
 
     .gallery-item {
