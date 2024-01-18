@@ -168,6 +168,7 @@ const expando = classList.includes("expando") ? true : false;
 
   function setupExpando() {
     const expandos = Array.from(document.querySelectorAll(".expando-overlay"));
+    console.log(expandos);
 
     expandos.forEach((expando) => {
       expando.parentElement?.setAttribute("data-expando", "collapsed");
