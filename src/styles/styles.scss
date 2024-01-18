@@ -226,13 +226,13 @@ p {
   margin-bottom: 1.5em;
 }
 
-// tr:nth-child(even) {
-//   background-color: color-mix(
-//     in oklch,
-//     rgb(var(--background-color)) 95%,
-//     rgb(var(--text-color))
-//   );
-// }
+tr:nth-child(even) {
+  background-color: color-mix(
+    in oklch,
+    rgb(var(--background-color)) 95%,
+    rgb(var(--text-color))
+  );
+}
 
 ::selection {
   color: black;
