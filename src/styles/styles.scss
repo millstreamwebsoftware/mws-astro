@@ -222,6 +222,10 @@ th {
   color: rgb(var(--text-color));
 }
 
+p {
+  margin-bottom: 1.5em;
+}
+
 // tr:nth-child(even) {
 //   background-color: color-mix(
 //     in oklch,
