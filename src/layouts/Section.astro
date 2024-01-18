@@ -154,6 +154,15 @@ const expando = classList.includes("expando") ? true : false;
       clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
     }
   }
+
+  @media (hover: none) {
+    .expando-button {
+      transform: translate(-50%);
+      p {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+      }
+    }
+  }
 </style>
 
 <script>
