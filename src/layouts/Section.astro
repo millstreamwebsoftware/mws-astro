@@ -87,16 +87,16 @@ const expando = classList.includes("expando") ? true : false;
     content: "";
     position: absolute;
     inset: 0;
-    top: 0;
+    top: 50%;
     backdrop-filter: blur(4px);
     z-index: 10;
     background: linear-gradient(
       to bottom,
-      transparent 50%,
-      rgb(var(--background-color)) 90%
+      transparent,
+      rgb(var(--background-color)) 80%
     );
     // background-color: rgb(var(--background-color) / 0.5);
-    mask-image: linear-gradient(to bottom, transparent 50%, white 80%);
+    mask-image: linear-gradient(to bottom, transparent, white 60%);
   }
 
   .expando-overlay {
@@ -148,6 +148,17 @@ const expando = classList.includes("expando") ? true : false;
         clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
       }
     }
+  }
+</style>
+
+<style is:global>
+  .columns-item
+    > section.expando:not([data-expando])
+    > .expando-overlay
+    .expando-button {
+    /* height: var(--indent); */
+
+    bottom: calc(var(--indent) * -0.5 - 1.5rem);
   }
 </style>
 
