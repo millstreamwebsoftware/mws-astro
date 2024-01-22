@@ -106,15 +106,17 @@ if (!ENV_BOOKSHOP_LIVE) {
     metadata = await sh.metadata();
     // ({ dominant } = await sh.stats());
 
-    const plSize = 16;
+    if (placeholder) {
+      const plSize = 16;
 
-    let pl = await sh
-      .resize(plSize, undefined, { fit: "inside" })
-      .blur()
-      .webp()
-      .toBuffer();
+      let pl = await sh
+        .resize(plSize, undefined, { fit: "inside" })
+        .blur()
+        .webp()
+        .toBuffer();
 
-    plData = pl.toString("base64");
+      plData = pl.toString("base64");
+    }
   } catch (err) {
     console.log(err);
   } finally {
