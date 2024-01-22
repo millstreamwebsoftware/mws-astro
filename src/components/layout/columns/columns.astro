@@ -141,6 +141,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     grid-auto-flow: row;
     grid-template-columns: repeat(var(--columns), 1fr);
     overflow: hidden;
+    // padding: 0;
   }
 
   .columns.no-indent {
@@ -197,26 +198,26 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   @media only screen and (max-width: 768px) {
     div.columns.collapse {
       --columns: 1 !important;
-      gap: 0;
+      gap: var(--indent);
       grid-template-columns: repeat(var(--columns), 1fr) !important;
 
       > .columns-item {
         grid-column: 1 / 2 !important;
         grid-row: auto !important;
 
-        > section {
-          padding-left: var(--indent);
-          padding-right: var(--indent);
-          padding-top: var(--column-gap);
-          padding-bottom: var(--column-gap);
+        // > section {
+        //   padding-left: var(--indent);
+        //   padding-right: var(--indent);
+        //   padding-top: var(--column-gap);
+        //   padding-bottom: var(--column-gap);
 
-          &:first-child {
-            padding-top: var(--indent);
-          }
-          &:last-child {
-            padding-bottom: var(--indent);
-          }
-        }
+        //   &:first-child {
+        //     padding-top: var(--indent);
+        //   }
+        //   &:last-child {
+        //     padding-bottom: var(--indent);
+        //   }
+        // }
 
         section::after {
           left: calc(var(--indent) * -1) !important;
