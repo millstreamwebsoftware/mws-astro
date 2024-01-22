@@ -15,6 +15,7 @@ blueprint:
   aspect: 1
   indent: true
   lightbox: true
+  placeholder: true
   classes:
   images:
     - image:

@@ -14,11 +14,13 @@ export interface Props {
   aspect: number;
   indent: boolean;
   lightbox?: boolean;
+  placeholder?: boolean;
   classes?: any;
   key?: string;
 }
 
-const { images, height, indent, lightbox, key, classes } = Astro.props;
+const { images, height, indent, lightbox, key, classes, placeholder } =
+  Astro.props;
 
 const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;
@@ -54,7 +56,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
             crop="faces,entropy"
             aspect={aspect}
             {sizes}
-            placeholder={true}
+            {placeholder}
           />
 
           {(asset.title || asset.description) && (
@@ -83,7 +85,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
                 decoding="async"
                 fit="contain"
                 q={80}
-                placeholder={true}
+                {placeholder}
               />
 
               {(asset.title || asset.description) && (
