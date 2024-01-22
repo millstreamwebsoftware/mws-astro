@@ -195,11 +195,15 @@ h4,
 h5,
 h6 {
   margin: 0;
-  margin-bottom: 0.2em;
+  margin-bottom: 0.5em;
   line-height: 1.6;
   font-family: var(--default-font-family);
   color: rgb(var(--heading-color));
   text-wrap: balance;
+}
+
+:is(h1, h2, h3, h4, h5, h6):last-child {
+  margin-bottom: 0;
 }
 
 h1 {
