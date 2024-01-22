@@ -229,6 +229,10 @@ th {
 
 p {
   margin-bottom: 1.5em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 tr:nth-child(even) {
