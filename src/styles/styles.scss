@@ -186,6 +186,7 @@ table th {
 
 table td {
   text-align: left;
+  vertical-align: baseline;
   padding: calc(var(--indent) * 0.1);
 }
 
