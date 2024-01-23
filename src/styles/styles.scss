@@ -213,15 +213,18 @@ table td {
 
     td {
       position: relative;
-      margin-left: 1em;
+      margin-left: 2rem;
     }
 
-    td::before {
+    td > :is(p, h1, h2, h3, h4, h5, h6):first-child::before,
+    td:not(:has(:is(p, h1, h2, h3, h4, h5, h6):first-child))::before {
       position: absolute;
       content: counter(column) ".";
       counter-increment: column;
       opacity: 0.5;
-      left: -1em;
+      line-height: inherit;
+      vertical-align: baseline;
+      left: -1.5rem;
     }
   }
 }
@@ -241,14 +244,19 @@ h4,
 h5,
 h6 {
   margin: 0;
-  margin-bottom: 0.5em;
+  margin-top: 0.8em;
+  margin-bottom: 0.2em;
   line-height: 1.6;
   font-family: var(--default-font-family);
   color: rgb(var(--heading-color));
   text-wrap: balance;
 }
 
-:is(h1, h2, h3, h4, h5, h6):last-child {
+:is(p, ul, ol, h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+}
+
+:is(p, ul, ol, h1, h2, h3, h4, h5, h6):last-child {
   margin-bottom: 0;
 }
 
@@ -274,11 +282,16 @@ th {
 }
 
 p {
-  margin-bottom: 1.5em;
+  margin-bottom: 0.5em;
 
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+ul,
+ol {
+  margin-bottom: 1em;
 }
 
 ::selection {
