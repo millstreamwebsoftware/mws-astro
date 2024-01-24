@@ -1,5 +1,4 @@
 ---
-import { convertColorString } from "@mws-astro/util";
 import preferences from "@data/preferences.json";
 import Navigation from "./Navigation.astro";
 import Social from "@components/social/social.astro";
@@ -48,11 +47,7 @@ const headerAreas =
       </a>
     )
   }
-  {
-    preferences.header.show_navigation && (
-      <Navigation {id} {paths} {currentPath} />
-    )
-  }
+  {preferences.header.show_navigation && <Navigation {id} {currentPath} />}
   {preferences.header.show_socials && <Social />}
 </header>
 
