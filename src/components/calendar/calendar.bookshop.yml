@@ -1,0 +1,36 @@
+# Metadata about this component, to be used in the CMS
+spec:
+  structures:
+    - content_blocks
+  label: Calendar
+  description: Display events in a calendar.
+  icon: event
+  tags: []
+
+# Defines the structure of this component, as well as the default values
+blueprint:
+  calendarEvents: []
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint
+_inputs:
+  googleCalendarId:
+    type: email
+    label: Google Calendar ID
+    comment: Look in the calendar settings to find this value, it will be formatted like 'abcd1234@group.calendar.google.com'
+  url:
+    type: url
+    label: iCal URL
+    comment:
+
+_structures:
+  calendarEvents:
+    values:
+      - label: Google Calendar
+        value:
+          name:
+          googleCalendarId:
+      # - label: iCal
+      #   value:
+      #     url:

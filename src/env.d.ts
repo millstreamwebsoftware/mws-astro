@@ -8,4 +8,12 @@ declare global {
       tree: TreeNode;
     }
   }
+
+  interface CalendarElement extends HTMLElement {
+    calendar: any;
+  }
+
+  interface FloatingUIElement extends HTMLElement {
+    _cleanup: Function;
+  }
 }

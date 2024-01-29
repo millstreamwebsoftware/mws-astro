@@ -1,0 +1,364 @@
+---
+import Section from "@layouts/Section.astro";
+
+type eventSource =
+  | { name?: string; googleCalendarId: string; className?: string; id?: string }
+  | { name?: string; url: string; className?: string; id?: string };
+
+export interface Props {
+  calendarEvents: [eventSource];
+  classes?: any;
+  key?: string;
+}
+
+const { calendarEvents, classes, key } = Astro.props;
+
+// const eventSources = [
+//   {
+//     googleCalendarId:
+//       "bayswaterses.com.au_n2q62d90t7m25m9n3d843pj0f4@group.calendar.google.com",
+//     className: "cal0 test",
+//   },
+//   {
+//     googleCalendarId:
+//       "bayswaterses.com.au_2mhqt62lv7rvdp675dnn6tjdr4@group.calendar.google.com",
+//     className: "cal1",
+//   },
+//   {
+//     googleCalendarId:
+//       "bayswaterses.com.au_sgt04lsr1705sm48jdhrdfgges@group.calendar.google.com",
+//     className: "cal2",
+//   },
+//   {
+//     googleCalendarId:
+//       "bayswaterses.com.au_mvu8uu7rhhsq9jde5ap6daq3fg@group.calendar.google.com",
+//     className: "cal3",
+//   },
+// ];
+
+const customButtons: Record<string, any> = {};
+
+const headerToolbar: { start?: string; center?: string; end?: string } = {
+  start: "title",
+  center: "",
+  end: "prev,today,next dayGridMonth,listWeek",
+};
+
+for (let i = 0; i < calendarEvents.length; i++) {
+  let cid = `cal${i}`;
+  calendarEvents[i].className = cid;
+  calendarEvents[i].id = cid;
+  customButtons[cid] = { text: calendarEvents[i].name };
+}
+
+if (Object.keys(customButtons).length - 1) {
+  headerToolbar.center = Object.keys(customButtons).join(" ");
+}
+
+const calendarOptions = { calendarEvents, customButtons, headerToolbar };
+---
+
+<Section component="calendar" classes={{ ...classes }} {...Astro.props}>
+  <script
+    id={`calendar-events-${key}`}
+    class="calendar-events"
+    set:html={JSON.stringify(calendarOptions)}
+    type="application/json"
+  />
+  <div id={`_calendar-${key}`} class="_calendar"></div>
+</Section>
+
+<script>
+  import { Calendar, type EventClickArg } from "@fullcalendar/core";
+  import dayGridPlugin from "@fullcalendar/daygrid";
+  import listPlugin from "@fullcalendar/list";
+  import googleCalendarPlugin from "@fullcalendar/google-calendar";
+  import {
+    computePosition,
+    type ComputePositionConfig,
+    autoUpdate,
+    offset,
+    shift,
+    flip,
+  } from "@floating-ui/dom";
+  import * as ics from "ics";
+
+  document.addEventListener("DOMContentLoaded", setupCalendar);
+  document.addEventListener("astro:after-swap", setupCalendar);
+
+  function setupCalendar() {
+    var calendarSections = document.querySelectorAll(
+      'section[data-component="calendar"]'
+    );
+
+    calendarSections.forEach((section) => {
+      const calendarEl = section.querySelector("._calendar") as CalendarElement;
+      if (!calendarEl) return;
+      const calendarSourceEl = calendarEl.parentElement?.querySelector(
+        ":scope script.calendar-events"
+      );
+      if (!calendarSourceEl) return;
+      const calendarOptions = JSON.parse(calendarSourceEl.innerHTML || "{}");
+      const customButtons = calendarOptions.customButtons;
+
+      Object.entries(customButtons).forEach(
+        ([buttonName, button]: [string, any]) => {
+          button.click = function (event: MouseEvent, element: HTMLElement) {
+            element.classList.toggle("cal-filter");
+            filterEvents(calendarEl);
+          };
+        }
+      );
+
+      var calendar = new Calendar(calendarEl, {
+        plugins: [dayGridPlugin, listPlugin, googleCalendarPlugin],
+        initialView: "dayGridMonth",
+        googleCalendarApiKey: "AIzaSyCvQRwk3SQkKAVs3RGWUdzL0XRIA9_mDrA",
+        eventSources: calendarOptions.calendarEvents,
+        eventClick: onClick,
+        eventClassNames: function (arg: { event: any }) {
+          console.log("asadadad");
+          if (!calendarEl.dataset.filter) return;
+          if (calendarEl.dataset.filter?.includes(arg.event.source.id)) return;
+          return "filter-hidden";
+          // e.el.classList.add("filter-hidden");
+        },
+        customButtons,
+        headerToolbar: calendarOptions.headerToolbar,
+      });
+      calendarEl.calendar = calendar;
+      calendar.render();
+    });
+  }
+
+  function closeCalendarPopup(e: MouseEvent) {
+    if (!e.target) return;
+    if ((e.target as HTMLElement).closest("#calendar-popup")) return;
+
+    document.getElementById("calendar-popup")?.remove();
+    document.removeEventListener("click", closeCalendarPopup);
+  }
+
+  function onClick({ event, el, jsEvent, view }: EventClickArg) {
+    jsEvent.preventDefault();
+    jsEvent.stopImmediatePropagation();
+    const calendarEl = el.closest("._calendar") as CalendarElement;
+    if (!calendarEl) return;
+    if (!event.start || !event.end) return;
+
+    const popup = document.createElement("div");
+
+    popup.classList.add(
+      ...Array.from(el.classList.values()).filter((cl) => !cl.startsWith("fc-"))
+    );
+    let offsetEnd = new Date(event.end.valueOf() - 1); // Prevent date rolling over when event ends at midnight
+
+    let fromTime = event.allDay ? "" : " " + event.start.toLocaleTimeString();
+    let toTime = event.allDay ? "" : " " + event.end.toLocaleTimeString();
+    let fromDate = event.start.toLocaleDateString();
+    let toDate =
+      offsetEnd.toLocaleDateString() != fromDate
+        ? offsetEnd.toLocaleDateString()
+        : "";
+    let timeString =
+      toDate || toTime
+        ? `${fromDate}${fromTime} - ${toDate}${toTime}`
+        : `${fromDate}${fromTime}`;
+
+    popup.id = "calendar-popup";
+    popup.innerHTML = `<h3>${event.title}</h3>
+    <p>${timeString}</p>
+    <a href="${downloadEvent(event)}" download="${
+      event.title
+    }.ics">Download Event</a>`;
+
+    document.getElementById("calendar-popup")?.remove();
+    document.addEventListener("click", closeCalendarPopup);
+    calendarEl.append(popup);
+
+    const options: ComputePositionConfig = {
+      placement: "top",
+      middleware: [offset(15), flip(), shift()],
+    };
+
+    (el as FloatingUIElement)._cleanup = autoUpdate(el, popup, () => {
+      computePosition(el, popup, options).then(
+        ({ x, y, middlewareData, placement }) => {
+          Object.assign(popup.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+          });
+        }
+      );
+    });
+  }
+
+  function filterEvents(calendar: CalendarElement) {
+    const buttons = calendar.querySelectorAll(
+      ":scope > .fc-toolbar .fc-button.cal-filter"
+    );
+
+    const filters = Array.from(buttons).map((e) => {
+      return e.classList.toString().match(/\bfc-(\w*)-button\b/)?.[1];
+    });
+
+    calendar.dataset.filter = filters.join(" ");
+    calendar.calendar.render();
+  }
+
+  function downloadEvent(e) {
+    let icalString: string = "";
+    let source: string;
+
+    // Calendar IDs should be unique, add hostname as a suffix
+    if (e.source.url) {
+      source = new URL(e.source.url).hostname;
+    } else {
+      source = "group.calendar.google.com";
+    }
+
+    let event = {
+      start: e.start.getTime(),
+      end: e.end.getTime(),
+      title: e.title,
+      url: e.url,
+      uid: e.id + "@" + source,
+    };
+
+    ics.createEvent(event, (error, value) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      icalString = value;
+    });
+
+    if (!icalString) return;
+    const blob = new Blob([icalString], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+    return url;
+  }
+</script>
+
+<style lang="scss" is:global>
+  #calendar-popup {
+    position: absolute;
+    z-index: 100;
+    background-color: rgb(
+      var(--background-color, var(--page-background-color))
+    );
+    color: rgb(var(--text-color));
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: 0.5rem 0.5rem 1rem #00000033;
+    border: 1px solid rgb(var(--calendar-color));
+    border-left: 5px solid rgb(var(--calendar-color));
+
+    h3 {
+      max-width: 400px;
+    }
+  }
+
+  .fc .fc-event:not(.fc-daygrid-dot-event) {
+    border-radius: var(--border-radius);
+    // border-width: 2px;
+    // border-color: color-mix(
+    //   in oklch,
+    //   rgb(var(--calendar-color)) 80%,
+    //   rgb(var(--text-color))
+    // );
+    // background-color: rgb(var(--calendar-color));
+    // color: rgb(var(--text-color));
+    // font-size: var(--text-size-xxsmall);
+    font-family: var(--font-family);
+    padding: 0.2em 0.4em;
+    // padding-right: 0;
+
+    .fc-event-title {
+      // color: rgb(var(--text-color));
+      font-weight: bold;
+    }
+
+    .fc-event-time {
+      // padding: 0.5em;
+      // color: rgb(var(--text-color));
+      // color: white;
+      // font-weight: 400;
+      width: min-content;
+      flex-shrink: 0;
+      // background-color: #00000066;
+      // padding: 0 0.5em;
+      // border-radius: var(--border-radius);
+    }
+
+    &:not(.fc-event-start) {
+      // outline: 4px solid magenta;
+      // clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 5% 50%);
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+      mask-image: linear-gradient(to left, white 95%, 98%, transparent);
+      padding-left: 5%;
+    }
+
+    &:not(.fc-event-end) {
+      // outline: 4px solid magenta;
+      // clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
+      border-radius: var(--border-radius) 0 0 var(--border-radius);
+      mask-image: linear-gradient(to right, white 95%, 98%, transparent);
+    }
+  }
+
+  .fc-event-selected::after,
+  .fc-event:focus::after {
+    border-radius: var(--border-radius);
+  }
+
+  .fc-event {
+    --fc-event-border-color: rgb(var(--calendar-color));
+    --fc-event-bg-color: rgb(var(--calendar-color));
+    transition: opacity 0.1s ease-in-out;
+  }
+
+  .fc-event.filter-hidden {
+    opacity: 0.2;
+  }
+
+  .fc-toolbar-chunk:has(.cal-filter) .fc-button:not(.cal-filter) {
+    opacity: 0.2;
+  }
+
+  .fc-button.cal-filter {
+    opacity: 1;
+  }
+
+  .fc-button[class*="fc-cal"] {
+    --fc-button-bg-color: rgb(var(--calendar-color));
+    --fc-button-hover-bg-color: color-mix(
+      in oklch,
+      rgb(var(--calendar-color)) 80%,
+      black
+    );
+    transition: opacity 0.1s ease-in-out;
+  }
+
+  .cal0,
+  .fc-cal0-button {
+    --calendar-color: 255 89 94;
+  }
+  .cal1,
+  .fc-cal1-button {
+    --calendar-color: 255 202 58;
+  }
+  .cal2,
+  .fc-cal2-button {
+    --calendar-color: 138 201 38;
+  }
+  .cal3,
+  .fc-cal3-button {
+    --calendar-color: 25 130 196;
+  }
+  .cal4,
+  .fc-cal4-button {
+    --calendar-color: 106 76 147;
+  }
+</style>
