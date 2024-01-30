@@ -1,61 +1,53 @@
 ---
 import Section from "@layouts/Section.astro";
+import preferences from "@data/preferences.json";
 
-type eventSource =
+type EventSource =
   | { name?: string; googleCalendarId: string; className?: string; id?: string }
   | { name?: string; url: string; className?: string; id?: string };
 
+type ToolBar = { start?: string; center?: string; end?: string };
+
 export interface Props {
-  calendarEvents: [eventSource];
+  calendarEvents: [EventSource];
   classes?: any;
   key?: string;
 }
 
 const { calendarEvents, classes, key } = Astro.props;
 
-// const eventSources = [
-//   {
-//     googleCalendarId:
-//       "bayswaterses.com.au_n2q62d90t7m25m9n3d843pj0f4@group.calendar.google.com",
-//     className: "cal0 test",
-//   },
-//   {
-//     googleCalendarId:
-//       "bayswaterses.com.au_2mhqt62lv7rvdp675dnn6tjdr4@group.calendar.google.com",
-//     className: "cal1",
-//   },
-//   {
-//     googleCalendarId:
-//       "bayswaterses.com.au_sgt04lsr1705sm48jdhrdfgges@group.calendar.google.com",
-//     className: "cal2",
-//   },
-//   {
-//     googleCalendarId:
-//       "bayswaterses.com.au_mvu8uu7rhhsq9jde5ap6daq3fg@group.calendar.google.com",
-//     className: "cal3",
-//   },
-// ];
-
 const customButtons: Record<string, any> = {};
+const filterButtons: Record<string, any> = {};
+const subscribeButtons: Record<string, any> = {};
 
-const headerToolbar: { start?: string; center?: string; end?: string } = {
+const headerToolbar: ToolBar = {
   start: "title",
   center: "",
   end: "prev,today,next dayGridMonth,listWeek",
 };
 
+const footerToolbar: ToolBar = {};
+
 for (let i = 0; i < calendarEvents.length; i++) {
   let cid = `cal${i}`;
   calendarEvents[i].className = cid;
   calendarEvents[i].id = cid;
-  customButtons[cid] = { text: calendarEvents[i].name };
+  filterButtons[`${cid}-filter`] = { text: calendarEvents[i].name };
+  subscribeButtons[`${cid}-subscribe`] = { text: calendarEvents[i].name };
 }
 
-if (Object.keys(customButtons).length - 1) {
-  headerToolbar.center = Object.keys(customButtons).join(" ");
+if (Object.keys(filterButtons).length - 1) {
+  headerToolbar.center = Object.keys(filterButtons).join(" ");
 }
 
-const calendarOptions = { calendarEvents, customButtons, headerToolbar };
+footerToolbar.start = Object.keys(subscribeButtons).join(" ");
+
+const calendarOptions = {
+  calendarEvents,
+  customButtons: Object.assign(filterButtons, subscribeButtons),
+  headerToolbar,
+  footerToolbar,
+};
 ---
 
 <Section component="calendar" classes={{ ...classes }} {...Astro.props}>
@@ -65,11 +57,20 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     set:html={JSON.stringify(calendarOptions)}
     type="application/json"
   />
-  <div id={`_calendar-${key}`} class="_calendar"></div>
+  <div
+    id={`_calendar-${key}`}
+    class="_calendar"
+    data-api-key={preferences.API.google_calendar.api_key}
+  >
+  </div>
 </Section>
 
 <script>
-  import { Calendar, type EventClickArg } from "@fullcalendar/core";
+  import {
+    Calendar,
+    type EventClickArg,
+    type EventApi,
+  } from "@fullcalendar/core";
   import dayGridPlugin from "@fullcalendar/daygrid";
   import listPlugin from "@fullcalendar/list";
   import googleCalendarPlugin from "@fullcalendar/google-calendar";
@@ -82,6 +83,7 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     flip,
   } from "@floating-ui/dom";
   import * as ics from "ics";
+  import { navigate } from "astro:transitions/client";
 
   document.addEventListener("DOMContentLoaded", setupCalendar);
   document.addEventListener("astro:after-swap", setupCalendar);
@@ -94,6 +96,9 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     calendarSections.forEach((section) => {
       const calendarEl = section.querySelector("._calendar") as CalendarElement;
       if (!calendarEl) return;
+      const apiKey = calendarEl.dataset?.apiKey;
+
+      if (!apiKey) return;
       const calendarSourceEl = calendarEl.parentElement?.querySelector(
         ":scope script.calendar-events"
       );
@@ -103,28 +108,53 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
 
       Object.entries(customButtons).forEach(
         ([buttonName, button]: [string, any]) => {
-          button.click = function (event: MouseEvent, element: HTMLElement) {
-            element.classList.toggle("cal-filter");
-            filterEvents(calendarEl);
-          };
+          if (buttonName.endsWith("-filter")) {
+            button.click = function (event: MouseEvent, element: HTMLElement) {
+              element.classList.toggle("cal-filter");
+              filterEvents(calendarEl);
+            };
+          } else if (buttonName.endsWith("-subscribe")) {
+            const calendarId = buttonName.match(/^(\w*)-subscribe$/)?.[1];
+            button.click = function (event: MouseEvent, element: HTMLElement) {
+              const source = calendarOptions.calendarEvents.find(
+                (source: EventApi) => source?.id === calendarId
+              );
+              if (!source) return;
+              let subscribeURL = "";
+
+              if (source.googleCalendarId) {
+                subscribeURL =
+                  "webcal://calendar.google.com/calendar/ical/" +
+                  source.googleCalendarId.replace(/@/, "%40") +
+                  "/public/basic.ics";
+              } else if ((source.format = "ics")) {
+                subscribeURL = source.url.replace(/^https?/, "webcal");
+              }
+
+              if (!subscribeURL) return;
+              navigate(subscribeURL);
+            };
+          }
         }
       );
 
       var calendar = new Calendar(calendarEl, {
         plugins: [dayGridPlugin, listPlugin, googleCalendarPlugin],
         initialView: "dayGridMonth",
-        googleCalendarApiKey: "AIzaSyCvQRwk3SQkKAVs3RGWUdzL0XRIA9_mDrA",
+        googleCalendarApiKey: apiKey,
         eventSources: calendarOptions.calendarEvents,
         eventClick: onClick,
         eventClassNames: function (arg: { event: any }) {
           console.log("asadadad");
-          if (!calendarEl.dataset.filter) return;
-          if (calendarEl.dataset.filter?.includes(arg.event.source.id)) return;
+          if (!calendarEl.dataset.filter) return "";
+          if (calendarEl.dataset.filter?.includes(arg.event.source.id))
+            return "";
           return "filter-hidden";
           // e.el.classList.add("filter-hidden");
         },
         customButtons,
         headerToolbar: calendarOptions.headerToolbar,
+        footerToolbar: calendarOptions.footerToolbar,
       });
       calendarEl.calendar = calendar;
       calendar.render();
@@ -166,11 +196,14 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
         : `${fromDate}${fromTime}`;
 
     popup.id = "calendar-popup";
-    popup.innerHTML = `<h3>${event.title}</h3>
-    <p>${timeString}</p>
-    <a href="${downloadEvent(event)}" download="${
-      event.title
-    }.ics">Download Event</a>`;
+    popup.innerHTML = `<h3 class="event-title">${event.title}</h3>
+    <p class="event-time">${timeString}</p>
+    <div class="event-links">
+      <a href="${event.url}">Open Link</a>
+      <a href="${downloadEvent(event)}" download="${
+        event.title
+      }.ics">Download Event</a>
+    </div>`;
 
     document.getElementById("calendar-popup")?.remove();
     document.addEventListener("click", closeCalendarPopup);
@@ -178,7 +211,7 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
 
     const options: ComputePositionConfig = {
       placement: "top",
-      middleware: [offset(15), flip(), shift()],
+      middleware: [offset(10), flip(), shift({ padding: 20 })],
     };
 
     (el as FloatingUIElement)._cleanup = autoUpdate(el, popup, () => {
@@ -199,23 +232,25 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     );
 
     const filters = Array.from(buttons).map((e) => {
-      return e.classList.toString().match(/\bfc-(\w*)-button\b/)?.[1];
+      return e.classList.toString().match(/\bfc-(\w*)-filter-button\b/)?.[1];
     });
 
     calendar.dataset.filter = filters.join(" ");
     calendar.calendar.render();
   }
 
-  function downloadEvent(e) {
+  function downloadEvent(e: EventApi) {
     let icalString: string = "";
     let source: string;
 
     // Calendar IDs should be unique, add hostname as a suffix
-    if (e.source.url) {
+    if (e.source?.url) {
       source = new URL(e.source.url).hostname;
     } else {
       source = "group.calendar.google.com";
     }
+
+    if (!(e.start && e.end)) return;
 
     let event = {
       start: e.start.getTime(),
@@ -258,51 +293,38 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     h3 {
       max-width: 400px;
     }
+
+    .event-links {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      justify-content: space-between;
+    }
   }
 
-  .fc .fc-event:not(.fc-daygrid-dot-event) {
+  .fc .fc-dayGridMonth-view .fc-event:not(.fc-daygrid-dot-event) {
     border-radius: var(--border-radius);
-    // border-width: 2px;
-    // border-color: color-mix(
-    //   in oklch,
-    //   rgb(var(--calendar-color)) 80%,
-    //   rgb(var(--text-color))
-    // );
-    // background-color: rgb(var(--calendar-color));
-    // color: rgb(var(--text-color));
-    // font-size: var(--text-size-xxsmall);
     font-family: var(--font-family);
     padding: 0.2em 0.4em;
-    // padding-right: 0;
 
     .fc-event-title {
-      // color: rgb(var(--text-color));
+      color: rgb(var(--calendar-contrast-color, var(--text-color)));
+      // filter: invert(1) grayscale(1) contrast(999);
       font-weight: bold;
     }
 
     .fc-event-time {
-      // padding: 0.5em;
-      // color: rgb(var(--text-color));
-      // color: white;
-      // font-weight: 400;
-      width: min-content;
+      font-weight: 400;
       flex-shrink: 0;
-      // background-color: #00000066;
-      // padding: 0 0.5em;
-      // border-radius: var(--border-radius);
     }
 
     &:not(.fc-event-start) {
-      // outline: 4px solid magenta;
-      // clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 5% 50%);
       border-radius: 0 var(--border-radius) var(--border-radius) 0;
       mask-image: linear-gradient(to left, white 95%, 98%, transparent);
       padding-left: 5%;
     }
 
     &:not(.fc-event-end) {
-      // outline: 4px solid magenta;
-      // clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
       border-radius: var(--border-radius) 0 0 var(--border-radius);
       mask-image: linear-gradient(to right, white 95%, 98%, transparent);
     }
@@ -317,6 +339,11 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     --fc-event-border-color: rgb(var(--calendar-color));
     --fc-event-bg-color: rgb(var(--calendar-color));
     transition: opacity 0.1s ease-in-out;
+    color: black;
+  }
+
+  .fc-list-event-title {
+    color: black;
   }
 
   .fc-event.filter-hidden {
@@ -331,34 +358,62 @@ const calendarOptions = { calendarEvents, customButtons, headerToolbar };
     opacity: 1;
   }
 
-  .fc-button[class*="fc-cal"] {
+  .fc-toolbar-chunk:has(.fc-button[class*="-subscribe"])::before {
+    content: "Subscribe To:";
+    padding: 1rem;
+  }
+
+  .fc-toolbar-chunk .fc-button[class*="-subscribe"] {
+    background-color: transparent;
+    color: rgb(var(--text-color));
+
+    &::before {
+      content: "";
+      display: inline-block;
+      border: 4px solid rgb(var(--calendar-color));
+      border-radius: 4px;
+      width: 0;
+      height: 0;
+      padding: 0;
+      line-height: 0;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .fc-button[class*="-filter"] {
     --fc-button-bg-color: rgb(var(--calendar-color));
     --fc-button-hover-bg-color: color-mix(
       in oklch,
       rgb(var(--calendar-color)) 80%,
       black
     );
+    color: rgb(var(--calendar-contrast-color, var(--text-color)));
     transition: opacity 0.1s ease-in-out;
   }
 
   .cal0,
-  .fc-cal0-button {
+  .fc-button[class*="fc-cal0"] {
+    --calendar-contrast-color: 255 255 255;
     --calendar-color: 255 89 94;
   }
   .cal1,
-  .fc-cal1-button {
+  .fc-button[class*="fc-cal1"] {
+    --calendar-contrast-color: 0 0 0;
     --calendar-color: 255 202 58;
   }
   .cal2,
-  .fc-cal2-button {
+  .fc-button[class*="fc-cal2"] {
+    --calendar-contrast-color: 0 0 0;
     --calendar-color: 138 201 38;
   }
   .cal3,
-  .fc-cal3-button {
+  .fc-button[class*="fc-cal3"] {
+    --calendar-contrast-color: 255 255 255;
     --calendar-color: 25 130 196;
   }
   .cal4,
-  .fc-cal4-button {
+  .fc-button[class*="fc-cal4"] {
+    --calendar-contrast-color: 255 255 255;
     --calendar-color: 106 76 147;
   }
 </style>

@@ -10,10 +10,10 @@ declare global {
   }
 
   interface CalendarElement extends HTMLElement {
-    calendar: any;
+    calendar?: any;
   }
 
   interface FloatingUIElement extends HTMLElement {
-    _cleanup: Function;
+    _cleanup?: Function;
   }
 }
