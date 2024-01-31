@@ -115,23 +115,23 @@ const calendarOptions = {
             };
           } else if (buttonName.endsWith("-subscribe")) {
             const calendarId = buttonName.match(/^(\w*)-subscribe$/)?.[1];
+            const source = calendarOptions.calendarEvents.find(
+              (source: EventApi) => source?.id === calendarId
+            );
+            if (!source) return;
+            let subscribeURL = "";
+
+            if (source.googleCalendarId) {
+              subscribeURL =
+                "webcal://calendar.google.com/calendar/ical/" +
+                source.googleCalendarId.replace(/@/, "%40") +
+                "/public/basic.ics";
+            } else if ((source.format = "ics")) {
+              subscribeURL = source.url.replace(/^https?/, "webcal");
+            }
+
+            if (!subscribeURL) return;
             button.click = function (event: MouseEvent, element: HTMLElement) {
-              const source = calendarOptions.calendarEvents.find(
-                (source: EventApi) => source?.id === calendarId
-              );
-              if (!source) return;
-              let subscribeURL = "";
-
-              if (source.googleCalendarId) {
-                subscribeURL =
-                  "webcal://calendar.google.com/calendar/ical/" +
-                  source.googleCalendarId.replace(/@/, "%40") +
-                  "/public/basic.ics";
-              } else if ((source.format = "ics")) {
-                subscribeURL = source.url.replace(/^https?/, "webcal");
-              }
-
-              if (!subscribeURL) return;
               navigate(subscribeURL);
             };
           }
@@ -389,6 +389,10 @@ const calendarOptions = {
     );
     color: rgb(var(--calendar-contrast-color, var(--text-color)));
     transition: opacity 0.1s ease-in-out;
+  }
+
+  .fc-icon {
+    line-height: 0.7;
   }
 
   .cal0,
