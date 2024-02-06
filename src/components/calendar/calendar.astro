@@ -83,7 +83,6 @@ const calendarOptions = {
     flip,
   } from "@floating-ui/dom";
   import * as ics from "ics";
-  import { navigate } from "astro:transitions/client";
 
   document.addEventListener("DOMContentLoaded", setupCalendar);
   document.addEventListener("astro:after-swap", setupCalendar);
@@ -131,8 +130,12 @@ const calendarOptions = {
             }
 
             if (!subscribeURL) return;
+
             button.click = function (event: MouseEvent, element: HTMLElement) {
-              navigate(subscribeURL);
+              // navigate(subscribeURL);
+              const subscribeAnchor = document.createElement("a");
+              subscribeAnchor.setAttribute("href", subscribeURL);
+              subscribeAnchor.click();
             };
           }
         }

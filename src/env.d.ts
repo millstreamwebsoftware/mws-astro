@@ -16,4 +16,8 @@ declare global {
   interface FloatingUIElement extends HTMLElement {
     _cleanup?: Function;
   }
+
+  interface MapElement extends HTMLElement {
+    map?: any;
+  }
 }

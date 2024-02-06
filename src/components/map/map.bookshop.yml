@@ -16,6 +16,7 @@ blueprint:
   marker: false
   height: 40
   indent: true
+  mapId:
   style:
 
 _inputs:
@@ -44,6 +45,7 @@ _inputs:
         - terrain
   marker:
     type: switch
+    comment: Show a marker pin at the center of the map
   height:
     type: number
     comment: Map height, in percentage of browser window height (vh).
@@ -53,11 +55,16 @@ _inputs:
   indent:
     type: switch
   style:
-    type: select
-    options:
-      values: preferences.maps.styles
+    type: text
+    comment: Use a legacy map style loaded from src/styles/<style>.map.json
+    hidden: mapId
+  mapId:
+    type: text
+    label: Google Map ID
+    comment: Override map style with Google Cloud Map Styling. Enables usage of Vector Maps via Google Cloud Console.
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
+
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 # _inputs:

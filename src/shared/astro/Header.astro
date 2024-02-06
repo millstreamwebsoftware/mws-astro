@@ -83,13 +83,15 @@ const headerAreas =
 
   .logo {
     padding: 10px;
+    width: fit-content;
   }
 
   .logo img {
     object-fit: contain;
     object-position: left;
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: var(--header-height);
+    max-height: 100%;
   }
 
   @media only screen and (max-width: 768px) {
