@@ -57,7 +57,13 @@ const background = convertColorString(background_color);
   style={{ ...(background && { "--background-color": background }) }}
   class:list={["form", classes]}
 >
-  <form method="post" {action} {name} {id}>
+  <form
+    method="post"
+    {action}
+    {name}
+    {id}
+    enctype="application/x-www-form-urlencoded"
+  >
     {
       required && (
         <p>
