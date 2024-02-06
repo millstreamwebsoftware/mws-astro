@@ -2,90 +2,126 @@
 import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 
+// const styles = Object.entries(
+//   await import.meta.glob("@custom/*.map.json")
+// ).reduce<Record<string, any>>((i, n) => {
+//   let name = n[0]
+//     .split("/")
+//     .at(-1)
+//     ?.match(/(.*)\.map\.json$/)?.[1];
+//   if (!name) return i;
+//   i[name] = n[1];
+//   return i;
+// }, {});
+
+const styles = {};
+
 export interface props {
   lat: number;
   lng: number;
   zoom?: number;
   mapType?: string;
+  mapId?: string;
   marker?: boolean;
   height: number;
-  style?: any;
+  style?: string;
   indent?: boolean;
   key?: string;
 }
 
-const { lat, lng, zoom, marker, key, indent } = Astro.props;
+const { lat, lng, zoom, marker, key, indent, mapId, style } = Astro.props;
+
+let mapStyle;
+if ((style || "default") in styles && !mapId) {
+  mapStyle = await styles[style || "default"]();
+}
 
 const apiKey = preferences.API.google_maps.api_key;
 const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "hybrid";
-const mapId = "map-" + key;
+const id = "map-" + key;
 ---
 
 <Section component="map" {...Astro.props}>
+  {
+    mapStyle && (
+      <script
+        id={`map-style-${key}`}
+        class="map-style"
+        set:html={JSON.stringify(mapStyle)}
+        type="application/json"
+      />
+    )
+  }
   <div
-    id={mapId}
     class="map-box"
-    data-map={mapId}
+    data-map={id}
     data-lat={lat}
     data-lng={lng}
     data-zoom={zoom}
     data-marker={marker}
     data-map-type={mapType}
     data-api-key={apiKey}
+    data-map-id={mapId}
   >
   </div>
 </Section>
 
 <script>
   import { Loader } from "@googlemaps/js-api-loader";
-  import { styles } from "@custom/map.json";
+  // import { styles } from "@custom/map.json";
 
-  const apiKey = document
-    .querySelector("[data-map][data-api-key]")
-    ?.getAttribute("data-api-key");
+  document.addEventListener("DOMContentLoaded", setupMaps);
+  document.addEventListener("astro:after-swap", setupMaps);
 
-  const mapExists = document.querySelector("[data-map]");
+  function setupMaps() {
+    const maps = document.querySelectorAll("[data-map]");
 
-  // if (!apiKey) throw TypeError("Missing Google Maps API Key");
+    maps.forEach((mapElement) => {
+      if (!(mapElement instanceof HTMLElement)) return;
+      const apiKey = mapElement.dataset.apiKey;
 
-  if (mapExists && apiKey) gMapsLoader(apiKey);
+      if (!apiKey) return console.warn("Map missing API Key", mapElement);
 
-  function gMapsLoader(apiKey: string) {
-    const loader = new Loader({
-      apiKey,
-      version: "weekly",
-    });
+      const styleEl = mapElement.parentElement?.querySelector(
+        ":scope > script.map-style"
+      );
+      const { styles } = JSON.parse(styleEl?.innerHTML || "{}");
 
-    loader.load().then(async () => {
-      const { Map } = (await google.maps.importLibrary(
-        "maps"
-      )) as google.maps.MapsLibrary;
-      const { Marker } = (await google.maps.importLibrary(
-        "marker"
-      )) as google.maps.MarkerLibrary;
+      const loader = new Loader({
+        apiKey,
+        version: "weekly",
+      });
 
-      document.querySelectorAll("[data-map]").forEach((e, i) => {
-        if (!(e instanceof HTMLElement)) return;
+      loader.load().then(async () => {
+        const { Map } = (await google.maps.importLibrary(
+          "maps"
+        )) as google.maps.MapsLibrary;
+        const { Marker } = (await google.maps.importLibrary(
+          "marker"
+        )) as google.maps.MarkerLibrary;
 
         const position = {
-          lat: Number(e.dataset?.lat),
-          lng: Number(e.dataset?.lng),
+          lat: Number(mapElement.dataset?.lat),
+          lng: Number(mapElement.dataset?.lng),
         };
 
-        const map = new Map(e, {
+        const map = new Map(mapElement, {
           center: position,
-          zoom: Number(e.dataset?.zoom),
-          mapTypeId: e.dataset?.mapType,
-          ...(e.dataset?.mapType == "roadmap" && { styles: styles }),
+          zoom: Number(mapElement.dataset?.zoom),
+          mapTypeId: mapElement.dataset?.mapType,
+          styles,
+          mapId: mapElement.dataset?.mapId,
         });
 
-        if ("marker" in e.dataset) {
+        if ("marker" in mapElement.dataset) {
           new Marker({
             position,
             map,
           });
         }
+
+        // (mapElement as MapElement).map = map;
       });
     });
   }
