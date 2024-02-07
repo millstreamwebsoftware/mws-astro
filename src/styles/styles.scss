@@ -4,7 +4,7 @@
   --page-max-width: 1920px;
 
   --indent: min(8vw, calc(var(--page-max-width) * 0.08));
-  --vertical-indent: 1;
+  --vertical-indent: 0.5;
   --column-gap: calc(var(--indent) * 0.5);
   --gallery-gap: 1rem;
   --text-gap: 2rem;
