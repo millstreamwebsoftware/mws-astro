@@ -36,7 +36,11 @@ if ((style || "default") in styles && !mapId) {
   mapStyle = await styles[style || "default"]();
 }
 
-const apiKey = preferences.API.google_maps.api_key;
+// @ts-ignore
+const bookshop: boolean = ENV_BOOKSHOP_LIVE;
+const apiKey = bookshop
+  ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
+  : preferences.API.google_maps.api_key;
 const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "hybrid";
 const id = "map-" + key;
@@ -86,7 +90,9 @@ const id = "map-" + key;
       const styleEl = mapElement.parentElement?.querySelector(
         ":scope > script.map-style"
       );
-      const { styles } = JSON.parse(styleEl?.innerHTML || "{}");
+      const { styles } = styleEl?.innerHTML
+        ? JSON.parse(styleEl?.innerHTML)
+        : undefined;
 
       const loader = new Loader({
         apiKey,
