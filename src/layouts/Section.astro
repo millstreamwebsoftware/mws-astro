@@ -81,6 +81,10 @@ const expando = classList.includes("expando") ? true : false;
       max-height: 100%;
       overflow: hidden;
     }
+
+    .expando-button {
+      bottom: calc(var(--indent) * 0.5 - 1.5rem);
+    }
   }
 
   [data-expando] > .expando-overlay::after {
@@ -103,21 +107,24 @@ const expando = classList.includes("expando") ? true : false;
     cursor: pointer;
   }
 
-  // section.columns .expando-overlay {
-  //   padding-bottom: 5rem;
-  //   margin-top: -2rem;
-  // }
-  // section:is(.no-indent, .no-indent-bottom) {
-  //   .expando-overlay {
-  //     padding-bottom: 5rem;
-  //   }
-  // }
+  section.columns .expando-overlay {
+    padding-bottom: 5rem;
+    margin-top: -2rem;
+  }
+  section:is(.no-indent, .no-indent-bottom) {
+    .expando-overlay {
+      padding-bottom: 5rem;
+    }
+  }
+
+  section.expando:not([data-expando]) .expando-button {
+    bottom: calc(var(--indent) * -0.25);
+  }
 
   .expando-button {
     position: absolute;
     z-index: 11;
     // bottom: 2rem;
-    bottom: calc(var(--indent) * 0.5 - 1.5rem);
     left: 50%;
     display: flex;
     transform: translate(-1.5rem);
