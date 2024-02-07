@@ -35,7 +35,7 @@
   --header-background-color-bottom: 0 0 0 / 0;
   --header-color: 255 255 255;
   --header-height: 100px;
-  --header-offset-transparent: 0;
+  --header-offset-transparent: var(--header-height);
 
   --border-radius: 0.3rem;
 
