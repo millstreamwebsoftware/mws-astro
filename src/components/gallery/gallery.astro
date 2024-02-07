@@ -6,8 +6,15 @@ import Section from "@layouts/Section.astro";
 
 const md = new MarkdownIt({ html: true });
 
+type Image = {
+  image: string;
+  title?: string;
+  description?: string;
+  link?: string;
+};
+
 export interface Props {
-  images: any[];
+  images: Image[];
   height: number;
   columns: number;
   gap: boolean;
