@@ -1,0 +1,35 @@
+---
+import Label from "@components/form/label.astro";
+export interface Props {
+  name: string;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  key?: string;
+}
+
+const { name, label, placeholder, required, key } = Astro.props;
+const id = (name || "") + "-" + (key || "");
+---
+
+<div class="input email">
+  <Label for={id} {required}>{label}</Label>
+  <input
+    type="tel"
+    name={name}
+    {id}
+    {required}
+    aria-required={required}
+    placeholder={placeholder}
+    maxlength="15"
+  />
+</div>
+
+<style>
+  input {
+    width: 100%;
+    background-color: rgb(var(--form-background));
+    border-radius: var(--border-radius);
+    border: var(--form-border);
+  }
+</style>
