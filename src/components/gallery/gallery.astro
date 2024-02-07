@@ -3,6 +3,7 @@ import MarkdownIt from "markdown-it";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Imgix from "@shared/Imgix.astro";
 import Section from "@layouts/Section.astro";
+import { link } from "fs/promises";
 
 const md = new MarkdownIt({ html: true });
 
@@ -21,14 +22,16 @@ export interface Props {
   aspect: number;
   indent: boolean;
   lightbox?: boolean;
+  linkgallery?: boolean;
   placeholder?: boolean;
   classes?: any;
   key?: string;
 }
 
-const { images, height, indent, lightbox, key, classes, placeholder } =
+const { images, height, indent, linkgallery, key, classes, placeholder } =
   Astro.props;
 
+const lightbox = Astro.props.lightbox && !linkgallery;
 const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;
 const gap = Astro.props.gap ?? true;
@@ -74,6 +77,8 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
               )}
             </figcaption>
           )}
+
+          {asset?.link && linkgallery && <a href={asset.link} />}
         </figure>
       ))
     }
@@ -118,6 +123,11 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
     grid-template-rows: 1fr;
     grid-auto-flow: row;
     gap: var(--gallery-gap);
+  }
+
+  .gallery-item a {
+    position: absolute;
+    inset: 0;
   }
 </style>
 
