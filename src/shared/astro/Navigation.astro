@@ -1,5 +1,5 @@
 ---
-import preferences from "@data/preferences.json";
+// import preferences from "@data/preferences.json";
 import Icon from "./icon.astro";
 import type { TreeNode } from "@mws-astro/middleware";
 
@@ -60,7 +60,7 @@ const Items = depth ? Fragment : "div";
         pages.children &&
           Object.values(pages.children).map((page: TreeNode, i) => {
             // Skip home element if show_home is false
-            if (!preferences.header.show_home && page.href === "") return;
+            // if (!preferences.header.show_home && page.href === "") return;
             const children =
               page.children && Object.keys(page.children)?.length;
             const id = `nav-${
