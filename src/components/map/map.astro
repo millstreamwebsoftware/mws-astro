@@ -14,7 +14,21 @@ import preferences from "@data/preferences.json";
 //   return i;
 // }, {});
 
-const styles = {};
+const styles = Object.entries(await Astro.glob("@custom/*.map.json")).reduce<
+  Record<string, any>
+>((i, n) => {
+  let name = n[0]
+    .split("/")
+    .at(-1)
+    ?.match(/(.*)\.map\.json$/)?.[1];
+  if (!name) return i;
+  i[name] = n[1];
+  return i;
+}, {});
+
+// const styles = {};
+
+console.log(styles);
 
 export interface props {
   lat: number;
@@ -33,7 +47,7 @@ const { lat, lng, zoom, marker, key, indent, mapId, style } = Astro.props;
 
 let mapStyle;
 if ((style || "default") in styles && !mapId) {
-  mapStyle = await styles[style || "default"]();
+  mapStyle = styles[style || "default"];
 }
 
 // @ts-ignore
