@@ -57,7 +57,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
       images.map((asset, i) => (
         <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
           <Imgix
-            image={asset.image?.src || asset.image}
+            image={asset.image}
             alt=""
             loading="lazy"
             decoding="async"
@@ -90,7 +90,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
               class:list={{ caption: asset.title || asset.description }}
             >
               <Imgix
-                image={asset.image?.src || asset.image}
+                image={asset.image}
                 alt=""
                 loading="lazy"
                 decoding="async"
