@@ -133,10 +133,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         showArrows && (
           <div class="glide__arrows" data-glide-el="controls">
             <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
-              <Icon name="carbon:chevron-left">
+              <Icon name="carbon:chevron-left" />
             </button>
             <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
-              <Icon name="carbon:chevron-right">
+              <Icon name="carbon:chevron-right" />
             </button>
           </div>
         )
@@ -157,32 +157,37 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 <script>
   import Glide from "@glidejs/glide";
 
-  document.querySelectorAll("div[data-glide]").forEach((e, i) => {
-    if (!(e instanceof HTMLElement)) return;
+  document.addEventListener("DOMContentLoaded", setupGlide);
+  document.addEventListener("astro:after-swap", setupGlide);
 
-    if (!e.matches(".ENV_EDITOR *")) {
-      const id = e.getAttribute("id");
+  function setupGlide() {
+    document.querySelectorAll("div[data-glide]").forEach((e, i) => {
+      if (!(e instanceof HTMLElement)) return;
 
-      const glideOptions: Partial<Glide.Options> = {
-        autoplay: Number(e.dataset?.autoplay) || false,
-        focusAt:
-          e.dataset?.focus == "center"
-            ? "center"
-            : Number(e.dataset?.focus) || 0,
-        bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
-        gap: Number(e.dataset?.gap) || 0,
-        type:
-          e.dataset?.sliderType?.toLowerCase() == "carousel"
-            ? "carousel"
-            : "slider",
-        perView: Number(e.dataset?.perView) || undefined,
-        animationDuration: Number(e.dataset?.animationDuration) || 0,
-        hoverpause: "hoverpause" in e.dataset,
-      };
+      if (!e.matches(".ENV_EDITOR *")) {
+        const id = e.getAttribute("id");
 
-      new Glide(`#${id}`, glideOptions).mount();
-    }
-  });
+        const glideOptions: Partial<Glide.Options> = {
+          autoplay: Number(e.dataset?.autoplay) || false,
+          focusAt:
+            e.dataset?.focus == "center"
+              ? "center"
+              : Number(e.dataset?.focus) || 0,
+          bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
+          gap: Number(e.dataset?.gap) || 0,
+          type:
+            e.dataset?.sliderType?.toLowerCase() == "carousel"
+              ? "carousel"
+              : "slider",
+          perView: Number(e.dataset?.perView) || undefined,
+          animationDuration: Number(e.dataset?.animationDuration) || 0,
+          hoverpause: "hoverpause" in e.dataset,
+        };
+
+        new Glide(`#${id}`, glideOptions).mount();
+      }
+    });
+  }
 </script>
 
 <style>
@@ -307,7 +312,9 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     border-radius: 0.5rem;
     background-color: #bbbbbb44;
     box-shadow: 0 0 0.2rem #00000011;
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition:
+      background-color 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
   }
 
   .glide__bullet--active {
