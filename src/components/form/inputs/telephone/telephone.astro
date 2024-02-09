@@ -12,7 +12,7 @@ const { name, label, placeholder, required, key } = Astro.props;
 const id = (name || "") + "-" + (key || "");
 ---
 
-<div class="input email">
+<div class="input telephone">
   <Label for={id} {required}>{label}</Label>
   <input
     type="tel"
