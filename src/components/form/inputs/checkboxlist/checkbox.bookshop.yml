@@ -2,9 +2,9 @@
 spec:
   structures:
     - form_blocks
-  label: Checkbox
-  description: Yes or No Toggle
-  icon: check_box
+  label: Checkbox List
+  description: A list of checkboxes for selecting multiple items
+  icon: checklist
   tags: ["form", "input"]
 
 # Defines the structure of this component, as well as the default values
@@ -13,7 +13,8 @@ blueprint:
   label: ""
   checkboxes:
   other: false
-  required:
+  minchecked: 0
+  maxchecked: 0
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
@@ -33,6 +34,17 @@ _inputs:
   other:
     type: checkbox
     comment: Add text input "Other" field
-  required:
-    type: checkbox
-    comment: Require this field to be filled to submit.
+  minchecked:
+    type: number
+    label: Minimum Checked
+    comment: Minimum number of checked boxes in submitted list. Set to 0 to disable.
+    options:
+      step: 1
+      min: 0
+  maxchecked:
+    type: number
+    label: Maximum Checked
+    comment: Maximum number of checked boxes in submitted list. Set to 0 to disable.
+    options:
+      step: 1
+      min: 0
