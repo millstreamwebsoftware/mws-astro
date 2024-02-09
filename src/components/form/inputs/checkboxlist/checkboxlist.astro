@@ -1,0 +1,75 @@
+---
+import Label from "@components/form/label.astro";
+export interface Props {
+  name: string;
+  label: string;
+  checkboxes: string[];
+  other: boolean;
+  required: boolean;
+  key?: string;
+}
+
+const { name, label, checkboxes, required, key } = Astro.props;
+// const other = Astro.props.other ? true : undefined;
+const id = (name || "") + "-" + (key || "");
+
+// {required}
+// aria-required={required}
+---
+
+<div class:list={["input", "checkboxlist", { required }]}>
+  <Label for={id} {required}>{label}</Label>
+  <ul>
+    {
+      checkboxes.map((checkbox, index) => {
+        return (
+          <li>
+            <input
+              type="checkbox"
+              name={`${name}-${index}`}
+              id={`${id}-${index}`}
+            />
+            <Label for={`${id}-${index}`}>{checkbox}</Label>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", setupCheckboxList);
+  document.addEventListener("astro:after-swap", setupCheckboxList);
+
+  function setupCheckboxList() {
+    const checkboxLists = document.querySelectorAll(".input.checkboxlist");
+
+    checkboxLists.forEach((checkboxList) => {
+      if (checkboxList.matches(".required")) {
+        checkboxList.querySelectorAll("input");
+      }
+    });
+  }
+</script>
+
+<style>
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.2rem 1rem;
+  }
+
+  input {
+    flex: 0 1 1em;
+  }
+
+  label {
+    margin: 0;
+  }
+</style>
