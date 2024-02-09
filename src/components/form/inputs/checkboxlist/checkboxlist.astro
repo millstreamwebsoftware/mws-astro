@@ -5,11 +5,13 @@ export interface Props {
   label: string;
   checkboxes: string[];
   other: boolean;
-  required: boolean;
+  minchecked: number;
+  maxchecked: number;
   key?: string;
 }
 
-const { name, label, checkboxes, required, key } = Astro.props;
+const { name, label, checkboxes, other, minchecked, maxchecked, key } =
+  Astro.props;
 // const other = Astro.props.other ? true : undefined;
 const id = (name || "") + "-" + (key || "");
 
@@ -17,22 +19,33 @@ const id = (name || "") + "-" + (key || "");
 // aria-required={required}
 ---
 
-<div class:list={["input", "checkboxlist", { required }]}>
-  <Label for={id} {required}>{label}</Label>
-  <ul>
+<div class:list={["input", "checkboxlist"]}>
+  <Label for={id} required={minchecked}>{label}</Label>
+  <ul data-minchecked={minchecked} data-maxchecked={maxchecked}>
     {
       checkboxes.map((checkbox, index) => {
         return (
           <li>
-            <input
-              type="checkbox"
-              name={`${name}-${index}`}
-              id={`${id}-${index}`}
-            />
+            <input type="checkbox" {name} id={`${id}-${index}`} />
             <Label for={`${id}-${index}`}>{checkbox}</Label>
           </li>
         );
       })
+    }
+    {
+      other && (
+        <li class="other">
+          <input class="other" type="checkbox" id={`${id}-other`} />
+          <Label for={`${id}-other`}>Other:</Label>
+          <input
+            class="other"
+            type="text"
+            data-name={`${name}-other`}
+            aria-required="true"
+            required
+          />
+        </li>
+      )
     }
   </ul>
 </div>
@@ -41,13 +54,77 @@ const id = (name || "") + "-" + (key || "");
   document.addEventListener("DOMContentLoaded", setupCheckboxList);
   document.addEventListener("astro:after-swap", setupCheckboxList);
 
+  function setChecklistValidity(e: Event) {
+    let checkboxList = e.currentTarget as HTMLElement;
+    if (!checkboxList) return;
+
+    let lowerBound = Number(checkboxList.dataset.minchecked) ?? 0;
+    let upperBound = Number(checkboxList.dataset.maxchecked) ?? 0;
+
+    const checkboxes = checkboxList.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"]'
+    );
+
+    const checkedCount = Array.from(checkboxes).filter(
+      (checkbox) => checkbox.checked
+    ).length;
+
+    switch (true) {
+      case checkedCount < lowerBound:
+        checkboxes[0].setCustomValidity(
+          `At least ${lowerBound} checkbox${lowerBound == 1 ? "" : "es"} must be selected. Select ${lowerBound - checkedCount} more checkbox${lowerBound - checkedCount == 1 ? "" : "es"}.`
+        );
+        break;
+
+      case checkedCount > upperBound && upperBound > 0:
+        checkboxes[0].setCustomValidity(
+          `At most ${upperBound} checkbox${upperBound == 1 ? "" : "es"} must be selected. Select ${checkedCount - upperBound} fewer checkbox${checkedCount - upperBound == 1 ? "" : "es"}.`
+        );
+        break;
+
+      default:
+        checkboxes[0].setCustomValidity(``);
+        break;
+    }
+  }
+
+  function updateOtherInput(e: Event) {
+    const checkbox = e.currentTarget as HTMLInputElement;
+    const textinput = checkbox.parentElement?.querySelector<HTMLInputElement>(
+      ':scope > input.other[type="text"]'
+    );
+    const checked = checkbox.checked;
+
+    if (!textinput) return;
+
+    textinput.toggleAttribute("hidden", !checked);
+    textinput.toggleAttribute("required", checked);
+
+    // Toggle name to prevent unwanted data submission
+    if (checked) {
+      textinput.setAttribute("name", textinput.dataset.name || "");
+    } else {
+      textinput.removeAttribute("name");
+    }
+  }
+
   function setupCheckboxList() {
-    const checkboxLists = document.querySelectorAll(".input.checkboxlist");
+    const checkboxLists = document.querySelectorAll(".input.checkboxlist > ul");
 
     checkboxLists.forEach((checkboxList) => {
-      if (checkboxList.matches(".required")) {
-        checkboxList.querySelectorAll("input");
+      const checkboxesEl = checkboxList as HTMLElement;
+      if (
+        Number(checkboxesEl.dataset.minchecked) > 0 ||
+        Number(checkboxesEl.dataset.maxchecked) > 0
+      ) {
+        checkboxesEl.addEventListener("change", setChecklistValidity);
       }
+
+      const other = checkboxesEl.querySelector(
+        ':scope input.other[type="checkbox"]'
+      );
+      other?.addEventListener("change", updateOtherInput);
+      other?.dispatchEvent(new Event("change")); // Trigger update to ensure correct state on load
     });
   }
 </script>
@@ -68,6 +145,14 @@ const id = (name || "") + "-" + (key || "");
   input {
     flex: 0 1 1em;
   }
+
+  /* input.other[type="text"] {
+    display: none;
+  }
+
+  input.other[type="checkbox"]:checked ~ input.other[type="text"] {
+    display: block;
+  } */
 
   label {
     margin: 0;
