@@ -1,0 +1,34 @@
+---
+import Label from "@components/form/label.astro";
+export interface Props {
+  name: string;
+  label: string;
+  type: "date" | "time" | "datetime";
+  required: boolean;
+  key?: string;
+}
+
+const { name, label, required, key } = Astro.props;
+// const minlength = Astro.props.minlength ? Astro.props.minlength : undefined;
+// const maxlength = Astro.props.maxlength ? Astro.props.maxlength : undefined;
+const id = (name || "") + "-" + (key || "");
+
+var type: "date" | "time" | "datetime-local" =
+  Astro.props.type == "datetime"
+    ? "datetime-local"
+    : Astro.props.type || "datetime-local";
+---
+
+<div class="input datetime">
+  <Label for={id} {required}>{label}</Label>
+  <input {type} name={name} {id} {required} aria-required={required} />
+</div>
+
+<style>
+  input {
+    width: 100%;
+    background-color: rgb(var(--form-background));
+    border-radius: var(--border-radius);
+    border: var(--form-border);
+  }
+</style>
