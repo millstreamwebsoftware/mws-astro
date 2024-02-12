@@ -27,6 +27,18 @@ var md;
 // @ts-ignore
 if (ENV_BOOKSHOP_LIVE) {
   md = new MarkdownIt({ html: true });
+} else {
+  // Get site specific custom snippets from src/snippets.ts
+
+  const { "/src/snippets.ts": promisedSnippets } = await import.meta.glob<
+    Record<string, any>
+  >("/src/snippets.ts");
+
+  const snippets = (await promisedSnippets()).snippets;
+
+  if (snippets) {
+    Object.assign(substitutions, snippets);
+  }
 }
 ---
 
