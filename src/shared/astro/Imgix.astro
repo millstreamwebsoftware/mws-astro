@@ -162,12 +162,19 @@ let height =
 
 // Figure out the aspect ratio of the served image
 aspect = width && height ? width / height : undefined;
+let placeholderString: string | undefined;
+let placeholderStyle;
 
-let webpString = `data:image/webp;base64,${plData}`;
+if (placeholder) {
+  let webpString = `data:image/webp;base64,${plData}`;
+
+  // Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
+  placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='none' href='${webpString}'/%3e%3c/svg%3e`;
+  placeholderStyle = {
+    "background-image": `url("${placeholderString}")`,
+  };
+}
 // let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage href='${webpString}' preserveAspectRatio='none' width="100%" height="100%"/%3e%3c/svg%3e`;
-
-// Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
-let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='none' href='${webpString}'/%3e%3c/svg%3e`;
 ---
 
 <>
@@ -188,16 +195,14 @@ let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000
         {srcset}
         {src}
         {alt}
-        class:list={fit}
+        class:list={[fit]}
         {loading}
         {decoding}
         {sizes}
         {width}
         {height}
         data-aspect={aspect}
-        style={{
-          "background-image": `url("${placeholderString}")`,
-        }}
+        style={placeholderStyle}
       />
     )
   }

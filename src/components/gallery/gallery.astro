@@ -18,6 +18,7 @@ export interface Props {
   height: number;
   columns: number;
   gap: boolean;
+  fit?: "cover" | "contain";
   aspect: number;
   indent: boolean;
   lightbox?: boolean;
@@ -34,6 +35,7 @@ const lightbox = Astro.props.lightbox && !linkgallery;
 const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;
 const gap = Astro.props.gap ?? true;
+const fit = Astro.props.fit ?? "cover";
 const id = `gallery-${key}`;
 
 const sizes = `(max-width: 768px) calc((100vw / 2) - (${
@@ -61,6 +63,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
             alt=""
             loading="lazy"
             decoding="async"
+            {fit}
             resizeFit="crop"
             crop="faces,entropy"
             aspect={aspect}
@@ -148,7 +151,7 @@ const sizes = `(max-width: 768px) calc((100vw / 2) - (${
       img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        // object-fit: cover;
         object-position: center;
         aspect-ratio: var(--aspect);
       }
