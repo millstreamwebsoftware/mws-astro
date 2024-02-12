@@ -20,8 +20,8 @@ const id = (name || "") + "-" + (key || "");
 ---
 
 <div class:list={["input", "checkboxlist"]}>
-  <Label for={id} required={minchecked}>{label}</Label>
-  <ul data-minchecked={minchecked} data-maxchecked={maxchecked}>
+  <Label for={id} required={!!minchecked}>{label}</Label>
+  <ul {id} data-minchecked={minchecked} data-maxchecked={maxchecked}>
     {
       checkboxes.map((checkbox, index) => {
         return (
@@ -153,8 +153,4 @@ const id = (name || "") + "-" + (key || "");
   input.other[type="checkbox"]:checked ~ input.other[type="text"] {
     display: block;
   } */
-
-  label {
-    margin: 0;
-  }
 </style>
