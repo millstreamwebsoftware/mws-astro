@@ -40,10 +40,11 @@ if (styles && (style || "default") in styles && !mapId) {
   mapStyle = styles[style || "default"];
 }
 
-const apiKey = bookshop
-  ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
-  : preferences.API.google_maps.api_key;
-const height = Astro.props.height + "vh";
+const apiKey =
+  bookshop || true
+    ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
+    : preferences.API.google_maps.api_key;
+// const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "hybrid";
 const id = "map-" + key;
 ---
@@ -80,60 +81,66 @@ const id = "map-" + key;
   document.addEventListener("DOMContentLoaded", setupMaps);
   document.addEventListener("astro:after-swap", setupMaps);
 
-  function setupMaps() {
-    const maps = document.querySelectorAll("[data-map]");
+  async function setupMaps() {
+    const maps = document.querySelectorAll<HTMLElement>("[data-map]");
+    if (!maps.length) return;
 
-    maps.forEach((mapElement) => {
-      if (!(mapElement instanceof HTMLElement)) return;
-      const apiKey = mapElement.dataset.apiKey;
+    const apiKey = maps[0].dataset.apiKey;
+    if (!apiKey) return console.warn("Map missing API Key", maps[0]);
 
-      if (!apiKey) return console.warn("Map missing API Key", mapElement);
-
-      const styleEl = mapElement.parentElement?.querySelector(
-        ":scope > script.map-style"
+    if ("google" in window && google?.maps != undefined) {
+      console.debug(
+        "[map.astro] Initialising map with existing Google Maps instance"
       );
-      const styles = styleEl?.innerHTML
-        ? JSON.parse(styleEl?.innerHTML)?.styles
-        : undefined;
-
+    } else {
       const loader = new Loader({
         apiKey,
         version: "weekly",
       });
 
-      loader.load().then(async () => {
-        const { Map } = (await google.maps.importLibrary(
-          "maps"
-        )) as google.maps.MapsLibrary;
-        const { Marker } = (await google.maps.importLibrary(
-          "marker"
-        )) as google.maps.MarkerLibrary;
+      await loader.importLibrary("maps");
+      await loader.importLibrary("marker");
+    }
 
-        const position = {
-          lat: Number(mapElement.dataset?.lat),
-          lng: Number(mapElement.dataset?.lng),
-        };
+    maps.forEach(initMap);
+  }
 
-        const mapOptions: google.maps.MapOptions = {
-          center: position,
-          zoom: Number(mapElement.dataset?.zoom),
-          mapTypeId: mapElement.dataset?.mapType,
-          mapId: mapElement.dataset?.mapId,
-          styles,
-        };
+  async function initMap(mapElement: MapElement) {
+    const { Map } = (await google.maps.importLibrary(
+      "maps"
+    )) as google.maps.MapsLibrary;
+    const { Marker } = (await google.maps.importLibrary(
+      "marker"
+    )) as google.maps.MarkerLibrary;
 
-        const map = new Map(mapElement, mapOptions);
+    const styleEl = mapElement.parentElement?.querySelector(
+      ":scope > script.map-style"
+    );
+    const styles = styleEl?.innerHTML
+      ? JSON.parse(styleEl?.innerHTML)?.styles
+      : undefined;
 
-        if ("marker" in mapElement.dataset) {
-          new Marker({
-            position,
-            map,
-          });
-        }
+    const position = {
+      lat: Number(mapElement.dataset?.lat),
+      lng: Number(mapElement.dataset?.lng),
+    };
 
-        // (mapElement as MapElement).map = map;
+    const mapOptions: google.maps.MapOptions = {
+      center: position,
+      zoom: Number(mapElement.dataset?.zoom),
+      mapTypeId: mapElement.dataset?.mapType,
+      mapId: mapElement.dataset?.mapId,
+      styles,
+    };
+
+    mapElement.map = new Map(mapElement, mapOptions);
+
+    if ("marker" in mapElement.dataset) {
+      new Marker({
+        position,
+        map: mapElement.map,
       });
-    });
+    }
   }
 </script>
 
