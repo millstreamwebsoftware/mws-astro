@@ -76,7 +76,6 @@ const id = "map-" + key;
 
 <script>
   import { Loader } from "@googlemaps/js-api-loader";
-  // import { styles } from "@custom/map.json";
 
   document.addEventListener("DOMContentLoaded", setupMaps);
   document.addEventListener("astro:after-swap", setupMaps);
@@ -90,9 +89,13 @@ const id = "map-" + key;
 
     if ("google" in window && google?.maps != undefined) {
       console.debug(
-        "[map.astro] Initialising map with existing Google Maps instance"
+        "[map.astro] Initialising map with existing Google Maps JS API"
       );
     } else {
+      console.debug(
+        "[map.astro] Loading new Google Maps JS API to initialise map"
+      );
+
       const loader = new Loader({
         apiKey,
         version: "weekly",
