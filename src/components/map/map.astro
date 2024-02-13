@@ -41,7 +41,7 @@ if (styles && (style || "default") in styles && !mapId) {
 }
 
 const apiKey =
-  bookshop || true
+  bookshop || import.meta.env.DEV
     ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
     : preferences.API.google_maps.api_key;
 // const height = Astro.props.height + "vh";
