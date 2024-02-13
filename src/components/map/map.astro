@@ -75,7 +75,7 @@ const id = "map-" + key;
 </Section>
 
 <script>
-  import { Loader } from "@googlemaps/js-api-loader";
+  // import { Loader } from "@googlemaps/js-api-loader";
 
   document.addEventListener("DOMContentLoaded", setupMaps);
   document.addEventListener("astro:after-swap", setupMaps);
@@ -96,25 +96,30 @@ const id = "map-" + key;
         "[map.astro] Loading new Google Maps JS API to initialise map"
       );
 
-      const loader = new Loader({
-        apiKey,
-        version: "weekly",
-      });
+      await import("@googlemaps/js-api-loader").then(async ({ Loader }) => {
+        const loader = new Loader({
+          apiKey,
+          version: "weekly",
+        });
 
-      await loader.importLibrary("maps");
-      await loader.importLibrary("marker");
+        await loader.importLibrary("maps");
+        await loader.importLibrary("marker");
+      });
     }
 
     maps.forEach(initMap);
   }
 
   async function initMap(mapElement: MapElement) {
-    const { Map } = (await google.maps.importLibrary(
-      "maps"
-    )) as google.maps.MapsLibrary;
-    const { Marker } = (await google.maps.importLibrary(
-      "marker"
-    )) as google.maps.MarkerLibrary;
+    // const { Map } = (await google.maps.importLibrary(
+    //   "maps"
+    // )) as google.maps.MapsLibrary;
+    // const { Marker } = (await google.maps.importLibrary(
+    //   "marker"
+    // )) as google.maps.MarkerLibrary;
+
+    const Map = google.maps.Map;
+    const Marker = google.maps.Marker;
 
     const styleEl = mapElement.parentElement?.querySelector(
       ":scope > script.map-style"
