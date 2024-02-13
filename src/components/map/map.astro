@@ -14,22 +14,6 @@ import preferences from "@data/preferences.json";
 //   return i;
 // }, {});
 
-const styles = Object.entries(await Astro.glob("@custom/*.map.json")).reduce<
-  Record<string, any>
->((i, n) => {
-  let name = n[0]
-    .split("/")
-    .at(-1)
-    ?.match(/(.*)\.map\.json$/)?.[1];
-  if (!name) return i;
-  i[name] = n[1];
-  return i;
-}, {});
-
-// const styles = {};
-
-console.log(styles);
-
 export interface props {
   lat: number;
   lng: number;
@@ -43,15 +27,31 @@ export interface props {
   key?: string;
 }
 
+// @ts-ignore
+const bookshop: boolean = ENV_BOOKSHOP_LIVE;
 const { lat, lng, zoom, marker, key, indent, mapId, style } = Astro.props;
 
+let styles;
+if (!bookshop) {
+  // Import map styles from src/styles/<name>.map.json
+  styles = Object.entries(await Astro.glob("@custom/*.map.json")).reduce<
+    Record<string, any>
+  >((i, n) => {
+    let name = n[0]
+      .split("/")
+      .at(-1)
+      ?.match(/(.*)\.map\.json$/)?.[1];
+    if (!name) return i;
+    i[name] = n[1];
+    return i;
+  }, {});
+}
+
 let mapStyle;
-if ((style || "default") in styles && !mapId) {
+if (styles && (style || "default") in styles && !mapId) {
   mapStyle = styles[style || "default"];
 }
 
-// @ts-ignore
-const bookshop: boolean = ENV_BOOKSHOP_LIVE;
 const apiKey = bookshop
   ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
   : preferences.API.google_maps.api_key;
