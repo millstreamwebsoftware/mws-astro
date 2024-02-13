@@ -2,18 +2,6 @@
 import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 
-// const styles = Object.entries(
-//   await import.meta.glob("@custom/*.map.json")
-// ).reduce<Record<string, any>>((i, n) => {
-//   let name = n[0]
-//     .split("/")
-//     .at(-1)
-//     ?.match(/(.*)\.map\.json$/)?.[1];
-//   if (!name) return i;
-//   i[name] = n[1];
-//   return i;
-// }, {});
-
 export interface props {
   lat: number;
   lng: number;
