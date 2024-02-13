@@ -141,6 +141,8 @@ const id = "map-" + key;
       styles,
     };
 
+    // Clear map contents to ensure a clean slate
+    mapElement.innerHTML = "";
     mapElement.map = new Map(mapElement, mapOptions);
 
     if ("marker" in mapElement.dataset) {
