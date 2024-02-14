@@ -181,11 +181,28 @@ const expando = classList.includes("expando") ? true : false;
       expando.addEventListener("click", (e) => {
         const t = e?.currentTarget as HTMLElement;
         if (!t) return;
-        let state = t?.parentElement?.toggleAttribute("data-expando");
         const buttonIcon = t.querySelector(".expando-button .icon");
         const buttonText = t.querySelector(".expando-button p");
+        const buttonOffset = buttonIcon?.getBoundingClientRect()?.top;
+        let state = t?.parentElement?.toggleAttribute("data-expando");
+        console.log(buttonOffset);
+
         if (buttonText) buttonText.innerHTML = state ? "Expand" : "Collapse";
         if (buttonIcon) buttonIcon.classList.toggle("rot180", !state);
+
+        // Scroll button to match old viewport position when collapsing
+        if (state && buttonOffset) {
+          const newButtonBounds = buttonIcon?.getBoundingClientRect();
+          const newButtonOffset = newButtonBounds
+            ? newButtonBounds?.top + window.scrollY
+            : undefined;
+
+          if (newButtonOffset)
+            window.scrollTo({
+              behavior: "instant",
+              top: newButtonOffset - buttonOffset,
+            });
+        }
       });
     });
   }
