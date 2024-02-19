@@ -119,7 +119,7 @@ const url = Astro.site ? new URL(image, Astro.site) : image;
 const file = "public" + image;
 
 let fs: any, Sharp: any;
-let metadata, plData, dominant;
+let metadata, plData;
 
 // @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE) {
@@ -131,9 +131,9 @@ if (!ENV_BOOKSHOP_LIVE) {
 
     let sh = Sharp(f);
     metadata = await sh.metadata();
-    // ({ dominant } = await sh.stats());
+    const { isOpaque } = await sh.stats(); // Don't generate placeholders for images with alpha
 
-    if (placeholder) {
+    if (placeholder && isOpaque) {
       const plSize = 16;
 
       let pl = await sh
@@ -146,8 +146,6 @@ if (!ENV_BOOKSHOP_LIVE) {
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    ix = undefined;
   }
 }
 
@@ -165,7 +163,7 @@ aspect = width && height ? width / height : undefined;
 let placeholderString: string | undefined;
 let placeholderStyle;
 
-if (placeholder) {
+if (placeholder && plData) {
   let webpString = `data:image/webp;base64,${plData}`;
 
   // Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
