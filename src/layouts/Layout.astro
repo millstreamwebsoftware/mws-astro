@@ -1,6 +1,7 @@
 ---
 import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
+import Opengraph from "@shared/Opengraph.astro";
 // import { ViewTransitions } from "astro:transitions";
 
 import * as git from "git-rev-sync";
@@ -12,6 +13,7 @@ import "@styles/styles.scss";
 
 export interface Props {
   title?: string;
+  description?: string;
   id?: string;
   content_blocks?: Array<Record<string, any>>;
   show_global_header?: boolean;
@@ -29,6 +31,7 @@ const mimetypes: any = {
 
 const {
   title,
+  description,
   content_blocks,
   show_global_header,
   show_global_footer,
@@ -38,13 +41,13 @@ const {
 } = Astro.props;
 import preferences from "@data/preferences.json";
 
-const pageTitle = title + preferences.general.browser_window_title_suffix;
+// const pageTitle = title + preferences.general.browser_window_title_suffix;
 const headerHeight = undefined; //preferences.header.height;
 const style: any = {};
 const pageWidth = preferences.page.maximum_page_width;
-const favicon = preferences.general.favicon;
-const appleTouchIcon = preferences.general["apple-touch-icon"];
-const faviconType = mimetypes[favicon.substring(favicon.lastIndexOf(".") + 1)];
+// const favicon = preferences.general.favicon;
+// const appleTouchIcon = preferences.general["apple-touch-icon"];
+// const faviconType = mimetypes[favicon.substring(favicon.lastIndexOf(".") + 1)];
 
 // <link rel="icon" href={favicon} type={faviconType} />
 // <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
@@ -60,13 +63,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="revision" content={git.long("./")} />
-
-    <link
-      rel="stylesheet"
-      href="//fast.fonts.net/cssapi/828d1fd7-e4e9-4173-89e6-afe7cda46a8e.css"
-    />
-    <title>{pageTitle}</title>
-    <!-- <ViewTransitions /> -->
+    <Opengraph {title} {description} />
   </head>
   <body>
     {show_global_header && <Header {id} {paths} {currentPath} />}

@@ -1,0 +1,30 @@
+---
+import preferences from "@data/preferences.json";
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(
+  preferences.general.default_sharing_image,
+  Astro.site
+);
+const title = Astro.props.title ?? preferences.general.site_name;
+const description =
+  Astro.props.description ?? preferences.general.default_site_description;
+const pageTitle = Astro.props.title
+  ? Astro.props.title + preferences.general.browser_window_title_suffix
+  : preferences.general.site_name;
+---
+
+<>
+  <title>{pageTitle}</title>
+  <meta property="og:title" content={title} />
+  <meta property="og:site_name" content={preferences.general.site_name} />
+  {description && <meta property="og:description" content={description} />}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+</>
