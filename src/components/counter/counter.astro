@@ -1,0 +1,67 @@
+---
+// export interface Props {}
+---
+
+<span data-counter><slot /></span>
+
+<script>
+  document.addEventListener("DOMContentLoaded", setupCounter);
+  document.addEventListener("astro:after-swap", setupCounter);
+
+  function setupCounter() {
+    const counters = document.querySelectorAll<HTMLElement>("[data-counter]");
+
+    const observerOptions = {
+      root: null,
+      rootMargin: "-50px",
+      threshold: [0.3],
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          let boundStartCountUp = startCountUp.bind(
+            entry.target as HTMLElement
+          );
+          boundStartCountUp(2000);
+        }
+      });
+    }, observerOptions);
+
+    counters.forEach((counter) => {
+      counter.dataset.counter = counter.textContent ?? undefined;
+      observer.observe(counter);
+    });
+  }
+
+  function startCountUp(this: HTMLElement, duration: number) {
+    if (this.dataset.counter == undefined) return;
+
+    const startTime = Number(document.timeline.currentTime ?? 0);
+    const target = this.dataset.counter?.replace(/\D*(\d*)/g, "$1");
+    if (!target) return;
+
+    const targetNumber = Number(target);
+    const targetLength = target.length;
+
+    const countUp = (t: number) => {
+      const x = Math.min((t - startTime) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - x, 4); // Ease out quart
+      const numString = Math.floor(easedProgress * targetNumber)
+        .toString()
+        .padStart(targetLength, "0");
+
+      this.textContent = format(numString, this.dataset.counter ?? "");
+
+      if (t - startTime < duration) requestAnimationFrame(countUp);
+    };
+
+    requestAnimationFrame(countUp);
+  }
+
+  function format(value: string, pattern: string) {
+    let i = 0;
+    const v = value.toString();
+    return pattern.replace(/\d/g, (_) => v[i++]);
+  }
+</script>
