@@ -248,8 +248,8 @@ h5,
 h6 {
   margin: 0;
   margin-top: 0.8em;
-  margin-bottom: 0.2em;
-  line-height: 1.6;
+  margin-bottom: 0.4em;
+  line-height: 1.4;
   font-family: var(--default-font-family);
   color: rgb(var(--heading-color));
   text-wrap: balance;
@@ -292,9 +292,18 @@ p {
   }
 }
 
+h2 + :is(ul, ol) {
+  margin-top: 2rem;
+}
+
 ul,
 ol {
   margin-bottom: 1em;
+}
+
+li {
+  line-height: 1.5;
+  margin-bottom: 0.5em;
 }
 
 ::selection {
