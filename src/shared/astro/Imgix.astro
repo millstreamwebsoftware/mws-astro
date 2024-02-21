@@ -1,11 +1,7 @@
 ---
 import ImgixClient from "@imgix/js-core";
-import preferences from "@data/preferences.json";
-
-type IxOptions = {
-  domain: string;
-  token: string;
-};
+import _preferences from "@data/preferences.json";
+const preferences = _preferences as unknown as Preferences;
 
 type cropOptions =
   | "center"
@@ -64,30 +60,10 @@ export interface Props {
 
 var ix: ImgixClient | undefined = undefined;
 
-// @ts-ignore
-// var ix: ImgixClient | undefined = preferences.API.imgix?.domain
-//   ? new ImgixClient({
-//       domain: preferences.API.imgix?.domain,
-//       secureURLToken: preferences.API.imgix?.token,
-//     })
-//   : undefined;
-
-// if ("imgix" in preferences?.API && "domain" in preferences.API.imgix && "token" in preferences.API.imgix) {
-//   let ixOptions: IxOptions = (preferences.API.imgix as IxOptions);
-//   ix = new ImgixClient({domain: preferences.API.imgix.domain, })
-// }
-
-let ixprefs: IxOptions = preferences?.API?.imgix;
-if (
-  ixprefs &&
-  "domain" in ixprefs &&
-  typeof ixprefs.domain == "string" &&
-  "token" in ixprefs &&
-  typeof ixprefs.token == "string"
-) {
+if (preferences.API.imgix?.domain && preferences.API.imgix?.token) {
   ix = new ImgixClient({
-    domain: ixprefs.domain,
-    secureURLToken: ixprefs.token,
+    domain: preferences.API.imgix.domain,
+    secureURLToken: preferences.API.imgix.token,
   });
 }
 

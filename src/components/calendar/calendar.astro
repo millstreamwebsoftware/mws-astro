@@ -1,6 +1,7 @@
 ---
 import Section from "@layouts/Section.astro";
-import preferences from "@data/preferences.json";
+import _preferences from "@data/preferences.json";
+const preferences = _preferences as unknown as Preferences;
 
 type EventSource =
   | { name?: string; googleCalendarId: string; className?: string; id?: string }
@@ -60,7 +61,7 @@ const calendarOptions = {
   <div
     id={`_calendar-${key}`}
     class="_calendar"
-    data-api-key={preferences.API.google_calendar.api_key}
+    data-api-key={preferences.API?.google_calendar?.api_key}
   >
   </div>
 </Section>
