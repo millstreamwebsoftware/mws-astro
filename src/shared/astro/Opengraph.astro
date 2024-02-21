@@ -1,5 +1,6 @@
 ---
-import preferences from "@data/preferences.json";
+import _preferences from "@data/preferences.json";
+const preferences: Preferences = _preferences as unknown as Preferences;
 
 export interface Props {
   title?: string;
@@ -7,10 +8,9 @@ export interface Props {
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(
-  preferences.general.default_sharing_image,
-  Astro.site
-);
+const ogImageURL = preferences.general.default_sharing_image
+  ? new URL(preferences.general.default_sharing_image, Astro.site)
+  : undefined;
 const title = Astro.props.title ?? preferences.general.site_name;
 const description =
   Astro.props.description ?? preferences.general.default_site_description;
