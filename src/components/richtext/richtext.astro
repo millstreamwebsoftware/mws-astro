@@ -1,5 +1,4 @@
 ---
-// import { convertColorString } from "@mws-astro/util";
 import Section from "@layouts/Section.astro";
 import Markdown from "@shared/Markdown.astro";
 
@@ -10,8 +9,7 @@ export interface Props {
   style?: Record<string, string>;
 }
 
-const { background_color, style, classes, content } = Astro.props;
-// const background = convertColorString(background_color);
+const { content } = Astro.props;
 ---
 
 <Section component="richtext" {...Astro.props}>
