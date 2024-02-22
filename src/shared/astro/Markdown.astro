@@ -41,15 +41,13 @@ if (ENV_BOOKSHOP_LIVE) {
 ---
 
 {
-  md ? (
-    <Fragment set:html={md.render(content)} />
-  ) : (
-    content && (
-      <RemoteMarkdown
-        {content}
-        sanitize={{ allowComponents: true }}
-        components={substitutions}
-      />
-    )
-  )
+  md
+    ? content && <Fragment set:html={md.render(content)} />
+    : content && (
+        <RemoteMarkdown
+          {content}
+          sanitize={{ allowComponents: true }}
+          components={substitutions}
+        />
+      )
 }

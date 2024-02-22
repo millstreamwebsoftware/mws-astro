@@ -1,8 +1,8 @@
 ---
 // import MarkdownIt from "markdown-it";
 
-import Markdown from '@shared/Markdown.astro';
-import Icon from '@shared/icon.astro';
+import Markdown from "@shared/Markdown.astro";
+import Icon from "@shared/icon.astro";
 
 // const md = new MarkdownIt({ html: true });
 
@@ -20,9 +20,9 @@ const style = Astro.props.style?.toLowerCase();
 
 const icon = style
   ? {
-      "info": "fa6-solid:circle-info",
-      "warning": "fa6-solid:triangle-exclamation",
-      "error": "fa6-solid:circle-xmark"
+      info: "fa6-solid:circle-info",
+      warning: "fa6-solid:triangle-exclamation",
+      error: "fa6-solid:circle-xmark",
     }[style]
   : undefined;
 
@@ -30,9 +30,11 @@ const icon = style
 // <Fragment set:html={htmlContent} />
 ---
 
-<div class:list={["form-info", style, {"has-icon": !!icon}]}>
-  <span class="icon-container">{icon && <Icon name={icon} height="2rem"/>}</span>
-  <span><Markdown {content}></span>
+<div class:list={["form-info", style, { "has-icon": !!icon }]}>
+  <span class="icon-container"
+    >{icon && <Icon name={icon} height="2rem" />}</span
+  >
+  <span>{content && <Markdown {content} />}</span>
 </div>
 
 <style>
@@ -93,23 +95,18 @@ const icon = style
   .form-info.error::after {
     content: "";
     position: absolute;
-    opacity: .3;
+    opacity: 0.3;
     z-index: 0;
     inset: 0px;
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
 
-    background: 
-      repeating-linear-gradient(
+    background: repeating-linear-gradient(
         45deg,
         rgb(var(--form-info-color)),
-        rgb(var(--form-info-color)) .5rem, 
-        rgb(var(--form-info-color) / 0.5) .5rem, 
+        rgb(var(--form-info-color)) 0.5rem,
+        rgb(var(--form-info-color) / 0.5) 0.5rem,
         rgb(var(--form-info-color) / 0.5) 1rem
-      ), linear-gradient(
-        to right, 
-        transparent, 
-        rgb(var(--form-info-color)) 5rem
-      );
+      ),
+      linear-gradient(to right, transparent, rgb(var(--form-info-color)) 5rem);
   }
-
 </style>
