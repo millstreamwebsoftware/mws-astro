@@ -1,18 +1,17 @@
 ---
-import { bookshopName, convertColorString } from "@mws-astro/util";
+import { bookshopName } from "@mws-astro/util";
+import Section from "@layouts/Section.astro";
 import Required from "./required.astro";
 
 export interface Props {
   action: string;
   name: string;
   form_blocks: any[];
-  background_color?: string;
   classes?: any;
   key?: string;
 }
 
-const { action, name, form_blocks, background_color, classes, key } =
-  Astro.props;
+const { action, name, form_blocks, classes, key } = Astro.props;
 const id = (name || "") + "-" + (key || "");
 
 const components: Record<string, any> = {};
@@ -37,9 +36,6 @@ Object.entries(componentImports).forEach(
 Object.entries(componentOverrides).forEach(
   ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
 );
-// function getNested(obj, ...args) {
-//   return args.reduce((obj, level) => obj && obj[level], obj)
-// }
 
 // Recurse form_blocks to check for any required fields.
 function checkRequired(obj: any[]): boolean {
@@ -49,14 +45,9 @@ function checkRequired(obj: any[]): boolean {
   });
 }
 const required = checkRequired(form_blocks);
-
-const background = convertColorString(background_color);
 ---
 
-<section
-  style={{ ...(background && { "--background-color": background }) }}
-  class:list={["form", classes]}
->
+<Section component="form" class:list={["form", classes]} {...Astro.props}>
   <form
     method="post"
     {action}
@@ -85,7 +76,7 @@ const background = convertColorString(background_color);
     <input type="hidden" name="_gotcha" />
     <input type="submit" value="Submit" />
   </form>
-</section>
+</Section>
 
 <style>
   form {

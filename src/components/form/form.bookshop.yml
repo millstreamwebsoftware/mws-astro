@@ -12,7 +12,7 @@ blueprint:
   name: ""
   action: ""
   form_blocks: []
-  background_color:
+  classes:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
@@ -26,3 +26,14 @@ _inputs:
   action:
     type: url
     comment: The URL the form will be submitted to.
+  classes:
+    label: Style
+    type: multiselect
+    options:
+      allow_create: true
+      values:
+        - no-indent
+        - no-indent-top
+        - no-indent-bottom
+        - no-indent-left
+        - no-indent-right
