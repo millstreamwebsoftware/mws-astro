@@ -33,7 +33,7 @@ if (ENV_BOOKSHOP_LIVE) {
   // Get site specific custom snippets from src/snippets.ts
   const snippetGlob = import.meta.glob<Record<string, any>>("/src/snippets.ts");
 
-  snippetGlob?.["/src/snippets.ts"]?.()?.then(
+  await snippetGlob?.["/src/snippets.ts"]?.()?.then(
     ({ snippets }) => Object.assign(substitutions, snippets),
     (error) => console.log(error)
   );

@@ -136,12 +136,13 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
 <style lang="scss">
   div.columns {
-    /* gap: var(--column-gap); */
     display: grid;
     grid-auto-flow: row;
-    grid-template-columns: repeat(var(--columns), 1fr);
+    grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
     overflow: hidden;
-    // padding: 0;
+    gap: var(--column-gap);
+    padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
+    background-color: rgb(var(--background-color));
   }
 
   .columns.no-indent {
@@ -171,13 +172,6 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     height: 100%;
     // padding: calc(var(--column-gap));
     padding: 0;
-  }
-
-  div.columns {
-    gap: var(--column-gap);
-    // padding: calc(var(--indent) * 0.5) var(--indent);
-    padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
-    background-color: rgb(var(--background-color));
   }
 
   // .columns > {
