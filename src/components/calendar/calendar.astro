@@ -71,6 +71,7 @@ const calendarOptions = {
     Calendar,
     type EventClickArg,
     type EventApi,
+    type ViewApi,
   } from "@fullcalendar/core";
   import dayGridPlugin from "@fullcalendar/daygrid";
   import listPlugin from "@fullcalendar/list";
@@ -83,7 +84,7 @@ const calendarOptions = {
     shift,
     flip,
   } from "@floating-ui/dom";
-  import * as ics from "ics";
+  import { createEvent } from "ics";
 
   document.addEventListener("DOMContentLoaded", setupCalendar);
   document.addEventListener("astro:after-swap", setupCalendar);
@@ -149,20 +150,28 @@ const calendarOptions = {
         eventSources: calendarOptions.calendarEvents,
         eventClick: onClick,
         eventClassNames: function (arg: { event: any }) {
-          console.log("asadadad");
           if (!calendarEl.dataset.filter) return "";
           if (calendarEl.dataset.filter?.includes(arg.event.source.id))
             return "";
           return "filter-hidden";
           // e.el.classList.add("filter-hidden");
         },
+        windowResize: function (arg: { view: ViewApi }) {
+          arg.view.calendar.setOption("height", getCalendarHeight());
+        },
         customButtons,
         headerToolbar: calendarOptions.headerToolbar,
         footerToolbar: calendarOptions.footerToolbar,
+        aspectRatio: 1.77,
+        height: getCalendarHeight(),
       });
       calendarEl.calendar = calendar;
       calendar.render();
     });
+  }
+
+  function getCalendarHeight() {
+    return window.screen.width > 768 ? undefined : "auto";
   }
 
   function closeCalendarPopup(e: MouseEvent) {
@@ -264,7 +273,7 @@ const calendarOptions = {
       uid: e.id + "@" + source,
     };
 
-    ics.createEvent(event, (error, value) => {
+    createEvent(event, (error, value) => {
       if (error) {
         console.log(error);
         return;
@@ -343,12 +352,6 @@ const calendarOptions = {
     --fc-event-border-color: rgb(var(--calendar-color));
     --fc-event-bg-color: rgb(var(--calendar-color));
     transition: opacity 0.1s ease-in-out;
-    color: black;
-  }
-
-  .fc-event-title,
-  .fc-list-event-title {
-    color: black;
   }
 
   .fc-event.filter-hidden {
@@ -363,9 +366,38 @@ const calendarOptions = {
     opacity: 1;
   }
 
+  .fc-toolbar-chunk {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    & > button.fc-button.fc-button-primary {
+      margin-left: 0;
+    }
+
+    & > div.fc-button-group.fc-button-group {
+      margin-left: 0;
+    }
+  }
+
+  .fc-header-toolbar {
+    @media only screen and (max-width: 768px) {
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  }
+
+  .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child {
+    justify-content: end;
+  }
+
   .fc-toolbar-chunk:has(.fc-button[class*="-subscribe"])::before {
     content: "Subscribe To:";
-    padding: 1rem;
+    padding: 0.4em 0.65em;
   }
 
   .fc-toolbar-chunk .fc-button[class*="-subscribe"] {
