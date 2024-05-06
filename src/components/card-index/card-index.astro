@@ -1,20 +1,22 @@
 ---
 import Section from "@layouts/Section.astro";
-import { type TreeNode } from "@mws-astro/middleware";
+import Card from "@components/card-index/card.astro";
+// import { type TreeNode } from "@mws-astro/middleware";
 
 interface Props {
   target: string;
-  include?: string;
+  include?: string[];
 }
 
 const tree = Astro.locals.tree;
 const data = Astro.locals.collections.pages;
 
-const { target, include } = Astro.props;
+const {
+  target = "/",
+  include = ["title", "description", "thumbnail", "link"],
+} = Astro.props;
 
-// data["pages"]
-
-const targetFragments = target?.split("/");
+const targetFragments = target?.split("/").filter((frg) => frg !== "");
 let cursor = tree;
 let error;
 
@@ -45,10 +47,20 @@ const cards = slugs && data.filter((node) => slugs.has(node.slug));
 ---
 
 <Section component="card-index">
-  {
-    cards &&
-      cards.map((card) => {
-        return <p>{card.data.title}</p>;
-      })
-  }
+  <div class="card-index">
+    {
+      cards &&
+        cards.map((card) => {
+          return <Card {include} {card} />;
+        })
+    }
+  </div>
 </Section>
+
+<style lang="scss">
+  .card-index {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+</style>

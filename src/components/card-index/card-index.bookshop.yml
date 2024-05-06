@@ -10,3 +10,7 @@ spec:
 blueprint:
   target: ""
   include: []
+
+preview:
+  target: /
+  include: ["title", "thumbnail", "description", "link"]

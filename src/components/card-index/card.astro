@@ -1,0 +1,73 @@
+---
+import type { CollectionKey } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Image from "@shared/Image.astro";
+import Markdown from "@shared/Markdown.astro";
+
+interface Props {
+  card: CollectionEntry<CollectionKey>;
+  include: string[];
+}
+
+const { card, include } = Astro.props;
+// const includeProp: CollectionKey[] = include;
+
+const cardProps: Record<string, any> = {};
+
+include.forEach((key) => {
+  if (card.hasOwnProperty(key)) {
+    cardProps[key] = card[key as keyof typeof card];
+  } else if (card.data.hasOwnProperty(key)) {
+    cardProps[key] = card.data[key as keyof typeof card.data];
+  }
+});
+
+// console.log(include, card);
+
+const { title, description, thumbnail, slug, ...cardData } = cardProps;
+const Link = slug || include.includes("link") ? "a" : Fragment;
+---
+
+<div class="card-index-card">
+  <!-- <p>
+    {JSON.stringify(cardProps)}
+  </p> -->
+
+  <Link href={card.slug.replace(/\/?index$/, "") ?? undefined}>
+    {thumbnail && <Image image={thumbnail} width={512} aspect={1} />}
+    {title && <h2>{title}</h2>}
+    {description && <Markdown content={description} />}
+    {
+      Object.entries(cardData).map(([k, v], i) => {
+        return (
+          <div {...{ [`data-${k}`]: v }}>
+            <>
+              <p>{k}</p>
+              <p>{v}</p>
+            </>
+          </div>
+        );
+      })
+    }
+  </Link>
+</div>
+
+<style lang="scss">
+  .card-index-card {
+    flex: 1 1 512px;
+    border: 2px solid rgb(var(--text-color));
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    background-color: rgb(var(--background-color));
+
+    > a {
+      display: block;
+      text-decoration: none;
+      padding: 2rem;
+    }
+  }
+
+  .card-index-card:has(> a) {
+    padding: 0;
+  }
+</style>
