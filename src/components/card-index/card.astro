@@ -3,6 +3,7 @@ import type { CollectionKey } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Image from "@shared/Image.astro";
 import Markdown from "@shared/Markdown.astro";
+import Icon from "@shared/icon.astro";
 
 interface Props {
   card: CollectionEntry<CollectionKey>;
@@ -25,49 +26,145 @@ include.forEach((key) => {
 // console.log(include, card);
 
 const { title, description, thumbnail, slug, ...cardData } = cardProps;
-const Link = slug || include.includes("link") ? "a" : Fragment;
+// const Link = slug || include.includes("link") ? "a" : Fragment;
+const link = slug || include.includes("link");
 ---
 
 <div class="card-index-card">
-  <!-- <p>
-    {JSON.stringify(cardProps)}
-  </p> -->
-
-  <Link href={card.slug.replace(/\/?index$/, "") ?? undefined}>
-    {thumbnail && <Image image={thumbnail} width={512} aspect={1} />}
+  {link && <a href={card.slug.replace(/\/?index$/, "")} />}
+  {
+    thumbnail && (
+      <div class="card-thumbnail">
+        <Image image={thumbnail} width={512} aspect={1} />
+      </div>
+    )
+  }
+  <div class="card-text">
     {title && <h2>{title}</h2>}
     {description && <Markdown content={description} />}
     {
       Object.entries(cardData).map(([k, v], i) => {
         return (
-          <div {...{ [`data-${k}`]: v }}>
+          <div class="card-data" {...{ "data-key": k, "data-value": v }}>
             <>
-              <p>{k}</p>
-              <p>{v}</p>
+              <p class="data-key">{k}</p>
+
+              {Array.isArray(v) ? (
+                v.map((vv) => <p class="data-value">{vv}</p>)
+              ) : (
+                <p class="data-value">{v}</p>
+              )}
             </>
           </div>
         );
       })
     }
-  </Link>
+  </div>
+  {
+    include.includes("link") && (
+      <div class="card-read-more">
+        <p>Read More</p>
+        <Icon name="fa6-solid:arrow-right-to-bracket" height="2rem" />
+      </div>
+    )
+  }
 </div>
 
 <style lang="scss">
   .card-index-card {
-    flex: 1 1 512px;
-    border: 2px solid rgb(var(--text-color));
+    display: grid;
+    overflow: hidden;
     border-radius: var(--border-radius);
-    padding: 2rem;
+    grid-template-rows: min-content auto auto;
+
+    position: relative;
+    flex: 0 1 512px;
+
+    // border: 2px solid rgb(var(--text-color));
+
+    box-shadow: 0 0 1rem rgb(var(--text-color) / 0.2);
+
+    border-radius: var(--border-radius);
     background-color: rgb(var(--background-color));
 
     > a {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       display: block;
-      text-decoration: none;
-      padding: 2rem;
+      border: 4px solid transparent;
+      border-radius: inherit;
+      transition:
+        background-color 0.2s ease-in-out,
+        border 0.2s ease-in-out;
     }
-  }
 
-  .card-index-card:has(> a) {
-    padding: 0;
+    &:hover > a {
+      background-color: rgb(var(--text-color) / 0.1);
+      border: 4px solid rgb(var(--color-primary));
+    }
+
+    .card-text {
+      padding: 2rem;
+      background-color: rgb(var(--background-color));
+      color: rgb(var(--text-color));
+    }
+
+    .card-read-more {
+      display: flex;
+      margin-top: auto;
+      padding: 1rem 2rem;
+      background-color: rgb(var(--color-primary));
+      --text-color: 255 255 255;
+
+      align-items: center;
+      justify-content: space-between;
+
+      p {
+        margin: 0;
+        font-weight: bold;
+      }
+    }
+
+    .card-thumbnail {
+      position: relative;
+      border-bottom: 4px solid rgb(var(--color-primary));
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          to bottom,
+          transparent 90%,
+          98%,
+          rgb(var(--color-primary) / 0.8)
+        );
+        z-index: 1;
+      }
+    }
+
+    .card-data {
+      display: flex;
+      gap: 1rem;
+      border-radius: var(--border-radius);
+      width: min-content;
+      padding: 0 1.5rem;
+
+      &[data-value=""] {
+        .data-value {
+          display: none;
+        }
+      }
+
+      &[data-key]:not([data-value]) {
+        display: none;
+      }
+
+      > p {
+        margin: 0;
+      }
+    }
   }
 </style>

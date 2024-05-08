@@ -7,9 +7,10 @@ interface Props {
   height?: number;
   alt?: string;
   aspect?: number;
+  classes?: string;
 }
 
-const { image } = Astro.props;
+const { image, classes } = Astro.props;
 let { height = image?.height, width = image?.width, aspect } = Astro.props;
 
 if (aspect == undefined) {
@@ -34,24 +35,29 @@ if (!ENV_BOOKSHOP_LIVE) {
 
   try {
     let realFile = file.replace(/^(?:\/@fs)?(.*?)(?:\?.*)?$/, "$1");
-    console.log(realFile, file);
 
     const f = await fs.readFile(realFile);
 
     let sh = Sharp(f);
     metadata = await sh.metadata();
-    const { isOpaque } = await sh.stats(); // Don't generate placeholders for images with alpha
+    if (placeholder) {
+      const { isOpaque, channels } = await sh.stats(); // Don't generate placeholders for images with alpha
 
-    if (placeholder && isOpaque) {
-      const plSize = 16;
+      if (isOpaque || channels[3].mean >= 254) {
+        // Include PNGs which are mostly opaque but not entirely
+        const plSize = 16;
 
-      let pl = await sh
-        .resize(plSize, undefined, { fit: "inside" })
-        .blur()
-        .webp()
-        .toBuffer();
+        let pl = await sh
+          .removeAlpha()
+          .resize(plSize, undefined, { fit: "inside" })
+          .blur()
+          .webp()
+          .toBuffer();
 
-      plData = pl.toString("base64");
+        plData = pl.toString("base64");
+      } else {
+        console.log("Skipped transparent image:", channels[3]);
+      }
     }
   } catch (err) {
     console.log(err);
@@ -84,6 +90,7 @@ if (placeholder && plData) {
   alt=""
   {width}
   {height}
+  class:list={[classes]}
   style={placeholderStyle}
   densities={[1, 1.5, 2]}
 />
@@ -91,5 +98,7 @@ if (placeholder && plData) {
 <style>
   img {
     object-fit: cover;
+    background-size: cover;
+    width: 100%;
   }
 </style>
