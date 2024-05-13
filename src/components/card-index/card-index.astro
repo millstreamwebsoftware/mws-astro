@@ -6,7 +6,9 @@ import Card from "@components/card-index/card.astro";
 interface Props {
   target: string;
   include?: string[];
+  filters?: string[];
   columns?: number;
+  key?: string;
 }
 
 const tree = Astro.locals.tree;
@@ -15,7 +17,9 @@ const data = Astro.locals.collections.pages;
 const {
   target = "/",
   include = ["title", "description", "thumbnail", "link"],
-  columns,
+  columns = 4,
+  filters = [""],
+  key,
 } = Astro.props;
 
 const targetFragments = target?.split("/").filter((frg) => frg !== "");
@@ -50,21 +54,200 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
 // });
 ---
 
-<Section component="card-index">
-  <div class="card-index" style={{ "--columns": columns }}>
+<Section component="card-index" {...Astro.props}>
+  <div class="card-index-container">
     {
-      cards &&
-        cards.map((card) => {
-          return <Card {include} {card} />;
-        })
+      filters.length && (
+        <div class="card-filters" data-filters={filters.join(" ")} />
+      )
     }
+    <div class="card-items" style={{ "--columns": columns }}>
+      {
+        cards &&
+          cards.map((card) => {
+            return <Card {include} {card} {filters} />;
+          })
+      }
+    </div>
   </div>
 </Section>
 
 <style lang="scss">
-  .card-index {
+  .card-items {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+
+    grid-area: items;
+  }
+
+  .card-filters {
+    grid-area: filters;
+  }
+
+  .card-index-container {
+    display: grid;
+    grid-template-areas: "filters" "items";
+    gap: 3rem;
   }
 </style>
+
+<style lang="scss" is:global>
+  .card-filters {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    > .card-filter-set {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+
+      p {
+        margin: 0;
+        text-transform: capitalize;
+      }
+    }
+
+    button {
+      user-select: none;
+      padding: 0.4rem 1.4rem;
+      border: 1px solid black;
+      border-radius: var(--border-radius);
+      text-transform: capitalize;
+
+      // input {
+      //   display: none;
+      // }
+
+      &[data-status] {
+        background-color: rgb(var(--text-color));
+        color: rgb(var(--background-color, var(--page-background-color)));
+      }
+
+      &[data-status="exclude"] {
+        text-decoration: line-through;
+        text-decoration-thickness: 0.12em;
+      }
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", setupCardIndex);
+  document.addEventListener("astro:after-swap", setupCardIndex);
+
+  function setupCardIndex() {
+    const cardIndexes = document.querySelectorAll<HTMLElement>(
+      'section[data-component="card-index"]'
+    );
+
+    if (!cardIndexes.length) return;
+
+    cardIndexes.forEach((index) => {
+      const options = getFilterOptions(index);
+      if (!options) return;
+
+      createFilters(index, options);
+    });
+  }
+
+  function getFilterOptions(
+    index: HTMLElement
+  ): Record<string, Set<string>> | undefined {
+    const filters = index
+      .querySelector<HTMLElement>(".card-filters")
+      ?.dataset?.filters?.split(" ");
+    const cards = Array.from(
+      index.querySelectorAll<HTMLElement>(".card-items .card-index-card")
+    );
+
+    if (!(filters && cards)) return;
+
+    // {key: Set(value1,value2), key2: Set(valueA,valueB)}
+    return Object.fromEntries(
+      filters.map((filter) => {
+        const set = new Set(
+          cards.flatMap((card) => card.dataset?.[filter]?.split(" "))
+        );
+        set.delete(undefined);
+        return [filter, set as Set<string>];
+      })
+    );
+  }
+
+  function createFilters(
+    index: HTMLElement,
+    options: Record<string, Set<string>>
+  ) {
+    const filters = index.querySelector<HTMLElement>(".card-filters");
+
+    if (!filters) return;
+
+    filters.innerHTML = Object.entries(options)
+      .map(([option, values]) => {
+        if (values.size == 1 && values.has("")) {
+          return `<button data-filter="${option}" data-value="" id="cif-${option}" type="checkbox"/>${option.replaceAll(/(-|_)/g, " ")}</button>`;
+        }
+        const buttons = [...values.keys()]
+          .toSorted((a, b) => String(a).localeCompare(b))
+          .map((value: string, i) => {
+            return `<button data-filter="${option}" data-value="${value}" id="cif-${option}-${i}" type="checkbox"/>${value.replaceAll(/(-|_)/g, " ")}</button>`;
+          })
+          .join("");
+
+        return `<div class="card-filter-set"><p>${option.replaceAll(/(-|_)/g, " ")}</p>${buttons}</div>`;
+      })
+      .join("");
+
+    filters.addEventListener("click", evaluateFilters);
+  }
+
+  function evaluateFilters(e: Event) {
+    const changedButton = e.target as HTMLElement;
+
+    if (!changedButton.matches("button")) return;
+
+    switch (changedButton.getAttribute("data-status")) {
+      case "include":
+        changedButton.setAttribute("data-status", "exclude");
+        break;
+      case "exclude":
+        changedButton.removeAttribute("data-status");
+        break;
+      default:
+        changedButton.setAttribute("data-status", "include");
+        break;
+    }
+
+    const index = changedButton.closest(".card-index-container");
+    if (!index) return;
+
+    const filters = Array.from(
+      index.querySelectorAll<HTMLInputElement>(".card-filters button")
+    );
+
+    const include = filters.filter(
+      (filter) => filter.dataset.status == "include"
+    );
+    const exclude = filters.filter(
+      (filter) => filter.dataset.status == "exclude"
+    );
+
+    const selector =
+      "*" +
+      (include.length ? `:is(${include.map(filterSelector).join(",")})` : "") +
+      (exclude.length ? `:not(${exclude.map(filterSelector).join(",")})` : "");
+
+    Array.from(index.querySelectorAll(".card-index-card")).forEach((card) =>
+      card.classList.toggle("filter-hide", !card.matches(selector))
+    );
+    console.log("Applied selector", selector);
+  }
+
+  function filterSelector(filter: HTMLElement): string {
+    return filter.dataset.value
+      ? `[data-${filter.dataset.filter}*="${filter.dataset.value}"]`
+      : `[data-${filter.dataset.filter}]`;
+  }
+</script>

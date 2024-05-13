@@ -8,9 +8,10 @@ import Icon from "@shared/icon.astro";
 interface Props {
   card: CollectionEntry<CollectionKey>;
   include: string[];
+  filters: string[];
 }
 
-const { card, include } = Astro.props;
+const { card, include, filters } = Astro.props;
 // const includeProp: CollectionKey[] = include;
 
 const cardProps: Record<string, any> = {};
@@ -28,9 +29,21 @@ include.forEach((key) => {
 const { title, description, thumbnail, slug, ...cardData } = cardProps;
 // const Link = slug || include.includes("link") ? "a" : Fragment;
 const link = slug || include.includes("link");
+
+// Convert card props to data attributes for filtering
+const filterData = Object.fromEntries(
+  Object.entries(cardData)
+    .filter(([k, v]) => filters.includes(k))
+    .map(([k, v]) => {
+      return [
+        `data-${k}`,
+        Array.isArray(v) ? v.map((v) => v.replaceAll(" ", "-")).join(" ") : v,
+      ];
+    })
+);
 ---
 
-<div class="card-index-card">
+<div class="card-index-card" {...filterData}>
   {link && <a href={card.slug.replace(/\/?index$/, "")} />}
   {
     thumbnail && (
@@ -86,6 +99,20 @@ const link = slug || include.includes("link");
 
     border-radius: var(--border-radius);
     background-color: rgb(var(--background-color));
+
+    transition:
+      filter 0.4s ease,
+      opacity 0.4s ease,
+      transform 0.4s ease;
+
+    &.filter-hide {
+      // display: none;
+      transform: scale(0.9);
+      opacity: 0.1;
+      filter: grayscale(1);
+      pointer-events: none;
+      order: 99999;
+    }
 
     > a {
       position: absolute;
