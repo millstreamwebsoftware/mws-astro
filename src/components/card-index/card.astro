@@ -106,12 +106,16 @@ const filterData = Object.fromEntries(
       transform 0.4s ease;
 
     &.filter-hide {
-      // display: none;
-      transform: scale(0.9);
-      opacity: 0.1;
-      filter: grayscale(1);
-      pointer-events: none;
-      order: 99999;
+      display: none;
+      // transform: scale(0.9);
+      // opacity: 0.1;
+      // filter: grayscale(1);
+      // pointer-events: none;
+      // order: 99999;
+    }
+
+    &.pagination-hide {
+      display: none;
     }
 
     > a {

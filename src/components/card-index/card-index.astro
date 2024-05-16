@@ -1,6 +1,7 @@
 ---
 import Section from "@layouts/Section.astro";
 import Card from "@components/card-index/card.astro";
+import Icon from "@shared/icon.astro";
 // import { type TreeNode } from "@mws-astro/middleware";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   include?: string[];
   filters?: string[];
   columns?: number;
+  pageSize?: number;
   key?: string;
 }
 
@@ -19,8 +21,11 @@ const {
   include = ["title", "description", "thumbnail", "link"],
   columns = 4,
   filters = [""],
+  pageSize = 0,
   key,
 } = Astro.props;
+
+const filterMode = "ignore include"; //ignore include exclude
 
 const targetFragments = target?.split("/").filter((frg) => frg !== "");
 let cursor = tree;
@@ -56,15 +61,42 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
 
 <Section component="card-index" {...Astro.props}>
   <div class="card-index-container">
-    {
-      filters.length && (
-        <div class="card-filters" data-filters={filters.join(" ")} />
-      )
-    }
+    <div class="card-tools">
+      {
+        filters.length && (
+          <div
+            class="card-filters"
+            data-filters={filters.join(" ")}
+            data-filtermode={filterMode}
+          >
+            {/* <Icon name="fa6-solid:filter" height="1.5rem" /> */}
+          </div>
+        )
+      }
+      {
+        pageSize && (
+          <div class="card-pagination" data-page-size={pageSize} data-page={0}>
+            <button data-action="0">
+              <Icon name="fa6-solid:backward-step" height="1.5rem" />
+            </button>
+            <button data-action="-1">
+              <Icon name="fa6-solid:angle-left" height="1.5rem" />
+            </button>
+            <input type="number" value="1" min="1" />
+            <button data-action="+1">
+              <Icon name="fa6-solid:angle-right" height="1.5rem" />
+            </button>
+            <button data-action="Infinity">
+              <Icon name="fa6-solid:forward-step" height="1.5rem" />
+            </button>
+          </div>
+        )
+      }
+    </div>
     <div class="card-items" style={{ "--columns": columns }}>
       {
         cards &&
-          cards.map((card) => {
+          cards.map((card, i) => {
             return <Card {include} {card} {filters} />;
           })
       }
@@ -81,13 +113,13 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     grid-area: items;
   }
 
-  .card-filters {
-    grid-area: filters;
+  .card-tools {
+    grid-area: tools;
   }
 
   .card-index-container {
     display: grid;
-    grid-template-areas: "filters" "items";
+    grid-template-areas: "tools" "items";
     gap: 3rem;
   }
 </style>
@@ -101,17 +133,19 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     > .card-filter-set {
       display: flex;
       flex-direction: row;
-      gap: 1rem;
+      gap: 0.5rem;
 
       p {
         margin: 0;
         text-transform: capitalize;
+        padding: 0.4rem 1.4rem;
       }
     }
 
     button {
       user-select: none;
-      padding: 0.4rem 1.4rem;
+      padding: 0 1.4rem;
+      // line-height: 1;
       border: 1px solid black;
       border-radius: var(--border-radius);
       text-transform: capitalize;
@@ -120,7 +154,7 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
       //   display: none;
       // }
 
-      &[data-status] {
+      &[data-status]:not([data-status="ignore"]) {
         background-color: rgb(var(--text-color));
         color: rgb(var(--background-color, var(--page-background-color)));
       }
@@ -149,6 +183,7 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
       if (!options) return;
 
       createFilters(index, options);
+      setupPagination(index);
     });
   }
 
@@ -187,12 +222,12 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     filters.innerHTML = Object.entries(options)
       .map(([option, values]) => {
         if (values.size == 1 && values.has("")) {
-          return `<button data-filter="${option}" data-value="" id="cif-${option}" type="checkbox"/>${option.replaceAll(/(-|_)/g, " ")}</button>`;
+          return `<button data-filter="${option}" data-value="" id="cif-${option}" aria-pressed="false"/>${option.replaceAll(/(-|_)/g, " ")}</button>`;
         }
         const buttons = [...values.keys()]
           .toSorted((a, b) => String(a).localeCompare(b))
           .map((value: string, i) => {
-            return `<button data-filter="${option}" data-value="${value}" id="cif-${option}-${i}" type="checkbox"/>${value.replaceAll(/(-|_)/g, " ")}</button>`;
+            return `<button data-filter="${option}" data-value="${value}" id="cif-${option}-${i}" aria-pressed="false"/>${value.replaceAll(/(-|_)/g, " ")}</button>`;
           })
           .join("");
 
@@ -203,24 +238,62 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     filters.addEventListener("click", evaluateFilters);
   }
 
+  function setupPagination(index: HTMLElement) {
+    const paginator = index.querySelector<HTMLElement>(".card-pagination");
+    if (!paginator) return;
+
+    setPage(index, 0); // Init to page 0
+
+    paginator.addEventListener("click", (e) => {
+      if (!e.target) return;
+      const t = (e.target as HTMLElement)?.closest("button");
+      if (!t) return;
+
+      const page = setPage(index, t.dataset.action);
+      if (typeof page != "number") return;
+
+      const pageCounter = paginator.querySelector<HTMLInputElement>("input");
+      if (!pageCounter || pageCounter.type != "number") return;
+
+      pageCounter.value = (page + 1).toString();
+    });
+
+    paginator.addEventListener("change", (e) => {
+      if (!e.target) return;
+      const t = (e.target as HTMLElement)?.closest("input");
+      if (!t) return;
+      let page = setPage(index, Number(t.value) - 1);
+      if (typeof page != "number") return;
+
+      t.value = (page + 1).toString();
+    });
+  }
+
   function evaluateFilters(e: Event) {
-    const changedButton = e.target as HTMLElement;
+    const clickedButton = e.target as HTMLElement;
 
-    if (!changedButton.matches("button")) return;
+    if (!clickedButton.matches("button")) return;
+    const filterMode = clickedButton
+      .closest<HTMLElement>("[data-filtermode]")
+      ?.dataset.filtermode?.split(" ");
+    const oldStatus = clickedButton.getAttribute("data-status") || "ignore";
 
-    switch (changedButton.getAttribute("data-status")) {
-      case "include":
-        changedButton.setAttribute("data-status", "exclude");
-        break;
-      case "exclude":
-        changedButton.removeAttribute("data-status");
-        break;
-      default:
-        changedButton.setAttribute("data-status", "include");
-        break;
-    }
+    if (!filterMode) return;
+    const filterStatus =
+      filterMode[
+        (filterMode?.findIndex((s) => s == oldStatus) + 1) % filterMode.length
+      ];
 
-    const index = changedButton.closest(".card-index-container");
+    clickedButton.dataset.status = filterStatus;
+    clickedButton.dataset.ariaPressed = {
+      include: "true",
+      exclude: "mixed",
+      ignore: "false",
+    }[filterStatus];
+
+    const index: HTMLElement | null = clickedButton.closest(
+      ".card-index-container"
+    );
     if (!index) return;
 
     const filters = Array.from(
@@ -242,12 +315,53 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     Array.from(index.querySelectorAll(".card-index-card")).forEach((card) =>
       card.classList.toggle("filter-hide", !card.matches(selector))
     );
+    setPage(index);
     console.log("Applied selector", selector);
   }
 
   function filterSelector(filter: HTMLElement): string {
     return filter.dataset.value
-      ? `[data-${filter.dataset.filter}*="${filter.dataset.value}"]`
+      ? `[data-${filter.dataset.filter}~="${filter.dataset.value}"]`
       : `[data-${filter.dataset.filter}]`;
+  }
+
+  function setPage(
+    index: HTMLElement,
+    page: number | string | undefined = undefined
+  ): number | undefined {
+    const paginator = index.querySelector<HTMLElement>(".card-pagination");
+    if (!paginator) return;
+
+    const pageSize = Number(paginator.dataset.pageSize);
+    if (isNaN(pageSize)) return;
+
+    const unfilteredItems = index.querySelectorAll(
+      ".card-items > :not(.filter-hide)"
+    );
+
+    let pageNumber = Number(paginator.dataset.page);
+
+    if (typeof page == "string") {
+      if (page.startsWith("+")) pageNumber += Number(page.slice(1));
+      if (page.startsWith("-")) pageNumber -= Number(page.slice(1));
+      if (!isNaN(Number(page))) pageNumber = Number(page);
+    } else if (typeof page == "number") {
+      pageNumber = page;
+    }
+
+    const numPages = Math.ceil(unfilteredItems.length / pageSize);
+    if (pageNumber >= numPages) pageNumber = numPages - 1;
+    if (pageNumber < 0) pageNumber = 0;
+
+    const minItem = pageNumber * pageSize;
+    const maxItem = minItem + pageSize;
+
+    unfilteredItems.forEach((card, i) => {
+      card.classList.toggle("pagination-hide", i < minItem || i >= maxItem);
+    });
+
+    paginator.dataset.page = pageNumber.toString();
+
+    return pageNumber;
   }
 </script>
