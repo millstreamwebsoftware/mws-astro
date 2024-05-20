@@ -69,7 +69,10 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
             data-filters={filters.join(" ")}
             data-filtermode={filterMode}
           >
-            {/* <Icon name="fa6-solid:filter" height="1.5rem" /> */}
+            <button data-filter="clear">
+              <Icon name="fa6-solid:filter" height="1.5rem" />
+              Clear Filters
+            </button>
           </div>
         )
       }
@@ -115,12 +118,26 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
 
   .card-tools {
     grid-area: tools;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: space-between;
   }
 
   .card-index-container {
     display: grid;
     grid-template-areas: "tools" "items";
     gap: 3rem;
+  }
+
+  button {
+    svg {
+      pointer-events: none;
+    }
+
+    &:disabled {
+      opacity: 0.2;
+    }
   }
 </style>
 
@@ -129,6 +146,7 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    gap: 2rem;
 
     > .card-filter-set {
       display: flex;
@@ -219,7 +237,7 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
 
     if (!filters) return;
 
-    filters.innerHTML = Object.entries(options)
+    filters.innerHTML += Object.entries(options)
       .map(([option, values]) => {
         if (values.size == 1 && values.has("")) {
           return `<button data-filter="${option}" data-value="" id="cif-${option}" aria-pressed="false"/>${option.replaceAll(/(-|_)/g, " ")}</button>`;
@@ -238,58 +256,10 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     filters.addEventListener("click", evaluateFilters);
   }
 
-  function setupPagination(index: HTMLElement) {
-    const paginator = index.querySelector<HTMLElement>(".card-pagination");
-    if (!paginator) return;
-
-    setPage(index, 0); // Init to page 0
-
-    paginator.addEventListener("click", (e) => {
-      if (!e.target) return;
-      const t = (e.target as HTMLElement)?.closest("button");
-      if (!t) return;
-
-      const page = setPage(index, t.dataset.action);
-      if (typeof page != "number") return;
-
-      const pageCounter = paginator.querySelector<HTMLInputElement>("input");
-      if (!pageCounter || pageCounter.type != "number") return;
-
-      pageCounter.value = (page + 1).toString();
-    });
-
-    paginator.addEventListener("change", (e) => {
-      if (!e.target) return;
-      const t = (e.target as HTMLElement)?.closest("input");
-      if (!t) return;
-      let page = setPage(index, Number(t.value) - 1);
-      if (typeof page != "number") return;
-
-      t.value = (page + 1).toString();
-    });
-  }
-
   function evaluateFilters(e: Event) {
     const clickedButton = e.target as HTMLElement;
 
     if (!clickedButton.matches("button")) return;
-    const filterMode = clickedButton
-      .closest<HTMLElement>("[data-filtermode]")
-      ?.dataset.filtermode?.split(" ");
-    const oldStatus = clickedButton.getAttribute("data-status") || "ignore";
-
-    if (!filterMode) return;
-    const filterStatus =
-      filterMode[
-        (filterMode?.findIndex((s) => s == oldStatus) + 1) % filterMode.length
-      ];
-
-    clickedButton.dataset.status = filterStatus;
-    clickedButton.dataset.ariaPressed = {
-      include: "true",
-      exclude: "mixed",
-      ignore: "false",
-    }[filterStatus];
 
     const index: HTMLElement | null = clickedButton.closest(
       ".card-index-container"
@@ -299,6 +269,36 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     const filters = Array.from(
       index.querySelectorAll<HTMLInputElement>(".card-filters button")
     );
+
+    const filterMode = clickedButton
+      .closest<HTMLElement>("[data-filtermode]")
+      ?.dataset.filtermode?.split(" ");
+
+    if (!filterMode) return;
+
+    const ariaPressed = {
+      include: "true",
+      exclude: "mixed",
+      ignore: "false",
+    };
+
+    if (clickedButton.dataset?.filter == "clear") {
+      filters.forEach((filter) => {
+        if (filter == clickedButton) return;
+        let filterStatus = filterMode?.[0] as keyof typeof ariaPressed;
+        filter.dataset.status = filterStatus;
+        filter.dataset.ariaPressed = ariaPressed[filterStatus];
+      });
+    } else {
+      const oldStatus = clickedButton.getAttribute("data-status") || "ignore";
+
+      const filterStatus = filterMode[
+        (filterMode?.findIndex((s) => s == oldStatus) + 1) % filterMode.length
+      ] as keyof typeof ariaPressed;
+
+      clickedButton.dataset.status = filterStatus;
+      clickedButton.dataset.ariaPressed = ariaPressed[filterStatus];
+    }
 
     const include = filters.filter(
       (filter) => filter.dataset.status == "include"
@@ -325,6 +325,34 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
       : `[data-${filter.dataset.filter}]`;
   }
 
+  function setupPagination(index: HTMLElement) {
+    const paginator = index.querySelector<HTMLElement>(".card-pagination");
+    if (!paginator) return;
+
+    setPage(index, 0); // Init to page 0
+
+    paginator.addEventListener("click", (e) => {
+      if (!e.target) return;
+      const t = (e.target as HTMLElement)?.closest("button");
+      if (!t) return;
+
+      const page = setPage(index, t.dataset.action);
+      if (typeof page != "number") return;
+
+      const pageCounter = paginator.querySelector<HTMLInputElement>("input");
+      if (!pageCounter || pageCounter.type != "number") return;
+
+      pageCounter.value = (page + 1).toString();
+    });
+
+    paginator.addEventListener("change", (e) => {
+      if (!e.target) return;
+      const t = (e.target as HTMLElement)?.closest("input");
+      if (!t) return;
+      setPage(index, Number(t.value) - 1);
+    });
+  }
+
   function setPage(
     index: HTMLElement,
     page: number | string | undefined = undefined
@@ -339,15 +367,7 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
       ".card-items > :not(.filter-hide)"
     );
 
-    let pageNumber = Number(paginator.dataset.page);
-
-    if (typeof page == "string") {
-      if (page.startsWith("+")) pageNumber += Number(page.slice(1));
-      if (page.startsWith("-")) pageNumber -= Number(page.slice(1));
-      if (!isNaN(Number(page))) pageNumber = Number(page);
-    } else if (typeof page == "number") {
-      pageNumber = page;
-    }
+    let pageNumber = getPageOffset(Number(paginator.dataset.page), page);
 
     const numPages = Math.ceil(unfilteredItems.length / pageSize);
     if (pageNumber >= numPages) pageNumber = numPages - 1;
@@ -361,7 +381,43 @@ cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
     });
 
     paginator.dataset.page = pageNumber.toString();
+    const pageCounter = paginator.querySelector<HTMLInputElement>("input");
+    const pageButtons = paginator.querySelectorAll<HTMLElement>("button");
+    if (pageCounter) {
+      pageCounter.value = (pageNumber + 1).toString();
+      pageCounter.setAttribute("max", numPages.toString());
+    }
 
+    pageButtons.forEach((button) => {
+      let buttonPageTarget = getPageOffset(pageNumber, button.dataset?.action);
+
+      if (button.dataset?.action == "0") {
+        return button.toggleAttribute("disabled", pageNumber == 0);
+      }
+      if (button.dataset?.action == "Infinity") {
+        return button.toggleAttribute("disabled", pageNumber + 1 == numPages);
+      }
+
+      button.toggleAttribute(
+        "disabled",
+        buttonPageTarget >= numPages || buttonPageTarget < 0
+      );
+    });
+
+    return pageNumber;
+  }
+
+  function getPageOffset(
+    pageNumber: number,
+    offset: string | number | undefined
+  ): number {
+    if (typeof offset == "string") {
+      if (offset.startsWith("+")) return pageNumber + Number(offset.slice(1));
+      if (offset.startsWith("-")) return pageNumber - Number(offset.slice(1));
+      if (!isNaN(Number(offset))) return Number(offset);
+    } else if (typeof offset == "number") {
+      return offset;
+    }
     return pageNumber;
   }
 </script>
