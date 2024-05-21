@@ -12,27 +12,19 @@ interface Props {
 }
 
 const { card, include, filters } = Astro.props;
-// const includeProp: CollectionKey[] = include;
 
-const cardProps: Record<string, any> = {};
+const combinedCard = Object.assign(Object.assign({}, card), card.data);
 
-include.forEach((key) => {
-  if (card.hasOwnProperty(key)) {
-    cardProps[key] = card[key as keyof typeof card];
-  } else if (card.data.hasOwnProperty(key)) {
-    cardProps[key] = card.data[key as keyof typeof card.data];
-  }
-});
-
-// console.log(include, card);
+const cardProps = Object.fromEntries(
+  Object.entries(combinedCard).filter(([k, v]) => include.includes(k))
+);
 
 const { title, description, thumbnail, slug, ...cardData } = cardProps;
-// const Link = slug || include.includes("link") ? "a" : Fragment;
 const link = slug || include.includes("link");
 
 // Convert card props to data attributes for filtering
 const filterData = Object.fromEntries(
-  Object.entries(cardData)
+  Object.entries(combinedCard)
     .filter(([k, v]) => filters.includes(k))
     .map(([k, v]) => {
       return [
