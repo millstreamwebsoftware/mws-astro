@@ -13,9 +13,6 @@ interface Props {
   key?: string;
 }
 
-const tree = Astro.locals.tree;
-const data = Astro.locals.collections.pages;
-
 const {
   target = "/",
   include = ["title", "description", "thumbnail", "link"],
@@ -26,33 +23,64 @@ const {
 } = Astro.props;
 
 const filterMode = "ignore include"; //ignore include exclude
+var cards;
 
-const targetFragments = target?.split("/").filter((frg) => frg !== "");
-let cursor = tree;
-let error;
+// @ts-ignore
+if (!ENV_BOOKSHOP_LIVE) {
+  const tree = Astro.locals.tree;
+  const data = Astro.locals.collections.pages;
 
-if (targetFragments !== undefined) {
-  for (let i = 0; i < targetFragments.length; i++) {
-    if (
-      !(cursor?.children !== undefined && targetFragments[i] in cursor.children)
-    ) {
-      error = `Could not resolve path ${target}`;
-      break;
+  const targetFragments = target?.split("/").filter((frg) => frg !== "");
+  let cursor = tree;
+  let error;
+
+  if (targetFragments !== undefined) {
+    for (let i = 0; i < targetFragments.length; i++) {
+      if (
+        !(
+          cursor?.children !== undefined &&
+          targetFragments[i] in cursor.children
+        )
+      ) {
+        error = `Could not resolve path ${target}`;
+        break;
+      }
+
+      cursor = cursor.children[targetFragments[i]];
     }
-
-    cursor = cursor.children[targetFragments[i]];
   }
+
+  const slugs =
+    cursor.children &&
+    Object.values(cursor.children).reduce<Set<string>>((obj, node) => {
+      node?.slug !== undefined && obj.add(node?.slug);
+      return obj;
+    }, new Set());
+  cards = slugs && data.filter((node) => slugs.has(node.slug));
+
+  cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
+} else {
+  cards = [
+    {
+      id: "bookshopPlaceholder",
+      slug: "bookshopPlaceholder",
+      body: "",
+      collection: "pages",
+      data: {
+        title: "Bookshop Placeholder",
+        description:
+          "This is a placeholder item for previewing card indexes in the live editor. ",
+        thumbnail: undefined,
+        status: "online",
+        order: 4,
+        content_blocks: [],
+        show_global_header: true,
+        show_global_footer: true,
+      },
+      render: undefined,
+    },
+  ];
 }
-
-const slugs =
-  cursor.children &&
-  Object.values(cursor.children).reduce<Set<string>>((obj, node) => {
-    node?.slug !== undefined && obj.add(node?.slug);
-    return obj;
-  }, new Set());
-const cards = slugs && data.filter((node) => slugs.has(node.slug));
-
-cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
 
 // const cards = Object.values(cursor?.children).map((node) => {
 //   return node?.slug !== undefined && node.slug in data ? data[node.slug]
