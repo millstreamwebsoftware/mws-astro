@@ -10,7 +10,50 @@ spec:
 blueprint:
   target: ""
   include: []
+  filters: []
+  columns: 4
+  pageSize: 0
 
 preview:
   target: /
   include: ["title", "thumbnail", "description", "link"]
+
+_inputs:
+  target:
+    type: text
+    label: Target
+    comment: Path to fetch cards from.
+  include:
+    type: multiselect
+    label: Include
+    comment: Properties to include on each card
+    options:
+      values:
+        - title
+        - thumbnail
+        - description
+        - link
+        - categories
+      allow_create: true
+  filters:
+    type: multiselect
+    label: Filters
+    comment: Show filters for certain properties
+    options:
+      values:
+        - categories
+  columns:
+    type: number
+    label: Columns
+    comment: The number of columns items are arranged into, provided there is space.
+    options:
+      min: 1
+      step: 1
+      max: 8
+  pageSize:
+    type: number
+    label: Page Size
+    comment: How many items to show per page. 0 disables pagination and shows all items at once.
+    options:
+      min: 0
+      step: 1
