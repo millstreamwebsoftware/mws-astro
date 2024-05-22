@@ -13,6 +13,7 @@ blueprint:
   filters: []
   columns: 4
   pageSize: 0
+  limit: 0
 
 preview:
   target: /
@@ -54,6 +55,13 @@ _inputs:
     type: number
     label: Page Size
     comment: How many items to show per page. 0 disables pagination and shows all items at once.
+    options:
+      min: 0
+      step: 1
+  pageSize:
+    type: number
+    label: Limit Cards
+    comment: How many items to show in total. 0 disables the limit.
     options:
       min: 0
       step: 1

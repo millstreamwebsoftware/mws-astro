@@ -10,15 +10,17 @@ interface Props {
   filters?: string[];
   columns?: number;
   pageSize?: number;
+  limit?: number;
   key?: string;
 }
 
 const {
   target = "/",
   include = ["title", "description", "thumbnail", "link"],
-  columns = 4,
+  columns = 4, // TODO: Make this work
   filters = [""],
   pageSize = 0,
+  limit = 0,
   key,
 } = Astro.props;
 
@@ -59,9 +61,10 @@ if (!ENV_BOOKSHOP_LIVE) {
   cards = slugs && data.filter((node) => slugs.has(node.slug));
 
   cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
+  cards = cards?.slice(0, limit || undefined); // Limit number of cards if required
 } else {
   // Create placeholder cards for the live editor
-  cards = new Array(pageSize || columns * 2).fill({
+  cards = new Array(limit || pageSize || columns * 2).fill({
     id: "bookshopPlaceholder",
     slug: "bookshopPlaceholder",
     body: "",
@@ -138,7 +141,7 @@ if (!ENV_BOOKSHOP_LIVE) {
 <style lang="scss">
   .card-items {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(var(--columns, 4), 1fr);
     gap: 2rem;
 
     grid-area: items;
