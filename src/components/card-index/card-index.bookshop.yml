@@ -58,7 +58,7 @@ _inputs:
     options:
       min: 0
       step: 1
-  pageSize:
+  limit:
     type: number
     label: Limit Cards
     comment: How many items to show in total. 0 disables the limit.
