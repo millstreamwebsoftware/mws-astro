@@ -1,109 +1,74 @@
 ---
 import Section from "@layouts/Section.astro";
-// import preferences from "@data/preferences.json";
+import preferences from "@data/preferences.json";
 
 export interface props {
-  lat: number;
-  lng: number;
+  location?: string;
+  lat?: number;
+  lng?: number;
   zoom?: number;
   mapType?: string;
   mapId?: string;
-  marker?: boolean;
+  // marker?: boolean;
   height: number;
   style?: string;
   indent?: boolean;
   key?: string;
 }
 
-const { lat, lng, zoom, marker, key, indent, mapId, style } = Astro.props;
+const {
+  location = "Perth City, WA",
+  lat,
+  lng,
+  zoom,
+  // marker = true,
+  key,
+  indent,
+  mapId,
+  style,
+} = Astro.props;
 
-//   bookshop || import.meta.env.DEV
-//     ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
-//     : preferences.API.google_maps.api_key;
+// @ts-expect-error
+const bs = ENV_BOOKSHOP_LIVE || true;
+
+const apiKey =
+  bs || import.meta.env.DEV
+    ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
+    : preferences.API.google_maps.api_key;
 // const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "hybrid";
 const id = "map-" + key;
+
+const mapMode = location ? "place" : "view";
+const mapURL = new URL(
+  `https://www.google.com/maps/embed/v1/${mapMode}?key=${apiKey}`
+);
+
+location && mapURL.searchParams.append("q", location);
+lat && lng && mapURL.searchParams.append("center", `${lat},${lng}`);
+zoom && mapURL.searchParams.append("zoom", zoom?.toString());
+mapType && mapURL.searchParams.append("maptype", mapType?.toString());
 ---
 
 <Section component="map" {...Astro.props}>
-  <div
-    class="map-box"
-    data-map={id}
-    data-lat={lat}
-    data-lng={lng}
-    data-zoom={zoom}
-    data-marker={marker}
-    data-map-type={mapType}
-    data-map-id={mapId}
-  >
-  </div>
+  <iframe
+    src={mapURL.toString()}
+    width="450"
+    height="250"
+    referrerpolicy="no-referrer-when-downgrade"
+    loading="lazy"
+    frameborder="0"
+    style="border: 0"
+    allowfullscreen></iframe>
 </Section>
-
-<script>
-  import { Loader } from "@googlemaps/js-api-loader";
-  import preferences from "@data/preferences.json";
-
-  const loader = new Loader({
-    apiKey: import.meta.env.DEV
-      ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
-      : preferences.API.google_maps.api_key,
-    version: "weekly",
-  });
-
-  document.addEventListener("DOMContentLoaded", setupMaps);
-  // document.addEventListener("astro:after-swap", setupMaps);
-
-  async function setupMaps() {
-    await Promise.all([
-      loader.importLibrary("maps"),
-      loader.importLibrary("marker"),
-    ]);
-
-    const maps = document.querySelectorAll<HTMLElement>("[data-map]");
-    if (!maps.length) return;
-
-    maps.forEach(initMap);
-  }
-
-  async function initMap(mapElement: MapElement) {
-    const Map = google.maps.Map;
-    const Marker = google.maps.Marker;
-
-    const styleEl = mapElement.parentElement?.querySelector(
-      ":scope > script.map-style"
-    );
-    const styles = styleEl?.innerHTML
-      ? JSON.parse(styleEl?.innerHTML)?.styles
-      : undefined;
-
-    const position = {
-      lat: Number(mapElement.dataset?.lat),
-      lng: Number(mapElement.dataset?.lng),
-    };
-
-    const mapOptions: google.maps.MapOptions = {
-      center: position,
-      zoom: Number(mapElement.dataset?.zoom),
-      mapTypeId: mapElement.dataset?.mapType,
-      mapId: mapElement.dataset?.mapId,
-      styles,
-    };
-
-    // Clear map contents to ensure a clean slate
-    mapElement.innerHTML = "";
-    mapElement.map = new Map(mapElement, mapOptions);
-
-    if ("marker" in mapElement.dataset) {
-      new Marker({
-        position,
-        map: mapElement.map,
-      });
-    }
-  }
-</script>
 
 <style>
   .map-box {
     min-height: 100%;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
   }
 </style>

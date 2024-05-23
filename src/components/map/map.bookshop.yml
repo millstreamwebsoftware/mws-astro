@@ -9,20 +9,24 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
+  location:
   lat: -32.0390536
   lng: 115.631223
   zoom: 12
   mapType: roadmap
-  marker: false
+  # marker: false
   height: 40
   indent: true
-  mapId:
-  style:
+  # mapId:
+  # style:
 
 _inputs:
+  location:
+    label: Location
+    comment: Place name, address, or plus code. Displays a marker if set.
   lat:
     label: Latitude
-    comment: Latitude and Longitude can be copied by right clicking a position on the map in Google Maps.
+    comment: Required if location is not specified. Latitude and Longitude can be copied by right clicking a position on the map in Google Maps.
     type: number
   lng:
     label: Longitude
@@ -41,11 +45,11 @@ _inputs:
       values:
         - roadmap
         - satellite
-        - hybrid
-        - terrain
-  marker:
-    type: switch
-    comment: Show a marker pin at the center of the map
+        # - hybrid
+        # - terrain
+  # marker:
+  #   type: switch
+  #   comment: Show a marker pin at the center of the map
   height:
     type: number
     comment: Map height, in percentage of browser window height (vh).
@@ -54,14 +58,14 @@ _inputs:
       max: 100
   indent:
     type: switch
-  style:
-    type: text
-    comment: Use a legacy map style loaded from src/styles/<style>.map.json
-    hidden: mapId
-  mapId:
-    type: text
-    label: Google Map ID
-    comment: Override map style with Google Cloud Map Styling. Enables usage of Vector Maps via Google Cloud Console.
+  # style:
+  #   type: text
+  #   comment: Use a legacy map style loaded from src/styles/<style>.map.json
+  #   hidden: mapId
+  # mapId:
+  #   type: text
+  #   label: Google Map ID
+  #   comment: Override map style with Google Cloud Map Styling. Enables usage of Vector Maps via Google Cloud Console.
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 
