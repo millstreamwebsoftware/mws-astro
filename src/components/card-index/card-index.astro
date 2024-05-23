@@ -109,7 +109,7 @@ if (!ENV_BOOKSHOP_LIVE) {
         )
       }
       {
-        !!pageSize && (
+        !!pageSize && cards && cards?.length > pageSize && (
           <div class="card-pagination" data-page-size={pageSize} data-page={0}>
             <button data-action="0">
               <Icon name="fa6-solid:backward-step" height="1.5rem" />
