@@ -1,6 +1,6 @@
 ---
 import Section from "@layouts/Section.astro";
-import preferences from "@data/preferences.json";
+// import preferences from "@data/preferences.json";
 
 export interface props {
   lat: number;
@@ -15,51 +15,17 @@ export interface props {
   key?: string;
 }
 
-// @ts-ignore
-const bookshop: boolean = ENV_BOOKSHOP_LIVE;
 const { lat, lng, zoom, marker, key, indent, mapId, style } = Astro.props;
 
-let styles;
-if (!bookshop) {
-  // Import map styles from src/styles/<name>.map.json
-  styles = Object.entries(await Astro.glob("@custom/*.map.json")).reduce<
-    Record<string, any>
-  >((i, n) => {
-    let name = n[0]
-      .split("/")
-      .at(-1)
-      ?.match(/(.*)\.map\.json$/)?.[1];
-    if (!name) return i;
-    i[name] = n[1];
-    return i;
-  }, {});
-}
-
-let mapStyle;
-if (styles && (style || "default") in styles && !mapId) {
-  mapStyle = styles[style || "default"];
-}
-
-const apiKey =
-  bookshop || import.meta.env.DEV
-    ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
-    : preferences.API.google_maps.api_key;
+//   bookshop || import.meta.env.DEV
+//     ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
+//     : preferences.API.google_maps.api_key;
 // const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "hybrid";
 const id = "map-" + key;
 ---
 
 <Section component="map" {...Astro.props}>
-  {
-    mapStyle && (
-      <script
-        id={`map-style-${key}`}
-        class="map-style"
-        set:html={JSON.stringify(mapStyle)}
-        type="application/json"
-      />
-    )
-  }
   <div
     class="map-box"
     data-map={id}
@@ -68,56 +34,38 @@ const id = "map-" + key;
     data-zoom={zoom}
     data-marker={marker}
     data-map-type={mapType}
-    data-api-key={apiKey}
     data-map-id={mapId}
   >
   </div>
 </Section>
 
 <script>
-  // import { Loader } from "@googlemaps/js-api-loader";
+  import { Loader } from "@googlemaps/js-api-loader";
+  import preferences from "@data/preferences.json";
+
+  const loader = new Loader({
+    apiKey: import.meta.env.DEV
+      ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
+      : preferences.API.google_maps.api_key,
+    version: "weekly",
+  });
 
   document.addEventListener("DOMContentLoaded", setupMaps);
-  document.addEventListener("astro:after-swap", setupMaps);
+  // document.addEventListener("astro:after-swap", setupMaps);
 
   async function setupMaps() {
+    await Promise.all([
+      loader.importLibrary("maps"),
+      loader.importLibrary("marker"),
+    ]);
+
     const maps = document.querySelectorAll<HTMLElement>("[data-map]");
     if (!maps.length) return;
-
-    const apiKey = maps[0].dataset.apiKey;
-    if (!apiKey) return console.warn("Map missing API Key", maps[0]);
-
-    if ("google" in window && google?.maps != undefined) {
-      console.debug(
-        "[map.astro] Initialising map with existing Google Maps JS API"
-      );
-    } else {
-      console.debug(
-        "[map.astro] Loading new Google Maps JS API to initialise map"
-      );
-
-      await import("@googlemaps/js-api-loader").then(async ({ Loader }) => {
-        const loader = new Loader({
-          apiKey,
-          version: "weekly",
-        });
-
-        await loader.importLibrary("maps");
-        await loader.importLibrary("marker");
-      });
-    }
 
     maps.forEach(initMap);
   }
 
   async function initMap(mapElement: MapElement) {
-    // const { Map } = (await google.maps.importLibrary(
-    //   "maps"
-    // )) as google.maps.MapsLibrary;
-    // const { Marker } = (await google.maps.importLibrary(
-    //   "marker"
-    // )) as google.maps.MarkerLibrary;
-
     const Map = google.maps.Map;
     const Marker = google.maps.Marker;
 
