@@ -36,7 +36,10 @@ const headerAreas =
 ---
 
 <header
-  class:list={{ pinned: preferences.header.pin_header }}
+  class:list={{
+    pinned: preferences.header.pin_header != "false",
+    contain: preferences.header.pin_header == "contain",
+  }}
   style={`--text-color: var(--header-color);` +
     `--header-areas: ${headerAreas};`}
 >
@@ -79,6 +82,11 @@ const headerAreas =
     top: 0;
     /* bottom: calc(100% - var(--header-height)); */
     /* height: var(--header-height); */
+  }
+
+  header.pinned.contain {
+    left: max(calc((100vw - var(--page-max-width)) * 0.5), 0vw);
+    right: max(calc((100vw - var(--page-max-width)) * 0.5), 0vw);
   }
 
   .logo {

@@ -66,6 +66,19 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
     <meta name="format-detection" content="telephone=no" />
 
     <Opengraph {title} {description} />
+
+    <script>
+      window.addEventListener(
+        "scroll",
+        (e) => {
+          document.documentElement.classList.toggle(
+            "scrolled",
+            window.scrollY > 100
+          );
+        },
+        { passive: true }
+      );
+    </script>
   </head>
   <body>
     {show_global_header && <Header {id} {paths} {currentPath} />}
