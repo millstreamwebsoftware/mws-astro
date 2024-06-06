@@ -1,27 +1,47 @@
 import { defineMiddleware } from "astro:middleware";
-import { getCollection, type CollectionEntry } from "astro:content";
+import {
+  getCollection,
+  type CollectionEntry,
+  type CollectionKey,
+} from "astro:content";
 import { collections } from "src/content/config";
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
-  const pages = await getCollection("pages", (page) => {
-    return page.data.status === "online";
-  });
-
   const currentPath = ctx.params.slug;
-  ctx.locals.tree = makeTree(pages, currentPath);
+  ctx.locals.collections = await getAllCollections(
+    (page) => page.data.status === "online"
+  );
 
-  ctx.locals.collections = await getAllCollections();
+  ctx.locals.tree = makeTree(
+    Object.values(ctx.locals.collections).flat(),
+    currentPath
+  );
 
   return next();
 });
 
-async function getAllCollections() {
-  type collectionsKey = keyof typeof collections;
+async function getAllCollections(
+  filter:
+    | ((arg0: CollectionEntry<CollectionKey>) => boolean)
+    | undefined = undefined
+) {
+  let allCollections = await Promise.all(
+    Object.keys(collections).map(async (k) => {
+      return [k, await getCollection(k as CollectionKey, filter)];
+    })
+  );
 
-  return Object.keys(collections).reduce(async (c, name) => {
-    c[name] = await getCollection(name as collectionsKey);
-    return c;
-  }, {} as any);
+  let modifiedCollections = allCollections.map(([k, collection]) => {
+    if (k == "pages" || typeof collection == "string") return [k, collection];
+
+    collection.forEach(
+      (entry: Record<string, any>) => (entry.slug = `${k}/${entry.slug}`)
+    );
+
+    return [k, collection];
+  });
+
+  return Object.fromEntries(modifiedCollections);
 }
 
 export enum Relationship {
@@ -36,10 +56,14 @@ export interface TreeNode {
   slug?: string;
   href?: string;
   order?: number;
+  collection?: CollectionKey;
   selected?: Relationship;
 }
 
-function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
+function makeTree(
+  pages: CollectionEntry<CollectionKey>[],
+  currentPath?: string
+) {
   const currentSlug = currentPath || "";
 
   // Determine which pages are 'selected' relative to the request path
@@ -66,15 +90,23 @@ function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
 
   const tree: TreeNode = {};
 
-  const pageList = Array.from(pages).map((page: CollectionEntry<"pages">) => {
-    return {
-      slug: page.slug,
-      href: page.slug.replace(/\/?index$/, ""),
-      order: page.data.order,
-      title: page.data.title,
-      selected: isSelected(page.slug, currentSlug),
-    };
-  });
+  const pageList = Array.from(pages).map(
+    (page: CollectionEntry<CollectionKey>) => {
+      let slug = page.slug;
+      // page.collection == "pages"
+      //   ? page.slug
+      //   : `${page.collection}/${page.slug}`;
+
+      return {
+        slug,
+        href: slug.replace(/\/?index$/, ""),
+        order: page.data.order,
+        title: page.data.title,
+        collection: page.collection,
+        selected: isSelected(slug, currentSlug),
+      };
+    }
+  );
 
   // Sort by path length then order - ensuring parents are before descendants if they exist
   const sorted = pageList.sort(
@@ -84,7 +116,7 @@ function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
   );
 
   sorted.forEach((page: any) => {
-    let path = page.slug.split("/") || [""];
+    let path: Array<string> = page.slug.split("/") || [""];
 
     // Create a cursor at the tree root
     let cursor = tree;
@@ -107,6 +139,8 @@ function makeTree(pages: CollectionEntry<"pages">[], currentPath?: string) {
               (t: string) =>
                 t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
             ),
+          // slug: path.slice(0, i + 1).join("/"),
+          collection: page.collection,
           selected: isSelected(path.slice(0, i + 1).join("/"), currentSlug),
         };
       }

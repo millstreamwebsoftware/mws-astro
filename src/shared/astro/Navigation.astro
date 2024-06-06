@@ -59,6 +59,7 @@ const Items = depth ? Fragment : "div";
           Object.values(pages.children).map((page: TreeNode, i) => {
             // Skip home element if show_home is false
             // if (!preferences.header.show_home && page.href === "") return;
+            if (page.collection && page.collection != "pages") return;
             const children =
               page.children && Object.keys(page.children)?.length;
             const id = `nav-${

@@ -12,7 +12,6 @@ interface Props {
 }
 
 const { card, include, filters } = Astro.props;
-
 const combinedCard = Object.assign(Object.assign({}, card), card.data);
 
 const cardProps = Object.fromEntries(

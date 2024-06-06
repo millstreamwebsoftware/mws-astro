@@ -3,6 +3,7 @@ import Section from "@layouts/Section.astro";
 import Card from "@components/card-index/card.astro";
 import Icon from "@shared/icon.astro";
 import PlaceholderImage from "@components/card-index/card-index-placeholder.png";
+import type { CollectionKey } from "astro:content";
 // import { type TreeNode } from "@mws-astro/middleware";
 
 interface Props {
@@ -18,7 +19,7 @@ interface Props {
 const {
   target = "/",
   include = ["title", "description", "thumbnail", "link"],
-  columns = 4, // TODO: Make this work
+  columns = 4,
   filters = [""],
   pageSize = 0,
   limit = 0,
@@ -31,11 +32,29 @@ var cards;
 // @ts-ignore
 if (!ENV_BOOKSHOP_LIVE) {
   const tree = Astro.locals.tree;
-  const data = Astro.locals.collections.pages;
+  // const data = Astro.locals.collections.pages;
+  // let collection = target.split(":")[0];
+  // if (!Object.keys(Astro.locals.collections).includes(collection))
+  //   collection = "pages";
 
-  const targetFragments = target?.split("/").filter((frg) => frg !== "");
+  const data = Object.values(Astro.locals.collections).flat();
+
+  const targetFragments = target
+    ?.split(":")
+    .at(-1)
+    ?.split("/")
+    .filter((frg) => frg !== "");
+
   let cursor = tree;
-  let error;
+  if (!tree.children) return;
+
+  // console.log(cursor.children.news.children.news.children);
+
+  // if (
+  //   collection != "pages" &&
+  //   Object.keys(tree?.children).includes(`${collection}:`)
+  // )
+  //   cursor = tree.children?.[`${collection}:`];
 
   if (targetFragments !== undefined) {
     for (let i = 0; i < targetFragments.length; i++) {
@@ -45,7 +64,7 @@ if (!ENV_BOOKSHOP_LIVE) {
           targetFragments[i] in cursor.children
         )
       ) {
-        error = `Could not resolve path ${target}`;
+        console.warn(`Could not resolve path ${target}`);
         break;
       }
 
@@ -59,6 +78,7 @@ if (!ENV_BOOKSHOP_LIVE) {
       node?.slug !== undefined && obj.add(node?.slug);
       return obj;
     }, new Set());
+
   cards = slugs && data.filter((node) => slugs.has(node.slug));
 
   cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
@@ -95,7 +115,7 @@ if (!ENV_BOOKSHOP_LIVE) {
   <div class="card-index-container">
     <div class="card-tools">
       {
-        filters.length && (
+        !!filters.length && (
           <div
             class="card-filters"
             data-filters={filters.join(" ")}
