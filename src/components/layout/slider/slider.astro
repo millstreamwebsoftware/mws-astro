@@ -3,6 +3,8 @@ import MarkdownIt from "markdown-it";
 import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
 const md = new MarkdownIt({ html: true });
 import Icon from "@shared/icon.astro";
+import Video from "@shared/Video.astro";
+import Markdown from "@shared/Markdown.astro";
 
 export interface Props {
   slides: any[];
@@ -109,6 +111,9 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                     : ""
                 }
               >
+                {slide.background_video && (
+                  <Video src={slide.background_video} background={true} />
+                )}
                 {slide.background_image && (
                   <img
                     class="slide__background"
@@ -121,7 +126,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                   />
                 )}
                 {slide.content && (
-                  <Fragment set:html={md.render(slide.content)} />
+                  // <Fragment set:html={md.render(slide.content)} />
+                  <div class="content">
+                    <Markdown content={slide.content} />
+                  </div>
                 )}
               </li>
             ))
@@ -241,6 +249,15 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
     padding: 4rem;
     height: 100%;
+  }
+
+  .glide__slide .content {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 10;
   }
 
   .glide__slide .slide__background {

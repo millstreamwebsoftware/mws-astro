@@ -1,0 +1,54 @@
+---
+interface Props {
+  src: string;
+  background?: boolean;
+}
+
+const { src, background } = Astro.props;
+
+// https://vimeo.com/868805980
+// https://vimeo.com/channels/bestofstaffpicks/868805980
+
+//player.vimeo.com/video/746427469?title=0&byline=0&portrait=0&background=1&dnt=1&autoplay=0&muted=1&loop=1
+
+const url = new URL(src);
+
+if (url.hostname.endsWith("vimeo.com")) {
+  url.hostname = "player.vimeo.com";
+  url.pathname = url.pathname.replace(/^(\/.*\/)(\d*)$/, "/video/$2");
+
+  if (background) {
+    url.searchParams.append("title", "0");
+    url.searchParams.append("byline", "0");
+    url.searchParams.append("portrait", "0");
+    url.searchParams.append("background", "1");
+    url.searchParams.append("autoplay", "1");
+    url.searchParams.append("muted", "1");
+    url.searchParams.append("loop", "1");
+  }
+
+  url.searchParams.append("dnt", "1");
+}
+---
+
+<div class="video-wrapper">
+  <iframe src={url.toString()} allowfullscreen allow="autoplay"></iframe>
+</div>
+<style lang="scss">
+  .video-wrapper {
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    inset: 0;
+  }
+
+  iframe {
+    // position: absolute;
+    // inset: 0;
+    flex: 0 0 100%;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+</style>
