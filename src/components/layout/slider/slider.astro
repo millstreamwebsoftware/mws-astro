@@ -1,50 +1,72 @@
 ---
-import MarkdownIt from "markdown-it";
 import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
-const md = new MarkdownIt({ html: true });
 import Icon from "@shared/icon.astro";
-import Video from "@shared/Video.astro";
-import Markdown from "@shared/Markdown.astro";
+import Section from "@layouts/Section.astro";
+import { bookshopName } from "@mws-astro/util";
+
+const contentBlocks = Astro.props.content_blocks;
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+    ["/src/mws-astro/src/components/**/*.astro"],
+    {
+        eager: true,
+    },
+);
+
+const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
+    eager: true,
+});
+
+Object.entries(componentImports).forEach(
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
+);
+
+Object.entries(componentOverrides).forEach(
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
+);
 
 export interface Props {
-  slides: any[];
-  height: number;
-  gap?: number;
-  autoplay?: number;
-  perView?: number;
-  focusAtCenter?: boolean;
-  focusAt?: number;
-  bound?: boolean;
-  showBullets?: boolean;
-  showArrows?: boolean;
-  transition?: string;
-  animationDuration?: number;
-  hoverpause?: boolean;
-  indent?: boolean;
-  classes?: string[];
-  key?: string;
+    content_blocks: any[];
+    height: number;
+    gap?: number;
+    autoplay?: number;
+    perView?: number;
+    focusAtCenter?: boolean;
+    focusAt?: number;
+    bound?: boolean;
+    showBullets?: boolean;
+    showArrows?: boolean;
+    transition?: string;
+    animationDuration?: number;
+    hoverpause?: boolean;
+    indent?: boolean;
+    classes?: string[];
+    key?: string;
 }
 
 declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
 const ENV_EDITOR: boolean =
-  typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
+    typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
 
 const {
-  key,
-  showBullets,
-  showArrows,
-  transition,
-  height,
-  perView,
-  indent,
-  bound,
-  gap,
-  autoplay,
-  animationDuration,
-  focusAt,
-  focusAtCenter,
-  hoverpause,
-  classes,
+    key,
+    showBullets,
+    showArrows,
+    transition,
+    height,
+    perView,
+    indent,
+    bound,
+    gap,
+    autoplay,
+    animationDuration,
+    focusAt,
+    focusAtCenter,
+    hoverpause,
+    classes,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 const slides = Astro.props.slides || [];
@@ -52,334 +74,359 @@ const slides = Astro.props.slides || [];
 type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
 const glideOptions: glideOptionsType = {
-  glide: ENV_EDITOR ? undefined : id,
-  sliderType: transition?.toLowerCase(),
-  autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
-  animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
-  focus: focusAtCenter ? "center" : focusAt,
-  gap,
-  perView,
-  bound,
-  hoverpause,
+    glide: ENV_EDITOR ? undefined : id,
+    sliderType: transition?.toLowerCase(),
+    autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
+    animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
+    focus: focusAtCenter ? "center" : focusAt,
+    gap,
+    perView,
+    bound,
+    hoverpause,
 };
 
 if (glideOptions.sliderType == "fader") {
-  glideOptions.perView = 1;
-  glideOptions.focus = 0;
-  glideOptions.animationDuration = 0;
+    glideOptions.perView = 1;
+    glideOptions.focus = 0;
+    glideOptions.animationDuration = 0;
 }
 
 if (ENV_EDITOR) glideOptions.sliderType = "slider";
 
 // Convert glideOptions to data-* attributes like DOMStringMap
 const dataGlideOptions = Object.entries(glideOptions).reduce(
-  (obj: glideOptionsType, [k, v]) => {
-    obj[`data-${k.replaceAll(/[A-Z]/g, "-$&").toLowerCase()}`] = v;
-    return obj;
-  },
-  {}
+    (obj: glideOptionsType, [k, v]) => {
+        obj[`data-${k.replaceAll(/[A-Z]/g, "-$&").toLowerCase()}`] = v;
+        return obj;
+    },
+    {},
 );
 ---
 
 <section
-  class:list={[
-    "slider",
-    { ENV_EDITOR },
-    `slider-${glideOptions.sliderType}`,
-    classes,
-  ]}
-  style={(animationDuration
-    ? `--transition: ${animationDuration * 1000}ms;`
-    : "") + (indent ? "" : "--indent: 0;")}
+    class:list={[
+        "slider",
+        { ENV_EDITOR },
+        `slider-${glideOptions.sliderType}`,
+        classes,
+    ]}
+    style={(animationDuration
+        ? `--transition: ${animationDuration * 1000}ms;`
+        : "") + (indent ? "" : "--indent: 0;")}
 >
-  <>
-    <div class="glide" {id} {...dataGlideOptions}>
-      <div
-        class="glide__track"
-        data-glide-el="track"
-        style={height ? `--height:${height}vh;` : ""}
-      >
-        <ul class="glide__slides">
-          {
-            slides.map((slide, i) => (
-              <li
-                data-slide-number={i}
-                class:list={["glide__slide"]}
-                style={
-                  slide.background_color
-                    ? `--background-color: ${slide.background_color};`
-                    : ""
-                }
-              >
-                {slide.background_video && (
-                  <Video src={slide.background_video} background={true} />
-                )}
-                {slide.background_image && (
-                  <img
-                    class="slide__background"
-                    src={slide.background_image}
-                    style={
-                      slide.background_fit === "contain"
-                        ? "--background-fit: contain;"
-                        : "--background-fit: cover;"
+    <>
+        <div class="glide" {id} {...dataGlideOptions}>
+            <div
+                class="glide__track"
+                data-glide-el="track"
+                style={height ? `--height:${height}vh;` : ""}
+            >
+                <ul class="glide__slides">
+                    {
+                        contentBlocks.map((block: any, i: any) => {
+                            var Component = components[block._bookshop_name];
+                            if (block._bookshop_name === "layout/slider")
+                                Component = Astro.self;
+                            if (Component) {
+                                return (
+                                    <div class:list={["slider-item"]}>
+                                        <Component
+                                            {...block}
+                                            key={
+                                                (key || "") + "-" + i.toString()
+                                            }
+                                        />
+                                    </div>
+                                );
+                            }
+                            const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+                            console.warn(warnstring);
+                            return (
+                                <div class="missing-component">
+                                    {warnstring}
+                                </div>
+                            );
+                        })
                     }
-                  />
-                )}
-                {slide.content && (
-                  // <Fragment set:html={md.render(slide.content)} />
-                  <div class="content">
-                    <Markdown content={slide.content} />
-                  </div>
-                )}
-              </li>
-            ))
-          }
-        </ul>
-        <div class="glide__overlay"></div>
-      </div>
-      {
-        showArrows && (
-          <div class="glide__arrows" data-glide-el="controls">
-            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
-              <Icon name="carbon:chevron-left" />
-            </button>
-            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
-              <Icon name="carbon:chevron-right" />
-            </button>
-          </div>
-        )
-      }
-      {
-        showBullets && (
-          <div class="glide__bullets" data-glide-el="controls[nav]">
-            {slides.map((slide, i) => (
-              <button class="glide__bullet" data-glide-dir={`=${i}`} />
-            ))}
-          </div>
-        )
-      }
-    </div>
-  </>
+                </ul>
+                <div class="glide__overlay"></div>
+            </div>
+            {
+                showArrows && (
+                    <div class="glide__arrows" data-glide-el="controls">
+                        <button
+                            class="glide__arrow glide__arrow--left"
+                            data-glide-dir="<"
+                        >
+                            <Icon name="carbon:chevron-left" />
+                        </button>
+                        <button
+                            class="glide__arrow glide__arrow--right"
+                            data-glide-dir=">"
+                        >
+                            <Icon name="carbon:chevron-right" />
+                        </button>
+                    </div>
+                )
+            }
+            {
+                showBullets && (
+                    <div class="glide__bullets" data-glide-el="controls[nav]">
+                        {slides.map((slide, i) => (
+                            <button
+                                class="glide__bullet"
+                                data-glide-dir={`=${i}`}
+                            />
+                        ))}
+                    </div>
+                )
+            }
+        </div>
+    </>
 </section>
 
 <script>
-  import Glide from "@glidejs/glide";
+    import Glide from "@glidejs/glide";
 
-  document.addEventListener("DOMContentLoaded", setupGlide);
-  document.addEventListener("astro:after-swap", setupGlide);
+    document.addEventListener("DOMContentLoaded", setupGlide);
+    document.addEventListener("astro:after-swap", setupGlide);
 
-  function setupGlide() {
-    document.querySelectorAll("div[data-glide]").forEach((e, i) => {
-      if (!(e instanceof HTMLElement)) return;
+    function setupGlide() {
+        document.querySelectorAll("div[data-glide]").forEach((e, i) => {
+            if (!(e instanceof HTMLElement)) return;
 
-      if (!e.matches(".ENV_EDITOR *")) {
-        const id = e.getAttribute("id");
+            if (!e.matches(".ENV_EDITOR *")) {
+                const id = e.getAttribute("id");
 
-        const glideOptions: Partial<Glide.Options> = {
-          autoplay: Number(e.dataset?.autoplay) || false,
-          focusAt:
-            e.dataset?.focus == "center"
-              ? "center"
-              : Number(e.dataset?.focus) || 0,
-          bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
-          gap: Number(e.dataset?.gap) || 0,
-          type:
-            e.dataset?.sliderType?.toLowerCase() == "carousel"
-              ? "carousel"
-              : "slider",
-          perView: Number(e.dataset?.perView) || undefined,
-          animationDuration: Number(e.dataset?.animationDuration) || 0,
-          hoverpause: "hoverpause" in e.dataset,
-        };
+                const glideOptions: Partial<Glide.Options> = {
+                    autoplay: Number(e.dataset?.autoplay) || false,
+                    focusAt:
+                        e.dataset?.focus == "center"
+                            ? "center"
+                            : Number(e.dataset?.focus) || 0,
+                    bound:
+                        "bound" in e.dataset
+                            ? e.dataset?.bound === "true"
+                            : undefined,
+                    gap: Number(e.dataset?.gap) || 0,
+                    type:
+                        e.dataset?.sliderType?.toLowerCase() == "carousel"
+                            ? "carousel"
+                            : "slider",
+                    perView: Number(e.dataset?.perView) || undefined,
+                    animationDuration:
+                        Number(e.dataset?.animationDuration) || 0,
+                    hoverpause: "hoverpause" in e.dataset,
+                };
 
-        new Glide(`#${id}`, glideOptions).mount();
-      }
-    });
-  }
+                new Glide(`#${id}`, glideOptions).mount();
+            }
+        });
+    }
 </script>
 
 <style>
-  .ENV_EDITOR .glide__slide {
-    position: relative;
-    border-right: 1px solid black;
-  }
-
-  .ENV_EDITOR .glide__slide::before {
-    content: attr(data-slide-number);
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-top: 4px;
-    border: 1px solid white;
-    border-left: none;
-    background-color: black;
-    color: white;
-    padding: 2px 5px;
-  }
-
-  .ENV_EDITOR .glide__slides {
-    overflow-x: scroll;
-  }
-
-  .ENV_EDITOR .glide__arrows,
-  .ENV_EDITOR .glide__bullets {
-    opacity: 0.5;
-    transition: opacity 0.4s ease-in-out;
-    pointer-events: none;
-  }
-
-  .ENV_EDITOR :hover .glide__arrows,
-  .ENV_EDITOR :hover .glide__bullets {
-    opacity: 0;
-  }
-
-  .slider {
-    --arrow-size: 6rem;
-    --bullet-size: 1rem;
-  }
-
-  .glide__slides {
-    height: var(--height);
-  }
-
-  .glide__slide {
-    background-color: var(--background-color);
-
-    position: relative;
-
-    padding: 4rem;
-    height: 100%;
-  }
-
-  .glide__slide .content {
-    position: relative;
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    justify-content: flex-end;
-    z-index: 10;
-  }
-
-  .glide__slide .slide__background {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: var(--background-fit);
-    object-position: center;
-  }
-
-  .glide__arrows {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .glide__arrow {
-    position: absolute;
-    top: calc(50% - var(--arrow-size) * 0.5);
-    height: var(--arrow-size);
-    width: var(--arrow-size);
-    border: none;
-    background-color: #0000000a;
-    border-radius: var(--arrow-size);
-    backdrop-filter: blur(2px);
-    touch-action: manipulation;
-  }
-
-  .glide__arrow:hover {
-    background-color: #00000044;
-  }
-
-  .glide__arrow--left {
-    left: 1rem;
-  }
-
-  .glide__arrow--right {
-    right: 1rem;
-  }
-
-  .glide__arrow svg {
-    color: rgb(var(--color-accent));
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .glide__bullets {
-    position: absolute;
-    bottom: 0.8rem;
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-direction: row;
-
-    justify-content: center;
-    gap: 1rem;
-  }
-
-  .glide__bullet {
-    border: none;
-    padding: 5px;
-    height: var(--bullet-size) * 0.5;
-    width: var(--bullet-size);
-    border-radius: 0.5rem;
-    background-color: #bbbbbb44;
-    box-shadow: 0 0 0.2rem #00000011;
-    transition:
-      background-color 0.2s ease-in-out,
-      box-shadow 0.2s ease-in-out;
-  }
-
-  .glide__bullet--active {
-    background-color: #ffffffaa;
-    box-shadow: 0 0 0.2rem #00000044;
-  }
-
-  .glide__bullet:hover {
-    box-shadow: 0 0 0.2rem #00000088;
-  }
-
-  .slider-fader .glide__slides {
-    transform: translate3d(0, 0, 0) !important;
-  }
-
-  .slider-fader .glide__slide:first-child {
-    animation-name: startOpaque;
-    animation-duration: var(--transition);
-    animation-iteration-count: 1;
-  }
-
-  .slider-fader .glide__slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    order: 2;
-    opacity: 0;
-    transition: opacity var(--transition) ease-in-out;
-  }
-
-  .slider-fader .glide__slide.glide__slide--active {
-    position: relative;
-    order: 1;
-    opacity: 1;
-    z-index: 1;
-  }
-
-  :where(.glide__overlay) {
-    display: none;
-    pointer-events: none;
-  }
-
-  @keyframes startOpaque {
-    0% {
-      opacity: 1;
+    .ENV_EDITOR .glide__slide {
+        position: relative;
+        border-right: 1px solid black;
     }
-    100% {
-      opacity: 1;
+
+    .ENV_EDITOR .glide__slide::before {
+        content: attr(data-slide-number);
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-top: 4px;
+        border: 1px solid white;
+        border-left: none;
+        background-color: black;
+        color: white;
+        padding: 2px 5px;
     }
-  }
+
+    .ENV_EDITOR .glide__slides {
+        overflow-x: scroll;
+    }
+
+    .ENV_EDITOR .glide__arrows,
+    .ENV_EDITOR .glide__bullets {
+        opacity: 0.5;
+        transition: opacity 0.4s ease-in-out;
+        pointer-events: none;
+    }
+
+    .ENV_EDITOR :hover .glide__arrows,
+    .ENV_EDITOR :hover .glide__bullets {
+        opacity: 0;
+    }
+
+    .slider {
+        --arrow-size: 6rem;
+        --bullet-size: 1rem;
+    }
+
+    .glide__slides {
+        min-height: var(--height);
+    }
+
+    .glide__slide {
+        background-color: var(--background-color);
+
+        position: relative;
+
+        padding: 4rem;
+        height: 100%;
+    }
+
+    .glide__slide .content {
+        position: relative;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: flex-end;
+        z-index: 10;
+    }
+
+    .glide__slide .slide__background {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: var(--background-fit);
+        object-position: center;
+    }
+
+    .glide__arrows {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+    }
+
+    .glide__arrow {
+        position: absolute;
+        top: calc(50% - var(--arrow-size) * 0.5);
+        height: var(--arrow-size);
+        width: var(--arrow-size);
+        border: none;
+        background-color: #0000000a;
+        border-radius: var(--arrow-size);
+        backdrop-filter: blur(2px) invert(0.1);
+        touch-action: manipulation;
+        pointer-events: all;
+    }
+
+    .glide__arrow:hover {
+        background-color: #00000044;
+    }
+
+    .glide__arrow--left {
+        left: 1rem;
+    }
+
+    .glide__arrow--right {
+        right: 1rem;
+    }
+
+    .glide__arrow svg {
+        color: rgb(var(--color-accent));
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .glide__bullets {
+        position: absolute;
+        bottom: 0.8rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: row;
+
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .glide__bullet {
+        border: none;
+        padding: 5px;
+        height: var(--bullet-size) * 0.5;
+        width: var(--bullet-size);
+        border-radius: 0.5rem;
+        background-color: #bbbbbb22;
+        box-shadow: 0 0 0.2rem #00000011;
+        backdrop-filter: invert(0.2);
+        transition:
+            background-color 0.2s ease-in-out,
+            box-shadow 0.2s ease-in-out;
+    }
+
+    .glide__bullet--active {
+        background-color: #ffffffaa;
+        box-shadow: 0 0 0.2rem #00000044;
+    }
+
+    .glide__bullet:hover {
+        box-shadow: 0 0 0.2rem #00000088;
+    }
+
+    .slider-fader .glide__slides {
+        transform: translate3d(0, 0, 0) !important;
+    }
+
+    .slider-fader .glide__slide:first-child {
+        animation-name: startOpaque;
+        animation-duration: var(--transition);
+        animation-iteration-count: 1;
+    }
+
+    .slider-fader .glide__slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        order: 2;
+        opacity: 0;
+        transition: opacity var(--transition) ease-in-out;
+    }
+
+    .slider-fader .glide__slide.glide__slide--active {
+        position: relative;
+        order: 1;
+        opacity: 1;
+        z-index: 1;
+    }
+
+    :where(.glide__overlay) {
+        display: none;
+        pointer-events: none;
+    }
+
+    @keyframes startOpaque {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+
+<style lang="scss" is:global>
+    .slider-item {
+        > section {
+            height: 100%;
+
+            > .component-wrapper {
+                padding-top: var(--header-height);
+
+                > * {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+        }
+    }
 </style>

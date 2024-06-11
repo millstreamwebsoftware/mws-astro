@@ -1,110 +1,110 @@
 @import "src/styles/editor.css";
 
 :root {
-  --page-max-width: 1920px;
+    --page-max-width: 1920px;
 
-  --indent: min(8vw, calc(var(--page-max-width) * 0.08));
-  --vertical-indent: 0.5;
-  --column-gap: calc(var(--indent) * 0.5);
-  --gallery-gap: 1rem;
-  --text-gap: 2rem;
-  --text-gap-small: 1rem;
-  --text-size-huge: 46px;
-  --text-size-xxlarge: 30px;
-  --text-size-xlarge: 22px;
-  --text-size-large: 17px;
-  --text-size-medium: 15px;
-  --text-size-small: 14px;
-  --text-size-xsmall: 12px;
-  --text-size-xxsmall: 10px;
+    --root-indent: min(8vw, calc(var(--page-max-width) * 0.08));
+    --indent: var(--root-indent);
+    --vertical-indent: 0.5;
+    --column-gap: calc(var(--indent) * 0.5);
+    --gallery-gap: 1rem;
+    --text-gap: 2rem;
+    --text-gap-small: 1rem;
+    --text-size-huge: 46px;
+    --text-size-xxlarge: 30px;
+    --text-size-xlarge: 22px;
+    --text-size-large: 17px;
+    --text-size-medium: 15px;
+    --text-size-small: 14px;
+    --text-size-xsmall: 12px;
+    --text-size-xxsmall: 10px;
 
-  --default-font-family: "Open Sans";
-  --feature-font-family: var(--default-font-family);
-  --bold-font-family: var(--default-font-family);
+    --default-font-family: "Open Sans";
+    --feature-font-family: var(--default-font-family);
+    --bold-font-family: var(--default-font-family);
 
-  --color-primary: 24 58 78;
-  --color-accent: 120 45 49;
-  --text-color: var(--color-primary);
-  --heading-color: var(--text-color);
+    --color-primary: 24 58 78;
+    --color-accent: 120 45 49;
+    --text-color: var(--color-primary);
+    --heading-color: var(--text-color);
 
-  --page-background-color: 255 255 255;
-  --page-background-shadow: 0 0 0 / 0.3;
-  --article-background-color: var(--page-background-color);
+    --page-background-color: 255 255 255;
+    --page-background-shadow: 0 0 0 / 0.3;
+    --article-background-color: var(--page-background-color);
 
-  --header-background-color: 0 0 0 / 0.6;
-  --header-background-color-bottom: 0 0 0 / 0.3;
-  --header-color: 255 255 255;
-  --header-height: 100px;
-  // --header-offset-transparent: var(--header-height);
-  --header-offset-transparent: 0;
+    --header-background-color: 0 0 0 / 0.6;
+    --header-background-color-bottom: 0 0 0 / 0.3;
+    --header-color: 255 255 255;
+    --header-height: 100px;
+    // --header-offset-transparent: var(--header-height);
+    --header-offset-transparent: 0;
 
-  --border-radius: 0.3rem;
+    --border-radius: 0.3rem;
 
-  --info-color: 147 205 223;
-  --warning-color: 233 205 115;
-  --details-color: 128 128 128;
-  --error-color: 211 65 65;
+    --info-color: 147 205 223;
+    --warning-color: 233 205 115;
+    --details-color: 128 128 128;
+    --error-color: 211 65 65;
 }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
+    box-sizing: border-box;
+    margin: 0;
 }
 
 html {
-  height: 100%;
-  width: 100%;
-  max-height: 100%;
-  font-size: 62.5%;
-  overflow-x: hidden;
-  font-family: var(--default-font-family);
-  display: grid;
-  grid-template-columns: 1fr min(var(--page-max-width), 100vw) 1fr;
-  scroll-behavior: smooth;
-  // background: linear-gradient(
-  //   to right,
-  //   rgb(var(--page-background-color)),
-  //   rgb(var(--page-background-shadow))
-  //     calc((100% - var(--page-max-width)) * 0.5),
-  //   rgb(var(--page-background-shadow))
-  //     calc((100% - var(--page-max-width)) * 0.5 + var(--page-max-width)),
-  //   rgb(var(--page-background-color))
-  // );
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    font-size: 62.5%;
+    overflow-x: hidden;
+    font-family: var(--default-font-family);
+    display: grid;
+    grid-template-columns: 1fr min(var(--page-max-width), 100vw) 1fr;
+    scroll-behavior: smooth;
+    // background: linear-gradient(
+    //   to right,
+    //   rgb(var(--page-background-color)),
+    //   rgb(var(--page-background-shadow))
+    //     calc((100% - var(--page-max-width)) * 0.5),
+    //   rgb(var(--page-background-shadow))
+    //     calc((100% - var(--page-max-width)) * 0.5 + var(--page-max-width)),
+    //   rgb(var(--page-background-color))
+    // );
 
-  background-color: rgb(var(--page-background-color));
+    background-color: rgb(var(--page-background-color));
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 article {
-  box-shadow: 0 0 10rem rgb(var(--page-background-shadow));
-  background-color: rgb(var(--article-background-color));
+    box-shadow: 0 0 10rem rgb(var(--page-background-shadow));
+    background-color: rgb(var(--article-background-color));
 }
 
 body {
-  // background-color: white;
-  max-width: var(--page-max-width);
-  position: relative;
-  grid-column: 2 / 3;
+    // background-color: white;
+    max-width: var(--page-max-width);
+    position: relative;
+    grid-column: 2 / 3;
 }
 
 section
-  > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address, script)
-  + :is(h1, h2, h3, h4, h5, h6, p, ul, form, address) {
-  margin-top: var(--text-gap);
+    > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address, script)
+    + :is(h1, h2, h3, h4, h5, h6, p, ul, form, address) {
+    margin-top: var(--text-gap);
 }
 
 :is(main, article) > section {
-  padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
-  // padding: var(--indent);
+    padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
 }
 
 [data-component="columns"] {
-  padding: 0;
+    padding: 0;
 }
 
 // section:not(#\9).no-indent {
@@ -125,20 +125,20 @@ section
 // }
 
 section.no-indent {
-  padding: 0;
+    padding: 0;
 
-  &-top {
-    padding-top: 0;
-  }
-  &-bottom {
-    padding-bottom: 0;
-  }
-  &-left {
-    padding-left: 0;
-  }
-  &-right {
-    padding-right: 0;
-  }
+    &-top {
+        padding-top: 0;
+    }
+    &-bottom {
+        padding-bottom: 0;
+    }
+    &-left {
+        padding-left: 0;
+    }
+    &-right {
+        padding-right: 0;
+    }
 }
 
 // main > :first-child {
@@ -146,20 +146,20 @@ section.no-indent {
 // }
 
 main {
-  padding-top: var(--header-height);
+    padding-top: var(--header-height);
 }
 
 main:has(:is(.image, .slider):first-child) {
-  padding-top: var(--header-offset-transparent);
+    padding-top: var(--header-offset-transparent);
 }
 
 form {
-  label {
-    display: block;
-    font-size: var(--text-size-small);
-    font-family: var(--bold-font-family);
-    margin: 0 0 5px;
-  }
+    label {
+        display: block;
+        font-size: var(--text-size-small);
+        font-family: var(--bold-font-family);
+        margin: 0 0 5px;
+    }
 }
 
 p,
@@ -169,76 +169,76 @@ button,
 textarea,
 label,
 select {
-  margin: 0;
-  line-height: 2;
-  font-family: var(--default-font-family);
-  font-size: var(--text-size-medium);
-  color: rgb(var(--text-color));
+    margin: 0;
+    line-height: 2;
+    font-family: var(--default-font-family);
+    font-size: var(--text-size-medium);
+    color: rgb(var(--text-color));
 }
 
 section.richtext table {
-  line-height: 1.6;
-  font-family: var(--default-font-family);
-  font-size: var(--text-size-medium);
-  margin-bottom: 2em;
+    line-height: 1.6;
+    font-family: var(--default-font-family);
+    font-size: var(--text-size-medium);
+    margin-bottom: 2em;
 
-  th {
-    text-align: right;
-    padding-right: 0.5em;
-  }
-
-  td {
-    text-align: left;
-    vertical-align: baseline;
-    padding: calc(var(--indent) * 0.1);
-  }
-
-  @media only screen and (max-width: 768px) {
-    tbody {
-      display: flex;
-      flex-direction: column;
-      // gap: 1rem;
+    th {
+        text-align: right;
+        padding-right: 0.5em;
     }
-    tr {
-      display: flex;
-      flex-direction: column;
-      counter-reset: column;
-      border-bottom: 1px solid
-        color-mix(
-          in oklch,
-          rgb(var(--background-color)) 90%,
-          rgb(var(--text-color))
-        );
 
-      &:last-child {
-        border-bottom: 0;
-      }
-
-      td {
-        position: relative;
-        margin-left: 2rem;
-      }
-
-      td > :is(p, h1, h2, h3, h4, h5, h6):first-child::before,
-      td:not(:has(:is(p, h1, h2, h3, h4, h5, h6):first-child))::before {
-        position: absolute;
-        content: counter(column) ".";
-        counter-increment: column;
-        opacity: 0.5;
-        line-height: inherit;
+    td {
+        text-align: left;
         vertical-align: baseline;
-        left: -1.5rem;
-      }
+        padding: calc(var(--indent) * 0.1);
     }
-  }
 
-  tr:nth-child(even) {
-    background-color: color-mix(
-      in oklch,
-      rgb(var(--background-color)) 95%,
-      rgb(var(--text-color))
-    );
-  }
+    @media only screen and (max-width: 768px) {
+        tbody {
+            display: flex;
+            flex-direction: column;
+            // gap: 1rem;
+        }
+        tr {
+            display: flex;
+            flex-direction: column;
+            counter-reset: column;
+            border-bottom: 1px solid
+                color-mix(
+                    in oklch,
+                    rgb(var(--background-color)) 90%,
+                    rgb(var(--text-color))
+                );
+
+            &:last-child {
+                border-bottom: 0;
+            }
+
+            td {
+                position: relative;
+                margin-left: 2rem;
+            }
+
+            td > :is(p, h1, h2, h3, h4, h5, h6):first-child::before,
+            td:not(:has(:is(p, h1, h2, h3, h4, h5, h6):first-child))::before {
+                position: absolute;
+                content: counter(column) ".";
+                counter-increment: column;
+                opacity: 0.5;
+                line-height: inherit;
+                vertical-align: baseline;
+                left: -1.5rem;
+            }
+        }
+    }
+
+    tr:nth-child(even) {
+        background-color: color-mix(
+            in oklch,
+            rgb(var(--background-color)) 95%,
+            rgb(var(--text-color))
+        );
+    }
 }
 
 h1,
@@ -247,83 +247,83 @@ h3,
 h4,
 h5,
 h6 {
-  margin: 0;
-  margin-top: 0.8em;
-  margin-bottom: 0.4em;
-  line-height: 1.4;
-  font-family: var(--default-font-family);
-  color: rgb(var(--heading-color));
-  text-wrap: balance;
+    margin: 0;
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+    line-height: 1.4;
+    font-family: var(--default-font-family);
+    color: rgb(var(--heading-color));
+    text-wrap: balance;
 }
 
 :is(p, ul, ol, h1, h2, h3, h4, h5, h6):first-child {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 :is(p, ul, ol, h1, h2, h3, h4, h5, h6, table):last-child {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 h1 {
-  font-size: var(--text-size-xxlarge);
-  font-family: var(--feature-font-family);
+    font-size: var(--text-size-xxlarge);
+    font-family: var(--feature-font-family);
 }
 
 h2 {
-  font-size: var(--text-size-xlarge);
-  font-family: var(--feature-font-family);
+    font-size: var(--text-size-xlarge);
+    font-family: var(--feature-font-family);
 }
 
 h3 {
-  font-size: var(--text-size-large);
-  font-family: var(--feature-font-family);
+    font-size: var(--text-size-large);
+    font-family: var(--feature-font-family);
 }
 
 a,
 td,
 th {
-  color: rgb(var(--text-color));
+    color: rgb(var(--text-color));
 }
 
 p {
-  margin-bottom: 0.5em;
+    margin-bottom: 0.5em;
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 h2 + :is(ul, ol) {
-  margin-top: 2rem;
+    margin-top: 2rem;
 }
 
 ul,
 ol {
-  margin-bottom: 1em;
+    margin-bottom: 1em;
 }
 
 li {
-  line-height: 1.5;
-  margin-bottom: 0.5em;
+    line-height: 1.5;
+    margin-bottom: 0.5em;
 }
 
 ::selection {
-  color: black;
-  background-color: rgb(180 213 255);
+    color: black;
+    background-color: rgb(180 213 255);
 }
 
 hr {
-  height: 1px;
-  background-color: rgb(var(--color-primary) / 0.25);
-  border: none;
+    height: 1px;
+    background-color: rgb(var(--color-primary) / 0.25);
+    border: none;
 }
 
 strong {
-  font-family: var(--bold-font-family);
+    font-family: var(--bold-font-family);
 }
 
 button {
-  cursor: pointer;
+    cursor: pointer;
 }
 // .missing-component {
 //   display: none;
@@ -331,31 +331,31 @@ button {
 
 // Fix anchor offset
 :target {
-  scroll-margin-top: calc(var(--header-height) + (var(--indent) * 0.5));
+    scroll-margin-top: calc(var(--header-height) + (var(--indent) * 0.5));
 }
 
 .cms-editor-active .missing-component {
-  display: block;
+    display: block;
 }
 
 .missing-component {
-  display: block;
-  background-color: #faa;
-  padding: 2rem;
-  border: 2px solid red;
-  margin: 1rem;
+    display: block;
+    background-color: #faa;
+    padding: 2rem;
+    border: 2px solid red;
+    margin: 1rem;
 }
 
 section {
-  background-color: rgb(var(--background-color));
+    background-color: rgb(var(--background-color));
 }
 
 a.button {
-  transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
 
-  &:hover {
-    background-color: rgb(var(--text-color) / 0.2);
-  }
+    &:hover {
+        background-color: rgb(var(--text-color) / 0.2);
+    }
 }
 
 // Site specific custom styling

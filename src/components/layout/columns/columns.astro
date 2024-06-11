@@ -3,11 +3,11 @@ import Section from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
 export interface Props {
-  content_blocks: any[];
-  collapse?: boolean;
-  layout?: number[];
-  classes?: any;
-  key?: string;
+    content_blocks: any[];
+    collapse?: boolean;
+    layout?: number[];
+    classes?: any;
+    key?: string;
 }
 
 const { collapse, layout, classes, key } = Astro.props;
@@ -15,22 +15,24 @@ const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/**/*.astro"],
-  {
-    eager: true,
-  }
+    ["/src/mws-astro/src/components/**/*.astro"],
+    {
+        eager: true,
+    },
 );
 
 const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-  eager: true,
+    eager: true,
 });
 
 Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
 );
 
 Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
 );
 
 // const columnCount = contentBlocks.length;
@@ -67,33 +69,33 @@ let layoutBlocks: any[] = [];
 let columns = contentBlocks.length;
 
 if (layout?.length) {
-  columns = lcmAll(layout);
+    columns = lcmAll(layout);
 
-  let row = 0;
-  let i = 0;
-  while (i < contentBlocks.length) {
-    const rowLayout = layout.at(row++) || layout.at(-1); // Use last item in array if out of bounds
-    if (typeof rowLayout === "undefined")
-      throw Error("Undefined value in layout");
-    const subcolumn = columns / rowLayout;
+    let row = 0;
+    let i = 0;
+    while (i < contentBlocks.length) {
+        const rowLayout = layout.at(row++) || layout.at(-1); // Use last item in array if out of bounds
+        if (typeof rowLayout === "undefined")
+            throw Error("Undefined value in layout");
+        const subcolumn = columns / rowLayout;
 
-    for (let j = 0; j < rowLayout; j++) {
-      const block = contentBlocks.at(i++);
-      if (!block) break;
-      const start = j * subcolumn + 1;
-      const columnString = `${start} / span ${subcolumn}`;
-      const rowString = `${row} / span 1`;
-      const cell = {
-        "first-in-row": start === 1,
-        "last-in-row": j + 1 === rowLayout,
-        "first-in-column": row === 1,
-        "last-in-column": contentBlocks.length - i <= rowLayout - j,
-      };
+        for (let j = 0; j < rowLayout; j++) {
+            const block = contentBlocks.at(i++);
+            if (!block) break;
+            const start = j * subcolumn + 1;
+            const columnString = `${start} / span ${subcolumn}`;
+            const rowString = `${row} / span 1`;
+            const cell = {
+                "first-in-row": start === 1,
+                "last-in-row": j + 1 === rowLayout,
+                "first-in-column": row === 1,
+                "last-in-column": contentBlocks.length - i <= rowLayout - j,
+            };
 
-      Object.assign(block, { columnString, rowString, cell });
-      layoutBlocks.push(block);
+            Object.assign(block, { columnString, rowString, cell });
+            layoutBlocks.push(block);
+        }
     }
-  }
 }
 
 let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
@@ -104,159 +106,164 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 ---
 
 <Section component="columns" {...Astro.props}>
-  <div
-    class:list={["columns", { collapse }]}
-    style={{ "--columns": columns }}
-    data-columns={columns}
-  >
-    {
-      items.map((block: any, i: any) => {
-        var Component = components[block._bookshop_name];
-        if (block._bookshop_name === "layout/columns") Component = Astro.self;
-        if (Component) {
-          return (
-            <div
-              style={{
-                "grid-row": block.rowString,
-                "grid-column": block.columnString,
-              }}
-              class:list={["columns-item", block.cell]}
-            >
-              <Component {...block} key={(key || "") + "-" + i.toString()} />
-            </div>
-          );
+    <div
+        class:list={["columns", { collapse }]}
+        style={{ "--columns": columns }}
+        data-columns={columns}
+    >
+        {
+            items.map((block: any, i: any) => {
+                var Component = components[block._bookshop_name];
+                if (block._bookshop_name === "layout/columns")
+                    Component = Astro.self;
+                if (Component) {
+                    return (
+                        <div
+                            style={{
+                                "grid-row": block.rowString,
+                                "grid-column": block.columnString,
+                            }}
+                            class:list={["columns-item", block.cell]}
+                        >
+                            <Component
+                                {...block}
+                                indent={false}
+                                key={(key || "") + "-" + i.toString()}
+                            />
+                        </div>
+                    );
+                }
+                const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+                console.warn(warnstring);
+                return <div class="missing-component">{warnstring}</div>;
+            })
         }
-        const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-        console.warn(warnstring);
-        return <div class="missing-component">{warnstring}</div>;
-      })
-    }
-  </div>
+    </div>
 </Section>
 
 <style lang="scss">
-  div.columns {
-    display: grid;
-    grid-auto-flow: row;
-    grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
-    overflow: hidden;
-    gap: var(--column-gap);
-    padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
-    background-color: rgb(var(--background-color));
-  }
+    div.columns {
+        display: grid;
+        grid-auto-flow: row;
+        grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
+        /* overflow: hidden; */
+        gap: var(--column-gap);
+        /* padding: calc(var(--indent) * var(--vertical-indent)) var(--indent); */
+        background-color: rgb(var(--background-color));
+    }
 
-  .columns.no-indent {
-    padding: 0;
+    .columns.no-indent {
+        padding: 0;
 
-    &-top {
-      padding-top: 0;
+        &-top {
+            padding-top: 0;
+        }
+        &-bottom {
+            padding-bottom: 0;
+        }
+        &-left {
+            padding-left: 0;
+        }
+        &-right {
+            padding-right: 0;
+        }
     }
-    &-bottom {
-      padding-bottom: 0;
-    }
-    &-left {
-      padding-left: 0;
-    }
-    &-right {
-      padding-right: 0;
-    }
-  }
 
-  .columns-item {
-    min-width: 0;
-  }
+    .columns-item {
+        min-width: 0;
+    }
 </style>
 
 <style is:global lang="scss">
-  .columns-item > section {
-    height: 100%;
-    // padding: calc(var(--column-gap));
-    padding: 0;
-  }
-
-  // .columns > {
-  //   .first-in-row > section {
-  //     padding-left: var(--indent);
-  //   }
-  //   .last-in-row > section {
-  //     padding-right: var(--indent);
-  //   }
-  //   .first-in-column > section {
-  //     padding-top: var(--indent);
-  //   }
-  //   .last-in-column > section {
-  //     padding-bottom: var(--indent);
-  //   }
-  // }
-
-  @media only screen and (max-width: 768px) {
-    div.columns.collapse {
-      --columns: 1 !important;
-      gap: var(--indent);
-      grid-template-columns: repeat(var(--columns), 1fr) !important;
-
-      > .columns-item {
-        grid-column: 1 / 2 !important;
-        grid-row: auto !important;
-
-        // > section {
-        //   padding-left: var(--indent);
-        //   padding-right: var(--indent);
-        //   padding-top: var(--column-gap);
-        //   padding-bottom: var(--column-gap);
-
-        //   &:first-child {
-        //     padding-top: var(--indent);
-        //   }
-        //   &:last-child {
-        //     padding-bottom: var(--indent);
-        //   }
-        // }
-
-        section::after {
-          left: calc(var(--indent) * -1) !important;
-          right: calc(var(--indent) * -1) !important;
-          top: 0;
-          bottom: 0;
-        }
-
-        &:first-child section::after {
-          top: calc(var(--indent) * -0.5);
-        }
-
-        &:last-child section::after {
-          bottom: calc(var(--indent) * -0.5);
-        }
-      }
+    .columns-item > section {
+        height: 100%;
+        // padding: calc(var(--column-gap));
+        padding: 0;
     }
-  }
 
-  .columns-item section {
-    position: relative;
-    z-index: 1;
-  }
+    // .columns > {
+    //   .first-in-row > section {
+    //     padding-left: var(--indent);
+    //   }
+    //   .last-in-row > section {
+    //     padding-right: var(--indent);
+    //   }
+    //   .first-in-column > section {
+    //     padding-top: var(--indent);
+    //   }
+    //   .last-in-column > section {
+    //     padding-bottom: var(--indent);
+    //   }
+    // }
 
-  .columns-item section.background-color::after {
-    content: "";
-    position: absolute;
-    inset: calc(var(--column-gap) * -0.5);
-    background-color: rgb(var(--background-color));
-    z-index: -1;
-  }
+    @media only screen and (max-width: 768px) {
+        div.columns.collapse {
+            --columns: 1 !important;
+            gap: var(--indent);
+            grid-template-columns: repeat(var(--columns), 1fr) !important;
 
-  .columns-item.first-in-column section::after {
-    top: calc(var(--indent) * -0.5);
-  }
+            > .columns-item {
+                grid-column: 1 / 2 !important;
+                grid-row: auto !important;
 
-  .columns-item.last-in-column section::after {
-    bottom: calc(var(--indent) * -0.5);
-  }
+                // > section {
+                //   padding-left: var(--indent);
+                //   padding-right: var(--indent);
+                //   padding-top: var(--column-gap);
+                //   padding-bottom: var(--column-gap);
 
-  .columns-item.first-in-row section::after {
-    left: calc(var(--indent) * -1);
-  }
+                //   &:first-child {
+                //     padding-top: var(--indent);
+                //   }
+                //   &:last-child {
+                //     padding-bottom: var(--indent);
+                //   }
+                // }
 
-  .columns-item.last-in-row section::after {
-    right: calc(var(--indent) * -1);
-  }
+                section::after {
+                    left: calc(var(--indent) * -1) !important;
+                    right: calc(var(--indent) * -1) !important;
+                    top: 0;
+                    bottom: 0;
+                }
+
+                &:first-child section::after {
+                    top: calc(var(--indent) * -0.5);
+                }
+
+                &:last-child section::after {
+                    bottom: calc(var(--indent) * -0.5);
+                }
+            }
+        }
+    }
+
+    .columns-item section {
+        position: relative;
+        z-index: 1;
+    }
+
+    .columns-item section.background-color::after {
+        content: "";
+        position: absolute;
+        inset: calc(var(--column-gap) * -0.5);
+        background-color: rgb(var(--background-color));
+        z-index: -1;
+    }
+
+    .columns-item.first-in-column section::after {
+        top: calc(var(--indent) * -0.5);
+    }
+
+    .columns-item.last-in-column section::after {
+        bottom: calc(var(--indent) * -0.5);
+    }
+
+    .columns-item.first-in-row section::after {
+        left: calc(var(--indent) * -1);
+    }
+
+    .columns-item.last-in-row section::after {
+        right: calc(var(--indent) * -1);
+    }
 </style>

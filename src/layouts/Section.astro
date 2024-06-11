@@ -3,207 +3,245 @@ import Sticker from "@components/sticker/sticker.astro";
 import clsx from "clsx";
 import { convertColorString } from "@mws-astro/util";
 import Icon from "@shared/icon.astro";
+import Image from "@shared/Image.astro";
+import Video from "@shared/Video.astro";
 
 export interface Props {
-  component: string;
-  height?: number;
-  background_color?: string;
-  classes?: any;
-  style?: Record<string, any>;
-  indent?: boolean;
-  key?: string;
+    component: string;
+    height?: number;
+    color?: string;
+    background_color?: string;
+    background_image?: string;
+    background_video?: string;
+    classes?: any;
+    style?: Record<string, any>;
+    indent?: boolean;
+    key?: string;
 }
 
-const { component, height, background_color, classes, style, key } =
-  Astro.props;
+const {
+    component,
+    height,
+    color,
+    background_color,
+    background_image,
+    background_video,
+    classes,
+    style,
+    key,
+} = Astro.props;
 
 const background = background_color && convertColorString(background_color);
+const textColor = color && convertColorString(color);
 const id = `${component}-${key}`;
 const indent = Astro.props.indent ?? true;
 
 const classList = clsx(classes).split(" ");
 
 const stickers = classList // Resolve classes like class:list
-  .filter((cl) => cl.startsWith("sticker-"));
+    .filter((cl) => cl.startsWith("sticker-"));
 
 const expando = classList.includes("expando") ? true : false;
 ---
 
 <section
-  style={{
-    ...(background && { "--background-color": background }),
-    ...(height && { "--height": height + "vh" }),
-    ...style,
-  }}
-  class:list={[
-    component,
-    classes,
-    { "no-indent": !indent },
-    { "background-color": background },
-  ]}
-  data-component={component}
-  {id}
+    style={{
+        ...(background && { "--background-color": background }),
+        ...(textColor && {
+            "--text-color": textColor,
+            "--heading-color": "var(--text-color)", // Needs to be redefined to update the value in this context
+        }),
+        ...(height && { "--height": height + "vh" }),
+        ...style,
+    }}
+    class:list={[
+        component,
+        classes,
+        { "no-indent": !indent },
+        { "background-color": background },
+    ]}
+    data-component={component}
+    {id}
 >
-  <div class="component-wrapper">
-    <slot />
-  </div>
-  {
-    stickers.map((sticker) => {
-      return <Sticker name={sticker.replace(/^sticker-/, "")} />;
-    })
-  }
-  {
-    expando && (
-      <div class="expando-overlay">
-        <div class="expando-button" data-for={id}>
-          <Icon name="fa6-solid:circle-chevron-down" height="3rem" />
-          <p>Expand</p>
-        </div>
-      </div>
-    )
-  }
+    {
+        background_image && (
+            <Image
+                image={background_image}
+                width={1920}
+                height={1080}
+                background={true}
+            />
+        )
+    }
+    {background_video && <Video src={background_video} background={true} />}
+    <div class="component-wrapper">
+        <slot />
+    </div>
+    {
+        stickers.map((sticker) => {
+            return <Sticker name={sticker.replace(/^sticker-/, "")} />;
+        })
+    }
+    {
+        expando && (
+            <div class="expando-overlay">
+                <div class="expando-button" data-for={id}>
+                    <Icon name="fa6-solid:circle-chevron-down" height="3rem" />
+                    <p>Expand</p>
+                </div>
+            </div>
+        )
+    }
 </section>
 
 <style lang="scss">
-  section {
-    position: relative;
-    height: var(--height);
-  }
-
-  .component-wrapper {
-    height: 100%;
-  }
-
-  section[data-expando] {
-    height: calc(30vh + (var(--indent) * 2));
+    section {
+        position: relative;
+        height: var(--height);
+        --indent: var(--root-indent);
+        padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
+    }
 
     .component-wrapper {
-      max-height: 100%;
-      overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
     }
 
-    .expando-button {
-      bottom: calc(var(--indent) * 0.5 - 1.5rem);
+    section[data-expando] {
+        height: calc(30vh + (var(--indent) * 2));
+
+        .component-wrapper {
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        .expando-button {
+            bottom: calc(var(--indent) * 0.5 - 1.5rem);
+        }
     }
-  }
 
-  [data-expando] > .expando-overlay::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    top: 50%;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-color)) 80%
-    );
-    // background-color: rgb(var(--background-color) / 0.5);
-    mask-image: linear-gradient(to bottom, transparent, white 60%);
-  }
+    [data-expando] > .expando-overlay::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        top: 50%;
+        backdrop-filter: blur(4px);
+        z-index: 10;
+        background: linear-gradient(
+            to bottom,
+            transparent,
+            rgb(var(--background-color)) 80%
+        );
+        // background-color: rgb(var(--background-color) / 0.5);
+        mask-image: linear-gradient(to bottom, transparent, white 60%);
+    }
 
-  .expando-overlay {
-    cursor: pointer;
-  }
-
-  section.columns .expando-overlay {
-    padding-bottom: 5rem;
-    margin-top: -2rem;
-  }
-  section:is(.no-indent, .no-indent-bottom) {
     .expando-overlay {
-      padding-bottom: 5rem;
+        cursor: pointer;
     }
-  }
 
-  section.expando:not([data-expando]) .expando-button {
-    bottom: calc(var(--indent) * -0.25);
-  }
-
-  .expando-button {
-    position: absolute;
-    z-index: 11;
-    // bottom: 2rem;
-    left: 50%;
-    display: flex;
-    transform: translate(-1.5rem);
-    transition: transform 0.5s ease;
-
-    color: rgb(var(--text-color));
-
-    p {
-      overflow: hidden;
-      white-space: nowrap;
-      text-indent: 1rem;
-      transition: clip-path 0.5s ease;
-      clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+    section.columns .expando-overlay {
+        padding-bottom: 5rem;
+        margin-top: -2rem;
     }
-  }
-
-  .expando-overlay:hover .expando-button {
-    transform: translate(-50%);
-    p {
-      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    section:is(.no-indent, .no-indent-bottom) {
+        .expando-overlay {
+            padding-bottom: 5rem;
+        }
     }
-  }
 
-  @media (hover: none) {
+    section.expando:not([data-expando]) .expando-button {
+        bottom: calc(var(--indent) * -0.25);
+    }
+
     .expando-button {
-      transform: translate(-50%);
-      p {
-        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-      }
+        position: absolute;
+        z-index: 11;
+        // bottom: 2rem;
+        left: 50%;
+        display: flex;
+        transform: translate(-1.5rem);
+        transition: transform 0.5s ease;
+
+        color: rgb(var(--text-color));
+
+        p {
+            overflow: hidden;
+            white-space: nowrap;
+            text-indent: 1rem;
+            transition: clip-path 0.5s ease;
+            clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+        }
     }
-  }
+
+    .expando-overlay:hover .expando-button {
+        transform: translate(-50%);
+        p {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+    }
+
+    @media (hover: none) {
+        .expando-button {
+            transform: translate(-50%);
+            p {
+                clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+            }
+        }
+    }
 </style>
 
 <style is:global>
-  .columns-item
-    > section.expando:not([data-expando])
-    > .expando-overlay
-    .expando-button {
-    /* height: var(--indent); */
+    .columns-item
+        > section.expando:not([data-expando])
+        > .expando-overlay
+        .expando-button {
+        /* height: var(--indent); */
 
-    bottom: calc(var(--indent) * -0.5 - 1.5rem);
-  }
+        bottom: calc(var(--indent) * -0.5 - 1.5rem);
+    }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", setupExpando);
-  document.addEventListener("astro:after-swap", setupExpando);
+    document.addEventListener("DOMContentLoaded", setupExpando);
+    document.addEventListener("astro:after-swap", setupExpando);
 
-  function setupExpando() {
-    const expandos = Array.from(document.querySelectorAll(".expando-overlay"));
+    function setupExpando() {
+        const expandos = Array.from(
+            document.querySelectorAll(".expando-overlay"),
+        );
 
-    expandos.forEach((expando) => {
-      expando.parentElement?.setAttribute("data-expando", "collapsed");
-      expando.addEventListener("click", (e) => {
-        const t = e?.currentTarget as HTMLElement;
-        if (!t) return;
-        const buttonIcon = t.querySelector(".expando-button .icon");
-        const buttonText = t.querySelector(".expando-button p");
-        const buttonOffset = buttonIcon?.getBoundingClientRect()?.top;
-        let state = t?.parentElement?.toggleAttribute("data-expando");
-        console.log(buttonOffset);
+        expandos.forEach((expando) => {
+            expando.parentElement?.setAttribute("data-expando", "collapsed");
+            expando.addEventListener("click", (e) => {
+                const t = e?.currentTarget as HTMLElement;
+                if (!t) return;
+                const buttonIcon = t.querySelector(".expando-button .icon");
+                const buttonText = t.querySelector(".expando-button p");
+                const buttonOffset = buttonIcon?.getBoundingClientRect()?.top;
+                let state = t?.parentElement?.toggleAttribute("data-expando");
+                console.log(buttonOffset);
 
-        if (buttonText) buttonText.innerHTML = state ? "Expand" : "Collapse";
-        if (buttonIcon) buttonIcon.classList.toggle("rot180", !state);
+                if (buttonText)
+                    buttonText.innerHTML = state ? "Expand" : "Collapse";
+                if (buttonIcon) buttonIcon.classList.toggle("rot180", !state);
 
-        // Scroll button to match old viewport position when collapsing
-        if (state && buttonOffset) {
-          const newButtonBounds = buttonIcon?.getBoundingClientRect();
-          const newButtonOffset = newButtonBounds
-            ? newButtonBounds?.top + window.scrollY
-            : undefined;
+                // Scroll button to match old viewport position when collapsing
+                if (state && buttonOffset) {
+                    const newButtonBounds = buttonIcon?.getBoundingClientRect();
+                    const newButtonOffset = newButtonBounds
+                        ? newButtonBounds?.top + window.scrollY
+                        : undefined;
 
-          if (newButtonOffset)
-            window.scrollTo({
-              behavior: "instant",
-              top: newButtonOffset - buttonOffset,
+                    if (newButtonOffset)
+                        window.scrollTo({
+                            behavior: "instant",
+                            top: newButtonOffset - buttonOffset,
+                        });
+                }
             });
-        }
-      });
-    });
-  }
+        });
+    }
 </script>

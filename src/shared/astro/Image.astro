@@ -8,9 +8,10 @@ interface Props {
   alt?: string;
   aspect?: number;
   classes?: string;
+  background?: boolean;
 }
 
-const { image, classes } = Astro.props;
+const { image, classes, background } = Astro.props;
 let { height = image?.height, width = image?.width, aspect } = Astro.props;
 
 if (aspect == undefined) {
@@ -90,7 +91,7 @@ if (placeholder && plData) {
   alt=""
   {width}
   {height}
-  class:list={[classes]}
+  class:list={[classes, { background }]}
   style={placeholderStyle}
   densities={[1, 1.5, 2]}
 />
@@ -100,5 +101,11 @@ if (placeholder && plData) {
     object-fit: cover;
     background-size: cover;
     width: 100%;
+  }
+
+  img.background {
+    position: absolute;
+    height: 100%;
+    inset: 0;
   }
 </style>
