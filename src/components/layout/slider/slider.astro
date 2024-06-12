@@ -69,7 +69,6 @@ const {
     classes,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
-const slides = Astro.props.slides || [];
 
 type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
@@ -103,16 +102,17 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 );
 ---
 
-<section
-    class:list={[
-        "slider",
-        { ENV_EDITOR },
-        `slider-${glideOptions.sliderType}`,
-        classes,
-    ]}
-    style={(animationDuration
-        ? `--transition: ${animationDuration * 1000}ms;`
-        : "") + (indent ? "" : "--indent: 0;")}
+<Section
+    component="slider"
+    classes={[{ ENV_EDITOR }, `slider-${glideOptions.sliderType}`, classes]}
+    {indent}
+    style={{
+        ...(animationDuration && {
+            "--transition": `${animationDuration * 1000}ms`,
+        }),
+    }}
+    {...Astro.props}
+    {key}
 >
     <>
         <div class="glide" {id} {...dataGlideOptions}>
@@ -172,7 +172,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             {
                 showBullets && (
                     <div class="glide__bullets" data-glide-el="controls[nav]">
-                        {slides.map((slide, i) => (
+                        {contentBlocks.map((slide, i) => (
                             <button
                                 class="glide__bullet"
                                 data-glide-dir={`=${i}`}
@@ -183,7 +183,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             }
         </div>
     </>
-</section>
+</Section>
 
 <script>
     import Glide from "@glidejs/glide";
@@ -225,42 +225,44 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
 </script>
 
-<style>
-    .ENV_EDITOR .glide__slide {
-        position: relative;
-        border-right: 1px solid black;
+<style lang="scss">
+    .ENV_EDITOR {
+        .glide__slide {
+            position: relative;
+            border-right: 1px solid black;
+        }
+
+        .glide__slide::before {
+            content: attr(data-slide-number);
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin-top: 4px;
+            border: 1px solid white;
+            border-left: none;
+            background-color: black;
+            color: white;
+            padding: 2px 5px;
+        }
+
+        .glide__slides {
+            overflow-x: scroll;
+        }
+
+        .glide__arrows,
+        .glide__bullets {
+            opacity: 0.5;
+            transition: opacity 0.4s ease-in-out;
+            pointer-events: none;
+        }
+
+        :hover .glide__arrows,
+        :hover .glide__bullets {
+            opacity: 0;
+        }
     }
 
-    .ENV_EDITOR .glide__slide::before {
-        content: attr(data-slide-number);
-        position: absolute;
-        top: 0;
-        left: 0;
-        margin-top: 4px;
-        border: 1px solid white;
-        border-left: none;
-        background-color: black;
-        color: white;
-        padding: 2px 5px;
-    }
-
-    .ENV_EDITOR .glide__slides {
-        overflow-x: scroll;
-    }
-
-    .ENV_EDITOR .glide__arrows,
-    .ENV_EDITOR .glide__bullets {
-        opacity: 0.5;
-        transition: opacity 0.4s ease-in-out;
-        pointer-events: none;
-    }
-
-    .ENV_EDITOR :hover .glide__arrows,
-    .ENV_EDITOR :hover .glide__bullets {
-        opacity: 0;
-    }
-
-    .slider {
+    .glide {
         --arrow-size: 6rem;
         --bullet-size: 1rem;
     }
@@ -271,37 +273,32 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
     .glide__slide {
         background-color: var(--background-color);
-
         position: relative;
-
         padding: 4rem;
         height: 100%;
-    }
 
-    .glide__slide .content {
-        position: relative;
-        display: flex;
-        height: 100%;
-        flex-direction: column;
-        justify-content: flex-end;
-        z-index: 10;
-    }
+        .content {
+            position: relative;
+            display: flex;
+            height: 100%;
+            flex-direction: column;
+            justify-content: flex-end;
+            z-index: 10;
+        }
 
-    .glide__slide .slide__background {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: var(--background-fit);
-        object-position: center;
+        .slide__background {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: var(--background-fit);
+            object-position: center;
+        }
     }
 
     .glide__arrows {
         position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        inset: 0;
         pointer-events: none;
     }
 
@@ -316,6 +313,14 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         backdrop-filter: blur(2px) invert(0.1);
         touch-action: manipulation;
         pointer-events: all;
+
+        svg {
+            color: rgb(var(--color-accent));
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
     }
 
     .glide__arrow:hover {
@@ -328,14 +333,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
     .glide__arrow--right {
         right: 1rem;
-    }
-
-    .glide__arrow svg {
-        color: rgb(var(--color-accent));
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
     }
 
     .glide__bullets {
@@ -353,7 +350,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     .glide__bullet {
         border: none;
         padding: 5px;
-        height: var(--bullet-size) * 0.5;
+        height: calc(var(--bullet-size) * 0.5);
         width: var(--bullet-size);
         border-radius: 0.5rem;
         background-color: #bbbbbb22;
@@ -373,30 +370,32 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         box-shadow: 0 0 0.2rem #00000088;
     }
 
-    .slider-fader .glide__slides {
-        transform: translate3d(0, 0, 0) !important;
-    }
+    .slider-fader {
+        .glide__slides {
+            transform: translate3d(0, 0, 0) !important;
+        }
 
-    .slider-fader .glide__slide:first-child {
-        animation-name: startOpaque;
-        animation-duration: var(--transition);
-        animation-iteration-count: 1;
-    }
+        .glide__slide:first-child {
+            animation-name: startOpaque;
+            animation-duration: var(--transition);
+            animation-iteration-count: 1;
+        }
 
-    .slider-fader .glide__slide {
-        position: absolute;
-        top: 0;
-        left: 0;
-        order: 2;
-        opacity: 0;
-        transition: opacity var(--transition) ease-in-out;
-    }
+        .glide__slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            order: 2;
+            opacity: 0;
+            transition: opacity var(--transition) ease-in-out;
+        }
 
-    .slider-fader .glide__slide.glide__slide--active {
-        position: relative;
-        order: 1;
-        opacity: 1;
-        z-index: 1;
+        .glide__slide.glide__slide--active {
+            position: relative;
+            order: 1;
+            opacity: 1;
+            z-index: 1;
+        }
     }
 
     :where(.glide__overlay) {

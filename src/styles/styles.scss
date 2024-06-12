@@ -151,6 +151,10 @@ main {
 
 main:has(:is(.image, .slider):first-child) {
     padding-top: var(--header-offset-transparent);
+
+    .glide__arrows {
+        top: var(--header-height);
+    }
 }
 
 form {
