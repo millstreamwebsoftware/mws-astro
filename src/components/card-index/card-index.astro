@@ -7,23 +7,23 @@ import type { CollectionKey } from "astro:content";
 // import { type TreeNode } from "@mws-astro/middleware";
 
 interface Props {
-  target: string;
-  include?: string[];
-  filters?: string[];
-  columns?: number;
-  pageSize?: number;
-  limit?: number;
-  key?: string;
+    target: string;
+    include?: string[];
+    filters?: string[];
+    columns?: number;
+    pageSize?: number;
+    limit?: number;
+    key?: string;
 }
 
 const {
-  target = "/",
-  include = ["title", "description", "thumbnail", "link"],
-  columns = 4,
-  filters = [""],
-  pageSize = 0,
-  limit = 0,
-  key,
+    target = "/",
+    include = ["title", "description", "thumbnail", "link"],
+    columns = 4,
+    filters = [""],
+    pageSize = 0,
+    limit = 0,
+    key,
 } = Astro.props;
 
 const filterMode = "ignore include"; //ignore include exclude
@@ -31,79 +31,79 @@ var cards;
 
 // @ts-ignore
 if (!ENV_BOOKSHOP_LIVE) {
-  const tree = Astro.locals.tree;
-  // const data = Astro.locals.collections.pages;
-  // let collection = target.split(":")[0];
-  // if (!Object.keys(Astro.locals.collections).includes(collection))
-  //   collection = "pages";
+    const tree = Astro.locals.tree;
+    // const data = Astro.locals.collections.pages;
+    // let collection = target.split(":")[0];
+    // if (!Object.keys(Astro.locals.collections).includes(collection))
+    //   collection = "pages";
 
-  const data = Object.values(Astro.locals.collections).flat();
+    const data = Object.values(Astro.locals.collections).flat();
 
-  const targetFragments = target
-    ?.split(":")
-    .at(-1)
-    ?.split("/")
-    .filter((frg) => frg !== "");
+    const targetFragments = target
+        ?.split(":")
+        .at(-1)
+        ?.split("/")
+        .filter((frg) => frg !== "");
 
-  let cursor = tree;
-  if (!tree.children) return;
+    let cursor = tree;
+    if (!tree.children) return;
 
-  // console.log(cursor.children.news.children.news.children);
+    // console.log(cursor.children.news.children.news.children);
 
-  // if (
-  //   collection != "pages" &&
-  //   Object.keys(tree?.children).includes(`${collection}:`)
-  // )
-  //   cursor = tree.children?.[`${collection}:`];
+    // if (
+    //   collection != "pages" &&
+    //   Object.keys(tree?.children).includes(`${collection}:`)
+    // )
+    //   cursor = tree.children?.[`${collection}:`];
 
-  if (targetFragments !== undefined) {
-    for (let i = 0; i < targetFragments.length; i++) {
-      if (
-        !(
-          cursor?.children !== undefined &&
-          targetFragments[i] in cursor.children
-        )
-      ) {
-        console.warn(`Could not resolve path ${target}`);
-        break;
-      }
+    if (targetFragments !== undefined) {
+        for (let i = 0; i < targetFragments.length; i++) {
+            if (
+                !(
+                    cursor?.children !== undefined &&
+                    targetFragments[i] in cursor.children
+                )
+            ) {
+                console.warn(`Could not resolve path ${target}`);
+                break;
+            }
 
-      cursor = cursor.children[targetFragments[i]];
+            cursor = cursor.children[targetFragments[i]];
+        }
     }
-  }
 
-  const slugs =
-    cursor.children &&
-    Object.values(cursor.children).reduce<Set<string>>((obj, node) => {
-      node?.slug !== undefined && obj.add(node?.slug);
-      return obj;
-    }, new Set());
+    const slugs =
+        cursor.children &&
+        Object.values(cursor.children).reduce<Set<string>>((obj, node) => {
+            node?.slug !== undefined && obj.add(node?.slug);
+            return obj;
+        }, new Set());
 
-  cards = slugs && data.filter((node) => slugs.has(node.slug));
+    cards = slugs && data.filter((node) => slugs.has(node.slug));
 
-  cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
-  cards = cards?.slice(0, limit || undefined); // Limit number of cards if required
+    cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
+    cards = cards?.slice(0, limit || undefined); // Limit number of cards if required
 } else {
-  // Create placeholder cards for the live editor
-  cards = new Array(limit || pageSize || columns * 2).fill({
-    id: "bookshopPlaceholder",
-    slug: "bookshopPlaceholder",
-    body: "",
-    collection: "pages",
-    data: {
-      title: "Card Index Placeholder",
-      description:
-        "This is a placeholder item for previewing card indexes in the live editor. ",
-      categories: ["placeholder"],
-      thumbnail: PlaceholderImage,
-      status: "online",
-      order: 4,
-      content_blocks: [],
-      show_global_header: true,
-      show_global_footer: true,
-    },
-    render: undefined,
-  });
+    // Create placeholder cards for the live editor
+    cards = new Array(limit || pageSize || columns * 2).fill({
+        id: "bookshopPlaceholder",
+        slug: "bookshopPlaceholder",
+        body: "",
+        collection: "pages",
+        data: {
+            title: "Card Index Placeholder",
+            description:
+                "This is a placeholder item for previewing card indexes in the live editor. ",
+            categories: ["placeholder"],
+            thumbnail: PlaceholderImage,
+            status: "online",
+            order: 4,
+            content_blocks: [],
+            show_global_header: true,
+            show_global_footer: true,
+        },
+        render: undefined,
+    });
 }
 
 // const cards = Object.values(cursor?.children).map((node) => {
@@ -112,364 +112,397 @@ if (!ENV_BOOKSHOP_LIVE) {
 ---
 
 <Section component="card-index" {...Astro.props}>
-  <div class="card-index-container">
-    <div class="card-tools">
-      {
-        !!filters.length && (
-          <div
-            class="card-filters"
-            data-filters={filters.join(" ")}
-            data-filtermode={filterMode}
-          >
-            <button data-filter="clear">
-              <Icon name="fa6-solid:filter" height="1.5rem" />
-              Clear Filters
-            </button>
-          </div>
-        )
-      }
-      {
-        !!pageSize && cards && cards?.length > pageSize && (
-          <div class="card-pagination" data-page-size={pageSize} data-page={0}>
-            <button data-action="0">
-              <Icon name="fa6-solid:backward-step" height="1.5rem" />
-            </button>
-            <button data-action="-1">
-              <Icon name="fa6-solid:angle-left" height="1.5rem" />
-            </button>
-            <input type="number" value="1" min="1" />
-            <button data-action="+1">
-              <Icon name="fa6-solid:angle-right" height="1.5rem" />
-            </button>
-            <button data-action="Infinity">
-              <Icon name="fa6-solid:forward-step" height="1.5rem" />
-            </button>
-          </div>
-        )
-      }
+    <div class="card-index-container">
+        <div class="card-tools">
+            {
+                !!filters.length && (
+                    <div
+                        class="card-filters"
+                        data-filters={filters.join(" ")}
+                        data-filtermode={filterMode}
+                    >
+                        <button data-filter="clear">
+                            <Icon name="fa6-solid:filter" height="1.5rem" />
+                            Clear Filters
+                        </button>
+                    </div>
+                )
+            }
+            {
+                !!pageSize && cards && cards?.length > pageSize && (
+                    <div
+                        class="card-pagination"
+                        data-page-size={pageSize}
+                        data-page={0}
+                    >
+                        <button data-action="0">
+                            <Icon
+                                name="fa6-solid:backward-step"
+                                height="1.5rem"
+                            />
+                        </button>
+                        <button data-action="-1">
+                            <Icon name="fa6-solid:angle-left" height="1.5rem" />
+                        </button>
+                        <input type="number" value="1" min="1" />
+                        <button data-action="+1">
+                            <Icon
+                                name="fa6-solid:angle-right"
+                                height="1.5rem"
+                            />
+                        </button>
+                        <button data-action="Infinity">
+                            <Icon
+                                name="fa6-solid:forward-step"
+                                height="1.5rem"
+                            />
+                        </button>
+                    </div>
+                )
+            }
+        </div>
+        <div class="card-items" style={{ "--columns": columns }}>
+            {
+                cards &&
+                    cards.map((card, i) => {
+                        return <Card {include} {card} {filters} />;
+                    })
+            }
+        </div>
     </div>
-    <div class="card-items" style={{ "--columns": columns }}>
-      {
-        cards &&
-          cards.map((card, i) => {
-            return <Card {include} {card} {filters} />;
-          })
-      }
-    </div>
-  </div>
 </Section>
 
 <style lang="scss">
-  .card-items {
-    display: grid;
-    grid-template-columns: repeat(var(--columns, 4), 1fr);
-    gap: 2rem;
+    .card-items {
+        display: grid;
+        grid-template-columns: repeat(var(--columns, 4), 1fr);
+        gap: 2rem;
 
-    grid-area: items;
-  }
-
-  .card-tools {
-    grid-area: tools;
-    display: flex;
-    flex-direction: row;
-    gap: 2rem;
-    justify-content: space-between;
-  }
-
-  .card-index-container {
-    display: grid;
-    grid-template-areas: "tools" "items";
-    gap: 3rem;
-  }
-
-  button {
-    svg {
-      pointer-events: none;
+        grid-area: items;
     }
 
-    &:disabled {
-      opacity: 0.2;
+    .card-tools {
+        grid-area: tools;
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        justify-content: space-between;
     }
-  }
-</style>
 
-<style lang="scss" is:global>
-  .card-filters {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    gap: 2rem;
-
-    > .card-filter-set {
-      display: flex;
-      flex-direction: row;
-      gap: 0.5rem;
-
-      p {
-        margin: 0;
-        text-transform: capitalize;
-        padding: 0.4rem 1.4rem;
-      }
+    .card-index-container {
+        display: grid;
+        grid-template-areas: "tools" "items";
+        gap: 3rem;
     }
 
     button {
-      user-select: none;
-      padding: 0 1.4rem;
-      // line-height: 1;
-      border: 1px solid black;
-      border-radius: var(--border-radius);
-      text-transform: capitalize;
+        svg {
+            pointer-events: none;
+        }
 
-      // input {
-      //   display: none;
-      // }
-
-      &[data-status]:not([data-status="ignore"]) {
-        background-color: rgb(var(--text-color));
-        color: rgb(var(--background-color, var(--page-background-color)));
-      }
-
-      &[data-status="exclude"] {
-        text-decoration: line-through;
-        text-decoration-thickness: 0.12em;
-      }
+        &:disabled {
+            opacity: 0.2;
+        }
     }
-  }
+</style>
+
+<style lang="scss" is:global>
+    .card-filters {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        gap: 2rem;
+
+        > .card-filter-set {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+
+            p {
+                margin: 0;
+                text-transform: capitalize;
+                padding: 0.4rem 1.4rem;
+            }
+        }
+
+        button {
+            user-select: none;
+            padding: 0 1.4rem;
+            // line-height: 1;
+            border: 1px solid black;
+            border-radius: var(--border-radius);
+            text-transform: capitalize;
+
+            // input {
+            //   display: none;
+            // }
+
+            &[data-status]:not([data-status="ignore"]) {
+                background-color: rgb(var(--text-color));
+                color: rgb(
+                    var(--background-color, var(--page-background-color))
+                );
+            }
+
+            &[data-status="exclude"] {
+                text-decoration: line-through;
+                text-decoration-thickness: 0.12em;
+            }
+        }
+    }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", setupCardIndex);
-  document.addEventListener("astro:after-swap", setupCardIndex);
+    document.addEventListener("DOMContentLoaded", setupCardIndex);
+    document.addEventListener("astro:after-swap", setupCardIndex);
 
-  function setupCardIndex() {
-    const cardIndexes = document.querySelectorAll<HTMLElement>(
-      'section[data-component="card-index"]'
-    );
-
-    if (!cardIndexes.length) return;
-
-    cardIndexes.forEach((index) => {
-      const options = getFilterOptions(index);
-      if (!options) return;
-
-      createFilters(index, options);
-      setupPagination(index);
-    });
-  }
-
-  function getFilterOptions(
-    index: HTMLElement
-  ): Record<string, Set<string>> | undefined {
-    const filters = index
-      .querySelector<HTMLElement>(".card-filters")
-      ?.dataset?.filters?.split(" ");
-    const cards = Array.from(
-      index.querySelectorAll<HTMLElement>(".card-items .card-index-card")
-    );
-
-    if (!(filters && cards)) return;
-
-    // {key: Set(value1,value2), key2: Set(valueA,valueB)}
-    return Object.fromEntries(
-      filters.map((filter) => {
-        const set = new Set(
-          cards.flatMap((card) => card.dataset?.[filter]?.split(" "))
+    function setupCardIndex() {
+        const cardIndexes = document.querySelectorAll<HTMLElement>(
+            'section[data-component="card-index"]',
         );
-        set.delete(undefined);
-        return [filter, set as Set<string>];
-      })
-    );
-  }
 
-  function createFilters(
-    index: HTMLElement,
-    options: Record<string, Set<string>>
-  ) {
-    const filters = index.querySelector<HTMLElement>(".card-filters");
+        if (!cardIndexes.length) return;
 
-    if (!filters) return;
+        cardIndexes.forEach((index) => {
+            const options = getFilterOptions(index);
+            if (!options) return;
 
-    filters.innerHTML += Object.entries(options)
-      .map(([option, values]) => {
-        if (values.size == 1 && values.has("")) {
-          return `<button data-filter="${option}" data-value="" id="cif-${option}" aria-pressed="false"/>${option.replaceAll(/(-|_)/g, " ")}</button>`;
+            createFilters(index, options);
+            setupPagination(index);
+        });
+    }
+
+    function getFilterOptions(
+        index: HTMLElement,
+    ): Record<string, Set<string>> | undefined {
+        const filters = index
+            .querySelector<HTMLElement>(".card-filters")
+            ?.dataset?.filters?.split(" ");
+        const cards = Array.from(
+            index.querySelectorAll<HTMLElement>(".card-items .card-index-card"),
+        );
+
+        if (!(filters && cards)) return;
+
+        // {key: Set(value1,value2), key2: Set(valueA,valueB)}
+        return Object.fromEntries(
+            filters.map((filter) => {
+                const set = new Set(
+                    cards.flatMap((card) => card.dataset?.[filter]?.split(" ")),
+                );
+                set.delete(undefined);
+                return [filter, set as Set<string>];
+            }),
+        );
+    }
+
+    function createFilters(
+        index: HTMLElement,
+        options: Record<string, Set<string>>,
+    ) {
+        const filters = index.querySelector<HTMLElement>(".card-filters");
+
+        if (!filters) return;
+
+        filters.innerHTML += Object.entries(options)
+            .map(([option, values]) => {
+                if (values.size == 1 && values.has("")) {
+                    return `<button data-filter="${option}" data-value="" id="cif-${option}" aria-pressed="false"/>${option.replaceAll(/(-|_)/g, " ")}</button>`;
+                }
+                const buttons = [...values.keys()]
+                    .toSorted((a, b) => String(a).localeCompare(b))
+                    .map((value: string, i) => {
+                        return `<button data-filter="${option}" data-value="${value}" id="cif-${option}-${i}" aria-pressed="false"/>${value.replaceAll(/(-|_)/g, " ")}</button>`;
+                    })
+                    .join("");
+
+                return `<div class="card-filter-set"><p>${option.replaceAll(/(-|_)/g, " ")}</p>${buttons}</div>`;
+            })
+            .join("");
+
+        filters.addEventListener("click", evaluateFilters);
+    }
+
+    function evaluateFilters(e: Event) {
+        const clickedButton = e.target as HTMLElement;
+
+        if (!clickedButton.matches("button")) return;
+
+        const index: HTMLElement | null = clickedButton.closest(
+            ".card-index-container",
+        );
+        if (!index) return;
+
+        const filters = Array.from(
+            index.querySelectorAll<HTMLInputElement>(".card-filters button"),
+        );
+
+        const filterMode = clickedButton
+            .closest<HTMLElement>("[data-filtermode]")
+            ?.dataset.filtermode?.split(" ");
+
+        if (!filterMode) return;
+
+        const ariaPressed = {
+            include: "true",
+            exclude: "mixed",
+            ignore: "false",
+        };
+
+        if (clickedButton.dataset?.filter == "clear") {
+            filters.forEach((filter) => {
+                if (filter == clickedButton) return;
+                let filterStatus = filterMode?.[0] as keyof typeof ariaPressed;
+                filter.dataset.status = filterStatus;
+                filter.dataset.ariaPressed = ariaPressed[filterStatus];
+            });
+        } else {
+            const oldStatus =
+                clickedButton.getAttribute("data-status") || "ignore";
+
+            const filterStatus = filterMode[
+                (filterMode?.findIndex((s) => s == oldStatus) + 1) %
+                    filterMode.length
+            ] as keyof typeof ariaPressed;
+
+            clickedButton.dataset.status = filterStatus;
+            clickedButton.dataset.ariaPressed = ariaPressed[filterStatus];
         }
-        const buttons = [...values.keys()]
-          .toSorted((a, b) => String(a).localeCompare(b))
-          .map((value: string, i) => {
-            return `<button data-filter="${option}" data-value="${value}" id="cif-${option}-${i}" aria-pressed="false"/>${value.replaceAll(/(-|_)/g, " ")}</button>`;
-          })
-          .join("");
 
-        return `<div class="card-filter-set"><p>${option.replaceAll(/(-|_)/g, " ")}</p>${buttons}</div>`;
-      })
-      .join("");
+        const include = filters.filter(
+            (filter) => filter.dataset.status == "include",
+        );
+        const exclude = filters.filter(
+            (filter) => filter.dataset.status == "exclude",
+        );
 
-    filters.addEventListener("click", evaluateFilters);
-  }
+        const selector =
+            "*" +
+            (include.length
+                ? `:is(${include.map(filterSelector).join(",")})`
+                : "") +
+            (exclude.length
+                ? `:not(${exclude.map(filterSelector).join(",")})`
+                : "");
 
-  function evaluateFilters(e: Event) {
-    const clickedButton = e.target as HTMLElement;
-
-    if (!clickedButton.matches("button")) return;
-
-    const index: HTMLElement | null = clickedButton.closest(
-      ".card-index-container"
-    );
-    if (!index) return;
-
-    const filters = Array.from(
-      index.querySelectorAll<HTMLInputElement>(".card-filters button")
-    );
-
-    const filterMode = clickedButton
-      .closest<HTMLElement>("[data-filtermode]")
-      ?.dataset.filtermode?.split(" ");
-
-    if (!filterMode) return;
-
-    const ariaPressed = {
-      include: "true",
-      exclude: "mixed",
-      ignore: "false",
-    };
-
-    if (clickedButton.dataset?.filter == "clear") {
-      filters.forEach((filter) => {
-        if (filter == clickedButton) return;
-        let filterStatus = filterMode?.[0] as keyof typeof ariaPressed;
-        filter.dataset.status = filterStatus;
-        filter.dataset.ariaPressed = ariaPressed[filterStatus];
-      });
-    } else {
-      const oldStatus = clickedButton.getAttribute("data-status") || "ignore";
-
-      const filterStatus = filterMode[
-        (filterMode?.findIndex((s) => s == oldStatus) + 1) % filterMode.length
-      ] as keyof typeof ariaPressed;
-
-      clickedButton.dataset.status = filterStatus;
-      clickedButton.dataset.ariaPressed = ariaPressed[filterStatus];
+        Array.from(index.querySelectorAll(".card-index-card")).forEach((card) =>
+            card.classList.toggle("filter-hide", !card.matches(selector)),
+        );
+        setPage(index);
+        console.log("Applied selector", selector);
     }
 
-    const include = filters.filter(
-      (filter) => filter.dataset.status == "include"
-    );
-    const exclude = filters.filter(
-      (filter) => filter.dataset.status == "exclude"
-    );
-
-    const selector =
-      "*" +
-      (include.length ? `:is(${include.map(filterSelector).join(",")})` : "") +
-      (exclude.length ? `:not(${exclude.map(filterSelector).join(",")})` : "");
-
-    Array.from(index.querySelectorAll(".card-index-card")).forEach((card) =>
-      card.classList.toggle("filter-hide", !card.matches(selector))
-    );
-    setPage(index);
-    console.log("Applied selector", selector);
-  }
-
-  function filterSelector(filter: HTMLElement): string {
-    return filter.dataset.value
-      ? `[data-${filter.dataset.filter}~="${filter.dataset.value}"]`
-      : `[data-${filter.dataset.filter}]`;
-  }
-
-  function setupPagination(index: HTMLElement) {
-    const paginator = index.querySelector<HTMLElement>(".card-pagination");
-    if (!paginator) return;
-
-    setPage(index, 0); // Init to page 0
-
-    paginator.addEventListener("click", (e) => {
-      if (!e.target) return;
-      const t = (e.target as HTMLElement)?.closest("button");
-      if (!t) return;
-
-      const page = setPage(index, t.dataset.action);
-      if (typeof page != "number") return;
-
-      const pageCounter = paginator.querySelector<HTMLInputElement>("input");
-      if (!pageCounter || pageCounter.type != "number") return;
-
-      pageCounter.value = (page + 1).toString();
-    });
-
-    paginator.addEventListener("change", (e) => {
-      if (!e.target) return;
-      const t = (e.target as HTMLElement)?.closest("input");
-      if (!t) return;
-      setPage(index, Number(t.value) - 1);
-    });
-  }
-
-  function setPage(
-    index: HTMLElement,
-    page: number | string | undefined = undefined
-  ): number | undefined {
-    const paginator = index.querySelector<HTMLElement>(".card-pagination");
-    if (!paginator) return;
-
-    const pageSize = Number(paginator.dataset.pageSize);
-    if (isNaN(pageSize)) return;
-
-    const unfilteredItems = index.querySelectorAll(
-      ".card-items > :not(.filter-hide)"
-    );
-
-    let pageNumber = getPageOffset(Number(paginator.dataset.page), page);
-
-    const numPages = Math.ceil(unfilteredItems.length / pageSize);
-    if (pageNumber >= numPages) pageNumber = numPages - 1;
-    if (pageNumber < 0) pageNumber = 0;
-
-    const minItem = pageNumber * pageSize;
-    const maxItem = minItem + pageSize;
-
-    unfilteredItems.forEach((card, i) => {
-      card.classList.toggle("pagination-hide", i < minItem || i >= maxItem);
-    });
-
-    paginator.dataset.page = pageNumber.toString();
-    const pageCounter = paginator.querySelector<HTMLInputElement>("input");
-    const pageButtons = paginator.querySelectorAll<HTMLElement>("button");
-    if (pageCounter) {
-      pageCounter.value = (pageNumber + 1).toString();
-      pageCounter.setAttribute("max", numPages.toString());
+    function filterSelector(filter: HTMLElement): string {
+        return filter.dataset.value
+            ? `[data-${filter.dataset.filter}~="${filter.dataset.value}"]`
+            : `[data-${filter.dataset.filter}]`;
     }
 
-    pageButtons.forEach((button) => {
-      let buttonPageTarget = getPageOffset(pageNumber, button.dataset?.action);
+    function setupPagination(index: HTMLElement) {
+        const paginator = index.querySelector<HTMLElement>(".card-pagination");
+        if (!paginator) return;
 
-      if (button.dataset?.action == "0") {
-        return button.toggleAttribute("disabled", pageNumber == 0);
-      }
-      if (button.dataset?.action == "Infinity") {
-        return button.toggleAttribute("disabled", pageNumber + 1 == numPages);
-      }
+        setPage(index, 0); // Init to page 0
 
-      button.toggleAttribute(
-        "disabled",
-        buttonPageTarget >= numPages || buttonPageTarget < 0
-      );
-    });
+        paginator.addEventListener("click", (e) => {
+            if (!e.target) return;
+            const t = (e.target as HTMLElement)?.closest("button");
+            if (!t) return;
 
-    return pageNumber;
-  }
+            const page = setPage(index, t.dataset.action);
+            if (typeof page != "number") return;
 
-  function getPageOffset(
-    pageNumber: number,
-    offset: string | number | undefined
-  ): number {
-    if (typeof offset == "string") {
-      if (offset.startsWith("+")) return pageNumber + Number(offset.slice(1));
-      if (offset.startsWith("-")) return pageNumber - Number(offset.slice(1));
-      if (!isNaN(Number(offset))) return Number(offset);
-    } else if (typeof offset == "number") {
-      return offset;
+            const pageCounter =
+                paginator.querySelector<HTMLInputElement>("input");
+            if (!pageCounter || pageCounter.type != "number") return;
+
+            pageCounter.value = (page + 1).toString();
+        });
+
+        paginator.addEventListener("change", (e) => {
+            if (!e.target) return;
+            const t = (e.target as HTMLElement)?.closest("input");
+            if (!t) return;
+            setPage(index, Number(t.value) - 1);
+        });
     }
-    return pageNumber;
-  }
+
+    function setPage(
+        index: HTMLElement,
+        page: number | string | undefined = undefined,
+    ): number | undefined {
+        const paginator = index.querySelector<HTMLElement>(".card-pagination");
+        if (!paginator) return;
+
+        const pageSize = Number(paginator.dataset.pageSize);
+        if (isNaN(pageSize)) return;
+
+        const unfilteredItems = index.querySelectorAll(
+            ".card-items > :not(.filter-hide)",
+        );
+
+        let pageNumber = getPageOffset(Number(paginator.dataset.page), page);
+
+        const numPages = Math.ceil(unfilteredItems.length / pageSize);
+        if (pageNumber >= numPages) pageNumber = numPages - 1;
+        if (pageNumber < 0) pageNumber = 0;
+
+        const minItem = pageNumber * pageSize;
+        const maxItem = minItem + pageSize;
+
+        unfilteredItems.forEach((card, i) => {
+            card.classList.toggle(
+                "pagination-hide",
+                i < minItem || i >= maxItem,
+            );
+        });
+
+        paginator.dataset.page = pageNumber.toString();
+        const pageCounter = paginator.querySelector<HTMLInputElement>("input");
+        const pageButtons = paginator.querySelectorAll<HTMLElement>("button");
+        if (pageCounter) {
+            pageCounter.value = (pageNumber + 1).toString();
+            pageCounter.setAttribute("max", numPages.toString());
+        }
+
+        pageButtons.forEach((button) => {
+            let buttonPageTarget = getPageOffset(
+                pageNumber,
+                button.dataset?.action,
+            );
+
+            if (button.dataset?.action == "0") {
+                return button.toggleAttribute("disabled", pageNumber == 0);
+            }
+            if (button.dataset?.action == "Infinity") {
+                return button.toggleAttribute(
+                    "disabled",
+                    pageNumber + 1 == numPages,
+                );
+            }
+
+            button.toggleAttribute(
+                "disabled",
+                buttonPageTarget >= numPages || buttonPageTarget < 0,
+            );
+        });
+
+        return pageNumber;
+    }
+
+    function getPageOffset(
+        pageNumber: number,
+        offset: string | number | undefined,
+    ): number {
+        if (typeof offset == "string") {
+            if (offset.startsWith("+"))
+                return pageNumber + Number(offset.slice(1));
+            if (offset.startsWith("-"))
+                return pageNumber - Number(offset.slice(1));
+            if (!isNaN(Number(offset))) return Number(offset);
+        } else if (typeof offset == "number") {
+            return offset;
+        }
+        return pageNumber;
+    }
 </script>

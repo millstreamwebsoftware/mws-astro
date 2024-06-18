@@ -1,27 +1,27 @@
 ---
 import preferences from "@data/preferences.json";
-import Navigation from "./Navigation.astro";
+import Navigation from "./SiteNavigation.astro";
 import Social from "@components/social/social.astro";
 
 export interface Props {
-  id?: string;
-  currentPath?: string;
-  paths?: any[];
+    id?: string;
+    currentPath?: string;
+    paths?: any[];
 }
 
 const { id, currentPath, paths } = Astro.props;
 
 const headerItems: Record<string, boolean> = {
-  logo: preferences.header.show_logo,
-  navigation: preferences.header.show_navigation,
-  social: preferences.header.show_socials,
+    logo: preferences.header.show_logo,
+    navigation: preferences.header.show_navigation,
+    social: preferences.header.show_socials,
 };
 const headerAreas =
-  '"' +
-  Object.keys(headerItems)
-    .filter((k) => headerItems[k])
-    .join(" ") +
-  '"';
+    '"' +
+    Object.keys(headerItems)
+        .filter((k) => headerItems[k])
+        .join(" ") +
+    '"';
 
 // const headerBackgroundColor = convertColorString(
 //   preferences.header.background_top_color
@@ -36,83 +36,83 @@ const headerAreas =
 ---
 
 <header
-  class:list={{
-    pinned: preferences.header.pin_header != "false",
-    contain: preferences.header.pin_header == "contain",
-  }}
-  style={`--text-color: var(--header-color);` +
-    `--header-areas: ${headerAreas};`}
+    class:list={{
+        pinned: preferences.header.pin_header != "false",
+        contain: preferences.header.pin_header == "contain",
+    }}
+    style={`--text-color: var(--header-color);` +
+        `--header-areas: ${headerAreas};`}
 >
-  {
-    preferences.header.show_logo && (
-      <a class="logo" href="/">
-        <img src={preferences.header.logo_image} />
-      </a>
-    )
-  }
-  {preferences.header.show_navigation && <Navigation {id} {currentPath} />}
-  {preferences.header.show_socials && <Social />}
+    {
+        preferences.header.show_logo && (
+            <a class="logo" href="/">
+                <img src={preferences.header.logo_image} />
+            </a>
+        )
+    }
+    {preferences.header.show_navigation && <Navigation {id} {currentPath} />}
+    {preferences.header.show_socials && <Social />}
 </header>
 
 <style>
-  header {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    display: grid;
-    z-index: 9999;
-    color: rgb(var(--header-color));
-    grid-template-areas: var(--header-areas);
-    grid-template-rows: 100%;
-    height: var(--header-height);
-    background: linear-gradient(
-      to bottom,
-      rgba(var(--header-background-color)),
-      rgba(var(--header-background-color-bottom))
-    );
-
-    padding: 0 calc(var(--indent) * 0.25);
-  }
-
-  header.pinned {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    /* bottom: calc(100% - var(--header-height)); */
-    /* height: var(--header-height); */
-  }
-
-  header.pinned.contain {
-    left: max(calc((100vw - var(--page-max-width)) * 0.5), 0vw);
-    right: max(calc((100vw - var(--page-max-width)) * 0.5), 0vw);
-  }
-
-  .logo {
-    padding: 10px;
-    width: fit-content;
-  }
-
-  .logo img {
-    object-fit: contain;
-    object-position: left;
-    width: auto;
-    height: var(--header-height);
-    max-height: 100%;
-  }
-
-  @media only screen and (max-width: 768px) {
-    .logo {
-      display: none;
-    }
-
     header {
-      height: 0;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        display: grid;
+        z-index: 9999;
+        color: rgb(var(--header-color));
+        grid-template-areas: var(--header-areas);
+        grid-template-rows: 100%;
+        height: var(--header-height);
+        background: linear-gradient(
+            to bottom,
+            rgba(var(--header-background-color)),
+            rgba(var(--header-background-color-bottom))
+        );
+
+        padding: 0 calc(var(--indent) * 0.25);
     }
 
-    :root {
-      --header-height: 0;
+    header.pinned {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        /* bottom: calc(100% - var(--header-height)); */
+        /* height: var(--header-height); */
     }
-  }
+
+    header.pinned.contain {
+        left: max(calc((100vw - var(--page-max-width)) * 0.5), 0vw);
+        right: max(calc((100vw - var(--page-max-width)) * 0.5), 0vw);
+    }
+
+    .logo {
+        padding: 10px;
+        width: fit-content;
+    }
+
+    .logo img {
+        object-fit: contain;
+        object-position: left;
+        width: auto;
+        height: var(--header-height);
+        max-height: 100%;
+    }
+
+    @media only screen and (max-width: 768px) {
+        .logo {
+            display: none;
+        }
+
+        header {
+            height: 0;
+        }
+
+        :root {
+            --header-height: 0;
+        }
+    }
 </style>

@@ -1,0 +1,80 @@
+---
+import Section from "@layouts/Section.astro";
+import type { TreeNode } from "@mws-astro/middleware";
+const depth = (Astro.props.depth ?? -1) + 1;
+
+interface Props {
+    tree?: TreeNode;
+    collection?: string;
+    maxDepth?: number;
+    filter?: string;
+    depth?: number;
+}
+
+const { maxDepth, filter, collection } = Astro.props;
+const tree = Astro.props.tree ?? Astro.locals.tree;
+
+const ComponentWrapper = depth ? Fragment : Section;
+const Wrapper = depth ? Fragment : "nav";
+
+// console.log(tree.children);
+---
+
+<ComponentWrapper component="navigation" {...Astro.props}>
+    <Wrapper>
+        {
+            tree.children != undefined &&
+                Object.entries(tree.children).map(([id, child], i) => {
+                    if (collection && child.collection != collection) return;
+                    // const ChildTag = child.href != undefined ? "a" : Fragment;
+                    const hasChildren =
+                        child.children && Object.keys(child.children).length;
+
+                    // console.log(
+                    //     id,
+                    //     child.children,
+                    //     child.children &&
+                    //         Object.keys(child.children).length,
+                    // );
+                    return (
+                        <>
+                            <div
+                                data-depth={depth}
+                                class:list={{ "has-children": hasChildren }}
+                            >
+                                <a
+                                    href={
+                                        child.href !== undefined
+                                            ? `/${child?.href}`
+                                            : undefined
+                                    }
+                                    aria-selected={
+                                        child.selected === 2 ? "true" : "false"
+                                    }
+                                >
+                                    {child.title}
+                                </a>
+                                {hasChildren && (
+                                    <div class="children">
+                                        <Astro.self
+                                            tree={child}
+                                            {depth}
+                                            {maxDepth}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    );
+                })
+        }
+    </Wrapper>
+</ComponentWrapper>
+
+<style>
+    a {
+        display: block;
+        font-size: var(--text-size-medium);
+        text-decoration: none;
+    }
+</style>
