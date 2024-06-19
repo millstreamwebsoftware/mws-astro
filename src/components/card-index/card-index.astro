@@ -13,16 +13,18 @@ interface Props {
     columns?: number;
     pageSize?: number;
     limit?: number;
+    aspect?: number;
     key?: string;
 }
 
 const {
     target = "/",
-    include = ["title", "description", "thumbnail", "link"],
+    include = ["title", "description", "thumbnail", "link", "read-more"],
     columns = 4,
     filters = [""],
     pageSize = 0,
     limit = 0,
+    aspect = 1,
     key,
 } = Astro.props;
 
@@ -165,7 +167,7 @@ if (!ENV_BOOKSHOP_LIVE) {
             {
                 cards &&
                     cards.map((card, i) => {
-                        return <Card {include} {card} {filters} />;
+                        return <Card {include} {card} {filters} {aspect} />;
                     })
             }
         </div>
