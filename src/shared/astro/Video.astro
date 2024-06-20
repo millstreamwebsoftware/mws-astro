@@ -1,10 +1,15 @@
 ---
 interface Props {
-  src: string;
-  background?: boolean;
+    src: string;
+    background?: boolean;
+    title?: boolean;
+    byline?: boolean;
+    autoplay?: boolean;
+    muted?: boolean;
+    loop?: boolean;
 }
 
-const { src, background } = Astro.props;
+const { src, background, title, byline, autoplay, muted, loop } = Astro.props;
 
 // https://vimeo.com/868805980
 // https://vimeo.com/channels/bestofstaffpicks/868805980
@@ -14,42 +19,48 @@ const { src, background } = Astro.props;
 const url = new URL(src);
 
 if (url.hostname.endsWith("vimeo.com")) {
-  url.hostname = "player.vimeo.com";
-  url.pathname = url.pathname.replace(/^(\/.*\/)(\d*)$/, "/video/$2");
+    url.hostname = "player.vimeo.com";
+    url.pathname = url.pathname.replace(/^(\/.*\/)(\d*)$/, "/video/$2");
 
-  if (background) {
-    url.searchParams.append("title", "0");
-    url.searchParams.append("byline", "0");
-    url.searchParams.append("portrait", "0");
-    url.searchParams.append("background", "1");
-    url.searchParams.append("autoplay", "1");
-    url.searchParams.append("muted", "1");
-    url.searchParams.append("loop", "1");
-  }
+    if (background) {
+        url.searchParams.append("title", "0");
+        url.searchParams.append("byline", "0");
+        url.searchParams.append("portrait", "0");
+        url.searchParams.append("background", "1");
+        url.searchParams.append("autoplay", "1");
+        url.searchParams.append("muted", "1");
+        url.searchParams.append("loop", "1");
+    } else {
+        url.searchParams.append("title", title ? "1" : "0");
+        url.searchParams.append("byline", byline ? "1" : "0");
+        url.searchParams.append("muted", muted || autoplay ? "1" : "0");
+        url.searchParams.append("autoplay", autoplay ? "1" : "0");
+        url.searchParams.append("loop", loop ? "1" : "0");
+    }
 
-  url.searchParams.append("dnt", "1");
+    url.searchParams.append("dnt", "1");
 }
 ---
 
 <div class="video-wrapper">
-  <iframe src={url.toString()} allowfullscreen allow="autoplay"></iframe>
+    <iframe src={url.toString()} allowfullscreen allow="autoplay"></iframe>
 </div>
 <style lang="scss">
-  .video-wrapper {
-    position: absolute;
-    overflow: hidden;
+    .video-wrapper {
+        position: absolute;
+        overflow: hidden;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    inset: 0;
-  }
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        inset: 0;
+    }
 
-  iframe {
-    // position: absolute;
-    // inset: 0;
-    flex: 0 0 100%;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-  }
+    iframe {
+        // position: absolute;
+        // inset: 0;
+        flex: 0 0 100%;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
 </style>

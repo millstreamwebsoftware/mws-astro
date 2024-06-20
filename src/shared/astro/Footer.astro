@@ -2,6 +2,7 @@
 import { convertColorString } from "@mws-astro/util";
 import Social from "@components/social/social.astro";
 import Navigation from "@components/navigation/Navigation.astro";
+import Richtext from "@components/richtext/richtext.astro";
 import preferences from "@data/preferences.json";
 const currentYear = new Date().getFullYear();
 
@@ -13,6 +14,14 @@ const textColor = convertColorString(preferences.footer.foreground_color);
     style={`--background-color: ${preferences.footer.background_color};` +
         `--text-color: ${textColor};`}
 >
+    {preferences.footer.show_top_button && <a href="#top">Back to top</a>}
+    {
+        preferences.footer.text_content && (
+            <Richtext content={preferences.footer.text_content} />
+        )
+    }
+    {preferences.footer.show_sitemap && <Navigation collection="pages" />}
+    {preferences.footer.show_socials && <Social />}
     {
         preferences.footer.show_copyright && (
             <p class="copyright">
@@ -23,9 +32,6 @@ const textColor = convertColorString(preferences.footer.foreground_color);
             </p>
         )
     }
-    {preferences.footer.show_socials && <Social />}
-    {preferences.footer.show_top_button && <a href="#top">Back to top</a>}
-    {preferences.footer.show_sitemap && <Navigation />}
     <p class="brand">
         Website by <a
             href="https://www.millstream.com.au/"

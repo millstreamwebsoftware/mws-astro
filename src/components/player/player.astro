@@ -1,0 +1,16 @@
+---
+import Video from "@shared/Video.astro";
+import Section from "@layouts/Section.astro";
+
+interface Props {
+    src: string;
+}
+
+const { src } = Astro.props;
+//
+// //?title=0&byline=0&portrait=0&dnt=1
+---
+
+<Section component="player">
+    {src && <Video {src} background={false} />}
+</Section>
