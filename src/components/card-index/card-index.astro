@@ -50,14 +50,6 @@ if (!ENV_BOOKSHOP_LIVE) {
     let cursor = tree;
     if (!tree.children) return;
 
-    // console.log(cursor.children.news.children.news.children);
-
-    // if (
-    //   collection != "pages" &&
-    //   Object.keys(tree?.children).includes(`${collection}:`)
-    // )
-    //   cursor = tree.children?.[`${collection}:`];
-
     if (targetFragments !== undefined) {
         for (let i = 0; i < targetFragments.length; i++) {
             if (
@@ -77,13 +69,18 @@ if (!ENV_BOOKSHOP_LIVE) {
     const slugs =
         cursor.children &&
         Object.values(cursor.children).reduce<Set<string>>((obj, node) => {
-            node?.slug !== undefined && obj.add(node?.slug);
+            if (node?.slug !== undefined && !node?.slug?.endsWith("index"))
+                obj.add(node?.slug);
             return obj;
         }, new Set());
 
     cards = slugs && data.filter((node) => slugs.has(node.slug));
 
-    cards?.sort((a, b) => a.data.order - b.data.order); // Sort in ascending order
+    cards?.sort(
+        (a, b) =>
+            b.data.publishDate.getTime() - a.data.publishDate.getTime() ||
+            a.data.order - b.data.order,
+    ); // Sort from newest to oldest, fall back on ascending order
     cards = cards?.slice(0, limit || undefined); // Limit number of cards if required
 } else {
     // Create placeholder cards for the live editor

@@ -19,7 +19,8 @@ const cardProps = Object.fromEntries(
     Object.entries(combinedCard).filter(([k, v]) => include.includes(k)),
 );
 
-const { title, description, thumbnail, slug, ...cardData } = cardProps;
+const { title, description, thumbnail, slug, publishDate, ...cardData } =
+    cardProps;
 const link = slug || include.includes("link");
 
 // Convert card props to data attributes for filtering
@@ -27,14 +28,23 @@ const filterData = Object.fromEntries(
     Object.entries(combinedCard)
         .filter(([k, v]) => filters.includes(k))
         .map(([k, v]) => {
-            return [
-                `data-${k}`,
-                Array.isArray(v)
-                    ? v.map((v) => v.replaceAll(" ", "-")).join(" ")
-                    : v,
-            ];
+            let filterValue;
+            if (v instanceof Date) filterValue = v.getTime();
+            if (Array.isArray(v))
+                filterValue = v.map((v) => v.replaceAll(" ", "-")).join(" ");
+
+            return [`data-${k}`, filterValue ?? v];
         }),
 );
+
+function formatDate(date: Date) {
+    return date.toLocaleDateString("en-AU", {
+        weekday: undefined,
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    });
+}
 ---
 
 <div class="card-index-card" {...filterData}>
@@ -49,12 +59,18 @@ const filterData = Object.fromEntries(
     <div class="card-text">
         {title && <h2>{title}</h2>}
         {description && <Markdown content={description} />}
+        {publishDate && <p>{formatDate(publishDate)}</p>}
         {
             Object.entries(cardData).map(([k, v], i) => {
+                let dateString;
+                if (v instanceof Date) dateString = formatDate(v);
                 return (
                     <div
                         class="card-data"
-                        {...{ "data-key": k, "data-value": v }}
+                        {...{
+                            "data-key": k,
+                            "data-value": dateString ? v.getTime() : v,
+                        }}
                     >
                         <>
                             <p class="data-key">{k}</p>
@@ -62,7 +78,7 @@ const filterData = Object.fromEntries(
                             {Array.isArray(v) ? (
                                 v.map((vv) => <p class="data-value">{vv}</p>)
                             ) : (
-                                <p class="data-value">{v}</p>
+                                <p class="data-value">{dateString ?? v}</p>
                             )}
                         </>
                     </div>
