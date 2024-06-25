@@ -378,10 +378,14 @@ if (!ENV_BOOKSHOP_LIVE) {
         const selector =
             "*" +
             (include.length
-                ? `:is(${include.map(filterSelector).join(",")})`
+                ? groupByDataFilter(include)
+                      .map((group) => `:is(${group.join(",")})`)
+                      .join("")
                 : "") +
             (exclude.length
-                ? `:not(${exclude.map(filterSelector).join(",")})`
+                ? groupByDataFilter(exclude)
+                      .map((group) => `:is(${group.join(",")})`)
+                      .join("")
                 : "");
 
         Array.from(index.querySelectorAll(".card-index-card")).forEach((card) =>
@@ -389,6 +393,23 @@ if (!ENV_BOOKSHOP_LIVE) {
         );
         setPage(index);
         console.log("Applied selector", selector);
+    }
+
+    function groupByDataFilter(inputElements: HTMLInputElement[]): string[][] {
+        return Object.values(
+            inputElements.reduce<Record<string, string[]>>(
+                (accumulator, inputElement) => {
+                    const dataFilter = inputElement.getAttribute("data-filter");
+                    if (!dataFilter) return accumulator;
+                    if (!accumulator[dataFilter]) {
+                        accumulator[dataFilter] = [];
+                    }
+                    accumulator[dataFilter].push(filterSelector(inputElement));
+                    return accumulator;
+                },
+                {},
+            ),
+        );
     }
 
     function filterSelector(filter: HTMLElement): string {
