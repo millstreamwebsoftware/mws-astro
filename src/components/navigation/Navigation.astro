@@ -1,7 +1,7 @@
 ---
 import Section from "@layouts/Section.astro";
+import { getTreeNode } from "@mws-astro/util";
 import type { TreeNode } from "@mws-astro/middleware";
-const depth = (Astro.props.depth ?? -1) + 1;
 
 interface Props {
     tree?: TreeNode;
@@ -11,19 +11,20 @@ interface Props {
     depth?: number;
 }
 
-const { maxDepth, filter, collection } = Astro.props;
-const tree = Astro.props.tree ?? Astro.locals.tree;
+const depth = (Astro.props.depth ?? -1) + 1;
+const { maxDepth = Infinity, filter, collection } = Astro.props;
+const tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter);
+
+// console.log(filter, tree);
 
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
-
-// console.log(tree.children);
 ---
 
 <ComponentWrapper component="navigation" {...Astro.props}>
     <Wrapper>
         {
-            tree.children != undefined &&
+            tree?.children != undefined &&
                 Object.entries(tree.children).map(([id, child], i) => {
                     if (collection && child.collection != collection) return;
                     // const ChildTag = child.href != undefined ? "a" : Fragment;
@@ -54,7 +55,7 @@ const Wrapper = depth ? Fragment : "nav";
                                 >
                                     {child.title}
                                 </a>
-                                {hasChildren && (
+                                {hasChildren && depth < maxDepth && (
                                     <div class="children">
                                         <Astro.self
                                             tree={child}

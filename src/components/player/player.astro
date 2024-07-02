@@ -7,10 +7,8 @@ interface Props {
 }
 
 const { src } = Astro.props;
-//
-// //?title=0&byline=0&portrait=0&dnt=1
 ---
 
-<Section component="player">
+<Section component="player" {...Astro.props}>
     {src && <Video {src} background={false} />}
 </Section>

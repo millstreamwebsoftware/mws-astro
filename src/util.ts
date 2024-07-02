@@ -1,8 +1,9 @@
 import colorString from "color-string";
 import he from "he";
+import type { TreeNode } from "@mws-astro/middleware";
 
 export function convertColorString(
-  color: string | undefined
+  color: string | undefined,
 ): string | undefined {
   if (!color) return;
   const c = colorString.get.rgb(color);
@@ -39,4 +40,33 @@ export function bookshopName(p: string) {
   }
 
   return parts.join("/");
+}
+
+export function getTreeNode(
+  tree: TreeNode,
+  filter: string | undefined,
+): TreeNode | undefined {
+  if (!filter) return tree;
+
+  const targetFragments = filter?.split("/").filter((frg) => frg !== "");
+  let cursor = tree;
+  if (!cursor.children) return;
+
+  for (let i = 0; i < targetFragments.length; i++) {
+    if (
+      cursor?.children == undefined ||
+      !(targetFragments[i] in cursor.children)
+    ) {
+      console.warn(`Could not resolve path ${filter}`);
+      return;
+    }
+
+    cursor = cursor.children[targetFragments[i]];
+  }
+
+  if (cursor.children?.index) {
+    cursor = { children: { index: cursor } };
+  }
+
+  return cursor;
 }

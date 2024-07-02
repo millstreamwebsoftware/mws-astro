@@ -2,67 +2,98 @@
 import { Image as AstroImage } from "astro:assets";
 
 interface Props {
-  image: string | any;
-  width?: number;
-  height?: number;
-  alt?: string;
-  aspect?: number;
-  classes?: string;
-  background?: boolean;
+    image: string | any;
+    width?: number;
+    height?: number;
+    alt?: string;
+    aspect?: number;
+    classes?: string;
+    background?: boolean;
 }
 
-const { image, classes, background } = Astro.props;
+const { classes, background } = Astro.props;
+
+let astroImage;
+
+if (
+    typeof Astro.props.image == "string" &&
+    Astro.props.image.startsWith("/assets/")
+) {
+    const images = import.meta.glob("src/assets/**/*");
+
+    let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
+        i.endsWith(Astro.props.image),
+    )[0];
+
+    astroImage = ((await images[imagePath]()) as any)?.default;
+}
+
+const image = astroImage ?? Astro.props.image;
+
+// console.log("######", image);
+
 let { height = image?.height, width = image?.width, aspect } = Astro.props;
 
 if (aspect == undefined) {
-  aspect = width / height;
+    aspect = width / height;
 } else if (Astro.props.width != undefined) {
-  height = Math.floor(width / aspect);
+    height = Math.floor(width / aspect);
 } else if (Astro.props.height != undefined) {
-  width = Math.floor(height * aspect);
+    width = Math.floor(height * aspect);
 } else {
-  height = Math.floor(width / aspect);
+    height = Math.floor(width / aspect);
 }
 
-const file = typeof image == "string" ? image : image?.src;
+// console.log(image, width, height);
+
+// const file = typeof image == "string" ? image : image?.src;
+const file = image?.src || image;
 const placeholder = true;
 
 let metadata, plData;
 
 // @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE) {
-  const fs = await import("node:fs/promises");
-  const Sharp = (await import("sharp")).default;
+    const fs = await import("node:fs/promises");
+    const Sharp = (await import("sharp")).default;
 
-  try {
-    let realFile = file.replace(/^(?:\/@fs)?(.*?)(?:\?.*)?$/, "$1");
+    try {
+        let realFile = file.replace(/^(?:\/@fs)?(.*?)(?:\?.*)?$/, "$1");
+        let f;
 
-    const f = await fs.readFile(realFile);
+        try {
+            f = await fs.readFile(realFile);
+        } catch (err) {
+            // Also try sourcing from the public directory
+            realFile =
+                "public" + (realFile.startsWith("/") ? "" : "/") + realFile;
+            f = await fs.readFile(realFile);
+        }
 
-    let sh = Sharp(f);
-    metadata = await sh.metadata();
-    if (placeholder) {
-      const { isOpaque, channels } = await sh.stats(); // Don't generate placeholders for images with alpha
+        let sh = Sharp(f);
+        metadata = await sh.metadata();
+        if (placeholder) {
+            const { isOpaque, channels, entropy } = await sh.stats(); // Don't generate placeholders for images with alpha
 
-      if (isOpaque || channels[3].mean >= 254) {
-        // Include PNGs which are mostly opaque but not entirely
-        const plSize = 16;
+            if (isOpaque || channels[3].mean >= 254) {
+                // Include PNGs which are mostly opaque but not entirely
+                const plSize = 16;
 
-        let pl = await sh
-          .removeAlpha()
-          .resize(plSize, undefined, { fit: "inside" })
-          .blur()
-          .webp()
-          .toBuffer();
+                let pl = await sh
+                    .removeAlpha()
+                    .resize(plSize, undefined, { fit: "inside" })
+                    .blur()
+                    .webp()
+                    .toBuffer();
 
-        plData = pl.toString("base64");
-      } else {
-        console.log("Skipped transparent image:", channels[3]);
-      }
+                plData = pl.toString("base64");
+            } else {
+                console.log("Skipped transparent image:", channels[3]);
+            }
+        }
+    } catch (err) {
+        console.warn("While generating a placeholder an error occurred:", err);
     }
-  } catch (err) {
-    console.log(err);
-  }
 }
 
 // Figure out the size of the served image, if an aspect is provided height is recalculated
@@ -76,36 +107,39 @@ let placeholderString: string | undefined;
 let placeholderStyle;
 
 if (placeholder && plData) {
-  let webpString = `data:image/webp;base64,${plData}`;
+    let webpString = `data:image/webp;base64,${plData}`;
 
-  // Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
-  placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice' href='${webpString}'/%3e%3c/svg%3e`;
-  placeholderStyle = {
-    "background-image": `url("${placeholderString}")`,
-  };
+    // Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
+    placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice' href='${webpString}'/%3e%3c/svg%3e`;
+    placeholderStyle = {
+        "background-image": `url("${placeholderString}")`,
+    };
 }
 ---
 
 <AstroImage
-  src={image}
-  alt=""
-  {width}
-  {height}
-  class:list={[classes, { background }]}
-  style={placeholderStyle}
-  densities={[1, 1.5, 2]}
+    src={image}
+    alt=""
+    {width}
+    {height}
+    class:list={[classes, { background }]}
+    style={placeholderStyle}
+    densities={[1, 1.5, 2]}
 />
 
 <style>
-  img {
-    object-fit: cover;
-    background-size: cover;
-    width: 100%;
-  }
+    img {
+        object-fit: cover;
+        object-position: center;
+        background-size: cover;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+    }
 
-  img.background {
-    position: absolute;
-    height: 100%;
-    inset: 0;
-  }
+    img.background {
+        position: absolute;
+        height: 100%;
+        inset: 0;
+    }
 </style>

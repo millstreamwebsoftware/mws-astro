@@ -1,37 +1,40 @@
 ---
-import Imgix from "@shared/Imgix.astro";
+import SharedImage from "@shared/Image.astro";
 import Markdown from "@shared/Markdown.astro";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Section from "@layouts/Section.astro";
+import preferences from "@data/preferences.json";
 import { convertColorString } from "@mws-astro/util";
 
 export interface Props {
-  image: any;
-  title?: string;
-  description?: string;
-  height: number;
-  columns: number;
-  aspect?: number;
-  indent: boolean;
-  foreground_color?: string;
-  background_color?: string;
-  lightbox?: boolean;
-  key?: string;
-  classes?: any;
+    image: any;
+    title?: string;
+    description?: string;
+    alt: string;
+    height: number;
+    columns: number;
+    aspect?: number;
+    indent: boolean;
+    foreground_color?: string;
+    background_color?: string;
+    lightbox?: boolean;
+    key?: string;
+    classes?: any;
 }
 
 const {
-  image,
-  title,
-  description,
-  height,
-  aspect,
-  indent,
-  foreground_color,
-  background_color,
-  lightbox,
-  key,
-  classes,
+    image,
+    title,
+    description,
+    alt,
+    height,
+    aspect,
+    indent,
+    foreground_color,
+    background_color,
+    lightbox,
+    key,
+    classes,
 } = Astro.props;
 
 const foreground = convertColorString(foreground_color);
@@ -41,166 +44,60 @@ const figcaption = title || description;
 ---
 
 <Section component="image" classes={{ lightbox, ...classes }} {...Astro.props}>
-  <figure
-    data-lightbox={lightbox && id}
-    style={{
-      ...(aspect && { "--aspect": aspect }),
-    }}
-  >
-    <Imgix
-      image={image?.src || image}
-      alt=""
-      loading="lazy"
-      decoding="async"
-      placeholder={true}
-      aspect={aspect}
-    />
+    <figure
+        data-lightbox={lightbox && id}
+        style={{
+            ...(aspect && { "--aspect": aspect }),
+        }}
+    >
+        <SharedImage
+            {image}
+            {alt}
+            aspect={aspect ?? 1.8}
+            width={preferences.page.maximum_page_width}
+        />
+
+        {
+            figcaption && (
+                <figcaption
+                    style={{
+                        ...(background && { "--background-color": background }),
+                        ...(foreground && { "--text-color": foreground }),
+                        ...(foreground && { "--heading-color": foreground }),
+                    }}
+                >
+                    {title && <h3>{title}</h3>}
+                    {description && <Markdown content={description} />}
+                </figcaption>
+            )
+        }
+    </figure>
 
     {
-      figcaption && (
-        <figcaption
-          style={{
-            ...(background && { "--background-color": background }),
-            ...(foreground && { "--text-color": foreground }),
-            ...(foreground && { "--heading-color": foreground }),
-          }}
-        >
-          {title && <h3>{title}</h3>}
-          {description && <Markdown content={description} />}
-        </figcaption>
-      )
+        lightbox && (
+            <Lightbox collection={id}>
+                <figure
+                    data-lightbox={id}
+                    class:list={{ caption: title || description }}
+                >
+                    <SharedImage {image} {alt} />
+
+                    {figcaption && (
+                        <figcaption>
+                            {title && <h3>{title}</h3>}
+                            {description && <Markdown content={description} />}
+                        </figcaption>
+                    )}
+                </figure>
+            </Lightbox>
+        )
     }
-  </figure>
-
-  {
-    lightbox && (
-      <Lightbox collection={id}>
-        <figure
-          data-lightbox={id}
-          class:list={{ caption: title || description }}
-        >
-          <Imgix
-            image={image?.src || image}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            fit="contain"
-            q={80}
-            placeholder={true}
-          />
-
-          {figcaption && (
-            <figcaption>
-              {title && <h3>{title}</h3>}
-              {description && <Markdown content={description} />}
-            </figcaption>
-          )}
-        </figure>
-      </Lightbox>
-    )
-  }
 </Section>
 
 <style>
-  /* figure {
-    width: 100%;
-    height: 100%;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  } */
-
-  figure {
-    overflow: hidden;
-    /* max-height: 100%; */
-    height: 100%;
-    width: 100%;
-  }
-</style>
-
-<style lang="scss" is:global>
-  /*
-  [data-component="image"] {
     figure {
-      position: relative;
-      height: var(--height);
-      display: flex;
-      flex-direction: column;
-      gap: var(--column-gap);
-      width: 100%;
-      overflow: hidden;
-    }
-
-    figcaption {
-      flex: 1 1 0;
-      padding: 0 var(--indent);
-      padding-bottom: calc(var(--indent) * 0.5);
-      background-color: rgb(var(--background-color));
-    }
-
-    img {
-      width: 100%;
-      height: 0;
-      flex: 1 1 100%;
-
-      object-fit: cover;
-      object-position: center;
-      aspect-ratio: var(--aspect);
-    }
-
-    &.description-right,
-    &.description-left {
-      figure {
-        height: auto;
-        padding: var(--indent);
-      }
-
-      figcaption {
-        // display: block;
-        padding: var(--column-gap);
-        padding-right: var(--indent);
-        width: 50%;
-        height: fit-content;
-        z-index: 1;
-        // margin: var(--indent);
-      }
-
-      img {
-        position: absolute;
-        inset: 0;
+        overflow: hidden;
         height: 100%;
-        z-index: 0;
-      }
+        width: 100%;
     }
-
-    &.description-left figure {
-      padding-left: 0;
-      align-items: start;
-    }
-
-    &.description-right figure {
-      padding-right: 0;
-      align-items: end;
-    }
-
-    @media only screen and (max-width: 768px) {
-      &.description-right,
-      &.description-left {
-        figcaption {
-          width: 100%;
-          padding: var(--indent);
-        }
-        figure {
-          padding: 0;
-        }
-      }
-    }
-
-    &.lightbox [data-lightbox] {
-      cursor: pointer;
-    }
-  }*/
 </style>

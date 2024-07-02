@@ -1,4 +1,5 @@
 ---
+import type { GetStaticPaths } from "astro";
 import Section from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
@@ -175,6 +176,19 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 </style>
 
 <style is:global lang="scss">
+    .one-two > .component-wrapper > .columns {
+        grid-template-columns: 1fr 2fr;
+    }
+    .two-one > .component-wrapper > .columns {
+        grid-template-columns: 2fr 1fr;
+    }
+    .one-three > .component-wrapper > .columns {
+        grid-template-columns: 1fr 3fr;
+    }
+    .three-one > .component-wrapper > .columns {
+        grid-template-columns: 3fr 1fr;
+    }
+
     .columns-item > section {
         height: 100%;
         // padding: calc(var(--column-gap));
@@ -197,32 +211,18 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     // }
 
     @media only screen and (max-width: 768px) {
-        div.columns.collapse {
+        div.columns.collapse.collapse {
             --columns: 1 !important;
             gap: var(--indent);
-            grid-template-columns: repeat(var(--columns), 1fr) !important;
+            grid-template-columns: 1fr;
 
             > .columns-item {
                 grid-column: 1 / 2 !important;
                 grid-row: auto !important;
 
-                // > section {
-                //   padding-left: var(--indent);
-                //   padding-right: var(--indent);
-                //   padding-top: var(--column-gap);
-                //   padding-bottom: var(--column-gap);
-
-                //   &:first-child {
-                //     padding-top: var(--indent);
-                //   }
-                //   &:last-child {
-                //     padding-bottom: var(--indent);
-                //   }
-                // }
-
                 section::after {
-                    left: calc(var(--indent) * -1) !important;
-                    right: calc(var(--indent) * -1) !important;
+                    left: calc(var(--indent) * -1);
+                    right: calc(var(--indent) * -1);
                     top: 0;
                     bottom: 0;
                 }

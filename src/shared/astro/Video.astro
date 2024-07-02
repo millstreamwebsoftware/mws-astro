@@ -11,11 +11,6 @@ interface Props {
 
 const { src, background, title, byline, autoplay, muted, loop } = Astro.props;
 
-// https://vimeo.com/868805980
-// https://vimeo.com/channels/bestofstaffpicks/868805980
-
-//player.vimeo.com/video/746427469?title=0&byline=0&portrait=0&background=1&dnt=1&autoplay=0&muted=1&loop=1
-
 const url = new URL(src);
 
 if (url.hostname.endsWith("vimeo.com")) {
@@ -42,11 +37,11 @@ if (url.hostname.endsWith("vimeo.com")) {
 }
 ---
 
-<div class="video-wrapper">
+<div class:list={["video-wrapper", { background }]}>
     <iframe src={url.toString()} allowfullscreen allow="autoplay"></iframe>
 </div>
 <style lang="scss">
-    .video-wrapper {
+    .video-wrapper.background {
         position: absolute;
         overflow: hidden;
 

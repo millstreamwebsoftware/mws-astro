@@ -12,6 +12,7 @@ blueprint:
   image:
   title:
   description:
+  alt:
   height: 50
   indent: true
   lightbox: true
@@ -37,6 +38,9 @@ _inputs:
     type: switch
   title:
     type: text
+  alt:
+    type: text
+    comment: Alt text should describe the subject of an image as an accessability feature for screen-readers.
   description:
     type: markdown
   lightbox:

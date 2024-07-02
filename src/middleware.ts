@@ -9,12 +9,14 @@ import { collections } from "src/content/config";
 export const onRequest = defineMiddleware(async (ctx, next) => {
   const currentPath = ctx.params.slug;
   ctx.locals.collections = await getAllCollections(
-    (page) => page.data.status === "online"
+    (page) => page.data.status === "online",
   );
+
+  // console.log("######", currentPath);
 
   ctx.locals.tree = makeTree(
     Object.values(ctx.locals.collections).flat(),
-    currentPath
+    currentPath,
   );
 
   return next();
@@ -23,19 +25,19 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 async function getAllCollections(
   filter:
     | ((arg0: CollectionEntry<CollectionKey>) => boolean)
-    | undefined = undefined
+    | undefined = undefined,
 ) {
   let allCollections = await Promise.all(
     Object.keys(collections).map(async (k) => {
       return [k, await getCollection(k as CollectionKey, filter)];
-    })
+    }),
   );
 
   let modifiedCollections = allCollections.map(([k, collection]) => {
     if (k == "pages" || typeof collection == "string") return [k, collection];
 
     collection.forEach(
-      (entry: Record<string, any>) => (entry.slug = `${k}/${entry.slug}`)
+      (entry: Record<string, any>) => (entry.slug = `${k}/${entry.slug}`),
     );
 
     return [k, collection];
@@ -62,7 +64,7 @@ export interface TreeNode {
 
 function makeTree(
   pages: CollectionEntry<CollectionKey>[],
-  currentPath?: string
+  currentPath?: string,
 ) {
   const currentSlug = currentPath || "";
 
@@ -105,14 +107,14 @@ function makeTree(
         collection: page.collection,
         selected: isSelected(slug, currentSlug),
       };
-    }
+    },
   );
 
   // Sort by path length then order - ensuring parents are before descendants if they exist
   const sorted = pageList.sort(
     (a: any, b: any) =>
       (a.slug.split("/").length || 0) - (b.slug.split("/").length || 0) ||
-      a.order - b.order
+      a.order - b.order,
   );
 
   sorted.forEach((page: any) => {
@@ -137,7 +139,7 @@ function makeTree(
             .replace(
               /\w\S*/g,
               (t: string) =>
-                t.charAt(0).toUpperCase() + t.substring(1).toLowerCase()
+                t.charAt(0).toUpperCase() + t.substring(1).toLowerCase(),
             ),
           // slug: path.slice(0, i + 1).join("/"),
           collection: page.collection,

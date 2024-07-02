@@ -2,6 +2,7 @@
 import Sticker from "@components/sticker/sticker.astro";
 import clsx from "clsx";
 import { convertColorString } from "@mws-astro/util";
+import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 import Image from "@shared/Image.astro";
 import Video from "@shared/Video.astro";
@@ -67,8 +68,8 @@ const expando = classList.includes("expando") ? true : false;
         background_image && (
             <Image
                 image={background_image}
-                width={1920}
-                height={1080}
+                width={preferences.page.maximum_page_width}
+                aspect={1.8}
                 background={true}
             />
         )
@@ -101,6 +102,10 @@ const expando = classList.includes("expando") ? true : false;
         --indent: var(--root-indent);
         padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
         z-index: 0;
+    }
+
+    section.image {
+        height: var(--height);
     }
 
     .component-wrapper {
