@@ -15,8 +15,6 @@ const depth = (Astro.props.depth ?? -1) + 1;
 const { maxDepth = Infinity, filter, collection } = Astro.props;
 const tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter);
 
-// console.log(filter, tree);
-
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
 ---
@@ -27,16 +25,9 @@ const Wrapper = depth ? Fragment : "nav";
             tree?.children != undefined &&
                 Object.entries(tree.children).map(([id, child], i) => {
                     if (collection && child.collection != collection) return;
-                    // const ChildTag = child.href != undefined ? "a" : Fragment;
                     const hasChildren =
                         child.children && Object.keys(child.children).length;
 
-                    // console.log(
-                    //     id,
-                    //     child.children,
-                    //     child.children &&
-                    //         Object.keys(child.children).length,
-                    // );
                     return (
                         <>
                             <div
@@ -44,11 +35,7 @@ const Wrapper = depth ? Fragment : "nav";
                                 class:list={{ "has-children": hasChildren }}
                             >
                                 <a
-                                    href={
-                                        child.href !== undefined
-                                            ? `/${child?.href}`
-                                            : undefined
-                                    }
+                                    href={child.href}
                                     aria-selected={
                                         child.selected === 2 ? "true" : "false"
                                     }

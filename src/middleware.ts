@@ -12,8 +12,6 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
     (page) => page.data.status === "online",
   );
 
-  // console.log("######", currentPath);
-
   ctx.locals.tree = makeTree(
     Object.values(ctx.locals.collections).flat(),
     currentPath,
@@ -101,7 +99,7 @@ function makeTree(
 
       return {
         slug,
-        href: slug.replace(/\/?index$/, ""),
+        href: "/" + slug.replace(/\/?index$/, ""),
         order: page.data.order,
         title: page.data.title,
         collection: page.collection,

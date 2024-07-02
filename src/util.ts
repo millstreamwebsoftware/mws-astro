@@ -64,8 +64,10 @@ export function getTreeNode(
     cursor = cursor.children[targetFragments[i]];
   }
 
+  // Reorder tree to place children inside their sibling index (/file/index -> /file/)
   if (cursor.children?.index) {
-    cursor = { children: { index: cursor } };
+    cursor = Object.assign(Object.assign({}, cursor), cursor.children.index);
+    delete cursor.children?.index;
   }
 
   return cursor;

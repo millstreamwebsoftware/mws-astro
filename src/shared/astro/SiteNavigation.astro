@@ -48,11 +48,7 @@ const Items = depth ? Fragment : "div";
                             aria-selected={
                                 pages.selected === 2 ? "true" : "false"
                             }
-                            href={
-                                pages.href !== undefined
-                                    ? "/" + pages.href
-                                    : undefined
-                            }
+                            href={pages.href}
                         >
                             <span>{pages?.title}</span>
                         </a>
@@ -95,11 +91,7 @@ const Items = depth ? Fragment : "div";
                                                 ? "true"
                                                 : "false"
                                         }
-                                        href={
-                                            !children && page.href !== undefined
-                                                ? "/" + page.href
-                                                : undefined
-                                        }
+                                        href={children ? undefined : page.href}
                                     >
                                         <span {id}>
                                             {page?.title}
