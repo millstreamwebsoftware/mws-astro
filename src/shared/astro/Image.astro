@@ -5,13 +5,15 @@ interface Props {
     image: string | any;
     width?: number;
     height?: number;
+    fit?: "cover" | "contain";
     alt?: string;
     aspect?: number;
     classes?: string;
     background?: boolean;
+    quality?: "low" | "mid" | "high" | "max" | number;
 }
 
-const { classes, background } = Astro.props;
+const { classes, background, fit = "cover", quality = "high" } = Astro.props;
 
 let astroImage;
 
@@ -29,9 +31,6 @@ if (
 }
 
 const image = astroImage ?? Astro.props.image;
-
-// console.log("######", image);
-
 let { height = image?.height, width = image?.width, aspect } = Astro.props;
 
 if (aspect == undefined) {
@@ -44,16 +43,13 @@ if (aspect == undefined) {
     height = Math.floor(width / aspect);
 }
 
-// console.log(image, width, height);
-
-// const file = typeof image == "string" ? image : image?.src;
 const file = image?.src || image;
 const placeholder = true;
 
 let metadata, plData;
 
 // @ts-expect-error
-if (!ENV_BOOKSHOP_LIVE) {
+if (!ENV_BOOKSHOP_LIVE && placeholder) {
     const fs = await import("node:fs/promises");
     const Sharp = (await import("sharp")).default;
 
@@ -72,45 +68,39 @@ if (!ENV_BOOKSHOP_LIVE) {
 
         let sh = Sharp(f);
         metadata = await sh.metadata();
-        if (placeholder) {
-            const { isOpaque, channels, entropy } = await sh.stats(); // Don't generate placeholders for images with alpha
 
-            if (isOpaque || channels[3].mean >= 254) {
-                // Include PNGs which are mostly opaque but not entirely
-                const plSize = 16;
+        const { isOpaque, channels } = await sh.stats(); // Don't generate placeholders for images with alpha
 
-                let pl = await sh
-                    .removeAlpha()
-                    .resize(plSize, undefined, { fit: "inside" })
-                    .blur()
-                    .webp()
-                    .toBuffer();
+        if (isOpaque || channels[3].mean >= 254) {
+            // Include PNGs which are mostly opaque but not entirely
+            const plSize = 16;
 
-                plData = pl.toString("base64");
-            } else {
-                console.log("Skipped transparent image:", channels[3]);
-            }
+            let pl = await sh
+                .removeAlpha()
+                .resize(plSize, undefined, { fit: "inside" })
+                .blur()
+                .webp()
+                .toBuffer();
+
+            plData = pl.toString("base64");
         }
+        // else {
+        //     console.log(
+        //         "Skipped transparent image:",
+        //         channels[3].mean,
+        //         realFile,
+        //     );
+        // }
     } catch (err) {
         console.warn("While generating a placeholder an error occurred:", err);
     }
 }
 
-// Figure out the size of the served image, if an aspect is provided height is recalculated
-// let width = tWidth || metadata?.width;
-// let height =
-//   aspect && width ? Math.floor(width / aspect) : tHeight || metadata?.height;
-
-// // Figure out the aspect ratio of the served image
-// aspect = width && height ? width / height : undefined;
-let placeholderString: string | undefined;
+// Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
 let placeholderStyle;
-
 if (placeholder && plData) {
     let webpString = `data:image/webp;base64,${plData}`;
-
-    // Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
-    placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice' href='${webpString}'/%3e%3c/svg%3e`;
+    let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice' href='${webpString}'/%3e%3c/svg%3e`;
     placeholderStyle = {
         "background-image": `url("${placeholderString}")`,
     };
@@ -125,6 +115,8 @@ if (placeholder && plData) {
     class:list={[classes, { background }]}
     style={placeholderStyle}
     densities={[1, 1.5, 2]}
+    data-fit={fit}
+    {quality}
 />
 
 <style>
@@ -135,6 +127,11 @@ if (placeholder && plData) {
         background-position: center;
         width: 100%;
         height: 100%;
+    }
+
+    img[data-fit="contain"] {
+        object-fit: contain;
+        background-size: contain;
     }
 
     img.background {

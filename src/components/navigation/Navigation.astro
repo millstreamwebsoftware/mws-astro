@@ -9,11 +9,19 @@ interface Props {
     maxDepth?: number;
     filter?: string;
     depth?: number;
+    parent?: boolean;
 }
 
 const depth = (Astro.props.depth ?? -1) + 1;
-const { maxDepth = Infinity, filter, collection } = Astro.props;
-const tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter);
+const {
+    maxDepth = 1,
+    filter = Astro.locals.path
+        ? Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1")
+        : undefined,
+    collection,
+    parent = true,
+} = Astro.props;
+let tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, parent);
 
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";

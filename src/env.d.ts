@@ -6,6 +6,7 @@ declare global {
     interface Locals {
       collections: Record<CollectionKey, CollectionEntry[]>;
       tree: TreeNode;
+      path: string | undefined;
     }
   }
 

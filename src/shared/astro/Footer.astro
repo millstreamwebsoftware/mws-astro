@@ -20,7 +20,11 @@ const textColor = convertColorString(preferences.footer.foreground_color);
             <Richtext content={preferences.footer.text_content} />
         )
     }
-    {preferences.footer.show_sitemap && <Navigation collection="pages" />}
+    {
+        preferences.footer.show_sitemap && (
+            <Navigation collection="pages" filter="/" parent={false} />
+        )
+    }
     {preferences.footer.show_socials && <Social />}
     {
         preferences.footer.show_copyright && (

@@ -3,30 +3,41 @@ import Section from "@layouts/Section.astro";
 import Markdown from "@shared/Markdown.astro";
 
 export interface Props {
-  content: string;
-  background_color?: string;
-  classes?: any;
-  style?: Record<string, string>;
+    content: string;
+    background_color?: string;
+    classes?: any;
+    style?: Record<string, string>;
 }
 
 const { content } = Astro.props;
 ---
 
 <Section component="richtext" {...Astro.props}>
-  <Markdown {content} />
+    <div>
+        <Markdown {content} />
+    </div>
 </Section>
 
 <style>
-  section {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    section {
+        position: relative;
+        /* display: flex;
+        flex-direction: column;
+        align-items: flex-start; */
+    }
 </style>
 
 <style is:global>
-  .rich-text img {
-    margin-bottom: 2rem;
-  }
+    .rich-text img {
+        max-width: 100%;
+        margin-bottom: 2rem;
+        max-width: 40%;
+    }
+
+    .richtext {
+        p {
+            line-height: 1.8;
+            margin-bottom: 1.6rem;
+        }
+    }
 </style>

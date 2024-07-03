@@ -45,6 +45,7 @@ export function bookshopName(p: string) {
 export function getTreeNode(
   tree: TreeNode,
   filter: string | undefined,
+  parent: boolean = false,
 ): TreeNode | undefined {
   if (!filter) return tree;
 
@@ -69,6 +70,11 @@ export function getTreeNode(
     cursor = Object.assign(Object.assign({}, cursor), cursor.children.index);
     delete cursor.children?.index;
   }
+
+  if (parent)
+    cursor = {
+      children: { index: cursor },
+    };
 
   return cursor;
 }

@@ -17,6 +17,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
     currentPath,
   );
 
+  ctx.locals.path = currentPath;
   return next();
 });
 

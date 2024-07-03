@@ -55,6 +55,7 @@ const figcaption = title || description;
             {alt}
             aspect={aspect ?? 1.8}
             width={preferences.page.maximum_page_width}
+            quality="mid"
         />
 
         {
@@ -80,7 +81,7 @@ const figcaption = title || description;
                     data-lightbox={id}
                     class:list={{ caption: title || description }}
                 >
-                    <SharedImage {image} {alt} />
+                    <SharedImage {image} {alt} fit="contain" quality="high" />
 
                     {figcaption && (
                         <figcaption>

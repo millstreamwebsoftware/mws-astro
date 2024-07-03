@@ -9,45 +9,51 @@ import Mailbuild from "@components/mailbuild/mailbuild.astro";
 import Facebook from "@components/facebook/facebook.astro";
 import Social from "@components/social/social.astro";
 import Counter from "@components/counter/counter.astro";
+import AsideImage from "@components/image/asideImage.astro";
 
 // We need to strip whitespace due to a strange bug which removes a character from the start of a line when there is whitespace before the newline.
-const content = await stripTrailingWhitespace(Astro.props.content).then(
-  replaceCmsEmbeds
-);
+// const content = await stripTrailingWhitespace(Astro.props.content).then(
+//     replaceCmsEmbeds,
+// );
+
+const content = await replaceCmsEmbeds(Astro.props.content);
 
 var substitutions = {
-  blockquote: Blockquote,
-  icon: Icon,
-  Newsletter: Mailbuild,
-  Facebook,
-  Social,
-  'a[class*="button"]': Button,
-  Counter,
+    blockquote: Blockquote,
+    icon: Icon,
+    Newsletter: Mailbuild,
+    Facebook,
+    Social,
+    'a[class*="button"]': Button,
+    img: AsideImage,
+    Counter,
 };
 var md;
 
 // @ts-ignore
 if (ENV_BOOKSHOP_LIVE) {
-  md = new MarkdownIt({ html: true });
+    md = new MarkdownIt({ html: true });
 } else {
-  // Get site specific custom snippets from src/snippets.ts
-  const snippetGlob = import.meta.glob<Record<string, any>>("/src/snippets.ts");
+    // Get site specific custom snippets from src/snippets.ts
+    const snippetGlob = import.meta.glob<Record<string, any>>(
+        "/src/snippets.ts",
+    );
 
-  await snippetGlob?.["/src/snippets.ts"]?.()?.then(
-    ({ snippets }) => Object.assign(substitutions, snippets),
-    (error) => console.log(error)
-  );
+    await snippetGlob?.["/src/snippets.ts"]?.()?.then(
+        ({ snippets }) => Object.assign(substitutions, snippets),
+        (error) => console.log(error),
+    );
 }
 ---
 
 {
-  md
-    ? content && <Fragment set:html={md.render(content)} />
-    : content && (
-        <RemoteMarkdown
-          {content}
-          sanitize={{ allowComponents: true }}
-          components={substitutions}
-        />
-      )
+    md
+        ? content && <Fragment set:html={md.render(content)} />
+        : content && (
+              <RemoteMarkdown
+                  {content}
+                  sanitize={{ allowComponents: true }}
+                  components={substitutions}
+              />
+          )
 }

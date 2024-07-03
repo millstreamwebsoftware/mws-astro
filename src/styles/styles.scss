@@ -36,7 +36,6 @@
     --header-background-color-bottom: 0 0 0 / 0.3;
     --header-color: 255 255 255;
     --header-height: 100px;
-    // --header-offset-transparent: var(--header-height);
     --header-offset-transparent: 0;
 
     --border-radius: 0.3rem;
@@ -93,11 +92,11 @@ body {
     grid-column: 2 / 3;
 }
 
-section
+/* section
     > :is(h1, h2, h3, h4, h5, h6, p, ul, form, address, script)
     + :is(h1, h2, h3, h4, h5, h6, p, ul, form, address) {
     margin-top: var(--text-gap);
-}
+} */
 
 :is(main, article) > section {
     padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
@@ -174,7 +173,7 @@ textarea,
 label,
 select {
     margin: 0;
-    line-height: 2;
+    line-height: 1.8;
     font-family: var(--default-font-family);
     font-size: var(--text-size-medium);
     color: rgb(var(--text-color));
@@ -252,12 +251,17 @@ h4,
 h5,
 h6 {
     margin: 0;
-    margin-top: 0.8em;
     margin-bottom: 0.4em;
     line-height: 1.4;
     font-family: var(--default-font-family);
-    color: rgb(var(--heading-color));
     text-wrap: balance;
+}
+
+@for $i from 1 through 6 {
+    h#{$i} {
+        --h#{$i}-color: var(--heading-color);
+        color: rgb(var(--h#{$i}-color));
+    }
 }
 
 :is(p, ul, ol, h1, h2, h3, h4, h5, h6):first-child {
@@ -290,7 +294,7 @@ th {
 }
 
 p {
-    margin-bottom: 0.5em;
+    margin-bottom: 1.6rem;
 
     &:last-child {
         margin-bottom: 0;
