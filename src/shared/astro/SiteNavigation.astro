@@ -1,5 +1,6 @@
 ---
 import Icon from "./icon.astro";
+import preferences from "@data/preferences.json";
 import type { TreeNode } from "@mws-astro/middleware";
 
 export interface Props {
@@ -14,9 +15,19 @@ const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
 const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
 const Wrapper = depth ? Fragment : "nav";
 const Items = depth ? Fragment : "div";
+const showHome = (preferences as any)?.header?.show_home ?? true;
+const showCaret = (preferences as any)?.header?.show_caret ?? true;
+const placement = (preferences as any)?.header?.center_dropdowns
+    ? "bottom"
+    : "bottom-start";
 ---
 
-<Wrapper id="navigation" role="navigation" aria-label="Main menu">
+<Wrapper
+    id="navigation"
+    role="navigation"
+    aria-label="Main menu"
+    data-placement={placement}
+>
     {
         !depth && (
             <>
@@ -59,7 +70,7 @@ const Items = depth ? Fragment : "div";
                 pages.children &&
                     Object.values(pages.children).map((page: TreeNode, i) => {
                         // Skip home element if show_home is false
-                        // if (!preferences.header.show_home && page.href === "") return;
+                        if (!showHome && page.href === "/") return;
                         if (page.collection && page.collection != "pages")
                             return;
                         const children =
@@ -117,7 +128,7 @@ const Items = depth ? Fragment : "div";
                         );
                     })
             }
-            {!!depth && <div class="dropdown-caret" />}
+            {!!depth && showCaret && <div class="dropdown-caret" />}
         </ul>
     </Items>
 </Wrapper>
@@ -126,6 +137,7 @@ const Items = depth ? Fragment : "div";
     import {
         computePosition,
         type ComputePositionConfig,
+        type Placement,
         autoUpdate,
         offset,
         shift,
@@ -141,6 +153,10 @@ const Items = depth ? Fragment : "div";
         const navigation = document.getElementById("navigation");
         const mobileNavButton = document.getElementById("mobile-nav-menu");
         const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+        const placement: Placement =
+            (navigation &&
+                (navigation.dataset?.placement as Placement | undefined)) ||
+            "bottom-start";
         const caretHeight = 20;
 
         // const navTarget = null;
@@ -202,32 +218,40 @@ const Items = depth ? Fragment : "div";
                 "depth-0",
             )
                 ? {
-                      placement: "bottom-start",
+                      placement,
                       strategy: "fixed", // Probably depends on if the menu is fixed or not
                       middleware: [
-                          offset({ mainAxis: caretHeight * 0.9, crossAxis: 0 }),
+                          offset({
+                              mainAxis: caretHeight * 0.9 * Number(!!caret),
+                              crossAxis: 0,
+                          }),
                           size({
-                              apply({ elements, availableHeight }) {
+                              apply({ rects, elements, availableHeight }) {
                                   if (isMobileNav()) {
                                       Object.assign(elements.floating.style, {
                                           maxHeight: null,
+                                          minWidth: null,
                                       });
                                       return;
                                   }
                                   Object.assign(elements.floating.style, {
                                       maxHeight: `${availableHeight}px`,
+                                      minWidth: `${rects.reference.width}px`,
                                   });
                               },
                           }),
                           shift(),
-                          arrow({ element: caret, padding: 10 }),
+                          caret && arrow({ element: caret, padding: 10 }),
                       ],
                   }
                 : {
                       placement: "right-start",
                       strategy: "fixed",
                       middleware: [
-                          offset({ mainAxis: caretHeight * 0.9, crossAxis: 0 }),
+                          offset({
+                              mainAxis: caretHeight * 0.9 * Number(!!caret),
+                              crossAxis: 0,
+                          }),
                           shift(),
                           size({
                               apply({ elements, availableHeight }) {
@@ -243,7 +267,7 @@ const Items = depth ? Fragment : "div";
                               },
                           }),
                           flip(),
-                          arrow({ element: caret, padding: 10 }),
+                          caret && arrow({ element: caret, padding: 10 }),
                       ],
                   };
 
