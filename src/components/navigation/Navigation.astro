@@ -10,6 +10,7 @@ interface Props {
     filter?: string;
     depth?: number;
     parent?: boolean;
+    hide_cousins?: boolean;
 }
 
 const depth = (Astro.props.depth ?? -1) + 1;
@@ -20,6 +21,7 @@ const {
         : undefined,
     collection,
     parent = true,
+    hide_cousins = false,
 } = Astro.props;
 let tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, parent);
 
@@ -33,8 +35,22 @@ const Wrapper = depth ? Fragment : "nav";
             tree?.children != undefined &&
                 Object.entries(tree.children).map(([id, child], i) => {
                     if (collection && child.collection != collection) return;
+
                     const hasChildren =
                         child.children && Object.keys(child.children).length;
+
+                    const displayChildren =
+                        depth < maxDepth &&
+                        hasChildren &&
+                        (hide_cousins // Don't render children of unselected nodes
+                            ? child?.selected == undefined || child?.selected
+                            : true);
+
+                    let link =
+                        child.href ??
+                        (child.children && // Redirect to first child page if no page exists and not rendering children
+                            !displayChildren &&
+                            Object.values(child.children)[0]?.href);
 
                     return (
                         <>
@@ -43,19 +59,20 @@ const Wrapper = depth ? Fragment : "nav";
                                 class:list={{ "has-children": hasChildren }}
                             >
                                 <a
-                                    href={child.href}
+                                    href={link}
                                     aria-selected={
                                         child.selected === 2 ? "true" : "false"
                                     }
                                 >
                                     {child.title}
                                 </a>
-                                {hasChildren && depth < maxDepth && (
+                                {!!displayChildren && (
                                     <div class="children">
                                         <Astro.self
                                             tree={child}
                                             {depth}
                                             {maxDepth}
+                                            {hide_cousins}
                                         />
                                     </div>
                                 )}

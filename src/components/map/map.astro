@@ -3,45 +3,45 @@ import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 
 export interface props {
-  location?: string;
-  lat?: number;
-  lng?: number;
-  zoom?: number;
-  mapType?: string;
-  mapId?: string;
-  // marker?: boolean;
-  height: number;
-  style?: string;
-  indent?: boolean;
-  key?: string;
+    location?: string;
+    lat?: number;
+    lng?: number;
+    zoom?: number;
+    mapType?: string;
+    mapId?: string;
+    // marker?: boolean;
+    height: number;
+    style?: string;
+    indent?: boolean;
+    key?: string;
 }
 
 const {
-  location = "Perth City, WA",
-  lat,
-  lng,
-  zoom,
-  // marker = true,
-  key,
-  indent,
-  mapId,
-  style,
+    location = "Perth City, WA",
+    lat,
+    lng,
+    zoom,
+    // marker = true,
+    key,
+    indent,
+    mapId,
+    style,
 } = Astro.props;
 
 // @ts-expect-error
 const bs = ENV_BOOKSHOP_LIVE || true;
 
 const apiKey =
-  bs || import.meta.env.DEV
-    ? "AIzaSyDkEYLtJmsfG9MU90-y4Y-JUi0KLJNG3OU"
-    : preferences.API.google_maps.api_key;
+    bs || import.meta.env.DEV
+        ? preferences.API.google_maps.dev_key
+        : preferences.API.google_maps.api_key;
 // const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "hybrid";
 const id = "map-" + key;
 
 const mapMode = location ? "place" : "view";
 const mapURL = new URL(
-  `https://www.google.com/maps/embed/v1/${mapMode}?key=${apiKey}`
+    `https://www.google.com/maps/embed/v1/${mapMode}?key=${apiKey}`,
 );
 
 location && mapURL.searchParams.append("q", location);
@@ -51,24 +51,24 @@ mapType && mapURL.searchParams.append("maptype", mapType?.toString());
 ---
 
 <Section component="map" {...Astro.props}>
-  <iframe
-    src={mapURL.toString()}
-    width="450"
-    height="250"
-    referrerpolicy="no-referrer-when-downgrade"
-    loading="lazy"
-    frameborder="0"
-    style="border: 0"
-    allowfullscreen></iframe>
+    <iframe
+        src={mapURL.toString()}
+        width="450"
+        height="250"
+        referrerpolicy="no-referrer-when-downgrade"
+        loading="lazy"
+        frameborder="0"
+        style="border: 0"
+        allowfullscreen></iframe>
 </Section>
 
 <style>
-  .map-box {
-    min-height: 100%;
-  }
+    .map-box {
+        min-height: 100%;
+    }
 
-  iframe {
-    width: 100%;
-    height: 100%;
-  }
+    iframe {
+        width: 100%;
+        height: 100%;
+    }
 </style>

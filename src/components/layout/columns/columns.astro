@@ -128,7 +128,6 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
                         >
                             <Component
                                 {...block}
-                                indent={false}
                                 key={(key || "") + "-" + i.toString()}
                             />
                         </div>
@@ -148,7 +147,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         grid-auto-flow: row;
         grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
         /* overflow: hidden; */
-        gap: var(--column-gap);
+        /* gap: var(--column-gap); */
         /* padding: calc(var(--indent) * var(--vertical-indent)) var(--indent); */
         background-color: rgb(var(--background-color));
     }
@@ -191,36 +190,49 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
     .columns-item > section {
         height: 100%;
-        // padding: calc(var(--column-gap));
-        padding: 0;
+        padding: calc(var(--column-gap));
+        /* padding: 0; */
     }
 
-    // .columns > {
-    //   .first-in-row > section {
-    //     padding-left: var(--indent);
-    //   }
-    //   .last-in-row > section {
-    //     padding-right: var(--indent);
-    //   }
-    //   .first-in-column > section {
-    //     padding-top: var(--indent);
-    //   }
-    //   .last-in-column > section {
-    //     padding-bottom: var(--indent);
-    //   }
-    // }
+    .columns > {
+        .first-in-row > section:not(.no-indent) {
+            padding-left: var(--indent);
+        }
+        .last-in-row > section:not(.no-indent) {
+            padding-right: var(--indent);
+        }
+        .first-in-column > section:not(.no-indent) {
+            padding-top: calc(var(--indent) * var(--vertical-indent));
+        }
+        .last-in-column > section:not(.no-indent) {
+            padding-bottom: calc(var(--indent) * var(--vertical-indent));
+        }
+    }
 
     @media only screen and (max-width: 768px) {
         div.columns.collapse.collapse {
             --columns: 1 !important;
-            gap: var(--indent);
+            /* gap: var(--indent); */
             grid-template-columns: 1fr;
 
             > .columns-item {
                 grid-column: 1 / 2 !important;
                 grid-row: auto !important;
 
-                section::after {
+                > section:not(.no-indent) {
+                    padding: var(--indent);
+                }
+
+                /* &:first-child > section:not(.no-indent) {
+                    padding-top: calc(var(--indent) * var(--vertical-indent));
+                }
+                &:last-child > section:not(.no-indent) {
+                    padding-bottom: calc(
+                        var(--indent) * var(--vertical-indent)
+                    );
+                } */
+
+                /* section::after {
                     left: calc(var(--indent) * -1);
                     right: calc(var(--indent) * -1);
                     top: 0;
@@ -233,7 +245,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
                 &:last-child section::after {
                     bottom: calc(var(--indent) * -0.5);
-                }
+                } */
             }
         }
     }
@@ -243,7 +255,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         z-index: 1;
     }
 
-    .columns-item section.background-color::after {
+    /* .columns-item section.background-color::after {
         content: "";
         position: absolute;
         inset: calc(var(--column-gap) * -0.5);
@@ -265,5 +277,5 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
     .columns-item.last-in-row section::after {
         right: calc(var(--indent) * -1);
-    }
+    } */
 </style>

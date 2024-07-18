@@ -9,7 +9,7 @@ import { collections } from "src/content/config";
 export const onRequest = defineMiddleware(async (ctx, next) => {
   const currentPath = ctx.params.slug;
   ctx.locals.collections = await getAllCollections(
-    (page) => page.data.status === "online",
+    (page) => page.data.status === "online" || page.data.status === "meta",
   );
 
   ctx.locals.tree = makeTree(
@@ -100,7 +100,10 @@ function makeTree(
 
       return {
         slug,
-        href: "/" + slug.replace(/\/?index$/, ""),
+        href:
+          page.data.status != "meta"
+            ? "/" + slug.replace(/\/?index$/, "")
+            : undefined,
         order: page.data.order,
         title: page.data.title,
         collection: page.collection,

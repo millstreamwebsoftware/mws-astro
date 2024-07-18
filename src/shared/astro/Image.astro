@@ -1,13 +1,17 @@
 ---
 import { Image as AstroImage } from "astro:assets";
 
+type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
+export type CssAlign = `${CssAlignment} ${CssAlignment}` | CssAlignment;
+
 interface Props {
     image: string | any;
     width?: number;
     height?: number;
     fit?: "cover" | "contain";
+    align?: CssAlign;
     alt?: string;
-    aspect?: number;
+    // aspect?: number;
     classes?: string;
     background?: boolean;
     quality?: "low" | "mid" | "high" | "max" | number;
@@ -17,6 +21,7 @@ const { classes, background, fit = "cover", quality = "high" } = Astro.props;
 
 let astroImage;
 
+// Attempt to import the image if we are given a string
 if (
     typeof Astro.props.image == "string" &&
     Astro.props.image.startsWith("/assets/")
@@ -31,17 +36,40 @@ if (
 }
 
 const image = astroImage ?? Astro.props.image;
-let { height = image?.height, width = image?.width, aspect } = Astro.props;
+// let { height = image?.height, width = image?.width, aspect } = Astro.props;
 
-if (aspect == undefined) {
-    aspect = width / height;
-} else if (Astro.props.width != undefined) {
-    height = Math.floor(width / aspect);
-} else if (Astro.props.height != undefined) {
-    width = Math.floor(height * aspect);
+// if (aspect == undefined) {
+//     aspect = width / height;
+// } else if (Astro.props.width != undefined) {
+//     height = Math.floor(width / aspect);
+// } else if (Astro.props.height != undefined) {
+//     width = Math.floor(height * aspect);
+// } else {
+//     height = Math.floor(width / aspect);
+// }
+
+let width, height;
+
+if (image.width && image.height) {
+    let aspect = image.width / image.height;
+
+    if (Astro.props.width != undefined) {
+        width = Astro.props.width;
+        height = Math.floor(width / aspect);
+    } else if (Astro.props.height != undefined) {
+        height = Astro.props.height;
+        width = Math.floor(height * aspect);
+    } else {
+        width = image.width;
+        height = image.height;
+    }
 } else {
-    height = Math.floor(width / aspect);
+    width = Astro.props.width;
+    height = Astro.props.height;
+    // aspect = width / height;
 }
+
+const align = { "--align": Astro.props.align ?? "center" };
 
 const file = image?.src || image;
 const placeholder = true;
@@ -113,7 +141,7 @@ if (placeholder && plData) {
     {width}
     {height}
     class:list={[classes, { background }]}
-    style={placeholderStyle}
+    style={Object.assign({}, placeholderStyle, align)}
     densities={[1, 1.5, 2]}
     data-fit={fit}
     {quality}
@@ -122,11 +150,13 @@ if (placeholder && plData) {
 <style>
     img {
         object-fit: cover;
-        object-position: center;
+        object-position: var(--align);
         background-size: cover;
-        background-position: center;
+        background-position: var(--align);
         width: 100%;
         height: 100%;
+        /* width: auto;
+        height: auto; */
     }
 
     img[data-fit="contain"] {

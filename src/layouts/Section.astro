@@ -5,6 +5,7 @@ import { convertColorString } from "@mws-astro/util";
 import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 import Image from "@shared/Image.astro";
+import { type CssAlign } from "@shared/Image.astro";
 import Video from "@shared/Video.astro";
 
 export interface Props {
@@ -14,6 +15,7 @@ export interface Props {
     background_color?: string;
     background_image?: string;
     background_video?: string;
+    background_align?: CssAlign;
     classes?: any;
     style?: Record<string, any>;
     indent?: boolean;
@@ -27,6 +29,7 @@ const {
     background_color,
     background_image,
     background_video,
+    background_align,
     classes,
     style,
     key,
@@ -70,6 +73,7 @@ const expando = classList.includes("expando") ? true : false;
                 image={background_image}
                 width={preferences.page.maximum_page_width}
                 aspect={1.8}
+                align={background_align}
                 background={true}
             />
         )
@@ -98,14 +102,21 @@ const expando = classList.includes("expando") ? true : false;
 <style lang="scss">
     section {
         position: relative;
-        height: max(var(--height), fit-content);
+        /* height: max(var(--height), fit-content); */
+
+        min-height: var(--height);
         --indent: var(--root-indent);
         padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
         z-index: 0;
     }
 
+    section.columns {
+        padding: 0;
+    }
+
     section.image {
-        height: var(--height);
+        /* min-height: var(--height); */
+        /* height: min(var(--height), 100%); */
     }
 
     .component-wrapper {
@@ -214,6 +225,12 @@ const expando = classList.includes("expando") ? true : false;
         /* height: var(--indent); */
 
         bottom: calc(var(--indent) * -0.5 - 1.5rem);
+    }
+
+    section.image figure > img {
+        /* height: var(--height); */
+        /* height: initial; */
+        position: absolute;
     }
 </style>
 

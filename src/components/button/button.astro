@@ -1,23 +1,23 @@
 ---
-import Markdown from "@shared/Markdown.astro";
 import Icon from "@shared/icon.astro";
+import preferences from "@data/preferences.json";
 
 const { href, target } = Astro.props;
 ---
 
 <a class="button" {target} {href}>
-  <span><slot /></span>
-  <Icon name="fa6-solid:circle-chevron-right" height="1.8em" />
+    <span><slot /></span>
+    <Icon name="fa6-solid:circle-chevron-right" height="1.8em" />
 </a>
 
 <style>
-  a {
-    display: flex;
-    align-items: center;
-    padding: 0.5em 1em;
-    gap: 1.2em;
-    border-radius: var(--border-radius);
-    text-decoration: none;
-    width: fit-content;
-  }
+    a {
+        display: flex;
+        align-items: center;
+        padding: 0.5em 1em;
+        gap: 1.2em;
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        width: fit-content;
+    }
 </style>
