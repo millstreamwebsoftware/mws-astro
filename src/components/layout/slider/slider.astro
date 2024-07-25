@@ -419,13 +419,15 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             height: 100%;
 
             > .component-wrapper {
-                padding-top: var(--header-height);
-
                 > * {
                     width: 100%;
                     height: 100%;
                 }
             }
         }
+    }
+
+    #slider-0 .slider-item > section > .component-wrapper {
+        padding-top: var(--header-height);
     }
 </style>

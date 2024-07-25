@@ -2,8 +2,8 @@
 import { getIconData, iconToSVG } from "@iconify/utils";
 
 export interface Props {
-  name: string;
-  height?: string;
+    name: string;
+    height?: string;
 }
 
 const { name } = Astro.props;
@@ -12,44 +12,45 @@ var [iconSetName, iconName] = name.split(":");
 const iconSetPath = `/node_modules/@iconify-json/${iconSetName}/icons.json`;
 
 const iconSets: Record<string, Function> = import.meta.glob(
-  "/node_modules/@iconify-json/*/icons.json"
+    "/node_modules/@iconify-json/*/icons.json",
 );
 
 if (!(iconSetPath in iconSets)) {
-  throw Error(
-    `Icon Collection "${iconSetName}" not found. Is it installed?\n> npm i @iconify-json/${iconSetName}`
-  );
+    throw Error(
+        `Icon Collection "${iconSetName}" not found. Is it installed?\n> npm i @iconify-json/${iconSetName}`,
+    );
 }
 
 const iconSet = await iconSets[iconSetPath]();
 const icon = getIconData(iconSet, iconName);
 
 if (!icon)
-  throw Error(`Icon "${iconName}" not found in collection ${iconSetName}.`);
+    throw Error(`Icon "${iconName}" not found in collection ${iconSetName}.`);
 
 const iconData = iconToSVG(icon, { height });
 ---
 
 <svg
-  class="icon"
-  data-icon-name={name}
-  {...iconData.attributes}
-  set:html={iconData.body}
+    class="icon"
+    data-icon-name={name}
+    {...iconData.attributes}
+    set:html={iconData.body}
 />
 
 <style>
-  svg.rot90 {
-    transform: rotate(90deg);
-  }
-  svg.rot180 {
-    transform: rotate(180deg);
-  }
-  svg.rot270 {
-    transform: rotate(270deg);
-  }
+    svg.rot90 {
+        transform: rotate(90deg);
+    }
+    svg.rot180 {
+        transform: rotate(180deg);
+    }
+    svg.rot270 {
+        transform: rotate(270deg);
+    }
 
-  svg {
-    overflow: visible;
-    color: rgb(var(--text-color));
-  }
+    svg {
+        overflow: visible;
+        /* color: rgb(var(--text-color)); */
+        color: inherit;
+    }
 </style>

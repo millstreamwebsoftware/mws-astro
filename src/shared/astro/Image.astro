@@ -20,6 +20,7 @@ interface Props {
 const { classes, background, fit = "cover", quality = "high" } = Astro.props;
 
 let astroImage;
+let placeholder = true;
 
 // Attempt to import the image if we are given a string
 if (
@@ -31,23 +32,36 @@ if (
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),
     )[0];
+    if (imagePath in images) {
+        astroImage = ((await images[imagePath]()) as any)?.default;
+    } else {
+        console.warn(
+            `[Missing Image] ${Astro.props.image} was requested but is missing.`,
+        );
+        placeholder = false;
+    }
+} else if (
+    typeof Astro.props.image == "string" &&
+    Astro.props.image.startsWith("public/")
+) {
+    const images = import.meta.glob("public/**/*");
 
-    astroImage = ((await images[imagePath]()) as any)?.default;
+    let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
+        i.endsWith(Astro.props.image),
+    )[0];
+    if (imagePath in images) {
+        astroImage = ((await images[imagePath]()) as any)?.default;
+    } else {
+        console.warn(
+            `[Missing Image] ${Astro.props.image} was requested but is missing.`,
+        );
+        placeholder = false;
+    }
+} else {
+    placeholder = false;
 }
 
 const image = astroImage ?? Astro.props.image;
-// let { height = image?.height, width = image?.width, aspect } = Astro.props;
-
-// if (aspect == undefined) {
-//     aspect = width / height;
-// } else if (Astro.props.width != undefined) {
-//     height = Math.floor(width / aspect);
-// } else if (Astro.props.height != undefined) {
-//     width = Math.floor(height * aspect);
-// } else {
-//     height = Math.floor(width / aspect);
-// }
-
 let width, height;
 
 if (image.width && image.height) {
@@ -64,16 +78,14 @@ if (image.width && image.height) {
         height = image.height;
     }
 } else {
-    width = Astro.props.width;
-    height = Astro.props.height;
+    width = Astro.props.width ?? 256;
+    height = Astro.props.height ?? 256;
     // aspect = width / height;
 }
 
 const align = { "--align": Astro.props.align ?? "center" };
 
 const file = image?.src || image;
-const placeholder = true;
-
 let metadata, plData;
 
 // @ts-expect-error
@@ -120,7 +132,7 @@ if (!ENV_BOOKSHOP_LIVE && placeholder) {
         //     );
         // }
     } catch (err) {
-        console.warn("While generating a placeholder an error occurred:", err);
+        // console.warn("While generating a placeholder an error occurred:", err);
     }
 }
 

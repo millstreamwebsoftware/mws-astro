@@ -1,28 +1,288 @@
 ---
 import Section from "@layouts/Section.astro";
 import Markdown from "@shared/Markdown.astro";
+// import fs from "node:fs/promises";
+import { PDFiumLibrary } from "@hyzyla/pdfium";
+import Image from "@shared/Image.astro";
+import Icon from "@shared/icon.astro";
 
 export interface Props {
-  files?: [{ path: string; title: string; description: string }];
-  show_filetype: boolean;
-  show_filesize: boolean;
+    files?: [
+        {
+            path: string;
+            title: string;
+            description: string;
+            size?: number;
+            thumbnail?: string;
+        },
+    ];
+    show_filetype: boolean;
+    show_icon: boolean;
+    show_filesize: boolean;
+    show_thumbnail: boolean;
 }
 
-const { files, show_filetype, show_filesize } = Astro.props;
+const { files, show_filetype, show_icon, show_filesize, show_thumbnail } =
+    Astro.props;
+
+// let fs: any | undefined;
+
+function formatBytes(bytes: number, decimals = 2) {
+    if (bytes === 0) return "0 Bytes";
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+
+function getFileType(path: string) {
+    return path.match(/.*\.(.*?)$/)?.[1].toLowerCase();
+}
+
+function getIcon(path: string) {
+    switch (getFileType(path)) {
+        case "jpg":
+        case "jpeg":
+        case "png":
+        case "gif":
+        case "webp":
+        case "bmp":
+        case "tga":
+        case "heic":
+        case "avif":
+        case "tiff":
+            return "fa6-solid:file-image";
+        case "mp4":
+        case "avi":
+        case "mkv":
+        case "mov":
+        case "webm":
+        case "hevc":
+            return "fa6-solid:file-video";
+        case "mp3":
+        case "wav":
+        case "flac":
+        case "ogg":
+        case "ogg":
+        case "aac":
+            return "Audio";
+        case "txt":
+            return "fa6-solid:file-lines";
+        case "doc":
+        case "docx":
+            return "fa6-solid:file-word";
+        case "ppt":
+        case "pptx":
+            return "fa6-solid:file-powerpoint";
+        case "xls":
+        case "xlsx":
+            return "fa6-solid:fa6-solid:file-excel";
+        case "pdf":
+            return "fa6-solid:file-pdf";
+        case "csv":
+            return "fa6-solid:file-csv";
+        case "html":
+        case "xml":
+        case "svg":
+            return "fa6-solid:file-code";
+        case "gz":
+        case "tar":
+        case "zip":
+        case "7z":
+        case "rar":
+            return "fa6-solid:file-zipper";
+        default:
+            return "fa6-solid:file";
+    }
+}
+
+// @ts-expect-error
+if (!ENV_BOOKSHOP_LIVE && files?.length) {
+    const fs = await import("node:fs/promises").catch(() => {
+        return undefined;
+    });
+    const path = await import("node:path");
+    // const sharp = (await import("sharp")).default;
+    // const pdf = await import("@hyzyla/pdfium").then(async (p: any) => {
+    //     return await p.init();
+    // }, () => {
+    //     return undefined;
+    // });
+
+    const pdf = await PDFiumLibrary.init();
+
+    if (fs) {
+        await Promise.all(
+            files.map(async (file) => {
+                let realPath = file.path;
+
+                file.size = await fs
+                    .stat(realPath)
+                    .catch(() => {
+                        realPath = path.join("public", realPath);
+                        return fs.stat(realPath);
+                    })
+                    .then(
+                        (stats) => stats.size,
+                        () => undefined,
+                    );
+
+                if (show_thumbnail) {
+                    switch (getFileType(realPath)) {
+                        case "jpg":
+                        case "jpeg":
+                        case "png":
+                        case "gif":
+                        case "webp":
+                        case "avif":
+                        case "tiff":
+                            file.thumbnail = realPath;
+                            break;
+                        case "pdf":
+                            file.thumbnail = await fs
+                                .readFile(realPath)
+                                .then((buffer) => pdf.loadDocument(buffer))
+                                .then((document) =>
+                                    document
+                                        .getPage(0)
+                                        .render({ scale: 1, render: "sharp" }),
+                                )
+                                .then((thumbnail) => {
+                                    let thumbPath = `${realPath}.png`;
+                                    fs.writeFile(thumbPath, thumbnail.data, {
+                                        flag: "w",
+                                    }).catch(() => {});
+                                    return thumbPath;
+                                });
+                            break;
+                        default:
+                    }
+                }
+            }),
+        );
+    }
+}
 ---
 
-<Section component="file">
-  <ul>
-    {
-      files &&
-        files.map(({ path, title, description }) => {
-          <li>
-            <a href={path}>
-              <p>{title}</p>
-              <Markdown>{description}</Markdown>
-            </a>
-          </li>;
-        })
-    }
-  </ul>
+<Section component="file" {...Astro.props}>
+    <ul>
+        {
+            files &&
+                files.map(({ path, title, description, size, thumbnail }) => {
+                    return (
+                        <li>
+                            {thumbnail && (
+                                <Image
+                                    image={thumbnail}
+                                    alt=""
+                                    width={256}
+                                    quality="mid"
+                                    fit="contain"
+                                />
+                            )}
+                            <div class="file-details">
+                                <div class="file-heading">
+                                    {show_icon && (
+                                        <div class="file-icon">
+                                            <Icon
+                                                name={getIcon(path)}
+                                                height={"3rem"}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <h5 class="file-title">{title}</h5>
+                                </div>
+                                {description && (
+                                    <div class="file-description">
+                                        <Markdown content={description} />
+                                    </div>
+                                )}
+                                {(show_filesize || show_filetype) && (
+                                    <div class="file-stats">
+                                        {show_filesize && size && (
+                                            <p class="file-size">
+                                                {formatBytes(size)}
+                                            </p>
+                                        )}
+                                        {show_filetype && (
+                                            <p class="file-type">
+                                                {getFileType(path)}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                            <a href={path} />
+                        </li>
+                    );
+                })
+        }
+    </ul>
 </Section>
+
+<style lang="scss">
+    ul {
+        width: 100%;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        align-items: stretch;
+        justify-content: center;
+        grid-template-columns: repeat(auto-fill, clamp(15rem, 25vw, 25rem));
+        gap: 2rem;
+        /* gap: var(--grid-gap); */
+    }
+
+    li {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        margin: 0;
+        border: 2px solid rgb(var(--color-primary));
+        background-color: #eee;
+        transform: scale(1);
+        transition: transform 0.2s ease;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+
+        > .file-details {
+            padding: 2rem;
+            gap: 1rem;
+            display: flex;
+            flex-direction: column;
+
+            .file-heading,
+            .file-stats {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+
+                p {
+                    margin: 0;
+                }
+            }
+
+            .file-stats {
+                justify-content: space-between;
+                opacity: 0.5;
+            }
+
+            .file-icon {
+                color: rgb(var(--heading-color));
+            }
+        }
+    }
+
+    a {
+        position: absolute;
+        display: block;
+        inset: 0;
+    }
+</style>
