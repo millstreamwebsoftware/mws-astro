@@ -36,7 +36,7 @@ const apiKey =
         ? preferences.API.google_maps.dev_key
         : preferences.API.google_maps.api_key;
 // const height = Astro.props.height + "vh";
-const mapType = Astro.props.mapType ?? "hybrid";
+const mapType = Astro.props.mapType ?? "roadmap";
 const id = "map-" + key;
 
 const mapMode = location ? "place" : "view";

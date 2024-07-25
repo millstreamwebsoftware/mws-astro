@@ -14,10 +14,19 @@ interface Props {
     // aspect?: number;
     classes?: string;
     background?: boolean;
+    opacity?: number;
     quality?: "low" | "mid" | "high" | "max" | number;
+    fixed?: boolean;
 }
 
-const { classes, background, fit = "cover", quality = "high" } = Astro.props;
+const {
+    classes,
+    background,
+    fit = "cover",
+    quality = "high",
+    opacity,
+    fixed = false,
+} = Astro.props;
 
 let astroImage;
 let placeholder = true;
@@ -25,7 +34,7 @@ let placeholder = true;
 // Attempt to import the image if we are given a string
 if (
     typeof Astro.props.image == "string" &&
-    Astro.props.image.startsWith("/assets/")
+    /^(\/?src)?\/assets/.test(Astro.props.image)
 ) {
     const images = import.meta.glob("src/assets/**/*");
 
@@ -83,7 +92,10 @@ if (image.width && image.height) {
     // aspect = width / height;
 }
 
-const align = { "--align": Astro.props.align ?? "center" };
+const style = {
+    "--align": Astro.props.align ?? "center",
+    "--opacity": opacity,
+};
 
 const file = image?.src || image;
 let metadata, plData;
@@ -152,8 +164,8 @@ if (placeholder && plData) {
     alt=""
     {width}
     {height}
-    class:list={[classes, { background }]}
-    style={Object.assign({}, placeholderStyle, align)}
+    class:list={[classes, { background, fixed }]}
+    style={Object.assign({}, placeholderStyle, style)}
     densities={[1, 1.5, 2]}
     data-fit={fit}
     {quality}
@@ -167,6 +179,7 @@ if (placeholder && plData) {
         background-position: var(--align);
         width: 100%;
         height: 100%;
+        opacity: var(--opacity, 1);
         /* width: auto;
         height: auto; */
     }
@@ -179,6 +192,11 @@ if (placeholder && plData) {
     img.background {
         position: absolute;
         height: 100%;
+        inset: 0;
+    }
+
+    img.fixed {
+        position: fixed;
         inset: 0;
     }
 </style>

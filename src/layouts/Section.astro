@@ -16,6 +16,8 @@ export interface Props {
     background_image?: string;
     background_video?: string;
     background_align?: CssAlign;
+    background_opacity?: number;
+    background_fixed?: boolean;
     classes?: any;
     style?: Record<string, any>;
     indent?: boolean;
@@ -30,6 +32,8 @@ const {
     background_image,
     background_video,
     background_align,
+    background_opacity,
+    background_fixed,
     classes,
     style,
     key,
@@ -69,13 +73,16 @@ const expando = classList.includes("expando") ? true : false;
 >
     {
         background_image && (
-            <Image
-                image={background_image}
-                width={preferences.page.maximum_page_width}
-                aspect={1.8}
-                align={background_align}
-                background={true}
-            />
+            <div class="background" class:list={[{ fixed: background_fixed }]}>
+                <Image
+                    image={background_image}
+                    width={preferences.page.maximum_page_width}
+                    align={background_align}
+                    opacity={background_opacity}
+                    fixed={background_fixed}
+                    background={true}
+                />
+            </div>
         )
     }
     {background_video && <Video src={background_video} background={true} />}
@@ -105,9 +112,15 @@ const expando = classList.includes("expando") ? true : false;
         /* height: max(var(--height), fit-content); */
 
         min-height: var(--height);
+
         --indent: var(--root-indent);
         padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
         z-index: 0;
+        width: 100%;
+
+        display: flex;
+        /* flex-direction: column; */
+        align-items: stretch;
     }
 
     section.columns {
@@ -119,8 +132,18 @@ const expando = classList.includes("expando") ? true : false;
         /* height: min(var(--height), 100%); */
     }
 
+    .background {
+        position: absolute;
+        inset: 0;
+    }
+
+    .background.fixed {
+        clip-path: inset(0);
+    }
+
     .component-wrapper {
-        height: 100%;
+        width: 100%;
+        /* height: 100%; */
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
