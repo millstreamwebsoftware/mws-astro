@@ -128,17 +128,21 @@ const expando = classList.includes("expando") ? true : false;
     }
 
     section.image {
+        user-select: none;
         /* min-height: var(--height); */
         /* height: min(var(--height), 100%); */
     }
 
     .background {
+        user-select: none;
+        pointer-events: none;
         position: absolute;
         inset: 0;
     }
 
     .background.fixed {
         clip-path: inset(0);
+        z-index: -1;
     }
 
     .component-wrapper {

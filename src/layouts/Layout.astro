@@ -12,32 +12,32 @@ import "sanitize.css/typography.css";
 import "@styles/styles.scss";
 
 export interface Props {
-  title?: string;
-  description?: string;
-  id?: string;
-  content_blocks?: Array<Record<string, any>>;
-  show_global_header?: boolean;
-  show_global_footer?: boolean;
-  paths?: any[];
-  currentPath?: string;
+    title?: string;
+    description?: string;
+    id?: string;
+    content_blocks?: Array<Record<string, any>>;
+    show_global_header?: boolean;
+    show_global_footer?: boolean;
+    paths?: any[];
+    currentPath?: string;
 }
 
 const mimetypes: any = {
-  ico: "image/vnd.microsoft.icon",
-  png: "image/png",
-  jpeg: "image/jpeg",
-  svg: "image/svg+xml",
+    ico: "image/vnd.microsoft.icon",
+    png: "image/png",
+    jpeg: "image/jpeg",
+    svg: "image/svg+xml",
 };
 
 const {
-  title,
-  description,
-  content_blocks,
-  show_global_header,
-  show_global_footer,
-  id,
-  paths,
-  currentPath,
+    title,
+    description,
+    content_blocks,
+    show_global_header,
+    show_global_footer,
+    id,
+    paths,
+    currentPath,
 } = Astro.props;
 import preferences from "@data/preferences.json";
 
@@ -58,33 +58,33 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
 
 <!doctype html>
 <html lang="en" style={style} transition:animate="none">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <meta name="revision" content={git.long("./")} />
-    <meta name="format-detection" content="telephone=no" />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <meta name="revision" content={git.long("./")} />
+        <meta name="format-detection" content="telephone=no" />
 
-    <Opengraph {title} {description} />
+        <Opengraph {title} {description} />
 
-    <script>
-      window.addEventListener(
-        "scroll",
-        (e) => {
-          document.documentElement.classList.toggle(
-            "scrolled",
-            window.scrollY > 100
-          );
-        },
-        { passive: true }
-      );
-    </script>
-  </head>
-  <body>
-    {show_global_header && <Header {id} {paths} {currentPath} />}
-    <article transition:animate="fade">
-      <slot />
-      {show_global_footer && <Footer />}
-    </article>
-  </body>
+        <script>
+            window.addEventListener(
+                "scroll",
+                (e) => {
+                    document.documentElement.classList.toggle(
+                        "scrolled",
+                        window.scrollY > 100,
+                    );
+                },
+                { passive: true },
+            );
+        </script>
+    </head>
+    <body>
+        {show_global_header && <Header {id} {paths} {currentPath} />}
+        <article transition:animate="fade">
+            <slot />
+            {show_global_footer && <Footer />}
+        </article>
+    </body>
 </html>

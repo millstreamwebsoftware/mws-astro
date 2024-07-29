@@ -2,6 +2,7 @@
 import preferences from "@data/preferences.json";
 import Navigation from "./SiteNavigation.astro";
 import Social from "@components/social/social.astro";
+import { bookshopName } from "@mws-astro/util";
 
 export interface Props {
     id?: string;
@@ -11,17 +12,39 @@ export interface Props {
 
 const { id, currentPath, paths } = Astro.props;
 
-const headerItems: Record<string, boolean> = {
-    logo: preferences.header.show_logo,
-    navigation: preferences.header.show_navigation,
-    social: preferences.header.show_socials,
-};
-const headerAreas =
-    '"' +
-    Object.keys(headerItems)
-        .filter((k) => headerItems[k])
-        .join(" ") +
-    '"';
+// const headerItems: Record<string, boolean> = {
+//     logo: preferences.header.show_logo,
+//     navigation: preferences.header.show_navigation,
+//     social: preferences.header.show_socials,
+// };
+// const headerAreas =
+//     '"' +
+//     Object.keys(headerItems)
+//         .filter((k) => headerItems[k])
+//         .join(" ") +
+//     '"';
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+    ["/src/mws-astro/src/components/**/*.astro"],
+    {
+        eager: true,
+    },
+);
+
+const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
+    eager: true,
+});
+
+Object.entries(componentImports).forEach(
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
+);
+
+Object.entries(componentOverrides).forEach(
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
+);
 
 // const headerBackgroundColor = convertColorString(
 //   preferences.header.background_top_color
@@ -33,6 +56,10 @@ const headerAreas =
 // +
 //     `--header-background-color: ${headerBackgroundColor};` +
 //     `--header-background-color-bottom: ${headerBackgroundColorBottom};`
+
+// const secondary: any = [{ _bookshop_name: "social" }];
+
+const secondary: any = preferences.header.secondary_navigation || [];
 ---
 
 <header
@@ -40,18 +67,42 @@ const headerAreas =
         pinned: preferences.header.pin_header != "false",
         contain: preferences.header.pin_header == "contain",
     }}
-    style={`--text-color: var(--header-color);` +
-        `--header-areas: ${headerAreas};`}
 >
     {
         preferences.header.show_logo && (
-            <a class="logo" href="/">
-                <img src={preferences.header.logo_image} />
+            <a class="logo" href="/" title="Home">
+                <img
+                    src={preferences.header.logo_image}
+                    alt={`${preferences.general.site_name} Logo`}
+                />
             </a>
         )
     }
+    {
+        !!secondary?.length && (
+            <ul class="secondary">
+                {secondary.map((block: any, i: number) => {
+                    const Component = components[block._bookshop_name];
+                    if (Component) {
+                        return (
+                            <li>
+                                <Component
+                                    {...block}
+                                    _blocks={secondary}
+                                    key={String(i)}
+                                />
+                            </li>
+                        );
+                    }
+                    const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+                    console.warn(warnstring);
+                    return <div class="missing-component">{warnstring}</div>;
+                })}
+            </ul>
+        )
+    }
     {preferences.header.show_navigation && <Navigation {id} {currentPath} />}
-    {preferences.header.show_socials && <Social />}
+    <!-- {preferences.header.show_socials && <Social />} -->
 </header>
 
 <style>
@@ -62,9 +113,8 @@ const headerAreas =
         top: 0;
         display: grid;
         z-index: 9999;
+        --text-color: var(--header-color);
         color: rgb(var(--header-color));
-        grid-template-areas: var(--header-areas);
-        grid-template-rows: 100%;
         height: var(--header-height);
         background: linear-gradient(
             to bottom,
@@ -73,6 +123,15 @@ const headerAreas =
         );
 
         padding: 0 calc(var(--indent) * 0.25);
+
+        grid-template-areas: "logo navigation";
+        grid-template-rows: 100%;
+        grid-template-columns: auto 1fr;
+    }
+
+    header:has(.secondary) {
+        grid-template-areas: "logo secondary" "logo navigation";
+        grid-template-rows: 4rem 1fr;
     }
 
     header.pinned {
@@ -91,6 +150,7 @@ const headerAreas =
 
     .logo {
         padding: 10px;
+        grid-area: logo;
         width: fit-content;
     }
 
@@ -100,6 +160,16 @@ const headerAreas =
         width: auto;
         height: var(--header-height);
         max-height: 100%;
+    }
+
+    .secondary {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        grid-area: secondary;
+        margin: 0;
+        list-style: none;
     }
 
     @media only screen and (max-width: 768px) {
@@ -114,5 +184,15 @@ const headerAreas =
         :root {
             --header-height: 0;
         }
+    }
+</style>
+
+<style lang="scss" is:global>
+    header nav {
+        grid-area: navigation;
+    }
+
+    header .secondary ul.social {
+        padding: 0;
     }
 </style>

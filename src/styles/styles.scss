@@ -80,6 +80,12 @@ html {
     }
 }
 
+@media only screen and (max-width: 768px) {
+    main {
+        --header-offset-transparent: 0px;
+    }
+}
+
 article {
     box-shadow: 0 0 10rem rgb(var(--page-background-shadow));
     background-color: rgb(var(--article-background-color));

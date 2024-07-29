@@ -1,0 +1,18 @@
+# Metadata about this component, to be used in the CMS
+spec:
+  structures:
+    - secondary_navigation
+  label: Social
+  description: Display Social Media Icons
+  icon: share
+  tags: []
+
+# Defines the structure of this component, as well as the default values
+blueprint:
+  show-text: false
+
+_inputs:
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint

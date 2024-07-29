@@ -3,163 +3,168 @@ import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 
 export interface Props {
-  align?: string;
-  "show-text"?: boolean;
+    align?: string;
+    "show-text"?: boolean;
 }
 
 const { align, "show-text": text } = Astro.props;
 
 const icons: Record<string, string> = {
-  twitter: "fa6-brands:square-x-twitter",
-  facebook: "fa6-brands:square-facebook",
-  instagram: "fa6-brands:square-instagram",
-  whatsapp: "fa6-brands:square-whatsapp",
-  telephone: "fa6-solid:square-phone",
-  email: "fa6-solid:square-envelope",
+    twitter: "fa6-brands:square-x-twitter",
+    facebook: "fa6-brands:square-facebook",
+    instagram: "fa6-brands:square-instagram",
+    whatsapp: "fa6-brands:square-whatsapp",
+    telephone: "fa6-solid:square-phone",
+    email: "fa6-solid:square-envelope",
 };
 
 const socials: Record<string, string>[] = preferences.general.social.map(
-  (s: any) => {
-    let social = { icon: icons[s.name] };
-    if (!social.icon) social.icon = "fa6-solid:square-up-right";
-    return Object.assign(social, s);
-  }
+    (s: any) => {
+        let social = { icon: icons[s.name] };
+        if (!social.icon) social.icon = "fa6-solid:square-up-right";
+        return Object.assign(social, s);
+    },
 );
 ---
 
 <ul class:list={["social", align, { "show-text": text }]}>
-  {
-    socials.map((s) =>
-      s.title ? (
-        <li>
-          <a
-            href={s.link}
-            class={s.name}
-            rel="noopener noreferrer"
-            target="_blank"
-            title={s.title}
-          >
-            {s.icon && <Icon name={s.icon} height={"1.8em"} />}
-            <span>{s.title}</span>
-          </a>
-        </li>
-      ) : (
-        ""
-      )
-    )
-  }
+    {
+        socials.map((s) =>
+            s.title ? (
+                <li>
+                    <a
+                        href={s.link}
+                        class={s.name}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        title={s.title}
+                    >
+                        {s.icon && <Icon name={s.icon} height={"1.8em"} />}
+                        <span>{s.title}</span>
+                    </a>
+                </li>
+            ) : (
+                ""
+            ),
+        )
+    }
 </ul>
 
 <style lang="scss">
-  .social {
-    color: var(--text-color);
-    display: flex;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    row-gap: 0.5rem;
+    .social {
+        color: var(--text-color);
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        row-gap: 0.5rem;
 
-    // height: 100%;
-    padding: 1rem;
-    margin-top: 0;
-    padding-right: var(--text-gap);
-    align-items: center;
-    list-style-type: none;
-    column-gap: var(--text-gap);
+        height: min-content;
 
-    &.left {
-      justify-content: flex-start;
+        padding: 1rem;
+        margin-top: 0;
+        padding-right: var(--text-gap);
+        align-items: center;
+        list-style-type: none;
+        column-gap: var(--text-gap);
+
+        li {
+            margin: 0;
+        }
+
+        &.left {
+            justify-content: flex-start;
+        }
+
+        &.center {
+            justify-content: center;
+        }
+
+        &.right {
+            justify-content: flex-end;
+        }
+
+        &.space-between {
+            justify-content: space-between;
+        }
+
+        &.space-evenly {
+            justify-content: space-evenly;
+        }
     }
 
-    &.center {
-      justify-content: center;
+    a {
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+
+        /* Accessible hiding of label text by default */
+        span {
+            position: absolute;
+            clip: rect(1px, 1px, 1px, 1px);
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            text-indent: -100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
     }
 
-    &.right {
-      justify-content: flex-end;
+    .telephone {
+        span {
+            all: unset;
+        }
     }
 
-    &.space-between {
-      justify-content: space-between;
+    .social.show-text {
+        span {
+            all: unset;
+        }
     }
-
-    &.space-evenly {
-      justify-content: space-evenly;
-    }
-  }
-
-  a {
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    text-decoration: none;
-
-    // Accessible hiding of label text by default
-    span {
-      position: absolute;
-      clip: rect(1px, 1px, 1px, 1px);
-      width: 1px;
-      height: 1px;
-      margin: -1px;
-      text-indent: -100%;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-  }
-
-  .telephone {
-    span {
-      all: unset;
-    }
-  }
-
-  .social.show-text {
-    span {
-      all: unset;
-    }
-  }
 </style>
 
 <style is:global>
-  social {
-    display: inline-block;
-    position: relative;
-    font-size: var(--text-size-medium);
-    height: 1.8em;
-    width: 100%;
-  }
+    social {
+        display: inline-block;
+        position: relative;
+        font-size: var(--text-size-medium);
+        height: 1.8em;
+        width: 100%;
+    }
 
-  social::after {
-    position: absolute;
-    content: "";
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 7em;
+    social::after {
+        position: absolute;
+        content: "";
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 7em;
 
-    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3e%3cpath d='M110 14.58v70.84c0 8.047-6.533 14.58-14.58 14.58H24.58C16.533 100 10 93.467 10 85.42V14.58C10 6.533 16.533 0 24.58 0h70.84C103.467 0 110 6.533 110 14.58'/%3e%3c/svg%3e");
-    mask-repeat: space no-repeat;
-    background-color: currentColor;
-    opacity: 0.7;
-  }
+        mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3e%3cpath d='M110 14.58v70.84c0 8.047-6.533 14.58-14.58 14.58H24.58C16.533 100 10 93.467 10 85.42V14.58C10 6.533 16.533 0 24.58 0h70.84C103.467 0 110 6.533 110 14.58'/%3e%3c/svg%3e");
+        mask-repeat: space no-repeat;
+        background-color: currentColor;
+        opacity: 0.7;
+    }
 
-  social[show-text*="true"]::after {
-    width: 19em;
-    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 100'%3e%3cpath d='M110 14.58v70.84c0 8.047-6.533 14.58-14.58 14.58H24.58C16.533 100 10 93.467 10 85.42V14.58C10 6.533 16.533 0 24.58 0h70.84C103.467 0 110 6.533 110 14.58M330 34.6v30.8c0 8.058-6.542 14.6-14.6 14.6H144.6c-8.058 0-14.6-6.542-14.6-14.6V34.6c0-8.058 6.542-14.6 14.6-14.6h170.8c8.058 0 14.6 6.542 14.6 14.6'/%3e%3c/svg%3e");
-  }
+    social[show-text*="true"]::after {
+        width: 19em;
+        mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 100'%3e%3cpath d='M110 14.58v70.84c0 8.047-6.533 14.58-14.58 14.58H24.58C16.533 100 10 93.467 10 85.42V14.58C10 6.533 16.533 0 24.58 0h70.84C103.467 0 110 6.533 110 14.58M330 34.6v30.8c0 8.058-6.542 14.6-14.6 14.6H144.6c-8.058 0-14.6-6.542-14.6-14.6V34.6c0-8.058 6.542-14.6 14.6-14.6h170.8c8.058 0 14.6 6.542 14.6 14.6'/%3e%3c/svg%3e");
+    }
 
-  social[align="left"]::after {
-    left: 0;
-  }
+    social[align="left"]::after {
+        left: 0;
+    }
 
-  social[align="space-between"]::after,
-  social[align="space-evenly"]::after {
-    width: 100%;
-    mask-size: 33% 100%;
-  }
+    social[align="space-between"]::after,
+    social[align="space-evenly"]::after {
+        width: 100%;
+        mask-size: 33% 100%;
+    }
 
-  social[align="center"]::after {
-    margin-left: calc(50% - 9.5em);
-    margin-right: calc(50% - 9.5em);
-  }
+    social[align="center"]::after {
+        margin-left: calc(50% - 9.5em);
+        margin-right: calc(50% - 9.5em);
+    }
 </style>

@@ -1,6 +1,7 @@
 ---
 import { convertColorString } from "@mws-astro/util";
 import Social from "@components/social/social.astro";
+import Markdown from "@shared/Markdown.astro";
 import Navigation from "@components/navigation/navigation.astro";
 import Richtext from "@components/richtext/richtext.astro";
 import preferences from "@data/preferences.json";
@@ -17,7 +18,9 @@ const textColor = convertColorString(preferences.footer.foreground_color);
     {preferences.footer.show_top_button && <a href="#top">Back to top</a>}
     {
         preferences.footer.text_content && (
-            <Richtext content={preferences.footer.text_content} />
+            <div class="content">
+                <Markdown content={preferences.footer.text_content} />
+            </div>
         )
     }
     {
@@ -73,6 +76,7 @@ const textColor = convertColorString(preferences.footer.foreground_color);
         section.footer {
             grid-template-rows: auto auto;
             grid-template-columns: auto;
+            padding-bottom: 100px; /* Create space for mobile navigation button */
         }
     }
 </style>
