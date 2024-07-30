@@ -43,8 +43,23 @@ const { width = 256, height = 256, class: classes, title } = Astro.props;
     }
 </style>
 
-<style is:global>
+<style is:global lang="scss">
     figure.aside img {
         max-height: 40rem;
+    }
+
+    /* Live editor support */
+    .cms-editor-active .richtext > .component-wrapper img {
+        max-height: 40rem;
+        margin: 3rem 0;
+
+        &.align-left {
+            margin: 0 2rem 2rem 0;
+            float: left;
+        }
+        &.align-right {
+            margin: 0 0 2rem 2rem;
+            float: right;
+        }
     }
 </style>
