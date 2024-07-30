@@ -7,11 +7,7 @@ spec:
   tags: []
 
 blueprint:
-  slides:
-    - content:
-      background_color:
-      background_image:
-      background_fit: cover
+  content_blocks: [bookshop:structure:content_blocks]
   height: 50
   gap: 0
   autoplay: 0
@@ -25,16 +21,16 @@ blueprint:
   indent: false
   transition: Slider
   animationDuration: 0.4
-  class:
+  classes:
 
+  # slides:
+  #   values:
+  #     background_fit:
+  #       type: select
+  #       values:
+  #         - cover
+  #           contain
 _inputs:
-  slides:
-    values:
-      background_fit:
-        type: select
-        values:
-          - cover
-            contain
   content:
     type: markdown
     options:
@@ -127,8 +123,14 @@ _inputs:
   hoverpause:
     type: switch
     label: Pause autoplay on hover
-  class:
+  classes:
     label: Style
     type: multiselect
     options:
       allow_create: true
+      values:
+        - no-indent
+        - no-indent-top
+        - no-indent-bottom
+        - no-indent-left
+        - no-indent-right
