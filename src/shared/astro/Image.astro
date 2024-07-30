@@ -33,10 +33,12 @@ let placeholder = true;
 
 // Attempt to import the image if we are given a string
 if (
+    // @ts-expect-error
+    !ENV_BOOKSHOP_LIVE &&
     typeof Astro.props.image == "string" &&
     /^(\/?src)?\/assets/.test(Astro.props.image)
 ) {
-    const images = import.meta.glob("src/assets/**/*");
+    const images = import.meta.glob("/src/assets/**/*");
 
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),
@@ -50,10 +52,12 @@ if (
         placeholder = false;
     }
 } else if (
+    // @ts-expect-error
+    !ENV_BOOKSHOP_LIVE &&
     typeof Astro.props.image == "string" &&
     Astro.props.image.startsWith("public/")
 ) {
-    const images = import.meta.glob("public/**/*");
+    const images = import.meta.glob("/public/**/*");
 
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),

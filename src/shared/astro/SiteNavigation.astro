@@ -479,7 +479,6 @@ const placement = (preferences as any)?.header?.center_dropdowns
         pointer-events: all;
         grid-area: centre;
         background-color: rgb(var(--header-background-color));
-        // left: calc(50% - 4rem);
         box-shadow: 0 0 2rem #0005;
         border: 0;
         z-index: 1;
@@ -500,7 +499,6 @@ const placement = (preferences as any)?.header?.center_dropdowns
     #mobile-nav-overlay {
         display: none;
         pointer-events: none;
-        // border: 1px solid red;
         position: fixed;
         inset: 0;
         z-index: -1;
@@ -651,14 +649,10 @@ const placement = (preferences as any)?.header?.center_dropdowns
             left: 0;
             display: flex;
 
-            // Workaround for https://github.com/philipwalton/flexbugs#flexbug-14
+            /* Workaround for https://github.com/philipwalton/flexbugs#flexbug-14 */
             flex-direction: row;
             flex-wrap: wrap;
             writing-mode: vertical-lr;
-
-            li {
-                writing-mode: horizontal-tb;
-            }
 
             background-color: rgb(var(--header-background-color));
             box-shadow: 2px 2px 16px #00000044;
@@ -672,6 +666,10 @@ const placement = (preferences as any)?.header?.center_dropdowns
 
             visibility: hidden;
             pointer-events: none;
+
+            li {
+                writing-mode: horizontal-tb;
+            }
         }
 
         .depth-1 a .dropdown-indicator {
