@@ -29,7 +29,7 @@ const {
 } = Astro.props;
 
 // @ts-expect-error
-const bs = ENV_BOOKSHOP_LIVE || true;
+const bs = ENV_BOOKSHOP_LIVE ?? false;
 
 const apiKey =
     bs || import.meta.env.DEV
