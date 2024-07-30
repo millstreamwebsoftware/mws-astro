@@ -53,6 +53,10 @@ const { width = 256, height = 256, class: classes, title } = Astro.props;
         max-height: 40rem;
         margin: 3rem 0;
 
+        &:not(.align-left, .align-right) {
+            width: 100%;
+        }
+
         &.align-left {
             margin: 0 2rem 2rem 0;
             float: left;
