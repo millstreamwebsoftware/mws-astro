@@ -16,7 +16,7 @@ export async function replaceCmsEmbeds(content: string) {
 
   const embedRe = /<div[^>]*data-cms-embed="([^>"]*)"[^>]*>[^>]*\/div>/gm;
 
-  return content.replaceAll(embedRe, (match, g1) => {
+  return content.replaceAll(embedRe, (_, g1) => {
     return he.decode(atob(g1));
   });
 }

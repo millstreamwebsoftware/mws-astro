@@ -59,7 +59,7 @@ const Wrapper = depth ? Fragment : "nav";
                                 class:list={{ "has-children": hasChildren }}
                             >
                                 <a
-                                    href={link}
+                                    href={link || undefined}
                                     aria-selected={
                                         child.selected === 2 ? "true" : "false"
                                     }

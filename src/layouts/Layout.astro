@@ -22,17 +22,16 @@ export interface Props {
     currentPath?: string;
 }
 
-const mimetypes: any = {
-    ico: "image/vnd.microsoft.icon",
-    png: "image/png",
-    jpeg: "image/jpeg",
-    svg: "image/svg+xml",
-};
+// const mimetypes: any = {
+//     ico: "image/vnd.microsoft.icon",
+//     png: "image/png",
+//     jpeg: "image/jpeg",
+//     svg: "image/svg+xml",
+// };
 
 const {
     title,
     description,
-    content_blocks,
     show_global_header,
     show_global_footer,
     id,
@@ -70,7 +69,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         <script>
             window.addEventListener(
                 "scroll",
-                (e) => {
+                () => {
                     document.documentElement.classList.toggle(
                         "scrolled",
                         window.scrollY > 100,

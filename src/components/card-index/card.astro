@@ -27,7 +27,7 @@ const link = slug || include.includes("link");
 // Convert card props to data attributes for filtering
 const filterData = Object.fromEntries(
     Object.entries(combinedCard)
-        .filter(([k, v]) => filters.includes(k))
+        .filter(([k, _]) => filters.includes(k))
         .map(([k, v]) => {
             let filterValue;
             if (v instanceof Date) filterValue = v.getTime();
@@ -53,7 +53,7 @@ function formatDate(date: Date) {
     {
         thumbnail && (
             <div class="card-thumbnail">
-                <Image image={thumbnail} width={512} {aspect} />
+                <Image image={thumbnail} width={512} />
             </div>
         )
     }
@@ -62,7 +62,7 @@ function formatDate(date: Date) {
         {description && <Markdown content={description} />}
         {publishDate && <p>{formatDate(publishDate)}</p>}
         {
-            Object.entries(cardData).map(([k, v], i) => {
+            Object.entries(cardData).map(([k, v]) => {
                 let dateString;
                 if (v instanceof Date) dateString = formatDate(v);
                 return (

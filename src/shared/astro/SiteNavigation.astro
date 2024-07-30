@@ -10,7 +10,7 @@ export interface Props {
     currentPath?: string;
 }
 
-const { id } = Astro.props;
+// const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
 const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
 const Wrapper = depth ? Fragment : "nav";
@@ -68,7 +68,7 @@ const placement = (preferences as any)?.header?.center_dropdowns
             }
             {
                 pages.children &&
-                    Object.values(pages.children).map((page: TreeNode, i) => {
+                    Object.values(pages.children).map((page: TreeNode) => {
                         // Skip home element if show_home is false
                         if (!showHome && page.href === "/") return;
                         if (page.collection && page.collection != "pages")
@@ -429,11 +429,11 @@ const placement = (preferences as any)?.header?.center_dropdowns
         }
 
         // Mobile Nav
-        mobileNavButton?.addEventListener("click", (e) => {
+        mobileNavButton?.addEventListener("click", () => {
             setModalState();
         });
 
-        mobileNavOverlay?.addEventListener("click", (e) => {
+        mobileNavOverlay?.addEventListener("click", () => {
             setModalState(false);
         });
     }
