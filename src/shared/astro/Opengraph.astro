@@ -17,7 +17,14 @@ let pagefindImage;
 
 // @ts-expect-error
 if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
-    let imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
+    let imgSrc;
+
+    if (typeof Astro.props.thumbnail == "string") {
+        let imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
+    } else {
+        imgSrc = Astro.props.thumbnail?.src;
+    }
+
     ogImageURL = new URL(imgSrc, Astro.site);
 
     pagefindImage = imgSrc;
