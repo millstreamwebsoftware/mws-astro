@@ -42,6 +42,10 @@ export function bookshopName(p: string) {
   return parts.join("/");
 }
 
+export function trimFilePath(p: string) {
+  return p.replace(/.*(\/src\/.*)/, "$1");
+}
+
 export function getTreeNode(
   tree: TreeNode,
   filter: string | undefined,

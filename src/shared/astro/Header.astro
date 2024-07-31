@@ -131,7 +131,7 @@ const secondary: any = preferences.header.secondary_navigation || [];
 
     header:has(.secondary) {
         grid-template-areas: "logo secondary" "logo navigation";
-        grid-template-rows: 4rem 1fr;
+        grid-template-rows: 3.6rem 1fr;
     }
 
     header.pinned {
@@ -166,10 +166,15 @@ const secondary: any = preferences.header.secondary_navigation || [];
         display: flex;
         justify-content: flex-end;
         align-items: center;
-
         grid-area: secondary;
         margin: 0;
         list-style: none;
+        padding-right: 2rem;
+        gap: 1rem;
+
+        li {
+            margin: 0;
+        }
     }
 
     @media only screen and (max-width: 768px) {
@@ -194,5 +199,10 @@ const secondary: any = preferences.header.secondary_navigation || [];
 
     header .secondary ul.social {
         padding: 0;
+    }
+
+    header .secondary li {
+        font-size: var(--text-size-small);
+        letter-spacing: 1px;
     }
 </style>

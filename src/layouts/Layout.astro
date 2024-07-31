@@ -37,6 +37,7 @@ const {
     id,
     paths,
     currentPath,
+    thumbnail,
 } = Astro.props;
 import preferences from "@data/preferences.json";
 
@@ -64,7 +65,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         <meta name="revision" content={git.long("./")} />
         <meta name="format-detection" content="telephone=no" />
 
-        <Opengraph {title} {description} />
+        <Opengraph {title} {description} {thumbnail} />
 
         <script>
             window.addEventListener(

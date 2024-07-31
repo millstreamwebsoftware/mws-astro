@@ -1,0 +1,19 @@
+---
+import Icon from "@shared/icon.astro";
+
+export interface Props {}
+---
+
+<form name="search" action="/search" method="GET">
+    <input name="q" type="text" placeholder="Search" />
+    <Icon name="fa6-solid:magnifying-glass" height="1.5em" />
+</form>
+
+<style lang="scss">
+    input {
+        border: none;
+        background-color: white;
+        color: #222;
+        height: 1.8em;
+    }
+</style>

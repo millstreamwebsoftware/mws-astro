@@ -1,0 +1,28 @@
+---
+export interface Props {
+    text: string;
+    link: string;
+    new_tab?: boolean;
+}
+
+const { text, link } = Astro.props;
+
+const new_tab =
+    (Astro.props.new_tab ?? false)
+        ? { target: "_blank", rel: "noopener" }
+        : undefined;
+---
+
+<a href={link} {...new_tab}>{text}</a>
+
+<style lang="scss">
+    a {
+        text-decoration: none;
+
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: rgb(var(--color-accent));
+        }
+    }
+</style>

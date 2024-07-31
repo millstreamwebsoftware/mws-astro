@@ -1,30 +1,56 @@
 ---
 import _preferences from "@data/preferences.json";
 const preferences: Preferences = _preferences as unknown as Preferences;
+import { trimFilePath } from "@mws-astro/util";
+import { getImage } from "astro:assets";
 
 export interface Props {
-  title?: string;
-  description?: string;
+    title?: string;
+    description?: string;
+    thumbnail?: { src: string; fsPath: string };
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = preferences.general.default_sharing_image
-  ? new URL(preferences.general.default_sharing_image, Astro.site)
-  : undefined;
+
+let ogImageURL: URL | undefined;
+let pagefindImage;
+
+if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
+    let imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
+    ogImageURL = new URL(imgSrc, Astro.site);
+
+    pagefindImage = imgSrc;
+} else if (preferences.general.default_sharing_image) {
+    ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
+}
+
 const title = Astro.props.title ?? preferences.general.site_name;
 const description =
-  Astro.props.description ?? preferences.general.default_site_description;
+    Astro.props.description ?? preferences.general.default_site_description;
 const pageTitle = Astro.props.title
-  ? Astro.props.title + preferences.general.browser_window_title_suffix
-  : preferences.general.site_name;
+    ? Astro.props.title + preferences.general.browser_window_title_suffix
+    : preferences.general.site_name;
 ---
 
 <>
-  <title>{pageTitle}</title>
-  <meta property="og:title" content={title} />
-  <meta property="og:site_name" content={preferences.general.site_name} />
-  {description && <meta property="og:description" content={description} />}
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content={canonicalURL} />
-  {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+    <title>{pageTitle}</title>
+    <meta
+        property="og:title"
+        content={title}
+        data-pagefind-meta="title[content]"
+    />
+    <meta property="og:site_name" content={preferences.general.site_name} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+    {
+        pagefindImage && (
+            <meta
+                property="pagefind:image"
+                content={pagefindImage}
+                data-pagefind-meta="image[content]"
+            />
+        )
+    }
 </>

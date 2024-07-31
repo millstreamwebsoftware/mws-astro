@@ -38,7 +38,10 @@ if (
     typeof Astro.props.image == "string" &&
     /^(\/?src)?\/assets/.test(Astro.props.image)
 ) {
-    const images = import.meta.glob("/src/assets/**/*");
+    const images = import.meta.glob([
+        "/src/assets/**/*",
+        "!/src/assets/**/*.pdf",
+    ]);
 
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),
@@ -57,7 +60,7 @@ if (
     typeof Astro.props.image == "string" &&
     Astro.props.image.startsWith("public/")
 ) {
-    const images = import.meta.glob("/public/**/*");
+    const images = import.meta.glob(["/public/**/*", "!/public/**/*.pdf"]);
 
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),
