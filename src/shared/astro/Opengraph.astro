@@ -20,15 +20,17 @@ if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
     let imgSrc;
 
     if (typeof Astro.props.thumbnail == "string") {
-        let imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
+        imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
     } else {
         imgSrc = Astro.props.thumbnail?.src;
     }
 
-    ogImageURL = new URL(imgSrc, Astro.site);
-
-    pagefindImage = imgSrc;
-} else if (preferences.general.default_sharing_image) {
+    if (imgSrc) {
+        ogImageURL = new URL(imgSrc, Astro.site);
+        pagefindImage = imgSrc;
+    }
+}
+if (!ogImageURL && preferences.general.default_sharing_image) {
     ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
 }
 
