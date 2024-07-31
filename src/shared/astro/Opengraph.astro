@@ -15,6 +15,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 let ogImageURL: URL | undefined;
 let pagefindImage;
 
+// @ts-expect-error
 if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
     let imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
     ogImageURL = new URL(imgSrc, Astro.site);
