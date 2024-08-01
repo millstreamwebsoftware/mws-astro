@@ -35,9 +35,10 @@ async function getAllCollections(
   let modifiedCollections = allCollections.map(([k, collection]) => {
     if (k == "pages" || typeof collection == "string") return [k, collection];
 
-    collection.forEach(
-      (entry: Record<string, any>) => (entry.slug = `${k}/${entry.slug}`),
-    );
+    collection.forEach((entry: Record<string, any>) => {
+      entry._slug ?? (entry._slug = entry.slug);
+      entry.slug = `${k}/${entry._slug}`;
+    });
 
     return [k, collection];
   });
