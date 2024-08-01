@@ -14,9 +14,9 @@ blueprint:
 
 _inputs:
   filter:
-    type: string
+    type: text
   collection:
-    type: string
+    type: text
   maxDepth:
     type: number
 

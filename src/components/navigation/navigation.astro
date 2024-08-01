@@ -23,8 +23,12 @@ const {
     parent = true,
     hide_cousins = false,
 } = Astro.props;
-let tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, parent);
 
+let tree;
+// @ts-ignore
+if (!ENV_BOOKSHOP_LIVE) {
+    tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, parent);
+}
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
 ---
