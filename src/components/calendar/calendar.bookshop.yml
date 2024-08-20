@@ -19,10 +19,10 @@ _inputs:
     type: email
     label: Google Calendar ID
     comment: Look in the calendar settings to find this value, it will be formatted like 'abcd1234@group.calendar.google.com'
-  url:
-    type: url
-    label: iCal URL
-    comment:
+  # url:
+  #   type: url
+  #   label: iCal URL
+  #   comment:
 
 _structures:
   calendarEvents:

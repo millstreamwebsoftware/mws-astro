@@ -112,6 +112,10 @@ body {
     padding: 0;
 }
 
+[data-component="richtext"] section {
+    padding: 0;
+}
+
 // section:not(#\9).no-indent {
 //   padding: 0;
 
@@ -330,6 +334,7 @@ hr {
     height: 1px;
     background-color: rgb(var(--color-primary) / 0.25);
     border: none;
+    margin: 0 0 1.6rem 0;
 }
 
 strong {

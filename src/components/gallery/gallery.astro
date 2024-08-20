@@ -63,7 +63,8 @@ const id = `gallery-${key}`;
                         alt=""
                         {fit}
                         width={1920 / columns}
-                        quality="mid"
+                        quality="low"
+                        placeholder={true}
                     />
 
                     {(asset.title || asset.description) && (
@@ -93,6 +94,7 @@ const id = `gallery-${key}`;
                                 image={asset.image}
                                 alt=""
                                 fit="contain"
+                                width={1920}
                                 quality="high"
                             />
 

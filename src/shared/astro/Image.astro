@@ -17,6 +17,7 @@ interface Props {
     opacity?: number;
     quality?: "low" | "mid" | "high" | "max" | number;
     fixed?: boolean;
+    placeholder?: boolean;
 }
 
 const {
@@ -29,7 +30,8 @@ const {
 } = Astro.props;
 
 let astroImage;
-let placeholder = true;
+let placeholder = Astro.props.placeholder ?? true;
+const plSize = 16;
 
 // Attempt to import the image if we are given a string
 if (
@@ -126,30 +128,24 @@ if (!ENV_BOOKSHOP_LIVE && placeholder) {
         }
 
         let sh = Sharp(f);
-        metadata = await sh.metadata();
+        // metadata = await sh.metadata();
 
         const { isOpaque, channels } = await sh.stats(); // Don't generate placeholders for images with alpha
 
-        if (isOpaque || channels[3].mean >= 254) {
+        plData = await sh.stats().then(({ isOpaque, channels }) => {
             // Include PNGs which are mostly opaque but not entirely
-            const plSize = 16;
-
-            let pl = await sh
-                .removeAlpha()
-                .resize(plSize, undefined, { fit: "inside" })
-                .blur()
-                .webp()
-                .toBuffer();
-
-            plData = pl.toString("base64");
-        }
-        // else {
-        //     console.log(
-        //         "Skipped transparent image:",
-        //         channels[3].mean,
-        //         realFile,
-        //     );
-        // }
+            if (isOpaque || channels[3].mean >= 254) {
+                return (
+                    sh
+                        .removeAlpha()
+                        .resize(plSize, undefined, { fit: "inside" })
+                        // .blur()
+                        .webp()
+                        .toBuffer()
+                        .then((b) => b.toString("base64"))
+                );
+            }
+        });
     } catch (err) {
         // console.warn("While generating a placeholder an error occurred:", err);
     }
@@ -159,7 +155,7 @@ if (!ENV_BOOKSHOP_LIVE && placeholder) {
 let placeholderStyle;
 if (placeholder && plData) {
     let webpString = `data:image/webp;base64,${plData}`;
-    let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice' href='${webpString}'/%3e%3c/svg%3e`;
+    let placeholderString = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3e%3cimage width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice' style='filter:blur(10px);' href='${webpString}'/%3e%3c/svg%3e`;
     placeholderStyle = {
         "background-image": `url("${placeholderString}")`,
     };
@@ -173,7 +169,7 @@ if (placeholder && plData) {
     {height}
     class:list={[classes, { background, fixed }]}
     style={Object.assign({}, placeholderStyle, style)}
-    densities={[1, 1.5, 2]}
+    densities={[1.5, 2]}
     data-fit={fit}
     {quality}
 />
