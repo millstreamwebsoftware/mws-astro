@@ -3,7 +3,7 @@ import he from "he";
 import type { TreeNode } from "@mws-astro/middleware";
 
 export function convertColorString(
-  color: string | undefined,
+  color: string | undefined
 ): string | undefined {
   if (!color) return;
   const c = colorString.get.rgb(color);
@@ -49,13 +49,13 @@ export function trimFilePath(p: string) {
 export function getTreeNode(
   tree: TreeNode,
   filter: string | undefined,
-  parent: boolean = false,
+  parent: boolean = false
 ): TreeNode | undefined {
   if (!filter) return tree;
 
   const targetFragments = filter?.split("/").filter((frg) => frg !== "");
   let cursor = tree;
-  if (!cursor.children) return;
+  if (!cursor?.children) return;
 
   for (let i = 0; i < targetFragments.length; i++) {
     if (

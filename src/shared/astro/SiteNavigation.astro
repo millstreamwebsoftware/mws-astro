@@ -67,7 +67,7 @@ const placement = (preferences as any)?.header?.center_dropdowns
                 )
             }
             {
-                pages.children &&
+                pages?.children &&
                     Object.values(pages.children).map((page: TreeNode) => {
                         // Skip home element if show_home is false
                         if (!showHome && page.href === "/") return;
