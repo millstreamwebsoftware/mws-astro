@@ -129,8 +129,7 @@ if (!ENV_BOOKSHOP_LIVE && placeholder) {
 
         let sh = Sharp(f);
         // metadata = await sh.metadata();
-
-        const { isOpaque, channels } = await sh.stats(); // Don't generate placeholders for images with alpha
+        // const { isOpaque, channels } = await sh.stats(); // Don't generate placeholders for images with alpha
 
         plData = await sh.stats().then(({ isOpaque, channels }) => {
             // Include PNGs which are mostly opaque but not entirely

@@ -1,8 +1,6 @@
 ---
 import preferences from "@data/preferences.json";
 import Navigation from "./SiteNavigation.astro";
-import Social from "@components/social/social.astro";
-import { bookshopName } from "@mws-astro/util";
 
 export interface Props {
     id?: string;
@@ -24,27 +22,6 @@ const { id, currentPath, paths } = Astro.props;
 //         .join(" ") +
 //     '"';
 
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-    ["/src/mws-astro/src/components/**/*.astro"],
-    {
-        eager: true,
-    },
-);
-
-const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-    eager: true,
-});
-
-Object.entries(componentImports).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
-);
 
 // const headerBackgroundColor = convertColorString(
 //   preferences.header.background_top_color
@@ -56,10 +33,6 @@ Object.entries(componentOverrides).forEach(
 // +
 //     `--header-background-color: ${headerBackgroundColor};` +
 //     `--header-background-color-bottom: ${headerBackgroundColorBottom};`
-
-// const secondary: any = [{ _bookshop_name: "social" }];
-
-const secondary: any = preferences.header.secondary_navigation || [];
 ---
 
 <header
@@ -78,35 +51,13 @@ const secondary: any = preferences.header.secondary_navigation || [];
             </a>
         )
     }
-    {
-        !!secondary?.length && (
-            <ul class="secondary">
-                {secondary.map((block: any, i: number) => {
-                    const Component = components[block._bookshop_name];
-                    if (Component) {
-                        return (
-                            <li>
-                                <Component
-                                    {...block}
-                                    _blocks={secondary}
-                                    key={String(i)}
-                                />
-                            </li>
-                        );
-                    }
-                    const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-                    console.warn(warnstring);
-                    return <div class="missing-component">{warnstring}</div>;
-                })}
-            </ul>
-        )
-    }
     {preferences.header.show_navigation && <Navigation {id} {currentPath} />}
     <!-- {preferences.header.show_socials && <Social />} -->
 </header>
 
 <style>
     header {
+        
         position: absolute;
         left: 0;
         right: 0;
@@ -121,18 +72,20 @@ const secondary: any = preferences.header.secondary_navigation || [];
             rgba(var(--header-background-color)),
             rgba(var(--header-background-color-bottom))
         );
-
-        padding: 0 calc(var(--indent) * 0.25);
-
-        grid-template-areas: "logo navigation";
-        grid-template-rows: 100%;
+ 
+        /* grid-template-areas: "logo navigation";
+        grid-template-rows: 100%; */
+        
+        grid-template-areas: "logo secondary" "logo navigation";
+        grid-template-rows: 3.6rem 1fr;
+        
         grid-template-columns: auto 1fr;
     }
 
-    header:has(.secondary) {
+    /* header:has(.secondary) {
         grid-template-areas: "logo secondary" "logo navigation";
         grid-template-rows: 3.6rem 1fr;
-    }
+    } */
 
     header.pinned {
         position: fixed;
@@ -162,21 +115,6 @@ const secondary: any = preferences.header.secondary_navigation || [];
         max-height: 100%;
     }
 
-    .secondary {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        grid-area: secondary;
-        margin: 0;
-        list-style: none;
-        padding-right: 2rem;
-        gap: 1rem;
-
-        li {
-            margin: 0;
-        }
-    }
-
     @media only screen and (max-width: 768px) {
         .logo {
             display: none;
@@ -194,7 +132,7 @@ const secondary: any = preferences.header.secondary_navigation || [];
 
 <style lang="scss" is:global>
     header nav {
-        grid-area: navigation;
+        grid-area: secondary / secondary / navigation / navigation;
     }
 
     header .secondary ul.social {

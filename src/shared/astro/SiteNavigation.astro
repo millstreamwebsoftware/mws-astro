@@ -1,6 +1,7 @@
 ---
 import Icon from "./icon.astro";
 import preferences from "@data/preferences.json";
+import { bookshopName } from "@mws-astro/util";
 import type { TreeNode } from "@mws-astro/middleware";
 
 export interface Props {
@@ -9,6 +10,7 @@ export interface Props {
     depth?: number;
     currentPath?: string;
 }
+
 
 // const { id } = Astro.props;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
@@ -20,6 +22,30 @@ const showCaret = (preferences as any)?.header?.show_caret ?? true;
 const placement = (preferences as any)?.header?.center_dropdowns
     ? "bottom"
     : "bottom-start";
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+    ["/src/mws-astro/src/components/**/*.astro"],
+    {
+        eager: true,
+    },
+);
+
+const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
+    eager: true,
+});
+
+Object.entries(componentImports).forEach(
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
+);
+
+Object.entries(componentOverrides).forEach(
+    ([path, obj]: [string, any]) =>
+        (components[bookshopName(path)] = obj.default),
+);
+
+const secondary: any = preferences.header.secondary_navigation || [];
 ---
 
 <Wrapper
@@ -43,6 +69,30 @@ const placement = (preferences as any)?.header?.center_dropdowns
             </>
         )
     }
+    { !depth && secondary.length && (
+        <>
+            <ul id="secondary-items" class="secondary">
+                {secondary.map((block: any, i: number) => {
+                    const Component = components[block._bookshop_name];
+                    if (Component) {
+                        return (
+                            <li>
+                                <Component
+                                    {...block}
+                                    _blocks={secondary}
+                                    key={String(i)}
+                                />
+                            </li>
+                        );
+                    }
+                    const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+                    console.warn(warnstring);
+                    return <div class="missing-component">{warnstring}</div>;
+                })}
+            </ul>
+        </>
+    )}
+
     <Items id="navigation-items">
         <ul class:list={[`depth-${depth}`]}>
             {
@@ -413,12 +463,14 @@ const placement = (preferences as any)?.header?.center_dropdowns
                 document.body.style.top = `-${window.scrollY}px`;
                 document.body.style.position = "fixed";
                 document.body.style.overflow = "hidden";
+                document.body.style.width = "min(100%, var(--page-max-width))";
                 document.documentElement.style.overflow = "hidden";
             } else {
                 const scrollY = document.body.style.top;
                 document.body.style.position = "";
                 document.body.style.top = "";
                 document.body.style.overflow = "";
+                document.body.style.width = "";
                 document.documentElement.style.overflow = "";
                 window.scrollTo({
                     left: 0,
@@ -446,6 +498,7 @@ const placement = (preferences as any)?.header?.center_dropdowns
 
     #navigation-items {
         height: 100%;
+        grid-area: secondary / navigation;
     }
 
     #mobile-nav-buttons {
@@ -460,19 +513,19 @@ const placement = (preferences as any)?.header?.center_dropdowns
         grid-template-columns: repeat(3, 1fr);
         align-items: center;
         justify-items: center;
-    }
-
-    #mobile-nav-buttons :is(button, a) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--header-color);
-
-        padding: 2rem;
-        border-radius: 6rem;
-        bottom: 0.5rem;
-        width: 8rem;
-        height: 8rem;
+        
+        :is(button, a) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--header-color);
+    
+            padding: 2rem;
+            border-radius: 6rem;
+            bottom: 0.5rem;
+            width: 8rem;
+            height: 8rem;
+        }
     }
 
     #mobile-nav-menu {
@@ -603,19 +656,22 @@ const placement = (preferences as any)?.header?.center_dropdowns
         list-style-type: none;
         padding: 0;
     }
-
-    .depth-1 a span {
-        padding: 0 10px;
-        margin: 0 5px;
+    
+    .depth-1 {
+        a span {
+            padding: 0 10px;
+            margin: 0 5px;
+        }
+        
+        li:first-of-type > a span {
+            margin-top: 5px;
+        }
+        
+        li:last-of-type > a span {
+            margin-bottom: 5px;
+        }
     }
 
-    .depth-1 li:first-of-type > a span {
-        margin-top: 5px;
-    }
-
-    .depth-1 li:last-of-type > a span {
-        margin-bottom: 5px;
-    }
 
     li.depth-0 > a span {
         padding: calc(var(--indent) * 0.1) calc(var(--indent) * 0.2);
@@ -627,7 +683,7 @@ const placement = (preferences as any)?.header?.center_dropdowns
 
     @media screen and (min-width: 769px) {
         ul.depth-0 {
-            grid-area: navigation;
+            /* grid-area: navigation; */
             display: flex;
             flex-direction: row;
             justify-content: flex-end;
@@ -747,5 +803,34 @@ const placement = (preferences as any)?.header?.center_dropdowns
         justify-content: space-between;
         gap: 1rem;
         text-align: center;
+    }
+    
+    .secondary {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        grid-area: secondary;
+        margin: 0;
+        list-style: none;
+        padding-right: 2rem;
+        gap: 1rem;
+        height: 100%;
+        width: 100%;
+
+        li {
+            margin: 0;
+        }
+    }
+    
+    nav:has(.secondary) {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-template-areas: "secondary" "navigation";
+        /* grid-template-columns: 1fr; */
+
+        #navigation-items {
+            grid-area: navigation;
+        }
+        
     }
 </style>

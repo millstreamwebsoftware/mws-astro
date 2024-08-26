@@ -6,7 +6,9 @@ export interface Props {}
 
 <form name="search" action="/search" method="GET">
     <input name="q" type="text" placeholder="Search" />
-    <Icon name="fa6-solid:magnifying-glass" height="1.5em" />
+    <button type="submit">
+        <Icon name="fa6-solid:magnifying-glass" height="1.5em" />
+    </button>
 </form>
 
 <style lang="scss">
@@ -15,5 +17,26 @@ export interface Props {}
         background-color: white;
         color: #222;
         height: 1.8em;
+        width: 100%;
+        
+    }
+    
+    form {
+        /* flex: .5 .5 20rem; */
+        /* container-type: size; */
+        display: flex;
+        flex-direction: row;
+        gap: .5rem;
+        align-items: center;
+        width: min(10vw, 20rem);
+    }
+    
+    button {
+        border: none;
+        padding: 0;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
