@@ -104,7 +104,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
 <Section
     component="slider"
-    classes={[{ ENV_EDITOR }, `slider-${glideOptions.sliderType}`, classes]}
     {indent}
     style={{
         ...(animationDuration && {
@@ -115,7 +114,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     {key}
 >
     <>
-        <div class="glide" {id} {...dataGlideOptions}>
+        <div class:list={["glide", `slider-${glideOptions.sliderType}`]} {id} {...dataGlideOptions}>
             <div
                 class="glide__track"
                 data-glide-el="track"
@@ -277,7 +276,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         min-height: var(--height);
     }
 
-    .glide__slide {
+    /* .glide__slide {
         background-color: var(--background-color);
         position: relative;
         padding: 4rem;
@@ -300,7 +299,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             object-fit: var(--background-fit);
             object-position: center;
         }
-    }
+    } */
 
     .glide__arrows {
         position: absolute;
@@ -376,18 +375,25 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         box-shadow: 0 0 0.2rem #00000088;
     }
 
+    :where(.glide__overlay) {
+        display: none;
+        pointer-events: none;
+    }
+    
     .slider-fader {
         .glide__slides {
             transform: translate3d(0, 0, 0) !important;
+            width: unset !important;
+            max-width: var(--page-max-width);
         }
 
-        .glide__slide:first-child {
+        .slider-item:first-child {
             animation-name: startOpaque;
             animation-duration: var(--transition);
             animation-iteration-count: 1;
         }
 
-        .glide__slide {
+        .slider-item {
             position: absolute;
             top: 0;
             left: 0;
@@ -396,17 +402,13 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             transition: opacity var(--transition) ease-in-out;
         }
 
-        .glide__slide.glide__slide--active {
+        .slider-item.glide__slide--active {
             position: relative;
             order: 1;
             opacity: 1;
             z-index: 1;
+            transition: opacity 0 ease-in-out;
         }
-    }
-
-    :where(.glide__overlay) {
-        display: none;
-        pointer-events: none;
     }
 
     @keyframes startOpaque {
@@ -432,7 +434,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             }
         }
     }
-
+    
     #slider-0 .slider-item > section > .component-wrapper {
         padding-top: var(--header-height);
     }

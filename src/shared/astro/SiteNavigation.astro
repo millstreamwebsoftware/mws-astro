@@ -69,7 +69,7 @@ const secondary: any = preferences.header.secondary_navigation || [];
             </>
         )
     }
-    { !depth && secondary.length && (
+    { !depth && !!secondary.length && (
         <>
             <ul id="secondary-items" class="secondary">
                 {secondary.map((block: any, i: number) => {
