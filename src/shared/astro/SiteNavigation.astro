@@ -45,7 +45,7 @@ Object.entries(componentOverrides).forEach(
         (components[bookshopName(path)] = obj.default),
 );
 
-const secondary: any = preferences.header.secondary_navigation || [];
+const secondary: any = (preferences as any).header?.secondary_navigation || [];
 ---
 
 <Wrapper
@@ -518,7 +518,7 @@ const secondary: any = preferences.header.secondary_navigation || [];
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--header-color);
+            color: rgb(var(--mobile-header-color));
     
             padding: 2rem;
             border-radius: 6rem;
@@ -531,7 +531,7 @@ const secondary: any = preferences.header.secondary_navigation || [];
     #mobile-nav-menu {
         pointer-events: all;
         grid-area: centre;
-        background-color: rgb(var(--header-background-color));
+        background-color: rgb(var(--mobile-header-background-color));
         box-shadow: 0 0 2rem #0005;
         border: 0;
         z-index: 1;
@@ -579,8 +579,8 @@ const secondary: any = preferences.header.secondary_navigation || [];
             #navigation-items {
                 background: linear-gradient(
                     to bottom,
-                    rgb(var(--header-background-color)),
-                    rgb(var(--header-background-color-bottom))
+                    rgb(var(--mobile-header-background-color)),
+                    rgb(var(--mobile-header-background-color-bottom))
                 );
 
                 position: relative;

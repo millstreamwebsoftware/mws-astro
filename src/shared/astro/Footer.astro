@@ -8,45 +8,50 @@ import preferences from "@data/preferences.json";
 const currentYear = new Date().getFullYear();
 
 const textColor = convertColorString(preferences.footer.foreground_color);
+
+const Override = await import("@src/components/Footer.astro").then((m) => m.default, () => undefined);
 ---
 
-<section
-    class="footer"
-    style={`--background-color: ${preferences.footer.background_color};` +
-        `--text-color: ${textColor};`}
->
-    {preferences.footer.show_top_button && <a href="#top">Back to top</a>}
-    {
-        preferences.footer.text_content && (
-            <div class="content">
-                <Markdown content={preferences.footer.text_content} />
-            </div>
-        )
-    }
-    {
-        preferences.footer.show_sitemap && (
-            <Navigation collection="pages" filter="/" parent={false} />
-        )
-    }
-    {preferences.footer.show_socials && <Social />}
-    {
-        preferences.footer.show_copyright && (
-            <p class="copyright">
-                {preferences.footer.copyright.replace(
-                    "©",
-                    "© " + currentYear,
-                )}
-            </p>
-        )
-    }
-    <p class="brand">
-        Website by <a
-            href="https://www.millstream.com.au/"
-            target="_blank"
-            rel="noopener">Millstream Creative</a
-        >
-    </p>
-</section>
+{ Override ? <Override {...Astro.props} /> : (
+  <section
+      class="footer"
+      style={`--background-color: ${preferences.footer.background_color};` +
+          `--text-color: ${textColor};`}
+  >
+      {preferences.footer.show_top_button && <a href="#top">Back to top</a>}
+      {
+          preferences.footer.text_content && (
+              <div class="content">
+                  <Markdown content={preferences.footer.text_content} />
+              </div>
+          )
+      }
+      {
+          preferences.footer.show_sitemap && (
+              <Navigation collection="pages" filter="/" parent={false} />
+          )
+      }
+      {preferences.footer.show_socials && <Social />}
+      {
+          preferences.footer.show_copyright && (
+              <p class="copyright">
+                  {preferences.footer.copyright.replace(
+                      "©",
+                      "© " + currentYear,
+                  )}
+              </p>
+          )
+      }
+      <p class="brand">
+          Website by <a
+              href="https://www.millstream.com.au/"
+              target="_blank"
+              rel="noopener">Millstream Creative</a
+          >
+      </p>
+  </section>
+)}
+
 
 <style>
     section.footer {

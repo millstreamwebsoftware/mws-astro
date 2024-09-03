@@ -5,6 +5,7 @@ import Markdown from "@shared/Markdown.astro";
 // import { PDFiumLibrary } from "@hyzyla/pdfium";
 import Image from "@shared/Image.astro";
 import Icon from "@shared/icon.astro";
+import type { PDFiumRenderOptions } from "@hyzyla/pdfium/dist/types.js";
 
 export interface Props {
     files?: [
@@ -106,12 +107,26 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
     });
     const path = await import("node:path");
     const { PDFiumLibrary } = await import("@hyzyla/pdfium");
-    // const sharp = (await import("sharp")).default;
+    const sharp = (await import("sharp")).default;
     // const pdf = await import("@hyzyla/pdfium").then(async (p: any) => {
     //     return await p.init();
     // }, () => {
     //     return undefined;
     // });
+    
+    
+    async function renderFunction(options: PDFiumRenderOptions) {
+      return await sharp(options.data, {
+        raw: {
+          width: options.width,
+          height: options.height,
+          channels: 4,
+        },
+      })
+        .png()
+        .toBuffer();
+    }
+
 
     const pdf = await PDFiumLibrary.init();
 
@@ -149,7 +164,7 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                                 .then((document) =>
                                     document
                                         .getPage(0)
-                                        .render({ scale: 1, render: "sharp" }),
+                                        .render({ scale: 1, render: renderFunction }),
                                 )
                                 .then((thumbnail) => {
                                     let thumbPath = `${realPath}.png`;
