@@ -11,6 +11,7 @@ import Social from "@components/social/social.astro";
 import Counter from "@components/counter/counter.astro";
 import AsideImage from "@components/image/asideImage.astro";
 import Player from "@components/player/player.astro";
+import Accordion from "@components/accordion/accordion.astro";
 
 // We need to strip whitespace due to a strange bug which removes a character from the start of a line when there is whitespace before the newline.
 // const content = await stripTrailingWhitespace(Astro.props.content).then(
@@ -20,6 +21,7 @@ import Player from "@components/player/player.astro";
 const content = await replaceCmsEmbeds(Astro.props.content);
 
 var substitutions = {
+    Accordion,
     blockquote: Blockquote,
     icon: Icon,
     Newsletter: Mailbuild,

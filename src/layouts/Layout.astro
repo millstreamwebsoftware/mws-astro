@@ -2,7 +2,7 @@
 import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
 import Opengraph from "@shared/Opengraph.astro";
-// import { ViewTransitions } from "astro:transitions";
+import { ViewTransitions } from "astro:transitions";
 
 import * as git from "git-rev-sync";
 
@@ -21,14 +21,8 @@ export interface Props {
     paths?: any[];
     currentPath?: string;
     thumbnail?: any;
+    classes?: string[];
 }
-
-// const mimetypes: any = {
-//     ico: "image/vnd.microsoft.icon",
-//     png: "image/png",
-//     jpeg: "image/jpeg",
-//     svg: "image/svg+xml",
-// };
 
 const {
     title,
@@ -39,26 +33,22 @@ const {
     paths,
     currentPath,
     thumbnail,
+    classes,
 } = Astro.props;
 import preferences from "@data/preferences.json";
 
-// const pageTitle = title + preferences.general.browser_window_title_suffix;
 const headerHeight = undefined; //preferences.header.height;
 const style: any = {};
 const pageWidth = preferences.page.maximum_page_width;
-// const favicon = preferences.general.favicon;
-// const appleTouchIcon = preferences.general["apple-touch-icon"];
-// const faviconType = mimetypes[favicon.substring(favicon.lastIndexOf(".") + 1)];
+const transitions = false;
 
-// <link rel="icon" href={favicon} type={faviconType} />
-// <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
 
 pageWidth && (style["--page-max-width"] = pageWidth + "px");
 headerHeight && (style["--header-height"] = headerHeight + "px");
 ---
 
 <!doctype html>
-<html lang="en" style={style} transition:animate="none">
+<html lang="en" class:list={classes} style={style} transition:animate="none">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
@@ -67,11 +57,13 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         <meta name="format-detection" content="telephone=no" />
 
         <Opengraph {title} {description} {thumbnail} />
+        {transitions && <ViewTransitions />}
 
         <script>
             window.addEventListener(
                 "scroll",
                 () => {
+                    if (document.documentElement.classList.contains("mobile-noscroll")) return;
                     document.documentElement.classList.toggle(
                         "scrolled",
                         window.scrollY > 100,
@@ -82,7 +74,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         </script>
     </head>
     <body>
-        {show_global_header && <Header {id} {paths} {currentPath} />}
+        {show_global_header && <Header transition:persist {id} {paths} {currentPath} />}
         <article transition:animate="fade">
             <slot />
             {show_global_footer && <Footer />}

@@ -461,17 +461,11 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             // Fix/Unfix body to prevent scrolling through the menu
             if (newState) {
                 document.body.style.top = `-${window.scrollY}px`;
-                document.body.style.position = "fixed";
-                document.body.style.overflow = "hidden";
-                document.body.style.width = "min(100%, var(--page-max-width))";
-                document.documentElement.style.overflow = "hidden";
+                document.documentElement.classList.toggle("mobile-noscroll", true);
             } else {
                 const scrollY = document.body.style.top;
-                document.body.style.position = "";
+                document.documentElement.classList.toggle("mobile-noscroll", false);
                 document.body.style.top = "";
-                document.body.style.overflow = "";
-                document.body.style.width = "";
-                document.documentElement.style.overflow = "";
                 window.scrollTo({
                     left: 0,
                     top: parseInt(scrollY || "0") * -1,
@@ -832,5 +826,25 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             grid-area: navigation;
         }
         
+    }
+</style>
+
+<style lang="scss" is:global>
+    @media only screen and (max-width: 768px) {
+        html.mobile-noscroll {
+            overflow: hidden;
+            
+            & > body {
+                position: fixed;
+                overflow: hidden;
+                width: min(100%, var(--page-max-width));
+            }
+        }
+    }
+    
+    @media only screen and (min-width: 769px) {
+        html.mobile-noscroll > body {
+            top: 0 !important;
+        }
     }
 </style>
