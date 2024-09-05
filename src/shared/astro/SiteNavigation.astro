@@ -69,29 +69,6 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             </>
         )
     }
-    { !depth && !!secondary.length && (
-        <>
-            <ul id="secondary-items" class="secondary">
-                {secondary.map((block: any, i: number) => {
-                    const Component = components[block._bookshop_name];
-                    if (Component) {
-                        return (
-                            <li>
-                                <Component
-                                    {...block}
-                                    _blocks={secondary}
-                                    key={String(i)}
-                                />
-                            </li>
-                        );
-                    }
-                    const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-                    console.warn(warnstring);
-                    return <div class="missing-component">{warnstring}</div>;
-                })}
-            </ul>
-        </>
-    )}
 
     <Items id="navigation-items">
         <ul class:list={[`depth-${depth}`]}>
@@ -179,6 +156,46 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                     })
             }
             {!!depth && showCaret && <div class="dropdown-caret" />}
+            {
+                !depth && !!secondary && (
+                    <li
+                        id="secondary-button"
+                        class:list={[
+                            `depth-${depth}`,
+                        ]}
+                    >
+                        <a href={pages.href}>
+                            <span>Quicklinks
+                            <div class="dropdown-indicator">
+                                <Icon
+                                    name="fa6-solid:caret-down"
+                                    height="2rem"
+                                />
+                            </div>
+                            </span>
+                        </a>
+                        <ul id="secondary-items" class:list={["secondary", `depth-1`]}>
+                            {secondary.map((block: any, i: number) => {
+                                const Component = components[block._bookshop_name];
+                                if (Component) {
+                                    return (
+                                        <li>
+                                            <Component
+                                                {...block}
+                                                _blocks={secondary}
+                                                key={String(i)}
+                                            />
+                                        </li>
+                                    );
+                                }
+                                const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+                                console.warn(warnstring);
+                                return <div class="missing-component">{warnstring}</div>;
+                            })}
+                        </ul>
+                    </li>
+                )
+            }
         </ul>
     </Items>
 </Wrapper>
@@ -201,6 +218,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
 
     function setupNavigation() {
         const navigation = document.getElementById("navigation");
+        const secondary = document.getElementById("secondary-items");
         const mobileNavButton = document.getElementById("mobile-nav-menu");
         const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
         const placement: Placement =
@@ -220,8 +238,6 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
          * @param target element to close the dropdown of
          */
         function closeNav(target: HTMLElement) {
-            target.classList.remove("dropdown-open");
-            target.setAttribute("aria-expanded", "false");
             if ("_cleanup" in target && target._cleanup instanceof Function) {
                 target._cleanup();
             }
@@ -253,75 +269,23 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         /**
          * Open the dropdown of the target element
          * @param target element to open the dropdown of
+         * @param dropdownElement dropdown to open (optional)
          */
-        function openNav(target: FloatingUIElement) {
+        function openNav(target: FloatingUIElement, dropdownElement?: HTMLElement) {
             // Close all dropdowns that do not contain the new dropdown
             closeAllNav(target, true);
 
-            const dropdown = target.querySelector(":scope ul") as HTMLElement;
+            const dropdown = dropdownElement ?? target.querySelector(":scope ul") as HTMLElement;
             if (!dropdown) return;
             const caret = dropdown.querySelector(
                 ":scope > .dropdown-caret",
             ) as HTMLElement;
 
-            const options: ComputePositionConfig = target.classList.contains(
-                "depth-0",
-            )
-                ? {
-                      placement,
-                      strategy: "fixed", // Probably depends on if the menu is fixed or not
-                      middleware: [
-                          offset({
-                              mainAxis: caretHeight * 0.9 * Number(!!caret),
-                              crossAxis: 0,
-                          }),
-                          size({
-                              apply({ rects, elements, availableHeight }) {
-                                  if (isMobileNav()) {
-                                      Object.assign(elements.floating.style, {
-                                          maxHeight: null,
-                                          minWidth: null,
-                                      });
-                                      return;
-                                  }
-                                  Object.assign(elements.floating.style, {
-                                      maxHeight: `${availableHeight}px`,
-                                      minWidth: `${rects.reference.width}px`,
-                                  });
-                              },
-                          }),
-                          shift(),
-                          caret && arrow({ element: caret, padding: 10 }),
-                      ],
-                  }
-                : {
-                      placement: "right-start",
-                      strategy: "fixed",
-                      middleware: [
-                          offset({
-                              mainAxis: caretHeight * 0.9 * Number(!!caret),
-                              crossAxis: 0,
-                          }),
-                          shift(),
-                          size({
-                              apply({ elements, availableHeight }) {
-                                  if (isMobileNav()) {
-                                      Object.assign(elements.floating.style, {
-                                          maxHeight: null,
-                                      });
-                                      return;
-                                  }
-                                  Object.assign(elements.floating.style, {
-                                      maxHeight: `${availableHeight}px`,
-                                  });
-                              },
-                          }),
-                          flip(),
-                          caret && arrow({ element: caret, padding: 10 }),
-                      ],
-                  };
-
-            target._cleanup = autoUpdate(target, dropdown, () => {
+            const options: ComputePositionConfig = dropdownOptions(target.classList.contains(
+                "depth-0"
+            ), caret);
+            
+            const cleanup = autoUpdate(target, dropdown, () => {
                 computePosition(target, dropdown, options).then(
                     ({ x, y, middlewareData, placement }) => {
                         if (isMobileNav()) {
@@ -336,6 +300,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                             left: `${x}px`,
                             top: `${y}px`,
                         });
+                        
                         if (middlewareData.arrow) {
                             let turn,
                                 top,
@@ -385,16 +350,86 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                     },
                 );
             });
+            
+            target._cleanup = () => {
+                cleanup();
+
+                target.classList.remove("dropdown-open");
+                target.setAttribute("aria-expanded", "false");
+                dropdown.classList.remove("open");
+            };
 
             target.setAttribute("aria-expanded", "true");
             target.classList.add("dropdown-open");
+            dropdown.classList.add("open");
+            console.log(target, dropdown);
         }
+        
+        function dropdownOptions(vertical: boolean, caret: Element | undefined): ComputePositionConfig {
+          return vertical ? {
+                placement,
+                strategy: "fixed", // Probably depends on if the menu is fixed or not
+                middleware: [
+                    offset({
+                        mainAxis: caretHeight * 0.9 * Number(!!caret),
+                        crossAxis: 0,
+                    }),
+                    size({
+                        apply({ rects, elements, availableHeight }) {
+                            if (isMobileNav()) {
+                                Object.assign(elements.floating.style, {
+                                    maxHeight: null,
+                                    minWidth: null,
+                                });
+                                return;
+                            }
+                            Object.assign(elements.floating.style, {
+                                maxHeight: `${availableHeight}px`,
+                                minWidth: `${rects.reference.width}px`,
+                            });
+                        },
+                    }),
+                    shift(),
+                    caret && arrow({ element: caret, padding: 10 }),
+                ],
+            }
+          : {
+                placement: "right-start",
+                strategy: "fixed",
+                middleware: [
+                    offset({
+                        mainAxis: caretHeight * 0.9 * Number(!!caret),
+                        crossAxis: 0,
+                    }),
+                    shift(),
+                    size({
+                        apply({ elements, availableHeight }) {
+                            if (isMobileNav()) {
+                                Object.assign(elements.floating.style, {
+                                    maxHeight: null,
+                                });
+                                return;
+                            }
+                            Object.assign(elements.floating.style, {
+                                maxHeight: `${availableHeight}px`,
+                            });
+                        },
+                    }),
+                    flip(),
+                    caret && arrow({ element: caret, padding: 10 }),
+                ],
+            }
+          
+        }
+        
 
         /**
          * Media query to test if mobile nav should be shown
          */
         function isMobileNav(): boolean {
-            return window.matchMedia("screen and (max-width: 768px)").matches;
+            // return window.matchMedia("screen and (max-width: 768px)").matches;
+            
+            return window.innerWidth <= 768;
         }
 
         /**
@@ -428,6 +463,20 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             const target: HTMLElement | null = (
                 e.target as HTMLElement
             ).closest("li, #navigation");
+            
+            if (target && target.id === "secondary-button" && secondary) {
+                const state = !target.classList.contains("dropdown-open");
+                
+                if (state) {
+                  openNav(target, secondary);
+                } else {
+                  closeNav(target);
+                  closeAllNav(target);
+                }
+                
+                return;
+            };
+            
             if (
                 !target ||
                 target.id === "navigation" ||
@@ -490,10 +539,10 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         z-index: 999;
     }
 
-    #navigation-items {
+    /* #navigation-items {
         height: 100%;
         grid-area: secondary / navigation;
-    }
+    } */
 
     #mobile-nav-buttons {
         display: none;
@@ -646,30 +695,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         }
     }
 
-    ul {
-        list-style-type: none;
-        padding: 0;
-    }
-    
-    .depth-1 {
-        a span {
-            padding: 0 10px;
-            margin: 0 5px;
-        }
-        
-        li:first-of-type > a span {
-            margin-top: 5px;
-        }
-        
-        li:last-of-type > a span {
-            margin-bottom: 5px;
-        }
-    }
 
-
-    li.depth-0 > a span {
-        padding: calc(var(--indent) * 0.1) calc(var(--indent) * 0.2);
-    }
 
     .dropdown-open > a .dropdown-indicator {
         transform: rotate(180deg);
@@ -758,48 +784,9 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         display: none;
     }
 
-    .active > a span {
-        font-weight: bold;
-        border: 4px solid
-            color-mix(
-                in oklab,
-                rgb(var(--header-background-color)) 70%,
-                rgb(var(--header-color))
-            );
-    }
 
-    a {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        text-decoration: none;
-        color: rgb(var(--header-color));
-        cursor: pointer;
-    }
-
-    a:hover span {
-        background-color: color-mix(
-            in oklab,
-            rgb(var(--header-background-color)) 70%,
-            rgb(var(--header-color))
-        );
-    }
-
-    a > span {
-        flex: 1 1 100%;
-        border: 4px solid #0000;
-        transition: background-color 0.1s ease-out;
-        border-radius: var(--border-radius);
-
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 1rem;
-        text-align: center;
-    }
     
-    .secondary {
+    /* .secondary {
         display: flex;
         justify-content: flex-end;
         align-items: center;
@@ -814,19 +801,19 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         li {
             margin: 0;
         }
-    }
+    } */
     
-    nav:has(.secondary) {
+    /* nav:has(.secondary) {
         display: grid;
         grid-template-rows: subgrid;
         grid-template-areas: "secondary" "navigation";
-        /* grid-template-columns: 1fr; */
+        grid-template-columns: 1fr;
 
         #navigation-items {
             grid-area: navigation;
         }
         
-    }
+    } */
 </style>
 
 <style lang="scss" is:global>
@@ -846,5 +833,72 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         html.mobile-noscroll > body {
             top: 0 !important;
         }
+    }
+    
+    nav#navigation {
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .depth-1 {
+            a span {
+                padding: 0 10px;
+                margin: 0 5px;
+            }
+            
+            li:first-of-type > a span {
+                margin-top: 5px;
+            }
+            
+            li:last-of-type > a span {
+                margin-bottom: 5px;
+            }
+        }
+    
+        .active > a span {
+            font-weight: bold;
+            border: 4px solid
+                color-mix(
+                    in oklab,
+                    rgb(var(--header-background-color)) 70%,
+                    rgb(var(--header-color))
+                );
+        }
+    
+        a {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            text-decoration: none;
+            color: rgb(var(--header-color));
+            cursor: pointer;
+        }
+    
+        a:hover span {
+            background-color: color-mix(
+                in oklab,
+                rgb(var(--header-background-color)) 70%,
+                rgb(var(--header-color))
+            );
+        }
+    
+        a > span {
+            flex: 1 1 100%;
+            border: 4px solid #0000;
+            transition: background-color 0.1s ease-out;
+            border-radius: var(--border-radius);
+    
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            text-align: center;
+        }
+    }
+
+    li.depth-0 > a span {
+        padding: calc(var(--indent) * 0.1) calc(var(--indent) * 0.2);
     }
 </style>

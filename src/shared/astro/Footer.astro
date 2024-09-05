@@ -3,11 +3,11 @@ import { convertColorString } from "@mws-astro/util";
 import Social from "@components/social/social.astro";
 import Markdown from "@shared/Markdown.astro";
 import Navigation from "@components/navigation/navigation.astro";
-import Richtext from "@components/richtext/richtext.astro";
 import preferences from "@data/preferences.json";
 const currentYear = new Date().getFullYear();
 
-const textColor = convertColorString(preferences.footer.foreground_color);
+const footerPreferences = (preferences.footer as typeof preferences.footer & Record<string, any>);
+const textColor = convertColorString(footerPreferences?.foreground_color);
 
 const Override = await import("@src/components/Footer.astro").then((m) => m.default, () => undefined);
 ---
@@ -15,27 +15,27 @@ const Override = await import("@src/components/Footer.astro").then((m) => m.defa
 { Override ? <Override {...Astro.props} /> : (
   <section
       class="footer"
-      style={`--background-color: ${preferences.footer.background_color};` +
+      style={`--background-color: ${footerPreferences?.background_color};` +
           `--text-color: ${textColor};`}
   >
-      {preferences.footer.show_top_button && <a href="#top">Back to top</a>}
+      {footerPreferences?.show_top_button && <a href="#top">Back to top</a>}
       {
-          preferences.footer.text_content && (
+          footerPreferences?.text_content && (
               <div class="content">
-                  <Markdown content={preferences.footer.text_content} />
+                  <Markdown content={footerPreferences?.text_content} />
               </div>
           )
       }
       {
-          preferences.footer.show_sitemap && (
+          footerPreferences?.show_sitemap && (
               <Navigation collection="pages" filter="/" parent={false} />
           )
       }
-      {preferences.footer.show_socials && <Social />}
+      {footerPreferences?.show_socials && <Social />}
       {
-          preferences.footer.show_copyright && (
+          footerPreferences?.show_copyright && (
               <p class="copyright">
-                  {preferences.footer.copyright.replace(
+                  {footerPreferences?.copyright.replace(
                       "©",
                       "© " + currentYear,
                   )}
