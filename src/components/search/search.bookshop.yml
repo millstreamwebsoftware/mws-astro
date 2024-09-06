@@ -2,16 +2,13 @@
 spec:
   structures:
     - secondary_navigation
-  label: Quicklink
-  description: Add a link to the secondary navigation
-  icon: add-link
+  label: Search
+  description: Add a search bar to the secondary navigation
+  icon: search
   tags: []
 
 # Defines the structure of this component, as well as the default values
 blueprint:
-  text:
-  link:
-  new_tab: false
 
 _inputs:
 
