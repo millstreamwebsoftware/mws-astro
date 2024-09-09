@@ -12,6 +12,7 @@ import Counter from "@components/counter/counter.astro";
 import AsideImage from "@components/image/asideImage.astro";
 import Player from "@components/player/player.astro";
 import Accordion from "@components/accordion/accordion.astro";
+import Navigation from "@components/navigation/navigation.astro";
 
 // We need to strip whitespace due to a strange bug which removes a character from the start of a line when there is whitespace before the newline.
 // const content = await stripTrailingWhitespace(Astro.props.content).then(
@@ -29,6 +30,7 @@ var substitutions = {
     Social,
     'a[class*="button"]': Button,
     Player,
+    Navigation,
     img: AsideImage,
     Counter,
 };
