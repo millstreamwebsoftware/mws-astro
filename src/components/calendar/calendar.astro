@@ -356,13 +356,19 @@ const calendarOptions = {
 
         &:not(.fc-event-start) {
             border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            mask-image: linear-gradient(to left, white 95%, 98%, transparent);
-            padding-left: 5%;
+            mask-image: linear-gradient(to right, transparent, white 2rem);
+            padding-left: 2rem;
         }
 
         &:not(.fc-event-end) {
             border-radius: var(--border-radius) 0 0 var(--border-radius);
-            mask-image: linear-gradient(to right, white 95%, 98%, transparent);
+            mask-image: linear-gradient(to right, white calc(100% - 2rem), transparent);
+            padding-right: 2rem;
+        }
+        
+        &:not(.fc-event-start):not(.fc-event-end) {
+            border-radius: 0;
+             mask-image: linear-gradient(to right, transparent, white 2rem, white calc(100% - 2rem), transparent);
         }
     }
 
@@ -421,6 +427,7 @@ const calendarOptions = {
     .fc-toolbar-chunk:has(.fc-button[class*="-subscribe"])::before {
         content: "Subscribe To:";
         padding: 0.4em 0.65em;
+        color: rgb(var(--text-color));
     }
 
     .fc-toolbar-chunk .fc-button[class*="-subscribe"] {
@@ -453,6 +460,11 @@ const calendarOptions = {
 
     .fc-icon {
         line-height: 0.7;
+    }
+    
+    .fc-event, .fc-button {
+        --calendar-contrast-color: 0 0 0;
+        --calendar-color: 210 210 210;
     }
 
     .cal0,
