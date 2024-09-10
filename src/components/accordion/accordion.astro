@@ -9,7 +9,7 @@ const {title} = Astro.props;
 ---
 
 <div class="accordion">
-    <div class="accordion-heading">
+    <div class="accordion-heading" tabindex="0">
         <div class="accordion-icon">
             <Icon name="fa6-solid:circle-chevron-down" height="2rem"/>
         </div>
@@ -27,14 +27,25 @@ const {title} = Astro.props;
         display: grid;
         grid-template-rows: min-content 0fr;
         transition: grid-template-rows 0.2s;
+        margin-bottom: 2rem;
     }
     
-    .accordion.expanded {
+    .accordion.expanded, .accordion:has(:focus-visible) {
         grid-template-rows: min-content 1fr;
+        
+        .accordion-content {
+            border-bottom: 1px solid rgb(var(--accordion-rule-color, var(--text-color)));
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+        }
     }
     
     .accordion-content {
         overflow: hidden;
+        
+        border-bottom: 1px solid transparent;
+        
+        transition: border 0.2s, padding 0.2s;
     }
 
     .accordion-heading {
@@ -42,7 +53,7 @@ const {title} = Astro.props;
         grid-template-areas: "icon title";
         gap: 1rem;
         padding: 1rem 0;
-        margin-bottom: 1rem;
+        /* margin-bottom: 1rem;  */
         align-items: center;
         border-bottom: 1px solid rgb(var(--accordion-rule-color, var(--text-color)));
         
@@ -57,6 +68,10 @@ const {title} = Astro.props;
             grid-area: "title";
         }
     }
+    
+    .accordion:has(+ .accordion) {
+        margin-bottom: 0rem;
+    }
 </style>
 
 <style is:global lang="scss">
@@ -65,16 +80,10 @@ const {title} = Astro.props;
         transition: transform 0.2s ease-in-out;
     }
 
-    .accordion.expanded .accordion-heading .accordion-icon svg {
-        transform: rotate(-180deg);
-    }
-    
-    .accordion {
-        margin-bottom: 2rem;
-    }
-    
-    .accordion:has(+ .accordion) {
-        margin-bottom: 0rem;
+    .accordion.expanded, .accordion:has(:focus-visible) {
+        .accordion-heading .accordion-icon svg {
+            transform: rotate(-180deg);
+        }
     }
 </style>
 
@@ -87,20 +96,27 @@ const {title} = Astro.props;
     
     if (!accordions) return;
     
-    accordions.forEach((accordion) => accordion.addEventListener("click", toggleAccordion));
+    accordions.forEach((accordion) => {
+      accordion.addEventListener("click", toggleAccordion);
+    });
     
   }
   
   function toggleAccordion(e: Event) {
     if (!e.currentTarget) return;
-    const target = (e.currentTarget as Element);
-    const state = target.classList.contains("expanded");
     
-    if (!state) target.closest("section")?.querySelectorAll(".accordion").forEach((sibling) => {
-      if (sibling !== target)
+    // Ignore clicks within accordion content
+    const target = (e.target as Element);
+    if (target.closest(".accordion-heading, .accordion")?.matches(".accordion")) return;
+    
+    const acccordion = (e.currentTarget as Element);
+    const state = acccordion.classList.contains("expanded");
+    
+    if (!state) acccordion.closest("section")?.querySelectorAll(".accordion").forEach((sibling) => {
+      if (sibling !== acccordion)
       sibling.classList.remove("expanded");
     });
     
-    target.classList.toggle("expanded");
+    acccordion.classList.toggle("expanded");
   }
 </script>
