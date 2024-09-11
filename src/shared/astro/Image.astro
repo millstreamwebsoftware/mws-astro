@@ -62,7 +62,14 @@ if (
     typeof Astro.props.image == "string" &&
     Astro.props.image.startsWith("public/")
 ) {
-    const images = import.meta.glob(["/public/**/*", "!/public/**/*.pdf"]);
+    const images = import.meta.glob([
+      "/public/**/*.png",
+      "/public/**/*.jpg",
+      "/public/**/*.jpeg",
+      "/public/**/*.webp",
+      "/public/**/*.gif",
+      "/public/**/*.tiff",
+      "/public/**/*.avif"]);
 
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),
