@@ -215,6 +215,12 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
 
     document.addEventListener("DOMContentLoaded", setupNavigation);
     document.addEventListener("astro:after-swap", setupNavigation);
+    
+    // function isOverflowing(element: HTMLElement) {
+    //   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+    // }
+    
+    
 
     function setupNavigation() {
         const navigation = document.getElementById("navigation");
@@ -226,12 +232,29 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                 (navigation.dataset?.placement as Placement | undefined)) ||
             "bottom-start";
         const caretHeight = 20;
-
+        
         // const navTarget = null;
         if (!navigation) throw Error("Navigation not found.");
         document.body.addEventListener("click", handleNavigationEvent);
         document.body.addEventListener("keydown", handleNavigationEvent);
         navigation.addEventListener("focusout", handleNavigationEvent);
+        
+        const navItems = navigation.querySelector("#navigation-items");
+        var mobileNavWidth = 768;
+        
+        function resizeHandler() {
+          if (document.documentElement.clientWidth > mobileNavWidth) {
+            if (navItems?.clientWidth && document.documentElement.clientWidth < navItems?.clientWidth) {
+              mobileNavWidth = navItems?.clientWidth;
+            }
+          }
+          
+          document.documentElement.classList.toggle("mobile-nav", isMobileNav());
+          navigation?.classList.toggle("mobile-nav", isMobileNav());
+        }
+        
+        window.addEventListener("resize", resizeHandler);
+        resizeHandler();
 
         /**
          * Close the dropdown of a given element, and cleanup
@@ -429,7 +452,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         function isMobileNav(): boolean {
             // return window.matchMedia("screen and (max-width: 768px)").matches;
             
-            return window.innerWidth <= 768;
+            return window.innerWidth <= mobileNavWidth;
         }
 
         /**
@@ -532,11 +555,14 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             setModalState(false);
         });
     }
+    
+
 </script>
 
 <style lang="scss">
     nav {
         z-index: 999;
+        overflow: hidden;
     }
 
     /* #navigation-items {
@@ -602,7 +628,8 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         transition: background-color 0.3s ease;
     }
 
-    @media only screen and (max-width: 768px) {
+    /* @media only screen and (max-width: 768px) { */
+    nav#navigation.mobile-nav {
         #mobile-nav-buttons {
             display: grid;
         }
@@ -611,7 +638,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             display: block;
         }
 
-        nav {
+        & {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -657,7 +684,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             }
         }
 
-        nav.expanded {
+        &.expanded {
             #mobile-nav-home {
                 pointer-events: initial;
                 transform: translate(0) scale(1);
@@ -701,7 +728,9 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         transform: rotate(180deg);
     }
 
-    @media screen and (min-width: 769px) {
+    /* @media screen and (min-width: 769px) { */
+    
+    #navigation:not(.mobile-nav) {
         ul.depth-0 {
             /* grid-area: navigation; */
             display: flex;
@@ -817,8 +846,8 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
 </style>
 
 <style lang="scss" is:global>
-    @media only screen and (max-width: 768px) {
-        html.mobile-noscroll {
+    /* @media only screen and (max-width: 768px) { */
+        html.mobile-noscroll.mobile-nav {
             overflow: hidden;
             
             & > body {
@@ -827,13 +856,13 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                 width: min(100%, var(--page-max-width));
             }
         }
-    }
+    /* } */
     
-    @media only screen and (min-width: 769px) {
-        html.mobile-noscroll > body {
+    /* @media only screen and (min-width: 769px) { */
+        html.mobile-noscroll:not(.mobile-nav) > body {
             top: 0 !important;
         }
-    }
+    /* } */
     
     nav#navigation {
         ul {
