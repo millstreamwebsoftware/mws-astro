@@ -1,0 +1,344 @@
+---
+import Section from "@layouts/Section.astro";
+import Icon from "@shared/icon.astro";
+
+export interface Props {
+  url?: string;
+}
+
+const {url} = Astro.props;
+---
+<Section component="flipbook" {...Astro.props}>
+    <div class="flipbook" data-flipbook={url}>
+        <div class="flipbook-page">
+            <canvas />
+            <div class="textLayer"></div>
+        </div>
+        <div class="flipbook-page">
+            <canvas />
+            <div class="textLayer"></div>
+        </div>
+        <div class="toolbar">
+            <button data-action="<" title="Previous Page"><Icon name="carbon:chevron-left" height="1em"/></button>
+            <button data-action="page-number" title="Page Number">1/1</button>
+            <button data-action=">" title="Next Page"><Icon name="carbon:chevron-right" height="1em"/></button>
+            <button data-action="download" title="Download PDF"><Icon name="carbon:download" height="1em"/></button>
+        </div>
+    </div>
+</Section>
+
+<script>
+// import * as PDFJSLib from "pdfjs-dist";
+import {getDocument, TextLayer, GlobalWorkerOptions} from "pdfjs-dist";
+import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
+GlobalWorkerOptions.workerSrc = PDFJSWorker;
+
+document.addEventListener("DOMContentLoaded", setupFlipbook);
+document.addEventListener("astro:after-swap", setupFlipbook);
+
+function setupFlipbook() {
+  const flipbooks = document.querySelectorAll<HTMLElement>("[data-flipbook]");
+ 
+  flipbooks.forEach(async (flipbook) => {
+    const canvases = Array.from(flipbook.getElementsByTagName("canvas"), 
+      (canvas) => ({
+          canvas, 
+          "context": canvas.getContext("2d"), 
+          "text": canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer")
+      }));
+    const toolbar = flipbook.querySelector(".toolbar");
+    const pageCounter = toolbar?.querySelector('[data-action="page-number"]');
+    
+    let page = 0;
+    
+    toolbar?.addEventListener("click", async (e) => {
+      if (!e.target) return;
+      const target = e.target as HTMLElement;
+      const button = target.closest<HTMLButtonElement>("button, .toolbar");
+      if (!button || button.matches(".toolbar")) return;
+      
+      switch (button.dataset.action) {
+        case "<":
+          page = page - canvases.length;
+          if (page < 0) page = 0;
+          await renderPage(page);
+          break;
+        case ">":
+          page = page + canvases.length;
+          if (page >= pdf.numPages) page = 0;
+          await renderPage(page);
+          break;
+        case "download":
+          const a = document.createElement('a');
+          const url = flipbook.dataset?.flipbook;
+          if (!url) break;
+          a.href = url;
+          a.download = url.split('/').pop() || "";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        default:
+          break;
+      }
+    })
+    
+    const pdf = await getDocument(flipbook.dataset.flipbook).promise;
+    
+    async function renderPage(num: number) {
+       pageCounter && (pageCounter.innerHTML = `${num+1}/${pdf.numPages}`);
+      
+        canvases.forEach(async (canvas, offset) => {
+          num = num + offset;
+          if (num < 0 || num >= pdf.numPages) {
+            // canvas.context?.clearRect(0,0,canvas.canvas.height,canvas.canvas.width);
+            canvas.canvas.width = canvas.canvas.width;
+            canvas?.text && (canvas.text.innerHTML = "");
+            canvas.canvas.parentElement?.classList.toggle("blank-page", true);
+            
+            return;
+          }
+          
+          canvas.canvas.parentElement?.classList.toggle("blank-page", false);
+          const page = await pdf.getPage(num+1);
+          
+          var viewport = page.getViewport({scale: 1.5});
+          if (canvas.canvas.height != viewport.height)
+          canvas.canvas.height = viewport.height;
+          
+          if (canvas.canvas.width != viewport.width)
+          canvas.canvas.width = viewport.width;
+          
+          if (!canvas.context) throw Error("Canvas context missing");
+          
+          const renderTask = page.render({canvasContext: canvas.context, viewport}).promise;
+          const textContent = page.getTextContent().then(async (textContent) => {
+            if (!canvas.text) return;
+            
+            canvas.text.style.left = canvas.canvas.offsetLeft + 'px';
+            canvas.text.style.top = canvas.canvas.offsetTop + 'px';
+            canvas.text.style.height = canvas.canvas.offsetHeight + 'px';
+            canvas.text.style.width = canvas.canvas.offsetWidth + 'px';
+            
+            const textLayer = new TextLayer({
+              textContentSource: textContent,
+              container: canvas.text,
+              viewport: viewport,
+            });
+            
+            function setScaleFactor() {
+              const scaleFactor = canvas.canvas.clientWidth / (canvas.canvas.width / viewport.scale);
+              canvas.text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
+            }
+            
+            setScaleFactor()
+            
+            canvas.text.innerHTML = "";
+            await textLayer.render();
+          });
+          
+          return await Promise.all([renderTask, textContent]);
+        });
+    }
+    
+    await renderPage(0);
+  });
+}
+</script>
+
+<style lang="scss">
+    div.flipbook {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: 1fr;
+        perspective: 1000px;
+        /* perspective-origin: center right; */
+        
+        canvas {
+            width: 100%;
+            object-fit: contain;
+        }
+        
+        .flipbook-page {
+            position: relative;
+            
+            .text-layer {
+                position: absolute;
+                inset: 0;
+
+            }
+        }
+        
+        .flipbook-page::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        
+        .flipbook-page.blank-page::after {
+            content: none;
+        }
+        
+        .flipbook-page:first-of-type {
+            transform-origin: right;
+            transform: rotateY(5deg);
+            
+            &::after {
+                background: linear-gradient(to right, transparent 80%, 95%, rgb(0, 0, 0, 0.4));
+            }
+        }
+        .flipbook-page:nth-child(2) {
+            transform-origin: left;
+            transform: rotateY(-5deg);
+            
+            &::after {
+                background: linear-gradient(to left, transparent 80%, 95%, rgb(0, 0, 0, 0.4));
+            }
+        }
+    }
+    
+    .toolbar {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        
+        transform: translateX(-50%);
+        background-color: white;
+        
+        button {
+            color: #333;
+            border-color: #333;
+            padding: .3em .8em;
+        }
+    }
+</style>
+
+<style lang="scss" is:global>
+    .hiddenCanvasElement {
+        display: none;
+    }
+    
+    .flipbook-page {
+        .textLayer {
+          position: absolute;
+          text-align: initial;
+          inset: 0;
+          overflow: clip;
+          opacity: 1;
+          line-height: 1;
+          text-size-adjust: none;
+          forced-color-adjust: none;
+          transform-origin: 0 0;
+          caret-color: CanvasText;
+          z-index: 0;
+          
+          ::selection {
+              color: transparent;
+          }
+        
+          &.highlighting {
+            touch-action: none;
+          }
+        
+          :is(span, br) {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+          }
+        
+          > :not(.markedContent),
+          .markedContent span:not(.markedContent) {
+            z-index: 1;
+          }
+        
+          /* Only necessary in Google Chrome, see issue 14205, and most unfortunately
+           * the problem doesn't show up in "text" reference tests. */
+          /*#if !MOZCENTRAL*/
+          span.markedContent {
+            top: 0;
+            height: 0;
+          }
+          /*#endif*/
+        
+          span[role="img"] {
+            user-select: none;
+            cursor: default;
+          }
+        
+          .highlight {
+            --highlight-bg-color: rgb(180 0 170 / 0.25);
+            --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
+            --highlight-backdrop-filter: none;
+            --highlight-selected-backdrop-filter: none;
+            
+            margin: -1px;
+            padding: 1px;
+            background-color: var(--highlight-bg-color);
+            backdrop-filter: var(--highlight-backdrop-filter);
+            border-radius: 4px;
+        
+            @media screen and (forced-colors: active) {
+              --highlight-bg-color: transparent;
+              --highlight-selected-bg-color: transparent;
+              --highlight-backdrop-filter: var(--hcm-highlight-filter);
+              --highlight-selected-backdrop-filter: var(
+                --hcm-highlight-selected-filter
+              );
+            }
+        
+            &.appended {
+              position: initial;
+            }
+        
+            &.begin {
+              border-radius: 4px 0 0 4px;
+            }
+        
+            &.end {
+              border-radius: 0 4px 4px 0;
+            }
+        
+            &.middle {
+              border-radius: 0;
+            }
+        
+            &.selected {
+              background-color: var(--highlight-selected-bg-color);
+              backdrop-filter: var(--highlight-selected-backdrop-filter);
+            }
+          }
+        
+          ::selection {
+            /* stylelint-disable declaration-block-no-duplicate-properties */
+            /*#if !MOZCENTRAL*/
+            background: rgba(0 0 255 / 0.25);
+            /*#endif*/
+            /* stylelint-enable declaration-block-no-duplicate-properties */
+            background: color-mix(in srgb, AccentColor, transparent 75%);
+          }
+        
+          /* Avoids https://github.com/mozilla/pdf.js/issues/13840 in Chrome */
+          /*#if !MOZCENTRAL*/
+          br::selection {
+            background: transparent;
+          }
+          /*#endif*/
+        
+          .endOfContent {
+            display: block;
+            position: absolute;
+            inset: 100% 0 0;
+            z-index: 0;
+            cursor: default;
+            user-select: none;
+          }
+        
+          &.selecting .endOfContent {
+            top: 0;
+          }
+        }
+    }
+</style>
