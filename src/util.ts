@@ -90,33 +90,60 @@ export function getTreeNode(
 }
 
 async function ensureFS(): Promise<boolean> {
+  // // @ts-expect-error
+  // console.log(ENV_BOOKSHOP_LIVE, typeof ENV_BOOKSHOP_LIVE);
+
   // @ts-expect-error
-  if (ENV_BOOKSHOP_LIVE) return false;
+  if (!ENV_BOOKSHOP_LIVE) {
+    if (!fs)
+      fs = await import("node:fs/promises").catch(() =>
+        console.error("node:fs/promises import failed"),
+      );
 
-  if (!fs)
-    fs = await import("node:fs/promises").catch(() =>
-      console.error("node:fs/promises import failed"),
-    );
+    if (!path)
+      path = await import("node:path").catch(() =>
+        console.error("node:path import failed"),
+      );
 
-  return !!fs;
+    return Boolean(fs) && Boolean(path);
+  }
+
+  return false;
 }
 
 export async function resolvePath(file: string): Promise<string | undefined> {
   if (!(await ensureFS())) return;
 
-  let filePath = file;
-  return await fs
-    .stat(file)
-    .catch(() => {
-      filePath = path.join("public", filePath);
-      return fs.stat(filePath);
-    })
-    .then(
-      () => {
-        return filePath;
-      },
-      () => undefined,
-    );
+  var filePath = file;
+  if (
+    await fs.stat(filePath).then(
+      () => true,
+      () => false,
+    )
+  )
+    return filePath;
+  filePath = path.join("public", filePath);
+  if (
+    await fs.stat(filePath).then(
+      () => true,
+      () => false,
+    )
+  )
+    return filePath;
+  return;
+
+  // return await fs
+  //   .stat(file)
+  //   .catch(() => {
+  //     filePath = path.join("public", filePath);
+  //     return fs.stat(filePath);
+  //   })
+  //   .then(
+  //     () => {
+  //       return filePath;
+  //     },
+  //     () => undefined,
+  //   );
 }
 
 export async function getPDFThumbnail(file: string, pageNum: number = 0) {
@@ -125,10 +152,6 @@ export async function getPDFThumbnail(file: string, pageNum: number = 0) {
 
   // @ts-expect-error
   if (!ENV_BOOKSHOP_LIVE) {
-    if (!path)
-      path = await import("node:path").catch(() =>
-        console.error("node:path import failed"),
-      );
     if (!sharp)
       sharp = (
         await import("sharp").catch(() => console.error("sharp import failed"))

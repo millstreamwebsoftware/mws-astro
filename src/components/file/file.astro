@@ -89,12 +89,12 @@ function getIcon(path: string) {
 
 // @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE && files?.length) {
-    const fs = await import("node:fs/promises").catch(() => {
-        return undefined;
-    });
-    const path = await import("node:path");
+    // const fs = await import("node:fs/promises").catch(() => {
+    //     return undefined;
+    // });
+    // const path = await import("node:path");
 
-    if (fs) {
+    // if (fs) {
         await Promise.all(
             files.map(async (file) => {
                 let realPath = file.path;
@@ -120,7 +120,7 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                 }
             }),
         );
-    }
+    // }
 }
 ---
 
