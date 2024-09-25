@@ -41,8 +41,13 @@ if (
     /^(\/?src)?\/assets/.test(Astro.props.image)
 ) {
     const images = import.meta.glob([
-        "/src/assets/**/*",
-        "!/src/assets/**/*.pdf",
+      "/src/assets/**/*.png",
+      "/src/assets/**/*.jpg",
+      "/src/assets/**/*.jpeg",
+      "/src/assets/**/*.webp",
+      "/src/assets/**/*.gif",
+      "/src/assets/**/*.tiff",
+      "/src/assets/**/*.avif"
     ]);
 
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
@@ -60,7 +65,8 @@ if (
     // // @ts-expect-error
     // !ENV_BOOKSHOP_LIVE &&
     typeof Astro.props.image == "string" &&
-    Astro.props.image.startsWith("public/")
+    // Astro.props.image.startsWith("public/") &&
+      /^(\/?)public/.test(Astro.props.image)
 ) {
     const images = import.meta.glob([
       "/public/**/*.png",
@@ -71,6 +77,7 @@ if (
       "/public/**/*.tiff",
       "/public/**/*.avif"]);
 
+    // console.log(Astro.props.image);
     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
         i.endsWith(Astro.props.image),
     )[0];
@@ -87,6 +94,8 @@ if (
 }
 
 const image = astroImage ?? Astro.props.image;
+
+// console.log(Astro.props.image, image);
 let width, height;
 
 if (image.width && image.height) {

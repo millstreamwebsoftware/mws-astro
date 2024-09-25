@@ -1,21 +1,42 @@
 ---
 import Section from "@layouts/Section.astro";
 import Icon from "@shared/icon.astro";
-import { getPDFThumbnail } from "@mws-astro/util";
+import Image from "@shared/Image.astro";
+import { getPDFThumbnail, getFilesize, formatBytes } from "@mws-astro/util";
 
 export interface Props {
+  title?: string;
   url?: string;
 }
 
-const {url} = Astro.props;
+const {title, url} = Astro.props;
 
 
 // const filesize = Astro.pr
 
-
+const thumbnail = url && await getPDFThumbnail(url);
+const filesize = url && await getFilesize(url);
 ---
 <Section component="flipbook" {...Astro.props}>
     <div class="flipbook" data-flipbook={url}>
+        <div class="flipbook-preview">
+            {thumbnail && <Image
+                image={thumbnail}
+                alt=""
+                width={512}
+                quality="mid"
+                fit="contain"
+            />}
+            <div class="flipbook-details">
+                {title && <h1>{title}</h1>}
+                {filesize && <p>{formatBytes(filesize)}</p>}
+                <div class="flipbook-progress"></div>
+                <div class="flipbook-buttons">
+                    <button class="flipbook-read">Read <Icon name="carbon:notebook-reference" height="1.25em"/></button>
+                    <button class="flipbook-download"><Icon name="carbon:download" height="1.25em"/></button>
+                </div>
+            </div>
+        </div>
         <div class="flipbook-viewport">
         </div>
         <div class="toolbar">
@@ -29,8 +50,10 @@ const {url} = Astro.props;
 
 <script>
 // import * as PDFJSLib from "pdfjs-dist";
+import { formatBytes } from "@mws-astro/util";
 import {getDocument, TextLayer, GlobalWorkerOptions} from "pdfjs-dist";
 import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
+import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
 type ResizeableCanvas = HTMLCanvasElement & {_resize?: Function};
@@ -42,207 +65,306 @@ function setupFlipbook() {
   const flipbooks = document.querySelectorAll<HTMLElement>("[data-flipbook]");
  
   flipbooks.forEach(async (flipbook) => {
+    const flipbookPreview = flipbook.querySelector<HTMLDivElement>(".flipbook-preview");
+    const flipbookButton = flipbookPreview?.querySelector<HTMLButtonElement>("button.flipbook-read");
+    const flipbookDownloadButton = flipbookPreview?.querySelector<HTMLButtonElement>("button.flipbook-download");
+    const flipbookProgress = flipbookPreview?.querySelector<HTMLDivElement>(".flipbook-progress");
     const flipbookViewport = flipbook.querySelector<HTMLDivElement>(".flipbook-viewport");
     const toolbar = flipbook.querySelector(".toolbar");
     const pageCounter = toolbar?.querySelector('[data-action="page-number"]');
     
+    flipbookButton?.addEventListener("click", startFlipbook);
+    flipbookDownloadButton?.addEventListener("click", download);
     
-    const evenSpreads = true;
-    let page = 0;
-    
-    if (!flipbookViewport) return;
-    const pdf = await getDocument(flipbook.dataset.flipbook).promise;
-    
-    updateCounter();
-    
-    // const observer = new MutationObserver((mut) => {});
-    // observer.observe(flipbookViewport, {attributes: false, childList: true, subtree: true});
-    
-  
-    
-    function updateCounter() {
-      if (!pageCounter) return;
-      
-      pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), pdf.numPages), 1)}/${pdf.numPages}`;
+    function download() {
+      const a = document.createElement('a');
+      const url = flipbook.dataset?.flipbook;
+      if (!url) return;
+      a.href = url;
+      a.download = url.split('/').pop() || "";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
     
-    async function addSpread(prepend?: boolean) {
-      const newSpread = document.createElement("div");
-      newSpread.classList.add("flipbook-spread");
-      (typeof prepend === "boolean") && newSpread.classList.add(prepend ? "previous" : "next");
+    async function startFlipbook() {
+      const evenSpreads = true;
+      let page = 0;
       
-      const newPage = document.createElement("div");
-      const newCanvas = document.createElement("canvas");
-      const newTextLayer = document.createElement("div");
-      newPage.classList.add("flipbook-page")
-      newTextLayer.classList.add("textLayer");
-      newPage.appendChild(newCanvas);
-      newPage.appendChild(newTextLayer);
-      newSpread.appendChild(newPage.cloneNode(true));
-      newSpread.appendChild(newPage);
-      
-      if (prepend) {
-        flipbookViewport?.prepend(newSpread);
-      } else {
-        flipbookViewport?.append(newSpread);
-      };
-      
-      return await renderSpread(newSpread);
-    }
-    
-    async function turnPage(backward: boolean = false) {
-      // const spreads = flipbookViewport.querySelectorAll<HTMLDivElement>(".flipbook-spread");
       if (!flipbookViewport) return;
-      const spreads = Array.from(flipbookViewport.children);
+      const loadTask = getDocument(flipbook.dataset.flipbook);
+      loadTask.onProgress = (progress: OnProgressParameters) => {
+        flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
+      };
+      flipbook.classList.toggle("loading",true);
+      const pdf = await loadTask.promise;
+      flipbook.classList.toggle("loading",false);
+      flipbook.classList.toggle("loaded",true);
       
-      
-      let oldPage = page;
-      
-      if (backward) {
-        spreads.reverse()
-        page -= 2;
-      } else {
-        page += 2;
-      }
-      
-      if (page < 0 - Number(evenSpreads)) page = 0 - Number(evenSpreads);
-      if (page > pdf.numPages) page = oldPage;
-      
-      if (page === oldPage) return;
-      
-      const [before, current, after] = spreads;
-      
-      before.parentNode?.removeChild(before);
-      current.classList.add(backward ? "next" : "previous");
-      after.classList.remove("next", "previous");
+      // flipbookPreview?.classList.add("hidden");
       
       updateCounter();
-      await addSpread(backward);
-    }
-    
-    toolbar?.addEventListener("click", async (e) => {
-      if (!e.target) return;
-      const target = e.target as HTMLElement;
-      const button = target.closest<HTMLButtonElement>("button, .toolbar");
-      if (!button || button.matches(".toolbar")) return;
       
-      switch (button.dataset.action) {
-        case "<":
-          // page = page - 2;
-          // if (page < 0) page = 0;
-          // await renderPage(page);
-          turnPage(true);
-          break;
-        case ">":
-          // page = page + 2;
-          // if (page >= pdf.numPages) page = 0;
-          // await renderPage(page);
-          turnPage();
-          break;
-        case "download":
-          const a = document.createElement('a');
-          const url = flipbook.dataset?.flipbook;
-          if (!url) break;
-          a.href = url;
-          a.download = url.split('/').pop() || "";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        default:
-          break;
-      }
-    })
-    
-    async function renderPage(canvas: ResizeableCanvas, num: number) {
-      const context = canvas.getContext("2d");
-      const text = canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer");
-      
-      if (num < 0 || num >= pdf.numPages) {
-        // canvas.width = canvas.width;
-        // text && (text.innerHTML = "");
-        canvas.parentElement?.classList.toggle("blank-page", true);
+      function updateCounter() {
+        if (!pageCounter) return;
         
-        return;
+        pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), pdf.numPages), 1)}/${pdf.numPages}`;
       }
       
-      const page = await pdf.getPage(num+1);
-      var viewport = page.getViewport({scale: 1.5});
-      
-      if (canvas.height != viewport.height)
-      canvas.height = viewport.height;
-      
-      if (canvas.width != viewport.width)
-      canvas.width = viewport.width;
-      
-      if (!context) throw Error("Canvas context missing");
-      
-      const renderTask = page.render({canvasContext: context, viewport}).promise;
-      const textContent = page.getTextContent().then(async (textContent) => {
-        if (!text) return;
+      async function addSpread(prepend?: boolean) {
+        const newSpread = document.createElement("div");
+        newSpread.classList.add("flipbook-spread");
+        (typeof prepend === "boolean") && newSpread.classList.add(prepend ? "previous" : "next");
         
-        text.style.left = canvas.offsetLeft + 'px';
-        text.style.top = canvas.offsetTop + 'px';
-        text.style.height = canvas.offsetHeight + 'px';
-        text.style.width = canvas.offsetWidth + 'px';
+        const newPage = document.createElement("div");
+        const newCanvas = document.createElement("canvas");
+        const newTextLayer = document.createElement("div");
+        newPage.classList.add("flipbook-page")
+        newTextLayer.classList.add("textLayer");
+        newPage.appendChild(newCanvas);
+        newPage.appendChild(newTextLayer);
+        newSpread.appendChild(newPage.cloneNode(true));
+        newSpread.appendChild(newPage);
         
-        const textLayer = new TextLayer({
-          textContentSource: textContent,
-          container: text,
-          viewport: viewport,
-        });
+        if (prepend) {
+          flipbookViewport?.prepend(newSpread);
+        } else {
+          flipbookViewport?.append(newSpread);
+        };
         
-        canvas._resize = () => {
-          const widthScaleFactor = canvas.clientWidth / (canvas.width / viewport.scale);
-          const heightScaleFactor = canvas.clientHeight / (canvas.height / viewport.scale);
-          const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
-          
-          text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
+        return await renderSpread(newSpread);
+      }
+      
+      async function turnPage(backward: boolean = false) {
+        // const spreads = flipbookViewport.querySelectorAll<HTMLDivElement>(".flipbook-spread");
+        if (!flipbookViewport) return;
+        const spreads = Array.from(flipbookViewport.children);
+        
+        
+        let oldPage = page;
+        
+        if (backward) {
+          spreads.reverse()
+          page -= 2;
+        } else {
+          page += 2;
         }
         
-        canvas._resize();
+        if (page < 0 - Number(evenSpreads)) page = 0 - Number(evenSpreads);
+        if (page > pdf.numPages) page = oldPage;
         
-        const observer = new ResizeObserver((entries) => {
-          entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
-        });
+        if (page === oldPage) return;
         
-        observer.observe(canvas);
+        const [before, current, after] = spreads;
         
-        text.innerHTML = "";
-        await textLayer.render();
+        before.parentNode?.removeChild(before);
+        current.classList.add(backward ? "next" : "previous");
+        after.classList.remove("next", "previous");
         
-        text.style.left = "";
-      });
-      
-      return await Promise.all([renderTask, textContent]);
-    }
-    
-    async function renderSpread(spread: HTMLDivElement) {
-      const canvases = Array.from(spread.querySelectorAll("canvas"));
-      var spreadOffset = 0;
-      
-      if (spread.classList.contains("next")) {
-        spreadOffset += 2;
-      } else if (spread.classList.contains("previous")) {
-        spreadOffset += -2;
+        updateCounter();
+        await addSpread(backward);
       }
       
-      return Promise.all(canvases.map(async (canvas, i) => {
-        let p = page + i + spreadOffset - Number(evenSpreads);
-        console.log(`Render page ${p} to`, canvas);
-        return renderPage(canvas, p);
-      }));
+      toolbar?.addEventListener("click", async (e) => {
+        if (!e.target) return;
+        const target = e.target as HTMLElement;
+        const button = target.closest<HTMLButtonElement>("button, .toolbar");
+        if (!button || button.matches(".toolbar")) return;
+        
+        switch (button.dataset.action) {
+          case "<":
+            // page = page - 2;
+            // if (page < 0) page = 0;
+            // await renderPage(page);
+            turnPage(true);
+            break;
+          case ">":
+            // page = page + 2;
+            // if (page >= pdf.numPages) page = 0;
+            // await renderPage(page);
+            turnPage();
+            break;
+          case "download":
+            download();
+            break;
+          default:
+            break;
+        }
+      })
+      
+      async function renderPage(canvas: ResizeableCanvas, num: number) {
+        const context = canvas.getContext("2d");
+        const text = canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer");
+        
+        if (num < 0 || num >= pdf.numPages) {
+          // canvas.width = canvas.width;
+          // text && (text.innerHTML = "");
+          canvas.parentElement?.classList.toggle("blank-page", true);
+          
+          return;
+        }
+        
+        const page = await pdf.getPage(num+1);
+        var viewport = page.getViewport({scale: 1.5});
+        
+        if (canvas.height != viewport.height)
+        canvas.height = viewport.height;
+        
+        if (canvas.width != viewport.width)
+        canvas.width = viewport.width;
+        
+        if (!context) throw Error("Canvas context missing");
+        
+        const renderTask = page.render({canvasContext: context, viewport}).promise;
+        const textContent = page.getTextContent().then(async (textContent) => {
+          if (!text) return;
+          
+          text.style.left = canvas.offsetLeft + 'px';
+          text.style.top = canvas.offsetTop + 'px';
+          text.style.height = canvas.offsetHeight + 'px';
+          text.style.width = canvas.offsetWidth + 'px';
+          
+          const textLayer = new TextLayer({
+            textContentSource: textContent,
+            container: text,
+            viewport: viewport,
+          });
+          
+          canvas._resize = () => {
+            const widthScaleFactor = canvas.clientWidth / (canvas.width / viewport.scale);
+            const heightScaleFactor = canvas.clientHeight / (canvas.height / viewport.scale);
+            const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
+            
+            text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
+          }
+          
+          canvas._resize();
+          
+          const observer = new ResizeObserver((entries) => {
+            entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
+          });
+          
+          observer.observe(canvas);
+          
+          text.innerHTML = "";
+          await textLayer.render();
+          
+          text.style.left = "";
+        });
+        
+        return await Promise.all([renderTask, textContent]);
+      }
+      
+      async function renderSpread(spread: HTMLDivElement) {
+        const canvases = Array.from(spread.querySelectorAll("canvas"));
+        var spreadOffset = 0;
+        
+        if (spread.classList.contains("next")) {
+          spreadOffset += 2;
+        } else if (spread.classList.contains("previous")) {
+          spreadOffset += -2;
+        }
+        
+        return Promise.all(canvases.map(async (canvas, i) => {
+          let p = page + i + spreadOffset - Number(evenSpreads);
+          console.log(`Render page ${p} to`, canvas);
+          return renderPage(canvas, p);
+        }));
+      }
+      
+      addSpread(true);
+      addSpread();
+      addSpread(false);
+
     }
-    
-    addSpread(true);
-    addSpread();
-    addSpread(false);
   });
 }
 </script>
 
+
+<style lang="scss">
+.loaded {    
+    .flipbook-preview {
+        display: none;
+    }
+}
+
+.loading .flipbook-read, .loading .flipbook-download {
+    display: none;
+}
+
+:not(.loaded) .toolbar {
+    display: none;
+}
+
+.toolbar button[data-action="page-number"] {
+    cursor: default;
+}
+
+.flipbook-preview {
+    /* position: absolute; */
+    /* inset: 0; */
+    z-index: 10;
+    padding: 5rem;
+    
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: var(--column-gap);
+    
+    @media only screen and (max-width: 768px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(2, auto);
+    }
+    
+    .flipbook-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .flipbook-progress {
+        position: relative;
+        width: 20rem;
+        height: 4px;
+        border: 1px solid rgb(var(--text-color));
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        display: none;
+        
+        background-color: rgb(var(--text-color));
+        
+        @at-root .loading & {
+            display: block;
+        }
+        
+        &::after {
+            content: "";
+            position: absolute;
+            
+            left: 0;
+            top: 0;
+            right: calc((1 - var(--progress,0)) * 100%);
+            bottom: 0;
+            
+            transition: right .5s ease;
+            
+            background-color: rgb(var(--color-accent));
+        }
+    }
+}
+</style>
+
+
 <style lang="scss" is:global>
     div.flipbook {
         position: relative;
+        /* min-height: 50rem; */
+        
+        
+        .flipbook-preview img {
+            min-height: 20rem;
+        }
         
         .flipbook-viewport {
             display: grid;
