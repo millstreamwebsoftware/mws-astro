@@ -42,10 +42,13 @@ const {title} = Astro.props;
     
     .accordion-content {
         overflow: hidden;
-        
         border-bottom: 1px solid transparent;
-        
         transition: border 0.2s, padding 0.2s;
+        
+        padding-left: 2rem;
+        margin-left: -2rem;
+        padding-right: 2rem;
+        margin-right: -2rem;
     }
 
     .accordion-heading {

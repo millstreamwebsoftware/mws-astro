@@ -101,9 +101,11 @@ function setupFlipbook() {
       flipbook.classList.toggle("loading",false);
       flipbook.classList.toggle("loaded",true);
       
-      // flipbookPreview?.classList.add("hidden");
-      
       updateCounter();
+      
+      addSpread(true);
+      addSpread();
+      addSpread(false);
       
       function updateCounter() {
         if (!pageCounter) return;
@@ -271,11 +273,6 @@ function setupFlipbook() {
           return renderPage(canvas, p);
         }));
       }
-      
-      addSpread(true);
-      addSpread();
-      addSpread(false);
-
     }
   });
 }
@@ -299,6 +296,31 @@ function setupFlipbook() {
 
 .toolbar button[data-action="page-number"] {
     cursor: default;
+}
+
+.toolbar {
+    /* position: absolute; */
+    /* bottom: 0; */
+    /* left: 50%; */
+    
+    /* transform: translateX(-50%) translateY(110%); */
+    /* background-color: white; */
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 1rem;
+    
+    z-index: 999;
+    
+    button {
+        color: #333;
+        border-color: #333;
+        padding: .3em .8em;
+        background-color: #fff;
+        
+        border-radius: var(--border-radius);
+    }
 }
 
 .flipbook-preview {
@@ -458,26 +480,6 @@ function setupFlipbook() {
             &.blank-page::after {
                 content: none;
             }
-        }
-    }
-    
-    .toolbar {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        
-        transform: translateX(-50%) translateY(110%);
-        /* background-color: white; */
-        
-        z-index: 999;
-        
-        button {
-            color: #333;
-            border-color: #333;
-            padding: .3em .8em;
-            background-color: #fff;
-            
-            border-radius: var(--border-radius);
         }
     }
 
