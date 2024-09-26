@@ -2,7 +2,10 @@
 import Header from "@shared/Header.astro";
 import Footer from "@shared/Footer.astro";
 import Opengraph from "@shared/Opengraph.astro";
-import { ViewTransitions } from "astro:transitions";
+// import { ViewTransitions } from "astro:transitions";
+// transition:animate="none"
+// transition:persist
+// transition:animate="fade"
 
 import * as git from "git-rev-sync";
 
@@ -40,7 +43,6 @@ import preferences from "@data/preferences.json";
 const headerHeight = undefined; //preferences.header.height;
 const style: any = {};
 const pageWidth = preferences.page.maximum_page_width;
-const transitions = false;
 
 
 pageWidth && (style["--page-max-width"] = pageWidth + "px");
@@ -48,7 +50,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
 ---
 
 <!doctype html>
-<html lang="en" class:list={classes} style={style} transition:animate="none">
+<html lang="en" class:list={classes} style={style}>
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
@@ -73,8 +75,8 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         </script>
     </head>
     <body>
-        {show_global_header && <Header transition:persist {id} {paths} {currentPath} />}
-        <article transition:animate="fade">
+        {show_global_header && <Header {id} {paths} {currentPath} />}
+        <article>
             <slot />
             {show_global_footer && <Footer />}
         </article>
