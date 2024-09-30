@@ -88,9 +88,6 @@ function setupFlipbook() {
     }
     
     async function startFlipbook() {
-      const evenSpreads = true;
-      let page = 0;
-      
       if (!flipbookViewport) return;
       const loadTask = getDocument(flipbook.dataset.flipbook);
       loadTask.onProgress = (progress: OnProgressParameters) => {
@@ -100,6 +97,13 @@ function setupFlipbook() {
       const pdf = await loadTask.promise;
       flipbook.classList.toggle("loading",false);
       flipbook.classList.toggle("loaded",true);
+      
+      const singlePage = pdf.numPages === 1;
+      flipbook.classList.toggle("singlepage", singlePage);
+      
+      const spreadSize = 2 - Number(singlePage);
+      const evenSpreads = !singlePage;
+      let page = 0;
       
       updateCounter();
       
@@ -125,7 +129,7 @@ function setupFlipbook() {
         newTextLayer.classList.add("textLayer");
         newPage.appendChild(newCanvas);
         newPage.appendChild(newTextLayer);
-        newSpread.appendChild(newPage.cloneNode(true));
+        !singlePage && newSpread.appendChild(newPage.cloneNode(true));
         newSpread.appendChild(newPage);
         
         if (prepend) {
@@ -147,9 +151,9 @@ function setupFlipbook() {
         
         if (backward) {
           spreads.reverse()
-          page -= 2;
+          page -= spreadSize;
         } else {
-          page += 2;
+          page += spreadSize;
         }
         
         if (page < 0 - Number(evenSpreads)) page = 0 - Number(evenSpreads);
@@ -262,14 +266,14 @@ function setupFlipbook() {
         var spreadOffset = 0;
         
         if (spread.classList.contains("next")) {
-          spreadOffset += 2;
+          spreadOffset += spreadSize;
         } else if (spread.classList.contains("previous")) {
-          spreadOffset += -2;
+          spreadOffset -= spreadSize;
         }
         
         return Promise.all(canvases.map(async (canvas, i) => {
           let p = page + i + spreadOffset - Number(evenSpreads);
-          console.log(`Render page ${p} to`, canvas);
+          console.log(`Render page ${p} to`, canvas, spread.classList.toString());
           return renderPage(canvas, p);
         }));
       }
@@ -479,6 +483,18 @@ function setupFlipbook() {
             
             &.blank-page::after {
                 content: none;
+            }
+        }
+        
+        &.singlepage {
+            .flipbook-spread {
+                grid-template-columns: 1fr;
+            }
+            
+            .flipbook-page {
+                &::after {
+                    content: none;
+                }
             }
         }
     }
