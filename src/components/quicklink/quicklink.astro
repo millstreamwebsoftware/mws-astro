@@ -1,4 +1,6 @@
 ---
+import Icon from '@shared/icon.astro';
+
 export interface Props {
     text: string;
     link: string;
@@ -11,9 +13,16 @@ const new_tab =
     (Astro.props.new_tab ?? false)
         ? { target: "_blank", rel: "noopener" }
         : undefined;
+
+const external = !(link.startsWith("/") || link.startsWith("#"));
+
 ---
 
-<a href={link} {...new_tab}><span>{text}</span></a>
+<a href={link} {...new_tab}>
+    <span>{text}
+    {(new_tab || external) && <Icon name="carbon:launch" height="1.25em" />}
+    </span>
+</a>
 
 <style lang="scss">
     a {
