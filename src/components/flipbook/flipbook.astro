@@ -2,7 +2,8 @@
 import Section from "@layouts/Section.astro";
 import Icon from "@shared/icon.astro";
 import Image from "@shared/Image.astro";
-import { getPDFThumbnail, getFilesize, formatBytes } from "@mws-astro/util";
+import { formatBytes } from "@mws-astro/util";
+import { getPDFThumbnail, getFilesize } from "@mws-astro/filesystem";
 
 export interface Props {
   title?: string;
@@ -13,9 +14,12 @@ const {title, url} = Astro.props;
 
 
 // const filesize = Astro.pr
+var thumbnail, filesize;
 
-const thumbnail = url && await getPDFThumbnail(url);
-const filesize = url && await getFilesize(url);
+if (url) {
+  thumbnail = await getPDFThumbnail(url);
+  filesize = await getFilesize(url);
+}
 ---
 <Section component="flipbook" {...Astro.props}>
     <div class="flipbook" data-flipbook={url}>

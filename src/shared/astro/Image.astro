@@ -32,70 +32,122 @@ const {
 let astroImage;
 let placeholder = Astro.props.placeholder ?? true;
 const plSize = 16;
+let remote = false;
 
-// Attempt to import the image if we are given a string
-if (
-    // // @ts-expect-error
-    // !ENV_BOOKSHOP_LIVE &&
-    typeof Astro.props.image == "string" &&
-    /^(\/?src)?\/assets/.test(Astro.props.image)
-) {
-    const images = import.meta.glob([
-      "/src/assets/**/*.png",
-      "/src/assets/**/*.jpg",
-      "/src/assets/**/*.jpeg",
-      "/src/assets/**/*.webp",
-      "/src/assets/**/*.gif",
-      "/src/assets/**/*.tiff",
-      "/src/assets/**/*.avif"
-    ]);
-
-    let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
-        i.endsWith(Astro.props.image),
-    )[0];
-    if (imagePath in images) {
-        astroImage = ((await images[imagePath]()) as any)?.default;
-    } else {
-        console.warn(
-            `[Missing Image] ${Astro.props.image} was requested but is missing.`,
-        );
-        placeholder = false;
-    }
-} else if (
-    // // @ts-expect-error
-    // !ENV_BOOKSHOP_LIVE &&
-    typeof Astro.props.image == "string" &&
-    // Astro.props.image.startsWith("public/") &&
-      /^(\/?)public/.test(Astro.props.image)
-) {
-    const images = import.meta.glob([
-      "/public/**/*.png",
-      "/public/**/*.jpg",
-      "/public/**/*.jpeg",
-      "/public/**/*.webp",
-      "/public/**/*.gif",
-      "/public/**/*.tiff",
-      "/public/**/*.avif"]);
-
-    // console.log(Astro.props.image);
-    let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
-        i.endsWith(Astro.props.image),
-    )[0];
-    if (imagePath in images) {
-        astroImage = ((await images[imagePath]()) as any)?.default;
-    } else {
-        console.warn(
-            `[Missing Image] ${Astro.props.image} was requested but is missing.`,
-        );
-        placeholder = false;
-    }
-} else {
-    placeholder = false;
+if (typeof Astro.props.image == "string" && /^https?:\/\/.*/.test(Astro.props.image)) {
+  remote = true;
+  placeholder = false;
 }
 
-const image = astroImage ?? Astro.props.image;
+// Attempt to import the image if we are given a string
+// if (
+//     // // @ts-expect-error
+//     // !ENV_BOOKSHOP_LIVE &&
+//     typeof Astro.props.image == "string" &&
+//     /^(\/?src)?\/assets/.test(Astro.props.image)
+// ) {
+//     const images = import.meta.glob([
+//       "/src/assets/**/*.png",
+//       "/src/assets/**/*.jpg",
+//       "/src/assets/**/*.jpeg",
+//       "/src/assets/**/*.webp",
+//       "/src/assets/**/*.gif",
+//       "/src/assets/**/*.tiff",
+//       "/src/assets/**/*.avif"
+//     ]);
 
-// console.log(Astro.props.image, image);
+//     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
+//         i.endsWith(Astro.props.image),
+//     )[0];
+//     if (imagePath in images) {
+//         astroImage = ((await images[imagePath]()) as any)?.default;
+//     } else {
+//         console.warn(
+//             `[Missing Image] ${Astro.props.image} was requested but is missing.`,
+//         );
+//         placeholder = false;
+//     }
+// } else if (
+//     // // @ts-expect-error
+//     // !ENV_BOOKSHOP_LIVE &&
+//     typeof Astro.props.image == "string" &&
+//     // Astro.props.image.startsWith("public/") &&
+//       /^(\/?)public/.test(Astro.props.image)
+// ) {
+//     const images = import.meta.glob([
+//       "/public/**/*.png",
+//       "/public/**/*.jpg",
+//       "/public/**/*.jpeg",
+//       "/public/**/*.webp",
+//       "/public/**/*.gif",
+//       "/public/**/*.tiff",
+//       "/public/**/*.avif"]);
+
+//     // console.log(Astro.props.image);
+//     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
+//         i.endsWith(Astro.props.image),
+//     )[0];
+//     if (imagePath in images) {
+//         astroImage = ((await images[imagePath]()) as any)?.default;
+//     } else {
+//         console.warn(
+//             `[Missing Image] ${Astro.props.image} was requested but is missing.`,
+//         );
+//         placeholder = false;
+//     }
+// } else if (typeof Astro.props.image == "string") {
+//   console.log("->", Astro.props.image);
+//   astroImage = await getImage({src: Astro.props.image, inferSize: true});
+// }
+// else {
+//     placeholder = false;
+// }
+
+if (typeof Astro.props.image == "string" && !remote) {
+  const images = import.meta.glob([
+    // Assets
+    "/src/assets/**/*.png",
+    "/src/assets/**/*.jpg",
+    "/src/assets/**/*.jpeg",
+    "/src/assets/**/*.webp",
+    "/src/assets/**/*.gif",
+    "/src/assets/**/*.tiff",
+    "/src/assets/**/*.avif",
+    // Public
+    "/public/**/*.png",
+    "/public/**/*.jpg",
+    "/public/**/*.jpeg",
+    "/public/**/*.webp",
+    "/public/**/*.gif",
+    "/public/**/*.tiff",
+    "/public/**/*.avif",
+  ]);
+  
+  let imagePaths: (keyof typeof images)[] = Object.keys(images).filter((i) =>
+      i.endsWith(Astro.props.image),
+  );
+  
+  if (imagePaths.length > 1) {
+      console.warn(`Ambiguous image import ${Astro.props.image} -?-> ${imagePaths}!`);
+  }
+  
+  let imagePath = imagePaths[0];
+  
+  if (imagePath in images) {
+      astroImage = ((await images[imagePath]()) as any)?.default;
+  } else {
+      console.warn(
+          `[Missing Image] ${Astro.props.image} was requested but is missing.`,
+      );
+      placeholder = false;
+  }
+}
+
+// if (!astroImage) {
+//   placeholder = false;
+// }
+
+const image = astroImage ?? Astro.props.image;
 let width, height;
 
 if (image.width && image.height) {
@@ -175,19 +227,32 @@ if (placeholder && plData) {
         "background-image": `url("${placeholderString}")`,
     };
 }
+
+let fallbackImage: string | undefined;
+
+if (typeof image == "string" && !remote) {
+  fallbackImage = image.replace(/^public/, "");
+  
+  
+}
 ---
 
-<AstroImage
-    src={image}
-    alt=""
-    {width}
-    {height}
-    class:list={[classes, { background, fixed }]}
-    style={Object.assign({}, placeholderStyle, style)}
-    densities={[1.5, 2]}
-    data-fit={fit}
-    {quality}
-/>
+{fallbackImage ?
+  <img src={fallbackImage} class:list={[classes, { background, fixed }]} {style} data-fit={fit} />
+  : 
+  <AstroImage
+      src={image}
+      alt=""
+      {width}
+      {height}
+      inferSize={true}
+      class:list={[classes, { background, fixed }]}
+      style={Object.assign({}, placeholderStyle, style)}
+      densities={[1.5, 2]}
+      data-fit={fit}
+      {quality}
+  />
+}
 
 <style>
     img {

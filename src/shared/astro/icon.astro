@@ -4,10 +4,11 @@ import { getIconData, iconToSVG } from "@iconify/utils";
 export interface Props {
     name: string;
     height?: string;
+    color?: string;
     class?: any;
 }
 
-const { name, class: classes } = Astro.props;
+const { name, class: classes, color } = Astro.props;
 const height = Astro.props.height || "unset";
 var [iconSetName, iconName] = name.split(":");
 const iconSetPath = `/node_modules/@iconify-json/${iconSetName}/icons.json`;
@@ -36,6 +37,7 @@ const iconData = iconToSVG(icon, { height });
     data-icon-name={name}
     {...iconData.attributes}
     set:html={iconData.body}
+    style={`color: ${color};`}
 />
 
 <style>

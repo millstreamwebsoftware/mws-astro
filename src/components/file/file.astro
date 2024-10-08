@@ -6,7 +6,8 @@ import Markdown from "@shared/Markdown.astro";
 import Image from "@shared/Image.astro";
 import Icon from "@shared/icon.astro";
 // import type { PDFiumRenderOptions } from "@hyzyla/pdfium/dist/types.js";
-import { getPDFThumbnail, getFilesize, formatBytes, resolvePath } from "@mws-astro/util";
+import { formatBytes } from "@mws-astro/util";
+import { getPDFThumbnail, getFilesize, resolvePath } from "@mws-astro/filesystem";
 
 export interface Props {
     files?: [
