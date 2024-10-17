@@ -3,13 +3,19 @@ import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 
-const facebookURL = preferences?.general?.social.find(
+
+export interface Props {
+  url?: string,
+}
+
+const { url: facebookURL = preferences?.general?.social.find(
     (e) => e?.name == "facebook",
-)?.link;
+)?.link } = Astro.props;
+
 const target = facebookURL && encodeURIComponent(facebookURL);
 const embedURL =
     target &&
-    `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
+    `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=500&height=700&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
 ---
 
 <Section component="facebook">
@@ -38,8 +44,8 @@ const embedURL =
                     <iframe
                         data-target={facebookURL}
                         src={embedURL}
-                        width="340"
-                        height="500"
+                        width="500"
+                        height="700"
                         style="border:none;overflow:hidden;"
                         allowfullscreen="true"
                         loading="lazy"
@@ -57,7 +63,7 @@ const embedURL =
         display: grid;
         justify-content: center;
         justify-items: center;
-        grid-template-columns: 1fr 340px 1fr;
+        grid-template-columns: 1fr minmax(0, 500px) 1fr;
         width: 100%;
 
         > * {
@@ -67,7 +73,7 @@ const embedURL =
     }
 
     .facebox {
-        padding: 1rem 2rem 2rem;
+        /* padding: 1rem 2rem 2rem; */
         // background-color: rgb(var(--text-color));
 
         border-radius: var(--border-radius);
