@@ -74,14 +74,14 @@ const calendarOptions = {
 
 <script>
     import {
-        Calendar,
+        // Calendar,
         type EventClickArg,
         type EventApi,
         type ViewApi,
     } from "@fullcalendar/core";
-    import dayGridPlugin from "@fullcalendar/daygrid";
-    import listPlugin from "@fullcalendar/list";
-    import googleCalendarPlugin from "@fullcalendar/google-calendar";
+    // import dayGridPlugin from "@fullcalendar/daygrid";
+    // import listPlugin from "@fullcalendar/list";
+    // import googleCalendarPlugin from "@fullcalendar/google-calendar";
     import {
         computePosition,
         type ComputePositionConfig,
@@ -90,17 +90,43 @@ const calendarOptions = {
         shift,
         flip,
     } from "@floating-ui/dom";
-    import { createEvent } from "ics";
+    // import { createEvent } from "ics";
+    
+    
+    var Calendar: any;
+    var dayGridPlugin: any;
+    var listPlugin: any;
+    var googleCalendarPlugin: any;
+    var createEvent: Function | undefined;
+    
+    async function importCalendar() {
+      if (Calendar && dayGridPlugin && listPlugin && googleCalendarPlugin && createEvent) return;
+      
+      const fullCalendar = await import("@fullcalendar/core");
+      ({Calendar} = fullCalendar);
+      
+      dayGridPlugin = (await import("@fullcalendar/daygrid")).default;
+      listPlugin = (await import("@fullcalendar/list")).default;
+      googleCalendarPlugin = (await import("@fullcalendar/google-calendar")).default;
+      
+      const ics = await import("ics");
+      ({createEvent} = ics);
+    }
+    
 
     document.addEventListener("DOMContentLoaded", setupCalendar);
     document.addEventListener("astro:after-swap", setupCalendar);
 
-    function setupCalendar() {
+    async function setupCalendar() {
         var calendarSections = document.querySelectorAll(
             'section[data-component="calendar"]',
         );
+        
+        if (!calendarSections.length) return;
+        
+        await importCalendar();
 
-        calendarSections.forEach((section) => {
+        calendarSections.forEach((section) => {          
             const calendarEl = section.querySelector(
                 "._calendar",
             ) as CalendarElement;
@@ -183,7 +209,7 @@ const calendarOptions = {
                 footerToolbar: calendarOptions.footerToolbar,
                 aspectRatio: 1.77,
                 height: getCalendarHeight(),
-            });
+            });            
             calendarEl.calendar = calendar;
             calendar.render();
         });

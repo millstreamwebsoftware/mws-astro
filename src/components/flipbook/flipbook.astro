@@ -54,20 +54,34 @@ if (url) {
 
 <script>
 // import * as PDFJSLib from "pdfjs-dist";
-import { formatBytes } from "@mws-astro/util";
-import {getDocument, TextLayer, GlobalWorkerOptions} from "pdfjs-dist";
+// import { formatBytes } from "@mws-astro/util";
+// import {getDocument, TextLayer, GlobalWorkerOptions} from "pdfjs-dist";
 import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
 import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
-GlobalWorkerOptions.workerSrc = PDFJSWorker;
-
 type ResizeableCanvas = HTMLCanvasElement & {_resize?: Function};
+
+// var {getDocument, TextLayer, GlobalWorkerOptions}: any = undefined;
+
+var getDocument: Function | undefined = undefined;
+var TextLayer: any | undefined = undefined;
+var GlobalWorkerOptions: any | undefined = undefined;
 
 document.addEventListener("DOMContentLoaded", setupFlipbook);
 document.addEventListener("astro:after-swap", setupFlipbook);
 
-function setupFlipbook() {
+async function importPDFJS() {
+  if (getDocument && TextLayer && GlobalWorkerOptions) return;
+  console.log("Imported PDF.JS");
+  
+  const PDFJS = await import("pdfjs-dist");
+  ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
+  GlobalWorkerOptions.workerSrc = PDFJSWorker;
+}
+
+async function setupFlipbook() {
   const flipbooks = document.querySelectorAll<HTMLElement>("[data-flipbook]");
- 
+  // if (!flipbooks.length) return;
+  
   flipbooks.forEach(async (flipbook) => {
     const flipbookPreview = flipbook.querySelector<HTMLDivElement>(".flipbook-preview");
     const flipbookButton = flipbookPreview?.querySelector<HTMLButtonElement>("button.flipbook-read");
@@ -92,6 +106,8 @@ function setupFlipbook() {
     }
     
     async function startFlipbook() {
+      await importPDFJS();
+      
       if (!flipbookViewport) return;
       const loadTask = getDocument(flipbook.dataset.flipbook);
       loadTask.onProgress = (progress: OnProgressParameters) => {
