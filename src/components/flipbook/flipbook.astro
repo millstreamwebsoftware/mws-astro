@@ -109,7 +109,7 @@ async function setupFlipbook() {
       await importPDFJS();
       
       if (!flipbookViewport) return;
-      const loadTask = getDocument(flipbook.dataset.flipbook);
+      const loadTask = getDocument?.(flipbook.dataset.flipbook);
       loadTask.onProgress = (progress: OnProgressParameters) => {
         flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
       };
@@ -242,7 +242,7 @@ async function setupFlipbook() {
         if (!context) throw Error("Canvas context missing");
         
         const renderTask = page.render({canvasContext: context, viewport}).promise;
-        const textContent = page.getTextContent().then(async (textContent) => {
+        const textContent = page.getTextContent().then(async (textContent: any) => {
           if (!text) return;
           
           text.style.left = canvas.offsetLeft + 'px';

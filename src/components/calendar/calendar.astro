@@ -322,7 +322,7 @@ const calendarOptions = {
             uid: e.id + "@" + source,
         };
 
-        createEvent(event, (error, value) => {
+        createEvent?.(event, (error: any, value: any) => {
             if (error) {
                 console.log(error);
                 return;
