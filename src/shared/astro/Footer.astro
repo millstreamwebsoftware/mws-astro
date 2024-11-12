@@ -9,7 +9,7 @@ const currentYear = new Date().getFullYear();
 const footerPreferences = (preferences.footer as typeof preferences.footer & Record<string, any>);
 const textColor = convertColorString(footerPreferences?.foreground_color);
 
-const Override = await import("@src/components/Footer.astro").then((m) => m.default, () => undefined);
+const Override = (await Object.values(import.meta.glob("/src/components/**/Footer.astro"))?.[0]?.() as any)?.default;
 ---
 
 { Override ? <Override {...Astro.props} /> : (
