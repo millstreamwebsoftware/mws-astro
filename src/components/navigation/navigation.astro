@@ -45,6 +45,9 @@ const Wrapper = depth ? Fragment : "nav";
 
                     const hasChildren =
                         child.children && Object.keys(child.children).length;
+                    
+                    // Don't render meta nodes without online children
+                    if (child.status !== "online" && !hasChildren) return;
 
                     const displayChildren =
                         depth < maxDepth &&

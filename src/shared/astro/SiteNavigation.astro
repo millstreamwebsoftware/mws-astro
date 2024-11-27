@@ -102,6 +102,9 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                             return;
                         const children =
                             page.children && Object.keys(page.children)?.length;
+                        
+                        if (page.status !== "online" && !children) return;
+                        
                         const id = `nav-${
                             page.slug ||
                             page.title?.toLowerCase().replaceAll(" ", "-")

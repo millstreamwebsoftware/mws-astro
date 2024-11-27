@@ -20,6 +20,8 @@ if (url) {
   thumbnail = await getPDFThumbnail(url);
   filesize = await getFilesize(url);
 }
+
+console.log(url);
 ---
 <Section component="flipbook" {...Astro.props}>
     <div class="flipbook" data-flipbook={url}>
@@ -357,6 +359,8 @@ async function setupFlipbook() {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
     gap: var(--column-gap);
+    
+    color: rgb(var(--text-color));
     
     @media only screen and (max-width: 768px) {
         grid-template-columns: 1fr;

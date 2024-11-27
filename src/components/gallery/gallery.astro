@@ -28,9 +28,10 @@ export interface Props {
     key?: string;
 }
 
-const { images, height, indent, linkgallery, key, classes, placeholder } =
+const { height, indent, linkgallery, key, classes, placeholder } =
     Astro.props;
 
+const images = Astro.props.images.filter((img) => !!img);
 const lightbox = Astro.props.lightbox && !linkgallery;
 const columns = Astro.props.columns || images.length;
 const aspect = Astro.props.aspect ?? 1.0;

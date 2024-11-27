@@ -1,5 +1,4 @@
 ---
-import type { GetStaticPaths } from "astro";
 import Section from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
@@ -88,7 +87,7 @@ if (layout?.length) {
             const firstColumn = start === 1;
             const lastColumn = j + 1 === rowLayout;
 
-            const columnString = `${firstColumn ? start : start + 1} / span ${firstColumn || lastColumn ? subcolumn + 1 : subcolumn}`;
+            const columnString = `${firstColumn ? start : start + 1} / span ${subcolumn + Number(firstColumn) + Number(lastColumn)}`;
             const rowString = `${row} / span 1`;
             const cell = {
                 "first-in-row": firstColumn,

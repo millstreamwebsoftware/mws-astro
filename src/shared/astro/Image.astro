@@ -1,5 +1,6 @@
 ---
 import { Image as AstroImage } from "astro:assets";
+// import { getDAMImage } from "@mws-astro/dam";
 
 type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
 export type CssAlign = `${CssAlignment} ${CssAlignment}` | CssAlignment;
@@ -34,78 +35,17 @@ let placeholder = Astro.props.placeholder ?? true;
 const plSize = 16;
 let remote = false;
 
+if (!Astro.props.image) console.warn(`Image is undefined on page ${Astro.url.toString()}`);
+
 if (typeof Astro.props.image == "string" && /^https?:\/\/.*/.test(Astro.props.image)) {
   remote = true;
   placeholder = false;
 }
 
-// Attempt to import the image if we are given a string
-// if (
-//     // // @ts-expect-error
-//     // !ENV_BOOKSHOP_LIVE &&
-//     typeof Astro.props.image == "string" &&
-//     /^(\/?src)?\/assets/.test(Astro.props.image)
-// ) {
-//     const images = import.meta.glob([
-//       "/src/assets/**/*.png",
-//       "/src/assets/**/*.jpg",
-//       "/src/assets/**/*.jpeg",
-//       "/src/assets/**/*.webp",
-//       "/src/assets/**/*.gif",
-//       "/src/assets/**/*.tiff",
-//       "/src/assets/**/*.avif"
-//     ]);
-
-//     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
-//         i.endsWith(Astro.props.image),
-//     )[0];
-//     if (imagePath in images) {
-//         astroImage = ((await images[imagePath]()) as any)?.default;
-//     } else {
-//         console.warn(
-//             `[Missing Image] ${Astro.props.image} was requested but is missing.`,
-//         );
-//         placeholder = false;
-//     }
-// } else if (
-//     // // @ts-expect-error
-//     // !ENV_BOOKSHOP_LIVE &&
-//     typeof Astro.props.image == "string" &&
-//     // Astro.props.image.startsWith("public/") &&
-//       /^(\/?)public/.test(Astro.props.image)
-// ) {
-//     const images = import.meta.glob([
-//       "/public/**/*.png",
-//       "/public/**/*.jpg",
-//       "/public/**/*.jpeg",
-//       "/public/**/*.webp",
-//       "/public/**/*.gif",
-//       "/public/**/*.tiff",
-//       "/public/**/*.avif"]);
-
-//     // console.log(Astro.props.image);
-//     let imagePath: keyof typeof images = Object.keys(images).filter((i) =>
-//         i.endsWith(Astro.props.image),
-//     )[0];
-//     if (imagePath in images) {
-//         astroImage = ((await images[imagePath]()) as any)?.default;
-//     } else {
-//         console.warn(
-//             `[Missing Image] ${Astro.props.image} was requested but is missing.`,
-//         );
-//         placeholder = false;
-//     }
-// } else if (typeof Astro.props.image == "string") {
-//   console.log("->", Astro.props.image);
-//   astroImage = await getImage({src: Astro.props.image, inferSize: true});
-// }
-// else {
-//     placeholder = false;
-// }
-
 if (typeof Astro.props.image == "string" && !remote) {
   const images = import.meta.glob([
     // Assets
+    "/src/assets/**/*.svg",
     "/src/assets/**/*.png",
     "/src/assets/**/*.jpg",
     "/src/assets/**/*.jpeg",
@@ -114,6 +54,7 @@ if (typeof Astro.props.image == "string" && !remote) {
     "/src/assets/**/*.tiff",
     "/src/assets/**/*.avif",
     // Public
+    "/public/**/*.svg",
     "/public/**/*.png",
     "/public/**/*.jpg",
     "/public/**/*.jpeg",
@@ -150,7 +91,7 @@ if (typeof Astro.props.image == "string" && !remote) {
 const image = astroImage ?? Astro.props.image;
 let width, height;
 
-if (image.width && image.height) {
+if (image?.width && image?.height) {
     let aspect = image.width / image.height;
 
     if (Astro.props.width != undefined) {
@@ -218,7 +159,6 @@ if (!ENV_BOOKSHOP_LIVE && placeholder) {
     }
 }
 
-// Create an SVG containing the webp for full control of aspect ratio (adds extra data, but gzip should take care of it)
 let placeholderStyle;
 if (placeholder && plData) {
     let webpString = `data:image/webp;base64,${plData}`;
@@ -232,15 +172,14 @@ let fallbackImage: string | undefined;
 
 if (typeof image == "string" && !remote) {
   fallbackImage = image.replace(/^public/, "");
-  
-  
 }
+
 ---
 
 {fallbackImage ?
   <img src={fallbackImage} class:list={[classes, { background, fixed }]} {style} data-fit={fit} />
   : 
-  <AstroImage
+  !!image && <AstroImage
       src={image}
       alt=""
       {width}

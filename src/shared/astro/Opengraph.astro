@@ -20,7 +20,7 @@ if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
     let imgSrc;
 
     if (typeof Astro.props.thumbnail == "string") {
-        imgSrc = await getImage(Astro.props.thumbnail).then((r) => r.src);
+        imgSrc = await getImage({src: Astro.props.thumbnail, inferSize: true}).then((r) => r.src);
     } else {
         imgSrc = Astro.props.thumbnail?.src;
     }

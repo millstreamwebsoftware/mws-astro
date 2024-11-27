@@ -4,6 +4,9 @@ import Card from "@components/card-index/card.astro";
 import Icon from "@shared/icon.astro";
 import PlaceholderImage from "@components/card-index/card-index-placeholder.png";
 import { getTreeNode } from "@mws-astro/util";
+import { type AllCollections, type TreeNode } from "@mws-astro/middleware";
+import type { CollectionEntry } from "astro:content";
+import type { CollectionKey } from "astro:content";
 // import type { CollectionKey } from "astro:content";
 // import { type TreeNode } from "@mws-astro/middleware";
 
@@ -11,6 +14,7 @@ interface Props {
     target: string;
     include?: string[];
     filters?: string[];
+    prefilter?: string[];
     columns?: number;
     pageSize?: number;
     limit?: number;
@@ -19,21 +23,22 @@ interface Props {
 }
 
 const {
-    target = "/",
+    target = "/pages/",
     include = ["title", "description", "thumbnail", "link", "read-more"],
     columns = 4,
     filters = [""],
+    prefilter = [""],
     pageSize = 0,
     limit = 0,
     aspect = 1,
 } = Astro.props;
 
 const filterMode = "ignore include"; //ignore include exclude
-var cards;
+var cards: undefined | TreeNode & CollectionEntry<CollectionKey>[];
 
 // @ts-ignore
 if (!ENV_BOOKSHOP_LIVE) {
-    const data = Object.values(Astro.locals.collections).flat();
+    const data: AllCollections[keyof AllCollections] = Object.values(Astro.locals.collections).flat();
 
     let cursor = getTreeNode(Astro.locals.tree, target);
     if (!cursor) return;
@@ -43,19 +48,29 @@ if (!ENV_BOOKSHOP_LIVE) {
         Object.values(cursor.children).reduce<typeof data & typeof cursor>(
             (cards, card) => {
                 let cardData = data.find((d) => d.slug === card.slug);
-                cards.push({ ...cardData, ...card });
+                let obj = Object.assign({}, cardData);
+                obj = Object.assign(obj, card);
+                cards.push(obj);
                 return cards;
             },
             [],
         );
+    
+    cards?.[0].data.publishDate?.getTime();
 
+    // Sort from newest to oldest, fall back on ascending order
     cards?.sort(
-        (a, b) =>
-            b.data?.publishDate.getTime() - a.data?.publishDate.getTime() ||
-            a.data?.order - b.data?.order,
-    ); // Sort from newest to oldest, fall back on ascending order
-
-    cards = cards?.slice(0, limit || undefined); // Limit number of cards if required
+        (a, b) => (b.data.publishDate?.getTime() ?? NaN) - (a.data.publishDate?.getTime() ?? NaN) ||
+        a.data.order - b.data.order
+    );
+    
+    // Limit number of cards if required
+    cards = cards?.slice(0, limit || undefined);
+    
+    // Prefilter cards
+    // cards = cards?.filter((card) => {
+    //   cards.categories
+    // }); 
 } else {
     // Create placeholder cards for the live editor
     cards = new Array(limit || pageSize || columns * 2).fill({
@@ -160,12 +175,14 @@ if (!ENV_BOOKSHOP_LIVE) {
         flex-direction: row;
         gap: 2rem;
         justify-content: space-between;
+        flex-wrap: wrap;
     }
 
     .card-index-container {
         display: grid;
         grid-template-areas: "tools" "items";
         gap: 3rem;
+        grid-template-columns: 100%;
     }
 
     button {
@@ -185,11 +202,13 @@ if (!ENV_BOOKSHOP_LIVE) {
         flex-direction: row;
         justify-content: space-evenly;
         gap: 2rem;
+        flex-wrap: wrap;
 
         > .card-filter-set {
             display: flex;
             flex-direction: row;
             gap: 0.5rem;
+            flex-wrap: wrap;
 
             p {
                 margin: 0;

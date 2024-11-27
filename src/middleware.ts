@@ -3,8 +3,14 @@ import {
   getCollection,
   type CollectionEntry,
   type CollectionKey,
+  // type ContentEntryMap,
 } from "astro:content";
 import { collections } from "src/content/config";
+
+export type AllCollections = Record<
+  CollectionKey,
+  CollectionEntry<CollectionKey>[]
+>;
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
   const currentPath = ctx.params.slug;
@@ -22,15 +28,14 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 });
 
 async function getAllCollections(
-  filter:
-    | ((arg0: CollectionEntry<CollectionKey>) => boolean)
-    | undefined = undefined,
-) {
-  let allCollections = await Promise.all(
-    Object.keys(collections).map(async (k) => {
-      return [k, await getCollection(k as CollectionKey, filter)];
-    }),
-  );
+  filter: (arg0: CollectionEntry<CollectionKey>) => boolean,
+): Promise<AllCollections> {
+  let allCollections: [string, CollectionEntry<CollectionKey>[]][] =
+    await Promise.all(
+      Object.keys(collections).map(async (k) => {
+        return [k, await getCollection(k as CollectionKey, filter)];
+      }),
+    );
 
   let modifiedCollections = allCollections.map(([k, collection]) => {
     if (k == "pages" || typeof collection == "string") return [k, collection];
@@ -57,6 +62,7 @@ export interface TreeNode {
   title?: string;
   slug?: string;
   href?: string;
+  status?: "online" | "hidden" | "meta" | "offline";
   order?: number;
   collection?: CollectionKey;
   selected?: Relationship;
@@ -105,6 +111,7 @@ function makeTree(
           page.data.status != "meta"
             ? "/" + slug.replace(/\/?index$/, "")
             : undefined,
+        status: page.data.status,
         order: page.data.order,
         title: page.data.title,
         collection: page.collection,
