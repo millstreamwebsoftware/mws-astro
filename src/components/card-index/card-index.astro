@@ -64,13 +64,36 @@ if (!ENV_BOOKSHOP_LIVE) {
         a.data.order - b.data.order
     );
     
+    // Prefilter cards
+    const prefilters = prefilter.map((filter) => {
+      if (!filter) return;
+      let match: any;
+      
+      // [attr~=value]
+      match = filter.match(/^(?<k>.*)~=(?<v>.*)$/)?.groups;
+      if (match)
+        return function IncludesFilter (card: any) {
+          return match.k in card.data && card.data?.[match.k]?.includes(match.v);
+        };
+      
+      // [attr=value]
+      match = filter.match(/^(?<k>.*)=(?<v>.*)$/)?.groups;
+      if (match)
+        return function EqualityFilter (card: any) {
+          return match.k in card.data && card.data?.[match.k] === match.v;
+        };
+      
+      // [attr]
+      return function IncludesAttrFilter (card: any) {return filter in card.data};
+    }).filter((filter) => !!filter);
+    
+    if (prefilters.length)
+    cards = cards?.filter((card) => {
+      return prefilters.some((p) => p(card));
+    }); 
+    
     // Limit number of cards if required
     cards = cards?.slice(0, limit || undefined);
-    
-    // Prefilter cards
-    // cards = cards?.filter((card) => {
-    //   cards.categories
-    // }); 
 } else {
     // Create placeholder cards for the live editor
     cards = new Array(limit || pageSize || columns * 2).fill({
