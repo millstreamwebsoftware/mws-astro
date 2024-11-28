@@ -7,11 +7,13 @@ import Icon from "@shared/icon.astro";
 import Image from "@shared/Image.astro";
 import { type CssAlign } from "@shared/Image.astro";
 import Video from "@shared/Video.astro";
+import Markdown from "@shared/Markdown.astro";
 
 export interface Props {
     component: string;
     height?: number;
     color?: string;
+    content?: string;
     background_color?: string;
     background_image?: string;
     background_video?: string;
@@ -28,6 +30,7 @@ const {
     component,
     height,
     color,
+    content,
     background_color,
     background_image,
     background_video,
@@ -87,6 +90,7 @@ const expando = classList.includes("expando") ? true : false;
     }
     {background_video && <Video src={background_video} background={true} />}
     <div class="component-wrapper">
+    {content && <div class="text-content"><Markdown {content}/></div>}
         <slot />
     </div>
     {

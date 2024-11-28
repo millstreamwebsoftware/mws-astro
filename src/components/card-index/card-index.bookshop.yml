@@ -11,6 +11,7 @@ blueprint:
   target: ""
   include: []
   filters: []
+  prefilter: []
   columns: 4
   pageSize: 0
   limit: 0
@@ -43,6 +44,12 @@ _inputs:
     options:
       values:
         - categories
+  prefilter:
+    type: multiselect
+    label: Prefilter
+    comment: Filter which cards will be displayed. E.g. property~=value (property contains value), property=value (property is exactly value), property (card has a property)
+    options:
+      allow_create: true
   columns:
     type: number
     label: Columns
