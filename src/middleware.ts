@@ -62,6 +62,7 @@ export interface TreeNode {
   title?: string;
   slug?: string;
   href?: string;
+  link?: string;
   status?: "online" | "hidden" | "meta" | "offline";
   order?: number;
   collection?: CollectionKey;
@@ -113,6 +114,7 @@ function makeTree(
             : undefined,
         status: page.data.status,
         order: page.data.order,
+        link: page.data.link,
         title: page.data.title,
         collection: page.collection,
         selected: isSelected(slug, currentSlug),

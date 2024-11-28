@@ -47,7 +47,7 @@ const Wrapper = depth ? Fragment : "nav";
                         child.children && Object.keys(child.children).length;
                     
                     // Don't render meta nodes without online children
-                    if (child.status !== "online" && !hasChildren) return;
+                    if (child.status !== "online" && !hasChildren && !child.link) return;
 
                     const displayChildren =
                         depth < maxDepth &&
@@ -60,7 +60,7 @@ const Wrapper = depth ? Fragment : "nav";
                         child.href ??
                         (child.children && // Redirect to first child page if no page exists and not rendering children
                             !displayChildren &&
-                            Object.values(child.children)[0]?.href);
+                            Object.values(child.children)[0]?.href) ?? child.link;
 
                     return (
                         <>

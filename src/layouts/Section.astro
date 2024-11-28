@@ -90,7 +90,7 @@ const expando = classList.includes("expando") ? true : false;
     }
     {background_video && <Video src={background_video} background={true} />}
     <div class="component-wrapper">
-    {content && <div class="text-content"><Markdown {content}/></div>}
+        {content && <div class="text-content"><Markdown {content}/></div>}
         <slot />
     </div>
     {
@@ -135,6 +135,10 @@ const expando = classList.includes("expando") ? true : false;
         user-select: none;
         /* min-height: var(--height); */
         /* height: min(var(--height), 100%); */
+    }
+    
+    :not(section.richtext) > * > .text-content {
+        margin-bottom: var(--column-gap);
     }
 
     .background {

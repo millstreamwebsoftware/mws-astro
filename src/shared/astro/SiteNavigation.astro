@@ -103,7 +103,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                         const children =
                             page.children && Object.keys(page.children)?.length;
                         
-                        if (page.status !== "online" && !children) return;
+                        if (page.status !== "online" && !children && !page.link) return;
                         
                         const id = `nav-${
                             page.slug ||
@@ -132,7 +132,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                                                 ? "true"
                                                 : "false"
                                         }
-                                        href={children ? undefined : page.href}
+                                        href={children ? undefined : page.href ?? page.link}
                                     >
                                         <span {id}>
                                             {page?.title}
