@@ -113,7 +113,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     {...Astro.props}
     {key}
 >
-    <>
+    <Fragment>
         <div class:list={["glide", `slider-${glideOptions.sliderType}`]} {id} {...dataGlideOptions}>
             <div
                 class="glide__track"
@@ -181,7 +181,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                 )
             }
         </div>
-    </>
+    </Fragment>
 </Section>
 
 <script>

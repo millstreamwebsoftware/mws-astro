@@ -73,7 +73,7 @@ function formatDate(date: Date) {
                             "data-value": dateString ? v.getTime() : v,
                         }}
                     >
-                        <>
+                        <Fragment>
                             <p class="data-key">{k}</p>
 
                             {Array.isArray(v) ? (
@@ -81,7 +81,7 @@ function formatDate(date: Date) {
                             ) : (
                                 <p class="data-value">{dateString ?? v}</p>
                             )}
-                        </>
+                        </Fragment>
                     </div>
                 );
             })
