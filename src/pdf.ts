@@ -1,12 +1,30 @@
 // import fs from "fs/promises";
 // import path from "path";
 // import sharp from "sharp";
+// import fs from "fs";
 import { resolvePath } from "./filesystem";
+var fs: any;
 
 // https://github.com/mozilla/pdf.js/blob/master/examples/node/pdf2png/pdf2png.mjs
 
-import fs from "fs";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+
+
+async function ensureFS(): Promise<boolean> {
+  // @ts-expect-error
+  if (!ENV_BOOKSHOP_LIVE) {
+    if (!fs)
+      fs = await import("node:fs").catch(() =>
+        console.error("node:fs import failed"),
+      );
+
+    return Boolean(fs);
+  }
+
+  return false;
+}
+
+
 
 // Some PDFs need external cmaps.
 const CMAP_URL = "../../../node_modules/pdfjs-dist/cmaps/";
@@ -17,6 +35,9 @@ const STANDARD_FONT_DATA_URL =
   "../../../node_modules/pdfjs-dist/standard_fonts/";
 
 export async function getPDFThumbnail(file: string, pageNum: number = 0) {
+  if (!await ensureFS()) return;
+
+
   const filePath = await resolvePath(file);
   if (!filePath) return;
 
@@ -55,7 +76,7 @@ export async function getPDFThumbnail(file: string, pageNum: number = 0) {
     await renderTask.promise;
     // Convert the canvas to an image buffer.
     const image = canvasAndContext.canvas.toBuffer("image/png");
-    fs.writeFile(thumbPath, image, function (error) {
+    fs.writeFile(thumbPath, image, function (error: any) {
       if (error) {
         // console.error("Error: " + error);
       } else {
