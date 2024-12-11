@@ -15,12 +15,15 @@ interface Props {
     icon?: string;
 }
 
+// console.log(Astro.locals.path, Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1"));
+
 const depth = (Astro.props.depth ?? -1) + 1;
 const {
     maxDepth = 1,
-    filter = Astro.locals.path
-        ? Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1")
-        : undefined,
+    // filter = Astro.locals.path
+    //     ? Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1")
+    //     : undefined,
+    filter = "../..",
     collection,
     parent = true,
     hide_cousins = false,
@@ -30,7 +33,8 @@ const {
 let tree;
 // @ts-ignore
 if (!ENV_BOOKSHOP_LIVE) {
-    tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, parent);
+    // console.log("Nav:", filter, !Astro.props.tree, Astro.locals.path);
+    tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, Astro.locals.path, parent);
 }
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
@@ -47,7 +51,7 @@ const Wrapper = depth ? Fragment : "nav";
                         child.children && Object.keys(child.children).length;
                     
                     // Don't render meta nodes without online children
-                    if (child.status !== "online" && !hasChildren && !child.link) return;
+                    if (child.status !== "online" && !hasChildren && !child.href) return;
 
                     const displayChildren =
                         depth < maxDepth &&
@@ -66,7 +70,7 @@ const Wrapper = depth ? Fragment : "nav";
                         <>
                             <div
                                 data-depth={depth}
-                                class:list={{ "has-children": hasChildren }}
+                                class:list={{ "has-children": displayChildren }}
                             >
                                 <a
                                     href={link || undefined}

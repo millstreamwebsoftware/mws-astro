@@ -65,6 +65,7 @@ const id = `gallery-${key}`;
                         {fit}
                         width={1920 / columns}
                         quality="low"
+                        densities={null}
                         placeholder={true}
                     />
 
@@ -97,6 +98,7 @@ const id = `gallery-${key}`;
                                 fit="contain"
                                 width={1920}
                                 quality="high"
+                                densities={null}
                             />
 
                             {(asset.title || asset.description) && (

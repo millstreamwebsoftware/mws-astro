@@ -48,25 +48,42 @@ export function trimFilePath(p: string) {
 
 export function getTreeNode(
   tree: TreeNode,
-  filter: string | undefined,
+  path: string | undefined,
+  relpath: string | undefined,
   parent: boolean = false,
 ): TreeNode | undefined {
-  if (!filter) return tree;
+  if (!path) return tree;
 
-  const targetFragments = filter?.split("/").filter((frg) => frg !== "");
+  const abspath = path.startsWith("/") ? path : relpath + "/" + path;
+
+  const targetFragments = abspath?.split("/").filter((frg) => frg !== "");
   let cursor = tree;
   if (!cursor?.children) return;
 
   for (let i = 0; i < targetFragments.length; i++) {
-    if (
-      cursor?.children == undefined ||
-      !(targetFragments[i] in cursor.children)
-    ) {
-      console.warn(`Could not resolve path ${filter}`);
-      return;
-    }
+    let fragment = targetFragments[i];
 
-    cursor = cursor.children[targetFragments[i]];
+    if (/^\.\.?$/.test(fragment)) {
+      if (fragment.length < 2) {
+        continue;
+      }
+
+      if (!cursor.parent) {
+        console.warn(
+          `Could not resolve path ${abspath} - Attempted to access undefined parent`,
+        );
+        return;
+      }
+
+      cursor = cursor.parent;
+    } else {
+      if (cursor?.children == undefined || !(fragment in cursor.children)) {
+        console.warn(`Could not resolve path ${abspath}`);
+        return;
+      }
+
+      cursor = cursor.children[fragment];
+    }
   }
 
   // Reorder tree to place children inside their sibling index (/file/index -> /file/)

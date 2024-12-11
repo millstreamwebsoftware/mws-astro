@@ -1,6 +1,5 @@
 ---
 import { Image as AstroImage } from "astro:assets";
-// import { getDAMImage } from "@mws-astro/dam";
 
 type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
 export type CssAlign = `${CssAlignment} ${CssAlignment}` | CssAlignment;
@@ -19,6 +18,7 @@ interface Props {
     quality?: "low" | "mid" | "high" | "max" | number;
     fixed?: boolean;
     placeholder?: boolean;
+    densities?: number[] | null;
 }
 
 const {
@@ -28,6 +28,7 @@ const {
     quality = "high",
     opacity,
     fixed = false,
+    densities = [1.5, 2],
 } = Astro.props;
 
 let astroImage;
@@ -146,9 +147,9 @@ if (!ENV_BOOKSHOP_LIVE && placeholder) {
                 return (
                     sh
                         .removeAlpha()
-                        .resize(plSize, undefined, { fit: "inside" })
+                        .resize(plSize, null, { fit: "inside" })
                         // .blur()
-                        .webp()
+                        .webp({quality: 10})
                         .toBuffer()
                         .then((b) => b.toString("base64"))
                 );
@@ -184,10 +185,10 @@ if (typeof image == "string" && !remote) {
       alt=""
       {width}
       {height}
-      inferSize={true}
+      inferSize={false}
       class:list={[classes, { background, fixed }]}
       style={Object.assign({}, placeholderStyle, style)}
-      densities={[1.5, 2]}
+      densities={densities ? densities : undefined}
       data-fit={fit}
       {quality}
   />

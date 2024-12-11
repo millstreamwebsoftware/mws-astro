@@ -40,7 +40,7 @@ var cards: undefined | TreeNode & CollectionEntry<CollectionKey>[];
 if (!ENV_BOOKSHOP_LIVE) {
     const data: AllCollections[keyof AllCollections] = Object.values(Astro.locals.collections).flat();
 
-    let cursor = getTreeNode(Astro.locals.tree, target);
+    let cursor = getTreeNode(Astro.locals.tree, target, Astro.locals.path);
     if (!cursor) return;
 
     cards =

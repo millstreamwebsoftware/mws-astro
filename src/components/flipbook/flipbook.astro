@@ -21,8 +21,6 @@ if (url) {
   thumbnail = await getPDFThumbnail(url);
   filesize = await getFilesize(url);
 }
-
-console.log(url);
 ---
 <Section component="flipbook" {...Astro.props}>
     <div class="flipbook" data-flipbook={url}>

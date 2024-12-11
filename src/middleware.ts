@@ -23,6 +23,25 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
     currentPath,
   );
 
+  // console.log(ctx.locals.tree);
+  // console.log(
+  //   JSON.stringify(
+  //     ctx.locals.tree,
+  //     function (key, value) {
+  //       if (key == "parent") {
+  //         return value?.slug;
+  //       } else {
+  //         return value;
+  //       }
+  //     },
+  //     4,
+  //   ),
+  // );
+  // console.log(
+  //   "Parent:",
+  //   ctx.locals.tree?.children?.community?.children?.parish?.parent,
+  // );
+
   ctx.locals.path = currentPath;
   return next();
 });
@@ -59,6 +78,7 @@ export enum Relationship {
 
 export interface TreeNode {
   children?: Record<string, TreeNode>;
+  parent?: TreeNode;
   title?: string;
   slug?: string;
   href?: string;
@@ -69,55 +89,36 @@ export interface TreeNode {
   selected?: Relationship;
 }
 
+function stripIndex(slug: string) {
+  return slug.replace(/\/?index$/, "");
+}
+
+/**
+ * Build a tree for navigation from the list of pages we get from the astro content collections api
+ * @param pages - collection entries
+ * @param currentPath - the path of the page we are rendering
+ * @returns a tree for generating the site navigation
+ */
 function makeTree(
   pages: CollectionEntry<CollectionKey>[],
   currentPath?: string,
 ) {
   const currentSlug = currentPath || "";
 
-  // Determine which pages are 'selected' relative to the request path
-  function isSelected(slug: string, selection: string): Relationship {
-    const realSlug = slug.replace(/\/?index$/, "");
-    const slugFragments = realSlug.split("/");
-    const selectionFragments = selection.split("/");
-
-    switch (true) {
-      // Requested page is this page
-      case realSlug === currentSlug:
-        return Relationship.Selected;
-
-      // Pages are not related
-      case selectionFragments.length <= slugFragments.length:
-      default:
-        return Relationship.None;
-
-      // Requested page is a child of this page
-      case slugFragments.every((val, i) => val === selectionFragments[i]):
-        return Relationship.Ancestor;
-    }
-  }
-
   const tree: TreeNode = {};
 
   const pageList = Array.from(pages).map(
     (page: CollectionEntry<CollectionKey>) => {
-      let slug = page.slug;
-      // page.collection == "pages"
-      //   ? page.slug
-      //   : `${page.collection}/${page.slug}`;
+      let slug = stripIndex(page.slug);
 
       return {
         slug,
-        href:
-          page.data.status != "meta"
-            ? "/" + slug.replace(/\/?index$/, "")
-            : undefined,
+        href: page.data.status != "meta" ? "/" + slug : page.data.link,
         status: page.data.status,
         order: page.data.order,
-        link: page.data.link,
         title: page.data.title,
         collection: page.collection,
-        selected: isSelected(slug, currentSlug),
+        selected: Relationship.None,
       };
     },
   );
@@ -129,11 +130,14 @@ function makeTree(
       a.order - b.order,
   );
 
+  let selectedPage: undefined | TreeNode;
+
   sorted.forEach((page: any) => {
     let path: Array<string> = page.slug.split("/") || [""];
 
     // Create a cursor at the tree root
     let cursor = tree;
+    let parent = undefined;
 
     for (var i = 0; i < path.length; i++) {
       if (!("children" in cursor)) {
@@ -145,7 +149,6 @@ function makeTree(
       // Page doesn't exist - Create an entry for the directory
       if (!(path[i] in cursor.children)) {
         cursor.children[path[i]] = {
-          // parent: undefined,
           title: path[i]
             .replaceAll("-", " ")
             .replace(
@@ -153,19 +156,38 @@ function makeTree(
               (t: string) =>
                 t.charAt(0).toUpperCase() + t.substring(1).toLowerCase(),
             ),
-          // slug: path.slice(0, i + 1).join("/"),
+          slug: path.slice(0, i + 1).join("/"),
           collection: page.collection,
-          selected: isSelected(path.slice(0, i + 1).join("/"), currentSlug),
+          // selected: isSelected(path.slice(0, i + 1).join("/"), currentSlug),
+          selected: Relationship.None,
+          status: "meta",
+          parent: cursor.parent,
         };
       }
 
       // Move cursor to child
       cursor = cursor.children[path[i]];
+      cursor.parent = parent;
+      parent = cursor;
     }
 
     // Assign page properties to the final node
     Object.assign(cursor, page);
+
+    if (currentSlug === stripIndex(cursor.slug || "")) {
+      selectedPage = cursor;
+    }
   });
+
+  // Mark selected page and ancestors
+  if (selectedPage) {
+    selectedPage.selected = Relationship.Selected;
+
+    while (selectedPage) {
+      selectedPage = selectedPage.parent;
+      selectedPage && (selectedPage.selected = Relationship.Ancestor);
+    }
+  }
 
   return tree;
 }
