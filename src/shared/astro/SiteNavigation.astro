@@ -237,7 +237,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         const caretHeight = 20;
         
         // const navTarget = null;
-        if (!navigation) throw Error("Navigation not found.");
+        if (!navigation) return;
         document.body.addEventListener("click", handleNavigationEvent);
         document.body.addEventListener("keydown", handleNavigationEvent);
         navigation.addEventListener("focusout", handleNavigationEvent);
