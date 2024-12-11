@@ -22,7 +22,6 @@ export interface Props {
     content_blocks?: Array<Record<string, any>>;
     show_global_header?: boolean;
     show_global_footer?: boolean;
-    paths?: any[];
     currentPath?: string;
     thumbnail?: any;
     classes?: string[];
@@ -34,7 +33,6 @@ const {
     show_global_header,
     show_global_footer,
     id,
-    paths,
     currentPath,
     thumbnail,
     classes,
@@ -76,7 +74,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         </script>
     </head>
     <body>
-        {show_global_header && <Header {id} {paths} {currentPath} />}
+        {show_global_header && <Header {id} {currentPath} />}
         <article>
             <slot />
             {show_global_footer && <Footer />}

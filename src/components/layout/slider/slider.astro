@@ -66,7 +66,6 @@ const {
     focusAt,
     focusAtCenter,
     hoverpause,
-    classes,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 
@@ -171,7 +170,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             {
                 showBullets && (
                     <div class="glide__bullets" data-glide-el="controls[nav]">
-                        {contentBlocks.map((slide, i) => (
+                        {contentBlocks.map((_slide, i) => (
                             <button
                                 class="glide__bullet"
                                 data-glide-dir={`=${i}`}
@@ -191,7 +190,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     document.addEventListener("astro:after-swap", setupGlide);
 
     function setupGlide() {
-        document.querySelectorAll("div[data-glide]").forEach((e, i) => {
+        document.querySelectorAll("div[data-glide]").forEach((e) => {
             if (!(e instanceof HTMLElement)) return;
 
             if (!e.matches(".ENV_EDITOR *")) {

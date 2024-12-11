@@ -13,11 +13,13 @@ interface Props {
     aspect?: number;
 }
 
-const { card, include, filters, aspect = 1 } = Astro.props;
+const { card, include, filters,
+  // aspect = 1
+} = Astro.props;
 const combinedCard = Object.assign(Object.assign({}, card), card.data);
 
 const cardProps = Object.fromEntries(
-    Object.entries(combinedCard).filter(([k, v]) => include.includes(k)),
+    Object.entries(combinedCard).filter(([k,]) => include.includes(k)),
 );
 
 const { title, description, thumbnail, slug, publishDate, ...cardData } =

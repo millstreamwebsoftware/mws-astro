@@ -10,7 +10,7 @@ export interface Props {
     key?: string;
 }
 
-const { collapse, layout, classes, key } = Astro.props;
+const { collapse, layout, key } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};

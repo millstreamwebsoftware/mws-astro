@@ -5,10 +5,9 @@ import Navigation from "./SiteNavigation.astro";
 export interface Props {
     id?: string;
     currentPath?: string;
-    paths?: any[];
 }
 
-const { id, currentPath, paths } = Astro.props;
+const { id, currentPath } = Astro.props;
 
 // const headerItems: Record<string, boolean> = {
 //     logo: preferences.header.show_logo,

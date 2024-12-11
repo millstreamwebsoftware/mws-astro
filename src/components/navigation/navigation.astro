@@ -44,7 +44,7 @@ const Wrapper = depth ? Fragment : "nav";
     <Wrapper>
         {
             tree?.children != undefined &&
-                Object.entries(tree.children).map(([id, child], i) => {
+                Object.entries(tree.children).map(([, child]) => {
                     if (collection && child.collection != collection) return;
 
                     const hasChildren =

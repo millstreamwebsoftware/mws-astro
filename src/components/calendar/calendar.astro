@@ -147,7 +147,7 @@ const calendarOptions = {
                 ([buttonName, button]: [string, any]) => {
                     if (buttonName.endsWith("-filter")) {
                         button.click = function (
-                            event: MouseEvent,
+                            _event: MouseEvent,
                             element: HTMLElement,
                         ) {
                             element.classList.toggle("cal-filter");

@@ -1,7 +1,6 @@
 ---
 import Page from "@shared/Page.astro";
 import Layout from "./Layout.astro";
-import { type CollectionEntry } from "astro:content";
 
 type Props = {
   frontmatter: {
@@ -9,7 +8,6 @@ type Props = {
     content_blocks: Array<Record<string, any>>;
   };
   id?: string;
-  paths?: any[];
   currentPath?: string;
 };
 
@@ -17,10 +15,10 @@ if (!Astro.props.frontmatter) {
   throw new Error("Page frontmatter must be defined");
 }
 const props = Astro.props.frontmatter;
-const { id, paths, currentPath } = Astro.props;
+const { id, currentPath } = Astro.props;
 // const _livetest = await getCollection("pages");
 ---
 
-<Layout {...props} {id} {paths} {currentPath}>
+<Layout {...props} {id} {currentPath}>
   <Page bookshop:live contentBlocks={props.content_blocks} />
 </Layout>

@@ -22,10 +22,10 @@ const {
     lng,
     zoom,
     // marker = true,
-    key,
-    indent,
-    mapId,
-    style,
+    // key,
+    // indent,
+    // mapId,
+    // style,
 } = Astro.props;
 
 // @ts-expect-error
@@ -37,7 +37,6 @@ const apiKey =
         : preferences.API.google_maps.api_key;
 // const height = Astro.props.height + "vh";
 const mapType = Astro.props.mapType ?? "roadmap";
-const id = "map-" + key;
 
 const mapMode = location ? "place" : "view";
 const mapURL = new URL(
@@ -57,7 +56,6 @@ mapType && mapURL.searchParams.append("maptype", mapType?.toString());
         height="250"
         referrerpolicy="no-referrer-when-downgrade"
         loading="lazy"
-        frameborder="0"
         style="border: 0"
         allowfullscreen></iframe>
 </Section>
