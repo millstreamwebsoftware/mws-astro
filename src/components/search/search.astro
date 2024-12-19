@@ -20,7 +20,6 @@ export interface Props {}
         width: 100%;
         
     }
-    
     form {
         /* flex: .5 .5 20rem; */
         /* container-type: size; */
@@ -28,7 +27,11 @@ export interface Props {}
         flex-direction: row;
         gap: .5rem;
         align-items: center;
-        width: min(10vw, 20rem);
+        /* width: min(12vw, 20rem); */
+        
+        
+        margin: 0 5px;
+        padding: 0 10px;
     }
     
     button {
@@ -39,4 +42,13 @@ export interface Props {}
         align-items: center;
         justify-content: center;
     }
+</style>
+
+<style is:global>
+nav form[name="search"] {
+    svg {
+        /* color: rgb(var(--text-color)); */
+        color: rgb(var(--header-color));
+    }
+}
 </style>

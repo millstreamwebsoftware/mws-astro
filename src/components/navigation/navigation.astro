@@ -23,18 +23,23 @@ const {
     // filter = Astro.locals.path
     //     ? Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1")
     //     : undefined,
-    filter = "../..",
+    filter = undefined,
     collection,
     parent = true,
     hide_cousins = false,
     icon = "",
 } = Astro.props;
 
-let tree;
+// console.log(Astro.locals.path);
+
+
+let tree = Astro.props.tree ?? undefined;
 // @ts-ignore
-if (!ENV_BOOKSHOP_LIVE) {
-    // console.log("Nav:", filter, !Astro.props.tree, Astro.locals.path);
-    tree = Astro.props.tree ?? getTreeNode(Astro.locals.tree, filter, Astro.locals.path, parent);
+if (!ENV_BOOKSHOP_LIVE && !tree) {
+    // Get this page to check if it has children
+    if (!filter) tree = getTreeNode(Astro.locals.tree, ".", Astro.locals.path, false);
+    
+    tree = getTreeNode(Astro.locals.tree, filter ?? tree?.children ? "." : "..", Astro.locals.path, parent);
 }
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";

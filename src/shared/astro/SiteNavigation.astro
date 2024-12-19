@@ -13,13 +13,14 @@ export interface Props {
 
 
 // const { id } = Astro.props;
+const prefs: Record<string, any> | typeof preferences = preferences;
 const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
 const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
 const Wrapper = depth ? Fragment : "nav";
 const Items = depth ? Fragment : "div";
-const showHome = (preferences as any)?.header?.show_home ?? true;
-const showCaret = (preferences as any)?.header?.show_caret ?? true;
-const placement = (preferences as any)?.header?.center_dropdowns
+const showHome = prefs?.header?.show_home ?? true;
+const showCaret = prefs?.header?.show_caret ?? true;
+const placement = prefs?.header?.center_dropdowns
     ? "bottom"
     : "bottom-start";
 
@@ -45,7 +46,8 @@ Object.entries(componentOverrides).forEach(
         (components[bookshopName(path)] = obj.default),
 );
 
-const secondary: any = (preferences as any).header?.secondary_navigation || [];
+const secondary: any = prefs.header?.secondary_navigation || [];
+const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.length;
 ---
 
 <Wrapper
@@ -53,6 +55,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
     role="navigation"
     aria-label="Main menu"
     data-placement={placement}
+    class:list={{"secondary-navbar": secondaryNavbar}}
 >
     {
         !depth && (
@@ -172,7 +175,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
                             <div class="dropdown-indicator">
                                 <Icon
                                     name="fa6-solid:caret-down"
-                                    height="2rem"
+                                    height="1.2em"
                                 />
                             </div>
                             </span>
@@ -506,7 +509,7 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
             if (
                 !target ||
                 target.id === "navigation" ||
-                !target.classList.contains("children")
+                false // !target.classList.contains("children")
             ) {
                 closeAllNav();
                 return;
@@ -733,16 +736,38 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
 
     /* @media screen and (min-width: 769px) { */
     
-    #navigation:not(.mobile-nav) {
+    html:not(.mobile-nav) #navigation {
         ul.depth-0 {
             /* grid-area: navigation; */
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
+            /* display: flex;
+            flex-direction: row; */
+            /* justify-content: flex-end; */
             height: 100%;
 
             gap: 0.5vw;
+
+            display: grid;
+            
+            grid-template-columns: 1fr;
+            grid-auto-columns: auto;
+            grid-auto-flow: column;
+            grid-row-gap: 0;
+            
+            position:relative;
+            /* height: var(--header-height); */
         }
+        
+        &.secondary-navbar {
+            ul.depth-0 {
+                grid-template-rows: 3.6rem 1fr;
+            }
+            
+            li.depth-0 {
+                grid-row: 2 / 3;
+                height: 100%;
+            }
+        }
+        
 
         li.depth-0 > a {
             height: 100%;
@@ -938,51 +963,33 @@ const secondary: any = (preferences as any).header?.secondary_navigation || [];
         padding: calc(var(--indent) * 0.1) calc(var(--indent) * 0.2);
     }
     
-    html:not(.mobile-nav) nav#navigation > #navigation-items > ul.depth-0 {
-        display: grid;
-        /* grid-template-rows: subgrid; */
-        grid-template-rows: 3.6rem 1fr;
-        grid-auto-columns: 1fr;
-        grid-auto-flow: column;
-        grid-row-gap: 0;
+    html:not(.mobile-nav) nav#navigation.secondary-navbar > #navigation-items > ul.depth-0 #secondary-button {
+        grid-row: 1 / 2;
+        /* grid-column: 1 / span 10; */
+        position: absolute;
+        left: 0;
+        right: 0;
         
-        position:relative;
-        height: var(--header-height);
-        
-        > li.depth-0 {
-            grid-row: 2 / 3;
-            height: 100%;
+        > a {
+            display: none;
         }
         
-        li#secondary-button {
-            grid-row: 1 / 2;
-            /* grid-column: 1 / span 10; */
-            position: absolute;
-            left: 0;
-            right: 0;
+        > #secondary-items {
+            flex-direction: row;
+            writing-mode: horizontal-tb;
+            padding-top: 0;
+            visibility: visible;
+            background-color: transparent;
+            --header-color: 255 255 255;
+            top: 0 !important;
+            width: 100%;
+            justify-content: flex-end;
             
-            > a {
-                display: none;
-                
-            }
+            pointer-events: all;
             
-            > #secondary-items {
-                flex-direction: row;
-                writing-mode: horizontal-tb;
-                padding-top: 0;
-                visibility: visible;
-                background-color: transparent;
-                --header-color: 255 255 255;
-                top: 0 !important;
-                width: 100%;
-                justify-content: flex-end;
-                
-                pointer-events: all;
-                
-                li, li a > span {
-                    margin: 0;
-                    /* border: 2px solid red; */
-                }
+            li, li a > span {
+                margin: 0;
+                /* border: 2px solid red; */
             }
         }
     }

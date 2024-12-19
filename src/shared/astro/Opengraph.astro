@@ -6,22 +6,32 @@ import { getImage } from "astro:assets";
 export interface Props {
     title?: string;
     description?: string;
-    thumbnail?: { src: string; fsPath: string };
+    thumbnail?: any;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
+let thumbnail = Astro.props.thumbnail;
 let ogImageURL: URL | undefined;
 let pagefindImage;
 
+if (!thumbnail && preferences.general.default_sharing_image) {
+    thumbnail = preferences.general.default_sharing_image;
+    // ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
+}
+
 // @ts-expect-error
-if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
+if (thumbnail && !ENV_BOOKSHOP_LIVE) {
     let imgSrc;
 
-    if (typeof Astro.props.thumbnail == "string") {
-        imgSrc = await getImage({src: Astro.props.thumbnail, inferSize: true}).then((r) => r.src);
+    if (typeof thumbnail == "string") {
+      try {
+        imgSrc = await getImage({src: thumbnail, width: 1200, height: 630}).then((r) => r.src);
+      } catch {
+        
+      }
     } else {
-        imgSrc = Astro.props.thumbnail?.src;
+        imgSrc = thumbnail?.src;
     }
 
     if (imgSrc) {
@@ -29,9 +39,7 @@ if (Astro.props.thumbnail && !ENV_BOOKSHOP_LIVE) {
         pagefindImage = imgSrc;
     }
 }
-if (!ogImageURL && preferences.general.default_sharing_image) {
-    ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
-}
+
 
 const title = Astro.props.title ?? preferences.general.site_name;
 const description =
