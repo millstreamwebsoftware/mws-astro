@@ -264,12 +264,7 @@ section.richtext table {
   }
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+:where(h1, h2, h3, h4, h5, h6) {
   margin: 0;
   margin-bottom: 0.4em;
   line-height: 1.4;
@@ -278,9 +273,8 @@ h6 {
 }
 
 @for $i from 1 through 6 {
-  h#{$i} {
-    --h#{$i}-color: var(--heading-color);
-    color: rgb(var(--h#{$i}-color));
+  :where(h#{$i}) {
+    color: rgb(var(--h#{$i}-color, var(--heading-color)));
   }
 }
 
@@ -292,19 +286,20 @@ h6 {
   margin-bottom: 0;
 }
 
-h1 {
+:where(h1, h2, h3) {
+  font-family: var(--feature-font-family);
+}
+
+:where(h1) {
   font-size: var(--text-size-xxlarge);
-  font-family: var(--feature-font-family);
 }
 
-h2 {
+:where(h2) {
   font-size: var(--text-size-xlarge);
-  font-family: var(--feature-font-family);
 }
 
-h3 {
+:where(h3) {
   font-size: var(--text-size-large);
-  font-family: var(--feature-font-family);
 }
 
 a,
