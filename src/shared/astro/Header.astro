@@ -71,13 +71,13 @@ const { id, currentPath } = Astro.props;
             rgba(var(--header-background-color-bottom))
         );
  
-        /* grid-template-areas: "logo navigation";
-        grid-template-rows: 100%; */
+        grid-template-areas: "logo navigation";
+        grid-template-rows: 100%;
         
-        grid-template-areas: "logo secondary" "logo navigation";
-        grid-template-rows: 3.6rem 1fr;
+        /* grid-template-areas: "logo secondary" "logo navigation"; */
+        /* grid-template-rows: 3.6rem 1fr; */
         
-        grid-template-columns: auto 1fr;
+        /* grid-template-columns: auto 1fr; */
     }
 
     /* header:has(.secondary) {
@@ -130,9 +130,9 @@ const { id, currentPath } = Astro.props;
 </style>
 
 <style lang="scss" is:global>
-    header nav {
+    /* header nav {
         grid-area: secondary / secondary / navigation / navigation;
-    }
+    } */
 
     header .secondary ul.social {
         padding: 0;
