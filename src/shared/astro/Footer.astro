@@ -35,10 +35,12 @@ const Override = (await Object.values(import.meta.glob("/src/components/**/Foote
       {
           footerPreferences?.show_copyright && (
               <p class="copyright">
-                  {footerPreferences?.copyright.replace(
-                      "©",
-                      "© " + currentYear,
-                  )}
+                <>
+                    <Markdown content={footerPreferences?.copyright.replace(
+                        "©",
+                        "© " + currentYear,
+                    )} />
+                </>
               </p>
           )
       }
