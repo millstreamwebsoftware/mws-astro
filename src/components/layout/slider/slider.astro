@@ -196,6 +196,8 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             if (!e.matches(".ENV_EDITOR *")) {
                 const id = e.getAttribute("id");
 
+                if (!id) return;
+
                 const glideOptions: Partial<Glide.Options> = {
                     autoplay: Number(e.dataset?.autoplay) || false,
                     focusAt:
@@ -217,7 +219,20 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                     hoverpause: "hoverpause" in e.dataset,
                 };
 
-                new Glide(`#${id}`, glideOptions).mount();
+                const glide = new Glide(`#${id}`, glideOptions);
+
+                // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
+                if (Number(e.dataset?.perView) === 1) {
+                  glide.on("move", () => {
+                    const slider = document.getElementById(id);
+                    const slides = slider?.querySelectorAll(".slider-item");
+
+                    slides?.forEach((e) => e.setAttribute("inert", ""));
+                    slides?.[glide.index].removeAttribute("inert");
+                  });
+                }
+
+                glide.mount();
             }
         });
     }
@@ -272,7 +287,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
 
     .glide__slides {
-        min-height: var(--height);
+        min-height: calc(var(--height) - var(--header-offset-transparent));
     }
 
     /* .glide__slide {
@@ -398,7 +413,9 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             left: 0;
             order: 2;
             opacity: 0;
+            z-index: 2;
             transition: opacity var(--transition) ease-in-out;
+            transition-delay: .2s;
         }
 
         .slider-item.glide__slide--active {
@@ -406,7 +423,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             order: 1;
             opacity: 1;
             z-index: 1;
-            transition: opacity 0 ease-in-out;
+            transition: opacity var(--transition) ease-in-out;
         }
     }
 
