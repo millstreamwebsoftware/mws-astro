@@ -73,6 +73,7 @@ const { id, currentPath } = Astro.props;
  
         grid-template-areas: "logo navigation";
         grid-template-rows: 100%;
+        grid-template-columns: 1fr auto;
         
         /* grid-template-areas: "logo secondary" "logo navigation"; */
         /* grid-template-rows: 3.6rem 1fr; */
@@ -103,6 +104,7 @@ const { id, currentPath } = Astro.props;
         padding: 10px;
         grid-area: logo;
         width: fit-content;
+        min-width: 15rem;
     }
 
     .logo img {
