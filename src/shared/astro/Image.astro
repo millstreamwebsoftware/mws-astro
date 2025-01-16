@@ -29,6 +29,7 @@ const {
     opacity,
     fixed = false,
     densities = [1.5, 2],
+    alt = "",
 } = Astro.props;
 
 let astroImage;
@@ -178,14 +179,13 @@ if (typeof image == "string" && !remote) {
 ---
 
 {fallbackImage ?
-  <img src={fallbackImage} class:list={[classes, { background, fixed }]} {style} data-fit={fit} />
+  <img src={fallbackImage} class:list={[classes, { background, fixed }]} {style} data-fit={fit} {alt} />
   : 
   !!image && <AstroImage
       src={image}
-      alt=""
+      {alt}
       {width}
       {height}
-      inferSize={false}
       class:list={[classes, { background, fixed }]}
       style={Object.assign({}, placeholderStyle, style)}
       densities={densities ? densities : undefined}

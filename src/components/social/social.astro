@@ -5,6 +5,7 @@ import Icon from "@shared/icon.astro";
 export interface Props {
     align?: string;
     "show-text"?: boolean;
+    socials?: [{"icon"?: string, "name": string, "link": string}]
 }
 
 const { align, "show-text": text } = Astro.props;
@@ -20,7 +21,9 @@ const icons: Record<string, string> = {
     email: "fa6-solid:square-envelope",
 };
 
-const socials: Record<string, string>[] = preferences.general.social.map(
+const socialItems = Astro.props.socials?.length ? Astro.props.socials : preferences.general.social;
+
+const socials: Record<string, string>[] = socialItems.map(
     (s: any) => {
         let social = { icon: icons[s.name] };
         if (!social.icon) social.icon = "fa6-solid:square-up-right";
