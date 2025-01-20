@@ -245,14 +245,19 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         document.body.addEventListener("keydown", handleNavigationEvent);
         navigation.addEventListener("focusout", handleNavigationEvent);
         
+        const secondaryNavbar = navigation.matches(".secondary-navbar");
         const navItems = navigation.querySelector("#navigation-items");
         var mobileNavWidth = 768;
         
         function resizeHandler() {
-          if (document.documentElement.clientWidth > mobileNavWidth) {
-            if (navItems?.clientWidth && document.documentElement.clientWidth < navItems?.clientWidth) {
-              mobileNavWidth = navItems?.clientWidth;
-            }
+          const rect = navItems?.getBoundingClientRect();
+          if (!rect) return;
+          
+          if (navItems?.scrollWidth && document.documentElement.clientWidth > mobileNavWidth && (Math.abs(navItems.scrollWidth - rect.width) > 3)) {
+            // Navigation is overflowing, switch to mobile navigation
+            mobileNavWidth = navItems.scrollWidth + rect.left;
+            
+            // console.log(`Updated mobile navigation width to ${mobileNavWidth}`);
           }
           
           document.documentElement.classList.toggle("mobile-nav", isMobileNav());
@@ -303,6 +308,8 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         function openNav(target: FloatingUIElement, dropdownElement?: HTMLElement) {
             // Close all dropdowns that do not contain the new dropdown
             closeAllNav(target, true);
+            
+            if (target.matches("#secondary-button") && secondaryNavbar && !isMobileNav()) return;
 
             const dropdown = dropdownElement ?? target.querySelector(":scope ul") as HTMLElement;
             if (!dropdown) return;
@@ -392,7 +399,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             target.setAttribute("aria-expanded", "true");
             target.classList.add("dropdown-open");
             dropdown.classList.add("open");
-            console.log(target, dropdown);
+            // console.log(target, dropdown);
         }
         
         function dropdownOptions(vertical: boolean, caret: Element | undefined): ComputePositionConfig {
@@ -457,8 +464,6 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
          * Media query to test if mobile nav should be shown
          */
         function isMobileNav(): boolean {
-            // return window.matchMedia("screen and (max-width: 768px)").matches;
-            
             return window.innerWidth <= mobileNavWidth;
         }
 
@@ -730,8 +735,6 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         }
     }
 
-
-
     .dropdown-open > a .dropdown-indicator {
         transform: rotate(180deg);
     }
@@ -749,6 +752,8 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             grid-auto-flow: column;
             grid-row-gap: 0;
             
+            width: 100%;
+            
             position:relative;
             /* height: var(--header-height); */
         }
@@ -756,7 +761,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         &.secondary-navbar {
             ul.depth-0 {
                 grid-template-rows: 3.6rem 1fr;
-                grid-template-columns: auto;
+                /* grid-template-columns: auto; */
             }
             
             li.depth-0 {
