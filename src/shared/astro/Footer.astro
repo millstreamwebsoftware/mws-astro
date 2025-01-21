@@ -34,14 +34,12 @@ const Override = (await Object.values(import.meta.glob("/src/components/**/Foote
       {footerPreferences?.show_socials && <Social />}
       {
           footerPreferences?.show_copyright && (
-              <p class="copyright">
-                <>
-                    <Markdown content={footerPreferences?.copyright.replace(
-                        "©",
-                        "© " + currentYear,
-                    )} />
-                </>
-              </p>
+              <div class="copyright">
+                <Markdown content={footerPreferences?.copyright.replace(
+                    "©",
+                    "© " + currentYear,
+                )} />
+              </div>
           )
       }
       <p class="brand">
@@ -79,11 +77,15 @@ const Override = (await Object.values(import.meta.glob("/src/components/**/Foote
         opacity: 0.5;
     }
 
-    @media only screen and (max-width: 768px) {
-        section.footer {
-            grid-template-rows: auto auto;
-            grid-template-columns: auto;
-            padding-bottom: 100px; /* Create space for mobile navigation button */
-        }
+    
+
+    
+</style>
+
+<style is:global lang="scss">
+    html.mobile-nav section.footer {
+        grid-template-rows: auto auto;
+        grid-template-columns: auto;
+        padding-bottom: 100px; /* Create space for mobile navigation button */
     }
 </style>
