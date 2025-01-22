@@ -128,7 +128,7 @@ const { id, currentPath } = Astro.props;
             height: 0;
         }
 
-        :root {
+        :where(:root) {
             --header-height: 0;
         }
     }

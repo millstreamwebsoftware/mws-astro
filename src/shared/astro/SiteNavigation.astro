@@ -601,34 +601,58 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             align-items: center;
             justify-content: center;
             color: rgb(var(--mobile-header-color));
-    
+            
+            background-color: rgb(var(--mobile-header-background-color));
+            border: 2px solid rgb(var(--color-accent));
             padding: 2rem;
             border-radius: 6rem;
             bottom: 0.5rem;
             width: 8rem;
             height: 8rem;
         }
+        
+        main {
+          --header-offset-transparent: var(--header-height);
+        }
+        
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 10rem;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            
+            background: linear-gradient(
+              to top,
+              rgb(var(--mobile-header-background-color)),
+              transparent
+            );
+        }
     }
 
     #mobile-nav-menu {
         pointer-events: all;
         grid-area: centre;
-        background-color: rgb(var(--mobile-header-background-color));
+
         box-shadow: 0 0 2rem #0005;
-        border: 0;
-        z-index: 1;
+        /* border: 0; */
+        z-index: 10;
     }
 
     #mobile-nav-home {
         opacity: 0;
         pointer-events: none;
         grid-area: left;
-        border: 0.5px solid #eee;
+        border: 2px solid rgb(var(--color-accent));
         transform: translate(calc(25vw + 3rem)) scale(0.5);
         transition:
             transform 0.3s ease,
             opacity 0.3s ease;
-        z-index: 0;
+        z-index: 5;
     }
 
     #mobile-nav-overlay {
@@ -698,6 +722,11 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         }
 
         &.expanded {
+            #mobile-nav-buttons::after {
+                opacity: 1;
+                pointer-events: all;
+            }
+            
             #mobile-nav-home {
                 pointer-events: initial;
                 transform: translate(0) scale(1);

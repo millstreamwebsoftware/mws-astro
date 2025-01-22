@@ -1,6 +1,6 @@
 @import "src/styles/editor.css";
 
-:root {
+:where(:root) {
   --page-max-width: 1920px;
 
   --root-indent: min(8vw, calc(var(--page-max-width) * 0.08));
@@ -374,7 +374,7 @@ section {
   background-color: rgb(var(--background-color));
 }
 
-a.button {
+:where(a.button) {
   transition: background-color 0.2s ease;
 
   &:hover {
