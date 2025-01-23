@@ -268,8 +268,9 @@ if (!ENV_BOOKSHOP_LIVE) {
 </style>
 
 <script>
-    document.addEventListener("DOMContentLoaded", setupCardIndex);
-    document.addEventListener("astro:after-swap", setupCardIndex);
+    // document.addEventListener("DOMContentLoaded", setupCardIndex);
+    // document.addEventListener("astro:after-swap", setupCardIndex);
+    setupCardIndex();
 
     function setupCardIndex() {
         const cardIndexes = document.querySelectorAll<HTMLElement>(

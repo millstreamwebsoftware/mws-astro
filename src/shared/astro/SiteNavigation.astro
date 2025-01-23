@@ -219,8 +219,9 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         arrow,
     } from "@floating-ui/dom";
 
-    document.addEventListener("DOMContentLoaded", setupNavigation);
-    document.addEventListener("astro:after-swap", setupNavigation);
+    // document.addEventListener("DOMContentLoaded", setupNavigation);
+    // document.addEventListener("astro:after-swap", setupNavigation);
+    setupNavigation();
     
     // function isOverflowing(element: HTMLElement) {
     //   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;

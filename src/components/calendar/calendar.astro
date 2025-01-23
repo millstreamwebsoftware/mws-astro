@@ -114,8 +114,9 @@ const calendarOptions = {
     }
     
 
-    document.addEventListener("DOMContentLoaded", setupCalendar);
-    document.addEventListener("astro:after-swap", setupCalendar);
+    // document.addEventListener("DOMContentLoaded", setupCalendar);
+    // document.addEventListener("astro:after-swap", setupCalendar);
+    setupCalendar();
 
     async function setupCalendar() {
         var calendarSections = document.querySelectorAll(

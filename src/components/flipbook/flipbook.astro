@@ -67,8 +67,9 @@ var getDocument: Function | undefined = undefined;
 var TextLayer: any | undefined = undefined;
 var GlobalWorkerOptions: any | undefined = undefined;
 
-document.addEventListener("DOMContentLoaded", setupFlipbook);
-document.addEventListener("astro:after-swap", setupFlipbook);
+// document.addEventListener("DOMContentLoaded", setupFlipbook);
+// document.addEventListener("astro:after-swap", setupFlipbook);
+setupFlipbook();
 
 async function importPDFJS() {
   if (getDocument && TextLayer && GlobalWorkerOptions) return;

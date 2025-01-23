@@ -186,9 +186,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 <script>
     import Glide from "@glidejs/glide";
 
-    document.addEventListener("DOMContentLoaded", setupGlide);
-    document.addEventListener("astro:after-swap", setupGlide);
-
+    // document.addEventListener("DOMContentLoaded", setupGlide);
+    // document.addEventListener("astro:after-swap", setupGlide);
+    setupGlide();
+    
     function setupGlide() {
         document.querySelectorAll("div[data-glide]").forEach((e) => {
             if (!(e instanceof HTMLElement)) return;

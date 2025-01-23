@@ -26,6 +26,8 @@ const { collection } = Astro.props;
 </template>
 
 <script>
+    setupLightbox();
+
     function showLightbox(
         lightboxTemplate: HTMLTemplateElement,
         target: string,
@@ -142,8 +144,8 @@ const { collection } = Astro.props;
         });
     }
 
-    document.addEventListener("DOMContentLoaded", setupLightbox);
-    document.addEventListener("astro:after-swap", setupLightbox);
+    // document.addEventListener("DOMContentLoaded", setupLightbox);
+    // document.addEventListener("astro:after-swap", setupLightbox);
 </script>
 
 <style is:global lang="scss">

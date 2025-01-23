@@ -5,8 +5,9 @@
 <span data-counter><slot /></span>
 
 <script>
-  document.addEventListener("DOMContentLoaded", setupCounter);
-  document.addEventListener("astro:after-swap", setupCounter);
+  // document.addEventListener("DOMContentLoaded", setupCounter);
+  // document.addEventListener("astro:after-swap", setupCounter);
+  setupCounter();
 
   function setupCounter() {
     const counters = document.querySelectorAll<HTMLElement>("[data-counter]");
