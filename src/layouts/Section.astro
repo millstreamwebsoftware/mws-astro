@@ -272,8 +272,9 @@ const expando = classList.includes("expando") ? true : false;
 </style>
 
 <script>
-    document.addEventListener("DOMContentLoaded", setupExpando);
-    document.addEventListener("astro:after-swap", setupExpando);
+    // document.addEventListener("DOMContentLoaded", setupExpando);
+    // document.addEventListener("astro:after-swap", setupExpando);
+    setupExpando();
 
     function setupExpando() {
         const expandos = Array.from(

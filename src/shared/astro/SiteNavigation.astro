@@ -163,7 +163,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             }
             {!!depth && showCaret && <div class="dropdown-caret" />}
             {
-                !depth && !!secondary && (
+                !depth && !!secondary.length && (
                     <li
                         id="secondary-button"
                         class:list={[
