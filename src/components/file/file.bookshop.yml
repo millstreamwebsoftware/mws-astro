@@ -4,8 +4,15 @@ spec:
     - content_blocks
   label: Files
   description: Display files to download.
-  icon: file-present
+  icon: file_present
   tags: ["file", "collection"]
+  preview:
+    subtext:
+      - template: "{files[*].title|default=files[*].url}"
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 # Defines the structure of this component, as well as the default values
 blueprint:

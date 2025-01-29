@@ -6,6 +6,18 @@ spec:
   description: Display a single image.
   icon: image
   tags: ["image"]
+  preview:
+    gallery:
+      image:
+        - key: image
+      text:
+        - key: alt
+    subtext:
+      - key: title
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 # Defines the structure of this component, as well as the default values
 blueprint:

@@ -7,7 +7,11 @@ spec:
   tags: []
   preview:
     subtext:
-      - template: "{content_blocks[*]._bookshop_name}"
+      - key: content_blocks[*]._bookshop_name
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 blueprint:
   content_blocks: [bookshop:structure:content_blocks]
