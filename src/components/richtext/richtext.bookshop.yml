@@ -12,6 +12,10 @@ blueprint:
   content:
   classes:
 
+preview:
+  image:
+    - key: background_image
+
 _inputs:
   content:
     type: markdown
@@ -56,8 +60,3 @@ _inputs:
         - no-indent-bottom
         - no-indent-left
         - no-indent-right
-
-# Overrides any fields in the blueprint when viewing this component in the component browser
-preview:
-# Any extra CloudCannon inputs configuration to apply to the blueprint
-

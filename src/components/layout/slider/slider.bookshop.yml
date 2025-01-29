@@ -23,6 +23,10 @@ blueprint:
   animationDuration: 0.4
   classes:
 
+preview:
+  subtext:
+    - template: "{content_blocks[*]._bookshop_name}"
+
   # slides:
   #   values:
   #     background_fit:
