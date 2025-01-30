@@ -36,6 +36,9 @@ const { collection } = Astro.props;
 
         let box = (lightboxTemplate.content.cloneNode(true) as DocumentFragment)
             ?.children[0] as HTMLElement;
+        
+        document.body.style.top = `-${window.scrollY}px`;
+        document.documentElement.classList.toggle("lightbox-noscroll", true);
 
         const setCounter = (i: number, l: number) => {
             const counter = box.querySelector(".buttons .counter");
@@ -44,6 +47,18 @@ const { collection } = Astro.props;
             counter.innerHTML = `${i}/${l}`;
             // counter.classList.toggle("hidden", l < 2);
             box.classList.toggle("single", l < 2);
+        };
+        
+        const close = () => {
+          const scrollY = document.body.style.top;
+          document.documentElement.classList.toggle("lightbox-noscroll", false);
+          document.body.style.top = "";
+          window.scrollTo({
+              left: 0,
+              top: parseInt(scrollY || "0") * -1,
+              behavior: "instant",
+          });
+          box.remove();
         };
 
         const select = (direction: number) => {
@@ -92,7 +107,7 @@ const { collection } = Astro.props;
             if (target.matches("[data-lightbox]")) return;
             if (target.closest("figcaption, #lightbox")?.matches("figcaption"))
                 return;
-            box.remove();
+            close();
         });
 
         box.addEventListener("keydown", (e) => {
@@ -109,7 +124,7 @@ const { collection } = Astro.props;
                     e.preventDefault();
                     break;
                 case "Escape":
-                    box.remove();
+                    close();
                     break;
             }
         });
@@ -158,6 +173,16 @@ const { collection } = Astro.props;
         justify-content: center;
         // z-index: 3;
     }
+    
+    html.lightbox-noscroll {
+        overflow: hidden;
+        
+        & > body {
+            position: fixed;
+            overflow: hidden;
+            width: min(100%, var(--page-max-width));
+        }
+    }
 
     // #lightbox .items .img-wrapper {
     //   /* width: 100%; */
@@ -174,6 +199,15 @@ const { collection } = Astro.props;
     //   object-fit: contain;
     //   object-position: center;
     // }
+    
+    #lightbox .items > main.selected {
+        display: block;
+    }
+    
+    #lightbox .items > main {
+        background-color: rgb(var(--article-background-color));
+        overflow: scroll;
+    }
 
     #lightbox .items figure {
         position: relative;

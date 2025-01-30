@@ -49,7 +49,7 @@ export function trimFilePath(p: string) {
 export function getTreeNode(
   tree: TreeNode,
   path: string | undefined,
-  relpath: string | undefined,
+  relpath: string = "",
   parent: boolean = false,
 ): TreeNode | undefined {
   if (!path) return tree;

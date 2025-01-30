@@ -5,15 +5,21 @@ import Image from "@shared/Image.astro";
 import Markdown from "@shared/Markdown.astro";
 import Icon from "@shared/icon.astro";
 import type { TreeNode } from "@mws-astro/middleware";
+// import Page from "@shared/Page.astro";
+// import Lightbox from "@components/lightbox/lightbox.astro";
 
 interface Props {
     card: CollectionEntry<CollectionKey> & TreeNode;
     include: string[];
     filters: string[];
     aspect?: number;
+    // key?: string;
+    "data-lightbox"?: string;
 }
 
-const { card, include, filters,
+const dataExclude = ["link", "render"];
+
+const { card, include, filters, "data-lightbox": lightbox
   // aspect = 1
 } = Astro.props;
 const combinedCard = Object.assign(Object.assign({}, card), card.data);
@@ -50,7 +56,7 @@ function formatDate(date: Date) {
 }
 ---
 
-<div class="card-index-card" {...filterData}>
+<div class="card-index-card" {...filterData} data-lightbox={lightbox}>
     {link && <a class="card-link" href={card?.href} />}
     {
         thumbnail && (
@@ -65,6 +71,7 @@ function formatDate(date: Date) {
         {publishDate && <p>{formatDate(publishDate)}</p>}
         {
             Object.entries(cardData).map(([k, v]) => {
+                if (dataExclude.includes(k)) return;
                 let dateString;
                 if (v instanceof Date) dateString = formatDate(v);
                 return (

@@ -2,11 +2,12 @@
 import { bookshopName } from "@mws-astro/util";
 
 export interface Props {
-    "bookshop:live"?: any;
     contentBlocks: any[];
+    "bookshop:live"?: any;
+    "data-lightbox"?: string;
 }
 
-const { contentBlocks } = Astro.props;
+const { contentBlocks, "data-lightbox": lightbox } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -43,7 +44,7 @@ Object.entries(componentOverrides).forEach(
 // });
 ---
 
-<main data-pagefind-body>
+<main data-pagefind-body data-lightbox={lightbox}>
     {
         contentBlocks.map((block: any, i: number) => {
             const Component = components[block._bookshop_name];

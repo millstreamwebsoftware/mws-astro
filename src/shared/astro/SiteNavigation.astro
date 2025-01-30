@@ -99,6 +99,8 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             {
                 pages?.children &&
                     Object.values(pages.children).map((page: TreeNode) => {
+                        if (page.status === "hidden") return;
+                    
                         // Skip home element if show_home is false
                         if (!showHome && page.href === "/") return;
                         if (page.collection && page.collection != "pages")

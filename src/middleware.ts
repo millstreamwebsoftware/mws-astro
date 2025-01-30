@@ -15,7 +15,7 @@ export type AllCollections = Record<
 export const onRequest = defineMiddleware(async (ctx, next) => {
   const currentPath = ctx.params.slug;
   ctx.locals.collections = await getAllCollections(
-    (page) => page.data.status === "online" || page.data.status === "meta",
+    (page) => page.data.status !== "offline",
   );
 
   ctx.locals.tree = makeTree(
