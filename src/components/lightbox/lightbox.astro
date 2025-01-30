@@ -105,6 +105,7 @@ const { collection } = Astro.props;
                 return;
             }
             if (target.matches("[data-lightbox]")) return;
+            if (target.closest("main")?.matches("[data-lightbox]")) return;
             if (target.closest("figcaption, #lightbox")?.matches("figcaption"))
                 return;
             close();
@@ -182,6 +183,10 @@ const { collection } = Astro.props;
             overflow: hidden;
             width: min(100%, var(--page-max-width));
         }
+    }
+    
+    #lightbox:has(.items > main) > .buttons {
+        z-index: -1;
     }
 
     // #lightbox .items .img-wrapper {
