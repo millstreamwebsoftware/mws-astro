@@ -2,13 +2,14 @@
 spec:
   structures:
     - content_blocks
-  label: Content
-  description: Rich text element.
-  icon: edit_note
+  label: Video Player
+  description: Embed a video player
+  icon: movie
   tags: []
   preview:
-    image:
-      - key: background_image
+    text: Video Player
+    subtext:
+      - key: src
     metadata:
       - text:
           - key: classes
@@ -16,5 +17,6 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
+  src:
   content:
   classes:

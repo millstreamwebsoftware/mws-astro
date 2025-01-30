@@ -6,6 +6,11 @@ spec:
   description: Display a navigaiton element
   icon: switch_access_shortcut
   tags: []
+  preview:
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 # Defines the structure of this component, as well as the default values
 blueprint:

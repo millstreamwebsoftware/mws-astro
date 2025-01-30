@@ -6,6 +6,15 @@ spec:
   description: Layout content in columns.
   icon: view_column
   tags: []
+  preview:
+    subtext:
+      - key: content_blocks[*]._bookshop_name
+    image:
+      - key: background_image
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 # Defines the structure of this component, as well as the default values
 blueprint:
