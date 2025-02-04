@@ -1,6 +1,4 @@
 ---
-import { Debug } from 'astro:components';
-
 export interface Props {
   text: string;
 }
@@ -9,6 +7,8 @@ const { text } = Astro.props;
 
 // @ts-expect-error
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
+
+//{typeof Astro.locals === "object" && <Debug locals={Object.keys(Astro.locals)} />}
 ---
 
 <div>
@@ -17,7 +17,6 @@ const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
   </p>
   <p>Test data: <span>{text}</span></p>
   <p>Middleware: <span>{typeof Astro.locals}</span></p>
-  {typeof Astro.locals === "object" && <Debug locals={Object.keys(Astro.locals)} />}
 </div>
 
 <style>
