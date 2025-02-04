@@ -6,6 +6,15 @@ spec:
   description: List information about other pages
   icon: recent_actors
   tags: []
+  preview:
+    subtext:
+      - key: target
+    image:
+      - key: background_image
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 blueprint:
   target: ""
@@ -15,6 +24,7 @@ blueprint:
   columns: 4
   pageSize: 0
   limit: 0
+  classes:
 
 preview:
   target: /
@@ -36,18 +46,36 @@ _inputs:
         - description
         - link
         - categories
+        - read-more
+        - lightbox
       allow_create: true
   filters:
     type: multiselect
-    label: Filters
-    comment: Show filters for certain properties
+    label: User Filters
+    comment: Show user-selectable filters for certain properties
     options:
       values:
         - categories
   prefilter:
     type: multiselect
     label: Prefilter
-    comment: Filter which cards will be displayed. E.g. property~=value (property contains value), property=value (property is exactly value), property (card has a property)
+    comment: Filter which cards will be displayed.
+    context:
+      open: false
+      title: Filter Formatting
+      icon: help
+      content: >-
+        Filters can be defined in the following formats:
+          
+         * `property~=value` (property contains value)
+         
+         * `property=value` (property is exactly value)
+         
+         * `property` (card has a property)
+         
+        Cards that match one of the filters will be displayed. 
+
+        E.g. `categories~=Blog` `categories~=News` will only display posts in the categories Blog or News.
     options:
       allow_create: true
   columns:

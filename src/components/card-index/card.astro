@@ -17,7 +17,7 @@ interface Props {
     "data-lightbox"?: string;
 }
 
-const dataExclude = ["link", "render"];
+const dataExclude = ["link", "lightbox"];
 
 const { card, include, filters, "data-lightbox": lightbox
   // aspect = 1
@@ -174,6 +174,7 @@ function formatDate(date: Date) {
             padding: 1rem 2rem;
             background-color: rgb(var(--color-primary));
             --text-color: 255 255 255;
+            color: rgb(var(--text-color));
 
             align-items: center;
             justify-content: space-between;

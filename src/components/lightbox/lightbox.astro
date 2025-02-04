@@ -145,7 +145,7 @@ const { collection } = Astro.props;
 
             if (!collection) return;
             collection.addEventListener("click", (e) => {
-                if (!(e.target instanceof HTMLElement)) return;
+                if (!(e.target instanceof Element)) return;
 
                 let clicked = e.target.closest(
                     "[data-lightbox]",

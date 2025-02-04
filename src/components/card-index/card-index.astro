@@ -58,7 +58,7 @@ if (!ENV_BOOKSHOP_LIVE) {
             },
             [],
         );
-    
+
     // cards?.[0].data.publishDate?.getTime();
 
     // Sort from newest to oldest, fall back on ascending order
@@ -66,35 +66,35 @@ if (!ENV_BOOKSHOP_LIVE) {
         (a, b) => (b.data.publishDate?.getTime() ?? NaN) - (a.data.publishDate?.getTime() ?? NaN) ||
         a.data.order - b.data.order
     );
-    
+
     // Prefilter cards
     const prefilters = prefilter.map((filter) => {
       if (!filter) return;
       let match: any;
-      
+
       // [attr~=value]
       match = filter.match(/^(?<k>.*)~=(?<v>.*)$/)?.groups;
       if (match)
         return function IncludesFilter (card: any) {
           return match.k in card.data && card.data?.[match.k]?.includes(match.v);
         };
-      
+
       // [attr=value]
       match = filter.match(/^(?<k>.*)=(?<v>.*)$/)?.groups;
       if (match)
         return function EqualityFilter (card: any) {
           return match.k in card.data && card.data?.[match.k] === match.v;
         };
-      
+
       // [attr]
       return function IncludesAttrFilter (card: any) {return filter in card.data};
     }).filter((filter) => !!filter);
-    
+
     if (prefilters.length)
     cards = cards?.filter((card) => {
       return prefilters.some((p) => p(card));
-    }); 
-    
+    });
+
     // Limit number of cards if required
     cards = cards?.slice(0, limit || undefined);
 } else {
@@ -185,7 +185,7 @@ const id = `card-index-${key}`;
                     })
             }
         </div>
-        {include.includes("render") && cards && 
+        {include.includes("lightbox") && cards &&
             <Lightbox collection={id}>
                 {cards.map((card, i) => {
                   return <Page contentBlocks={card.data["content_blocks"]} data-lightbox={`${id}-${i}`} />;
