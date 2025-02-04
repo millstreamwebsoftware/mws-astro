@@ -18,8 +18,7 @@ const { collection } = Astro.props;
         <div class="buttons">
             <p class="counter">0/0</p>
             <button data-action="<"><Icon name="carbon:chevron-left" /></button>
-            <button data-action=">"><Icon name="carbon:chevron-right" /></button
-            >
+            <button data-action=">"><Icon name="carbon:chevron-right" /></button>
             <button data-action="x"><Icon name="carbon:close" /></button>
         </div>
     </div>
@@ -36,7 +35,7 @@ const { collection } = Astro.props;
 
         let box = (lightboxTemplate.content.cloneNode(true) as DocumentFragment)
             ?.children[0] as HTMLElement;
-        
+
         document.body.style.top = `-${window.scrollY}px`;
         document.documentElement.classList.toggle("lightbox-noscroll", true);
 
@@ -48,7 +47,7 @@ const { collection } = Astro.props;
             // counter.classList.toggle("hidden", l < 2);
             box.classList.toggle("single", l < 2);
         };
-        
+
         const close = () => {
           const scrollY = document.body.style.top;
           document.documentElement.classList.toggle("lightbox-noscroll", false);
@@ -174,41 +173,26 @@ const { collection } = Astro.props;
         justify-content: center;
         // z-index: 3;
     }
-    
+
     html.lightbox-noscroll {
         overflow: hidden;
-        
+
         & > body {
             position: fixed;
             overflow: hidden;
             width: min(100%, var(--page-max-width));
+            left: calc((100vw - min(100%, var(--page-max-width))) * .5);
         }
     }
-    
+
     #lightbox:has(.items > main) > .buttons {
         z-index: -1;
     }
 
-    // #lightbox .items .img-wrapper {
-    //   /* width: 100%; */
-    //   /* height: 100%; */
-    //   /* object-fit: contain; */
-    //   /* object-position: center; */
-    //   /* background-size: contain; */
-    //   flex: 1 1 100%;
-    //   height: 100%;
-    // }
-
-    // #lightbox .items .img-wrapper img {
-    //   height: 100%;
-    //   object-fit: contain;
-    //   object-position: center;
-    // }
-    
     #lightbox .items > main.selected {
         display: block;
     }
-    
+
     #lightbox .items > main {
         background-color: rgb(var(--article-background-color));
         overflow: scroll;
@@ -230,11 +214,6 @@ const { collection } = Astro.props;
     }
 
     #lightbox .items figcaption {
-        /* position: absolute; */
-        /* bottom: 0;
-    left: 0;
-    right: 0; */
-        /* height: 6rem; */
         margin: 2rem;
         flex: 0 0 0;
         z-index: 3;
@@ -340,7 +319,6 @@ const { collection } = Astro.props;
         justify-content: center;
         align-items: center;
         height: 100%;
-        /* max-height: 100vh; */
     }
 
     .buttons {
