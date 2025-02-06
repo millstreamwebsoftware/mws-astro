@@ -48,6 +48,9 @@ Object.entries(componentOverrides).forEach(
 
 const secondary: any = prefs.header?.secondary_navigation || [];
 const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.length;
+
+// !depth && console.log(pages);
+
 ---
 
 <Wrapper
@@ -76,40 +79,40 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
     <Items id="navigation-items">
         <ul class:list={[`depth-${depth}`]}>
             {
-                pages?.href && (
-                    <li
-                        class:list={[
-                            {
-                                selected: pages.selected === 2,
-                            },
-                            `depth-${depth}`,
-                        ]}
-                    >
-                        <a
-                            aria-selected={
-                                pages.selected === 2 ? "true" : "false"
-                            }
-                            href={pages.href}
-                        >
-                            <span>{pages?.title}</span>
-                        </a>
-                    </li>
-                )
-            }
-            {
                 pages?.children &&
                     Object.values(pages.children).map((page: TreeNode) => {
-                        if (page.status === "hidden") return;
-                    
+
+                        // Online  -- children if any visible
+                        // Meta    -- visible if children or link
+                        // Hidden  -- hide
+                        // Offline -- hide
+
+
+                        // Hide self and children if Hidden of Offline
+                        if (page.status === "hidden" || page.status === "offline") return;
+
+                        // Check if we have children to display
+                        const children =
+                            page.children
+                            && Object.keys(page.children)?.length
+                            && Object.values(page.children).some(
+                              (child) => child.status === "online"
+                                || (child.status === "meta" && child.link
+                                  || child.children
+                                  && Object.keys(child.children).length
+                                )
+                            );
+
+                        // Hide meta pages without visible children or a link
+                        if (page.status !== "online" && !children && !page.href) return;
+
                         // Skip home element if show_home is false
                         if (!showHome && page.href === "/") return;
+
+                        // Skip pages that are not from the "pages" collection
                         if (page.collection && page.collection != "pages")
                             return;
-                        const children =
-                            page.children && Object.keys(page.children)?.length;
-                        
-                        if (page.status !== "online" && !children && !page.href) return;
-                        
+
                         const id = `nav-${
                             page.slug ||
                             page.title?.toLowerCase().replaceAll(" ", "-")
@@ -224,12 +227,12 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
     // document.addEventListener("DOMContentLoaded", setupNavigation);
     // document.addEventListener("astro:after-swap", setupNavigation);
     setupNavigation();
-    
+
     // function isOverflowing(element: HTMLElement) {
     //   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
     // }
-    
-    
+
+
 
     function setupNavigation() {
         const navigation = document.getElementById("navigation");
@@ -241,32 +244,32 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                 (navigation.dataset?.placement as Placement | undefined)) ||
             "bottom-start";
         const caretHeight = 20;
-        
+
         // const navTarget = null;
         if (!navigation) return;
         document.body.addEventListener("click", handleNavigationEvent);
         document.body.addEventListener("keydown", handleNavigationEvent);
         navigation.addEventListener("focusout", handleNavigationEvent);
-        
+
         const secondaryNavbar = navigation.matches(".secondary-navbar");
         const navItems = navigation.querySelector("#navigation-items");
         var mobileNavWidth = 768;
-        
+
         function resizeHandler() {
           const rect = navItems?.getBoundingClientRect();
           if (!rect) return;
-          
+
           if (navItems?.scrollWidth && document.documentElement.clientWidth > mobileNavWidth && (Math.abs(navItems.scrollWidth - rect.width) > 3)) {
             // Navigation is overflowing, switch to mobile navigation
             mobileNavWidth = navItems.scrollWidth + rect.left;
-            
+
             // console.log(`Updated mobile navigation width to ${mobileNavWidth}`);
           }
-          
+
           document.documentElement.classList.toggle("mobile-nav", isMobileNav());
           navigation?.classList.toggle("mobile-nav", isMobileNav());
         }
-        
+
         window.addEventListener("resize", resizeHandler);
         resizeHandler();
 
@@ -311,7 +314,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         function openNav(target: FloatingUIElement, dropdownElement?: HTMLElement) {
             // Close all dropdowns that do not contain the new dropdown
             closeAllNav(target, true);
-            
+
             if (target.matches("#secondary-button") && secondaryNavbar && !isMobileNav()) return;
 
             const dropdown = dropdownElement ?? target.querySelector(":scope ul") as HTMLElement;
@@ -323,7 +326,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             const options: ComputePositionConfig = dropdownOptions(target.classList.contains(
                 "depth-0"
             ), caret);
-            
+
             const cleanup = autoUpdate(target, dropdown, () => {
                 computePosition(target, dropdown, options).then(
                     ({ x, y, middlewareData, placement }) => {
@@ -339,7 +342,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                             left: `${x}px`,
                             top: `${y}px`,
                         });
-                        
+
                         if (middlewareData.arrow) {
                             let turn,
                                 top,
@@ -389,7 +392,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                     },
                 );
             });
-            
+
             target._cleanup = () => {
                 cleanup();
 
@@ -404,7 +407,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             dropdown.classList.add("open");
             // console.log(target, dropdown);
         }
-        
+
         function dropdownOptions(vertical: boolean, caret: Element | undefined): ComputePositionConfig {
           return vertical ? {
                 placement,
@@ -459,9 +462,9 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                     caret && arrow({ element: caret, padding: 10 }),
                 ],
             }
-          
+
         }
-        
+
 
         /**
          * Media query to test if mobile nav should be shown
@@ -501,20 +504,20 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             const target: HTMLElement | null = (
                 e.target as HTMLElement
             ).closest("li, #navigation");
-            
+
             if (target && target.id === "secondary-button" && secondary) {
                 const state = !target.classList.contains("dropdown-open");
-                
+
                 if (state) {
                   openNav(target, secondary);
                 } else {
                   closeNav(target);
                   closeAllNav(target);
                 }
-                
+
                 return;
             };
-            
+
             if (
                 !target ||
                 target.id === "navigation" ||
@@ -570,7 +573,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             setModalState(false);
         });
     }
-    
+
 
 </script>
 
@@ -578,7 +581,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
     nav {
         z-index: 999;
         overflow: hidden;
-        
+
         grid-template-areas: "logo navigation";
     }
 
@@ -598,13 +601,13 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
         grid-template-columns: repeat(3, 1fr);
         align-items: center;
         justify-items: center;
-        
+
         :is(button, a) {
             display: flex;
             align-items: center;
             justify-content: center;
             color: rgb(var(--mobile-header-color));
-            
+
             background-color: rgb(var(--mobile-header-background-color));
             border: 2px solid rgb(var(--color-accent));
             padding: 2rem;
@@ -613,11 +616,11 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             width: 8rem;
             height: 8rem;
         }
-        
+
         main {
           --header-offset-transparent: var(--header-height);
         }
-        
+
         &::after {
             content: "";
             position: absolute;
@@ -628,7 +631,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             z-index: 0;
             opacity: 0;
             transition: opacity 0.2s ease;
-            
+
             background: linear-gradient(
               to top,
               rgb(var(--mobile-header-background-color)),
@@ -729,7 +732,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                 opacity: 1;
                 pointer-events: all;
             }
-            
+
             #mobile-nav-home {
                 pointer-events: initial;
                 transform: translate(0) scale(1);
@@ -772,7 +775,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
     }
 
     /* @media screen and (min-width: 769px) { */
-    
+
     html:not(.mobile-nav) #navigation {
         ul.depth-0 {
             height: 100%;
@@ -783,29 +786,29 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             grid-auto-columns: auto;
             grid-auto-flow: column;
             grid-row-gap: 0;
-            
+
             width: 100%;
-            
+
             position:relative;
             /* height: var(--header-height); */
         }
-        
+
         &.secondary-navbar {
             ul.depth-0 {
                 grid-template-rows: 3.6rem 1fr;
                 /* grid-template-columns: auto; */
             }
-            
+
             li.depth-0 {
                 grid-row: 2 / 3;
                 height: 100%;
             }
         }
-        
 
-        li.depth-0 { 
+
+        li.depth-0 {
             margin-bottom: 0;
-            
+
             & > a {
             height: 100%;
             /* padding: 20px; */
@@ -883,7 +886,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
     /* @media only screen and (max-width: 768px) { */
         html.mobile-noscroll.mobile-nav {
             overflow: hidden;
-            
+
             & > body {
                 position: fixed;
                 overflow: hidden;
@@ -891,34 +894,34 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             }
         }
     /* } */
-    
+
     /* @media only screen and (min-width: 769px) { */
         html.mobile-noscroll:not(.mobile-nav) > body {
             top: 0 !important;
         }
     /* } */
-    
+
     nav#navigation {
         ul {
             list-style-type: none;
             padding: 0;
         }
-        
+
         .depth-1 {
             a span {
                 padding: 0 10px;
                 margin: 0 5px;
             }
-            
+
             li:first-of-type > a span {
                 margin-top: 5px;
             }
-            
+
             li:last-of-type > a span {
                 margin-bottom: 5px;
             }
         }
-    
+
         .active > a span {
             font-weight: bold;
             border: 4px solid
@@ -928,7 +931,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                     rgb(var(--header-color))
                 );
         }
-    
+
         a {
             display: flex;
             align-items: center;
@@ -937,7 +940,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             color: rgb(var(--header-color));
             cursor: pointer;
         }
-    
+
         a:hover span {
             background-color: color-mix(
                 in oklab,
@@ -945,22 +948,22 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                 rgb(var(--header-color))
             );
         }
-    
+
         a > span {
             flex: 1 1 100%;
             border: 4px solid #0000;
             transition: background-color 0.1s ease-out;
             border-radius: var(--border-radius);
-            
+
             line-height: 1.1;
-    
+
             display: flex;
             align-items: center;
             flex-direction: row;
             justify-content: space-between;
             gap: 1rem;
         }
-        
+
         li.depth-0 > a > span {
             justify-content: center;
         }
@@ -969,18 +972,18 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
     li.depth-0 > a span {
         padding: calc(var(--indent) * 0.02) calc(var(--indent) * 0.2);
     }
-    
+
     html:not(.mobile-nav) nav#navigation.secondary-navbar > #navigation-items > ul.depth-0 #secondary-button {
         grid-row: 1 / 2;
         /* grid-column: 1 / span 10; */
         position: absolute;
         left: 0;
         right: 0;
-        
+
         > a {
             display: none;
         }
-        
+
         > #secondary-items {
             flex-direction: row;
             writing-mode: horizontal-tb;
@@ -992,17 +995,17 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             /* width: 100%; */
             /* left: 0; */
             right: calc(var(--indent) * 0.2);
-            
+
             position: absolute;
-            
+
             justify-content: flex-end;
             align-items: center;
             border: none;
             box-shadow: none;
             flex-wrap: nowrap;
-            
+
             pointer-events: all;
-            
+
             li, li a > span {
                 margin: 0;
                 /* border: 2px solid red; */
