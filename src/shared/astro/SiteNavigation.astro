@@ -49,7 +49,7 @@ Object.entries(componentOverrides).forEach(
 const secondary: any = prefs.header?.secondary_navigation || [];
 const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.length;
 
-// !depth && console.log(pages);
+// !depth && console.log(pages.children.discover);
 
 ---
 
@@ -78,6 +78,28 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
 
     <Items id="navigation-items">
         <ul class:list={[`depth-${depth}`]}>
+            {
+              pages?.href && (
+                  <li
+                      class:list={[
+                          {
+                              selected: pages.selected === 2,
+                          },
+                          `depth-${depth}`,
+                      ]}
+                  >
+                    { /* Add parent to child dropdown */ }
+                      <a
+                          aria-selected={
+                              pages.selected === 2 ? "true" : "false"
+                          }
+                          href={pages.href}
+                      >
+                          <span>{pages?.title}</span>
+                      </a>
+                  </li>
+              )
+            }
             {
                 pages?.children &&
                     Object.values(pages.children).map((page: TreeNode) => {
