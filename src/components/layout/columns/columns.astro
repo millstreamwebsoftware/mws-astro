@@ -197,7 +197,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         /* padding: 0; */
     }
 
-    .columns > {
+    :where(.columns) > {
         .first-in-row > section:not(.no-indent) {
             padding-left: var(--indent);
         }
