@@ -262,8 +262,6 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
           if (navItems?.scrollWidth && document.documentElement.clientWidth > mobileNavWidth && (Math.abs(navItems.scrollWidth - rect.width) > 3)) {
             // Navigation is overflowing, switch to mobile navigation
             mobileNavWidth = navItems.scrollWidth + rect.left;
-
-            // console.log(`Updated mobile navigation width to ${mobileNavWidth}`);
           }
 
           document.documentElement.classList.toggle("mobile-nav", isMobileNav());
@@ -587,6 +585,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
 
     #navigation-items {
         height: 100%;
+        max-width: 100vw;
     }
 
     #mobile-nav-buttons {
