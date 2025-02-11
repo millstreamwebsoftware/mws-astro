@@ -1,6 +1,7 @@
 ---
 import { Markdown as RemoteMarkdown } from "astro-remote";
 import MarkdownIt from "markdown-it";
+import {marked} from "marked";
 import { replaceCmsEmbeds } from "@mws-astro/util";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Button from "@components/button/button.astro";
@@ -34,11 +35,12 @@ var substitutions = {
     img: AsideImage,
     Counter,
 };
-var md: MarkdownIt | undefined;
+
+var md: string | undefined;
 
 // @ts-ignore
-if (ENV_BOOKSHOP_LIVE) {
-    md = new MarkdownIt({ html: true });
+if (ENV_BOOKSHOP_LIVE || true) {
+    md = await marked.parse(content);
 } else {
     // Get site specific custom snippets from src/snippets.ts
     const snippetGlob = import.meta.glob<Record<string, any>>(
@@ -54,7 +56,7 @@ if (ENV_BOOKSHOP_LIVE) {
 
 {
     md
-        ? content && <Fragment set:html={md.render(content)} />
+        ? content && <Fragment set:html={md} />
         : content && (
               <RemoteMarkdown
                   {content}
