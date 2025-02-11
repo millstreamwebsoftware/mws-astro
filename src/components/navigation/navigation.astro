@@ -38,7 +38,7 @@ let tree = Astro.props.tree ?? undefined;
 if (!ENV_BOOKSHOP_LIVE && !tree) {
     // Get this page to check if it has children
     if (!filter) tree = getTreeNode(Astro.locals.tree, ".", Astro.locals.path, false);
-    
+
     tree = getTreeNode(Astro.locals.tree, filter ?? tree?.children ? "." : "..", Astro.locals.path, parent);
 }
 const ComponentWrapper = depth ? Fragment : Section;
@@ -54,7 +54,7 @@ const Wrapper = depth ? Fragment : "nav";
 
                     const hasChildren =
                         child.children && Object.keys(child.children).length;
-                    
+
                     // Don't render meta nodes without online children
                     if (child.status !== "online" && !hasChildren && !child.href) return;
 
@@ -117,5 +117,20 @@ const Wrapper = depth ? Fragment : "nav";
     section.navigation svg {
         justify-self: center;
         height: 100%;
+    }
+
+    /* Editor Fallback */
+    navigation {
+        display: block;
+        border: 1px solid grey;
+        background-color: white;
+        border-radius: .5rem;
+        padding: 1rem 2rem;
+
+        &::before {
+            content: "🧭 Navigation";
+            font-size: var(--text-size-medium);
+
+        }
     }
 </style>
