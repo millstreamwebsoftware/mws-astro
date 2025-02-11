@@ -381,3 +381,7 @@ section {
     background-color: rgb(var(--text-color) / 0.2);
   }
 }
+
+.text-content :where(img) {
+  max-width: 100%;
+}

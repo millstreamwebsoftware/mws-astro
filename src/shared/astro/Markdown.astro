@@ -39,7 +39,7 @@ var substitutions = {
 var md: string | undefined;
 
 // @ts-ignore
-if (ENV_BOOKSHOP_LIVE || true) {
+if (ENV_BOOKSHOP_LIVE) {
     md = await marked.parse(content);
 } else {
     // Get site specific custom snippets from src/snippets.ts
