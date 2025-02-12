@@ -41,19 +41,25 @@ const { width = 256, height = 256, class: classes, title } = Astro.props;
         float: none;
         margin: 3rem 0;
     }
-    
+
     @media only screen and (max-width: 768px) {
         figure:where(.align-left,.align-right,.align-center) {
             float: none;
             margin: 2rem 4rem 2rem 4rem;
         }
-        
+
     }
 </style>
 
 <style is:global lang="scss">
     figure.aside img {
         max-height: 40rem;
+    }
+    figure.aside:where(.small) img {
+        max-height: 30rem;
+    }
+    figure.aside:where(.full) img {
+        max-height: unset;
     }
 
     /* Live editor support */

@@ -66,18 +66,20 @@ _inputs:
       icon: help
       content: >-
         Filters can be defined in the following formats:
-          
+
          * `property~=value` (property contains value)
-         
+
          * `property=value` (property is exactly value)
-         
+
          * `property` (card has a property)
-         
-        Cards that match one of the filters will be displayed. 
+
+        Cards that match one of the filters will be displayed.
 
         E.g. `categories~=Blog` `categories~=News` will only display posts in the categories Blog or News.
     options:
       allow_create: true
+  prefilter[*]:
+    type: string
   columns:
     type: number
     label: Columns

@@ -189,7 +189,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     // document.addEventListener("DOMContentLoaded", setupGlide);
     // document.addEventListener("astro:after-swap", setupGlide);
     setupGlide();
-    
+
     function setupGlide() {
         document.querySelectorAll("div[data-glide]").forEach((e) => {
             if (!(e instanceof HTMLElement)) return;
@@ -198,6 +198,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                 const id = e.getAttribute("id");
 
                 if (!id) return;
+                console.log(`Slider ${id} started in EDITOR mode!`);
 
                 const glideOptions: Partial<Glide.Options> = {
                     autoplay: Number(e.dataset?.autoplay) || false,
@@ -394,7 +395,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         display: none;
         pointer-events: none;
     }
-    
+
     .slider-fader {
         .glide__slides {
             transform: translate3d(0, 0, 0) !important;
@@ -451,7 +452,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             }
         }
     }
-    
+
     #slider-0 .slider-item > section > .component-wrapper {
         padding-top: calc(var(--header-height) - var(--header-offset-transparent));
     }
