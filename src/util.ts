@@ -50,7 +50,7 @@ export function getTreeNode(
   tree: TreeNode,
   path: string | undefined,
   relpath: string = "",
-  parent: boolean = false,
+  // parent: boolean = false,
 ): TreeNode | undefined {
   if (!path) return tree;
 
@@ -69,10 +69,13 @@ export function getTreeNode(
       }
 
       if (!cursor.parent) {
-        console.warn(
-          `Could not resolve path ${abspath} - Attempted to access undefined parent`,
-        );
-        return;
+        // console.warn(
+        //   `Could not resolve path ${abspath} - Attempted to access undefined parent`,
+        // );
+        // console.log(tree);
+        // return;
+        cursor = tree;
+        continue;
       }
 
       cursor = cursor.parent;
@@ -91,11 +94,6 @@ export function getTreeNode(
     cursor = Object.assign(Object.assign({}, cursor), cursor.children.index);
     delete cursor.children?.index;
   }
-
-  if (parent)
-    cursor = {
-      children: { index: cursor },
-    };
 
   return cursor;
 }

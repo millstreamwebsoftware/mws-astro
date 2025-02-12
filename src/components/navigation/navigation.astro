@@ -15,14 +15,9 @@ interface Props {
     icon?: string;
 }
 
-// console.log(Astro.locals.path, Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1"));
-
 const depth = (Astro.props.depth ?? -1) + 1;
 const {
     maxDepth = 1,
-    // filter = Astro.locals.path
-    //     ? Astro.locals.path?.replace(/^(.*)\/.*?$/, "$1")
-    //     : undefined,
     filter = undefined,
     collection,
     parent = true,
@@ -30,16 +25,16 @@ const {
     icon = "",
 } = Astro.props;
 
-// console.log(Astro.locals.path);
-
 
 let tree = Astro.props.tree ?? undefined;
 // @ts-ignore
 if (!ENV_BOOKSHOP_LIVE && !tree) {
     // Get this page to check if it has children
-    if (!filter) tree = getTreeNode(Astro.locals.tree, ".", Astro.locals.path, false);
+    if (!filter) tree = getTreeNode(Astro.locals.tree, ".", Astro.locals.path);
 
-    tree = getTreeNode(Astro.locals.tree, filter ?? tree?.children ? "." : "..", Astro.locals.path, parent);
+    // console.log(`${tree?.title} children: ${!!tree?.children}`)
+
+    tree = getTreeNode(Astro.locals.tree, filter ?? tree?.children ? "." : "..", Astro.locals.path);
 }
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
@@ -47,6 +42,18 @@ const Wrapper = depth ? Fragment : "nav";
 
 <ComponentWrapper component="navigation" {...Astro.props}>
     <Wrapper>
+        { parent && tree?.slug && <div data-depth={depth}>
+            <a
+                href={tree?.href || tree?.link}
+                aria-selected={
+                    tree.selected === 2 ? "true" : "false"
+                }
+            >
+                {icon && <Icon name={icon} height="1em" />}
+                {tree.title}
+            </a>
+        </div>
+        }
         {
             tree?.children != undefined &&
                 Object.entries(tree.children).map(([, child]) => {
@@ -59,7 +66,7 @@ const Wrapper = depth ? Fragment : "nav";
                     if (child.status !== "online" && !hasChildren && !child.href) return;
 
                     const displayChildren =
-                        depth < maxDepth &&
+                        depth < (maxDepth - 1) &&
                         hasChildren &&
                         (hide_cousins // Don't render children of unselected nodes
                             ? child?.selected == undefined || child?.selected
