@@ -72,7 +72,8 @@ const id = "glide" + "-" + (key || "");
 type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
 const glideOptions: glideOptionsType = {
-    glide: ENV_EDITOR ? undefined : id,
+    // glide: ENV_EDITOR ? undefined : id,
+    glide: id,
     sliderType: transition?.toLowerCase(),
     autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
     animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
@@ -89,7 +90,7 @@ if (glideOptions.sliderType == "fader") {
     glideOptions.animationDuration = 0;
 }
 
-if (ENV_EDITOR) glideOptions.sliderType = "slider";
+// if (ENV_EDITOR) glideOptions.sliderType = "slider";
 
 // Convert glideOptions to data-* attributes like DOMStringMap
 const dataGlideOptions = Object.entries(glideOptions).reduce(
@@ -194,54 +195,54 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         document.querySelectorAll("div[data-glide]").forEach((e) => {
             if (!(e instanceof HTMLElement)) return;
 
-            if (!e.matches(".ENV_EDITOR *")) {
-                const id = e.getAttribute("id");
+            // if (!e.matches(".ENV_EDITOR *")) {
+            const id = e.getAttribute("id");
 
-                if (!id) return;
-                console.log(`Slider ${id} started in EDITOR mode!`);
+            if (!id) return;
+            // console.log(`Slider ${id} started in EDITOR mode!`);
 
-                const glideOptions: Partial<Glide.Options> = {
-                    autoplay: Number(e.dataset?.autoplay) || false,
-                    focusAt:
-                        e.dataset?.focus == "center"
-                            ? "center"
-                            : Number(e.dataset?.focus) || 0,
-                    bound:
-                        "bound" in e.dataset
-                            ? e.dataset?.bound === "true"
-                            : undefined,
-                    gap: Number(e.dataset?.gap) || 0,
-                    type:
-                        e.dataset?.sliderType?.toLowerCase() == "carousel"
-                            ? "carousel"
-                            : "slider",
-                    perView: Number(e.dataset?.perView) || undefined,
-                    animationDuration:
-                        Number(e.dataset?.animationDuration) || 0,
-                    hoverpause: "hoverpause" in e.dataset,
-                };
+            const glideOptions: Partial<Glide.Options> = {
+                autoplay: Number(e.dataset?.autoplay) || false,
+                focusAt:
+                    e.dataset?.focus == "center"
+                        ? "center"
+                        : Number(e.dataset?.focus) || 0,
+                bound:
+                    "bound" in e.dataset
+                        ? e.dataset?.bound === "true"
+                        : undefined,
+                gap: Number(e.dataset?.gap) || 0,
+                type:
+                    e.dataset?.sliderType?.toLowerCase() == "carousel"
+                        ? "carousel"
+                        : "slider",
+                perView: Number(e.dataset?.perView) || undefined,
+                animationDuration:
+                    Number(e.dataset?.animationDuration) || 0,
+                hoverpause: "hoverpause" in e.dataset,
+            };
 
-                const glide = new Glide(`#${id}`, glideOptions);
+            const glide = new Glide(`#${id}`, glideOptions);
 
-                // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
-                if (Number(e.dataset?.perView) === 1) {
-                  glide.on("move", () => {
-                    const slider = document.getElementById(id);
-                    const slides = slider?.querySelectorAll(".slider-item");
+            // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
+            if (Number(e.dataset?.perView) === 1) {
+              glide.on("move", () => {
+                const slider = document.getElementById(id);
+                const slides = slider?.querySelectorAll(".slider-item");
 
-                    slides?.forEach((e) => e.setAttribute("inert", ""));
-                    slides?.[glide.index].removeAttribute("inert");
-                  });
-                }
-
-                glide.mount();
+                slides?.forEach((e) => e.setAttribute("inert", ""));
+                slides?.[glide.index].removeAttribute("inert");
+              });
             }
+
+            glide.mount();
+            //}
         });
     }
 </script>
 
 <style lang="scss">
-    .ENV_EDITOR {
+    /* .ENV_EDITOR {
         .glide__slide {
             position: relative;
             border-right: 1px solid black;
@@ -275,7 +276,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         :hover .glide__bullets {
             opacity: 0;
         }
-    }
+    } */
 
     .glide {
         --arrow-size: 6rem;
