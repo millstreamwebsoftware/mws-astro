@@ -47,9 +47,9 @@ export interface Props {
     key?: string;
 }
 
-declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
-const ENV_EDITOR: boolean =
-    typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
+// declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
+// const ENV_EDITOR: boolean =
+//     typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
 
 const {
     key,
@@ -235,6 +235,17 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
               });
             }
 
+            if (e.dataset?.sliderType?.toLowerCase() == "fader") {
+              glide.on("move", () => {
+                const slider = document.getElementById(id);
+                const slides = slider?.querySelectorAll(".slider-item");
+
+                slides?.forEach((e) => e.removeAttribute("data-fader"));
+                slides?.[glide.index].removeAttribute("style");
+                slides?.[glide.index].setAttribute("data-fader", "");
+              });
+            }
+
             glide.mount();
             //}
         });
@@ -406,6 +417,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
         .slider-item:first-child {
             animation-name: startOpaque;
+            animation-delay: 0s;
             animation-duration: var(--transition);
             animation-iteration-count: 1;
         }
@@ -417,16 +429,17 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             order: 2;
             opacity: 0;
             z-index: 2;
+            transition-delay: 0s;
             transition: opacity var(--transition) ease-in-out;
-            transition-delay: .2s;
         }
 
-        .slider-item.glide__slide--active {
+        .slider-item[data-fader] {
             position: relative;
             order: 1;
             opacity: 1;
             z-index: 1;
-            transition: opacity var(--transition) ease-in-out;
+            transition-delay: var(--transition);
+            transition: opacity 0s;
         }
     }
 
