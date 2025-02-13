@@ -9,8 +9,8 @@ const { href, target } = Astro.props;
     <Icon name="fa6-solid:circle-chevron-right" height="1.8em" />
 </a>
 
-<style>
-    a {
+<style is:global>
+    a.button {
         display: flex;
         align-items: center;
         padding: 0.5em 1em;
