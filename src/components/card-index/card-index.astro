@@ -204,6 +204,12 @@ const id = `card-index-${key}`;
         grid-area: items;
     }
 
+    @media only screen and (max-width: 768px) {
+        .card-items {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .card-tools {
         grid-area: tools;
         display: flex;

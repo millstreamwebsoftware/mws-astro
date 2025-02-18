@@ -95,6 +95,22 @@ const { collection } = Astro.props;
         box = document.body.appendChild(box);
         box.focus();
 
+        var touchstart: Array<number> = [];
+        box.addEventListener('touchstart', function (e) {
+          touchstart = [e.changedTouches[0].screenX, e.changedTouches[0].screenY];
+        });
+        box.addEventListener('touchend', function (e) {
+          let touchvector = [e.changedTouches[0].screenX - touchstart[0], e.changedTouches[0].screenY - touchstart[1]];
+
+          let magnitude = Math.sqrt(touchvector[0] * touchvector[0] + touchvector[1] * touchvector[1]);
+          let direction = Math.abs(Math.atan2(touchvector[1], touchvector[0]) / Math.PI);
+
+          if (magnitude < Math.min(screen.width * 0.2, 250)) return;
+          if (direction > .2 && direction < .8) return;
+
+          select(direction < .5 ? -1 : 1);
+        });
+
         box.addEventListener("click", (e) => {
             if (!e.target) return;
             let target = e.target as HTMLElement;
@@ -158,9 +174,6 @@ const { collection } = Astro.props;
             });
         });
     }
-
-    // document.addEventListener("DOMContentLoaded", setupLightbox);
-    // document.addEventListener("astro:after-swap", setupLightbox);
 </script>
 
 <style is:global lang="scss">
@@ -196,6 +209,7 @@ const { collection } = Astro.props;
     #lightbox .items > main {
         background-color: rgb(var(--article-background-color));
         overflow: scroll;
+        --header-height: 0px;
     }
 
     #lightbox .items figure {
@@ -311,6 +325,23 @@ const { collection } = Astro.props;
         background-color: #000;
         padding: 0 8rem;
         animation: lightbox 0.4s ease;
+        max-width: 100vw;
+        max-height: 100vh;
+    }
+
+    @media only screen and (max-width: 768px) {
+        #lightbox [data-action=">"], #lightbox [data-action="<"] {
+            display: none;
+        }
+
+        #lightbox {
+            padding: 0 0 8rem;
+        }
+
+        #lightbox [data-action="x"], .buttons .counter {
+            top: unset;
+            bottom: 0;
+        }
     }
 
     .items {
@@ -341,6 +372,7 @@ const { collection } = Astro.props;
         font-family: var(--bold-font-family);
         font-weight: var(--bold-font-weight);
         font-size: 2rem;
+        margin: 0;
     }
 
     #lightbox.single {
