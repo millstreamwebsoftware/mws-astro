@@ -331,7 +331,18 @@ const { collection } = Astro.props;
 
     @media only screen and (max-width: 768px) {
         #lightbox [data-action=">"], #lightbox [data-action="<"] {
-            display: none;
+            top: unset;
+            bottom: 0;
+            width: 8rem;
+            height: 8rem;
+        }
+
+        #lightbox [data-action="<"] {
+            left: 8rem;
+        }
+
+        #lightbox [data-action=">"] {
+            right: 8rem;
         }
 
         #lightbox {
@@ -341,6 +352,12 @@ const { collection } = Astro.props;
         #lightbox [data-action="x"], .buttons .counter {
             top: unset;
             bottom: 0;
+        }
+    }
+
+    @media only screen and (max-width: 320px) {
+        #lightbox [data-action=">"], #lightbox [data-action="<"] {
+            display: none;
         }
     }
 
