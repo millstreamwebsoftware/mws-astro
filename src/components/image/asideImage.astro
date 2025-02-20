@@ -3,7 +3,7 @@ import Image from "@shared/Image.astro";
 
 const image = Astro.props.src;
 
-const { width = 256, height = 256, class: classes, title } = Astro.props;
+const { width = 256, height = 256, class: classes, title, alt, ...props } = Astro.props;
 ---
 
 <figure class:list={[classes, "aside"]}>
@@ -11,7 +11,8 @@ const { width = 256, height = 256, class: classes, title } = Astro.props;
         {image}
         {width}
         {height}
-        {...Astro.props}
+        {alt}
+        {...props}
         fit="contain"
         quality="mid"
     />
