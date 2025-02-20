@@ -1,10 +1,8 @@
 ---
-import MarkdownIt from "markdown-it";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Image from "@shared/Image.astro";
 import Section from "@layouts/Section.astro";
-
-const md = new MarkdownIt({ html: true });
+import Markdown from "@shared/Markdown.astro";
 
 type Image = {
     image: string;
@@ -73,7 +71,7 @@ const id = `gallery-${key}`;
                         <figcaption>
                             {asset.title && <h3>{asset.title}</h3>}
                             {asset.description && (
-                                <div set:html={md.render(asset.description)} />
+                                <Markdown content={asset.description} />
                             )}
                         </figcaption>
                     )}
@@ -105,11 +103,7 @@ const id = `gallery-${key}`;
                                 <figcaption>
                                     {asset.title && <h3>{asset.title}</h3>}
                                     {asset.description && (
-                                        <div
-                                            set:html={md.render(
-                                                asset.description,
-                                            )}
-                                        />
+                                        <Markdown content={asset.description} />
                                     )}
                                 </figcaption>
                             )}
