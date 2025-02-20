@@ -355,6 +355,10 @@ button {
 
 // Fix anchor offset
 :target {
+  scroll-margin-top: calc(var(--indent) * 0.5);
+}
+
+body:has(#header.pinned) :target {
   scroll-margin-top: calc(var(--header-height) + (var(--indent) * 0.5));
 }
 
