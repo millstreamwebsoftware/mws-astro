@@ -1,6 +1,7 @@
 ---
 import { Markdown as RemoteMarkdown } from "astro-remote";
-import {marked} from "marked";
+import { marked } from "marked";
+import { gfmHeadingId } from "marked-gfm-heading-id";
 import { replaceCmsEmbeds } from "@mws-astro/util";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Button from "@components/button/button.astro";
@@ -13,11 +14,6 @@ import AsideImage from "@components/image/asideImage.astro";
 import Player from "@components/player/player.astro";
 import Accordion from "@components/accordion/accordion.astro";
 import Navigation from "@components/navigation/navigation.astro";
-
-// We need to strip whitespace due to a strange bug which removes a character from the start of a line when there is whitespace before the newline.
-// const content = await stripTrailingWhitespace(Astro.props.content).then(
-//     replaceCmsEmbeds,
-// );
 
 const content = await replaceCmsEmbeds(Astro.props.content);
 
@@ -39,6 +35,7 @@ var md: string | undefined;
 
 // @ts-ignore
 if (ENV_BOOKSHOP_LIVE) {
+    marked.use(gfmHeadingId())
     md = await marked.parse(content);
 } else {
     // Get site specific custom snippets from src/snippets.ts
@@ -61,6 +58,7 @@ if (ENV_BOOKSHOP_LIVE) {
                   {content}
                   sanitize={{ allowComponents: true }}
                   components={substitutions}
+                  marked={{"extensions": [gfmHeadingId()]}}
               />
           )
 }
