@@ -6,6 +6,19 @@ spec:
   description: Display a single image.
   icon: image
   tags: ["image"]
+  tabbed: true
+  groups:
+    - heading: Section
+      inputs:
+        - content
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
+        - classes
   preview:
     gallery:
       image:
@@ -28,6 +41,16 @@ blueprint:
   height: 50
   indent: true
   lightbox: true
+  # height:
+  color:
+  content:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  classes:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
