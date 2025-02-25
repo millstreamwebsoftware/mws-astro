@@ -6,7 +6,6 @@ spec:
   description: Display a single image.
   icon: image
   tags: ["image"]
-  tabbed: true
   groups:
     - heading: Section
       inputs:
