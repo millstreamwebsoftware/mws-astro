@@ -24,6 +24,7 @@ export interface Props {
     style?: Record<string, any>;
     indent?: boolean;
     key?: string;
+    section?: any;
 }
 
 const {
@@ -40,7 +41,7 @@ const {
     classes,
     style,
     key,
-} = Astro.props;
+} = Object.assign({}, Astro.props, Astro.props?.section);
 
 const background = background_color && convertColorString(background_color);
 const textColor = color && convertColorString(color);
@@ -137,7 +138,7 @@ const expando = classList.includes("expando") ? true : false;
         /* min-height: var(--height); */
         /* height: min(var(--height), 100%); */
     }
-    
+
     :not(section.richtext) > * > .text-content {
         margin-bottom: var(--column-gap);
     }
