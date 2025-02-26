@@ -21,7 +21,7 @@ var type: "date" | "time" | "datetime-local" =
 
 <div class="input datetime">
   <Label for={id} {required}>{label}</Label>
-  <input {type} name={name} {id} {required} aria-required={required} />
+  <input {type} name={name} {id} {required} aria-required={required} onfocus="this.showPicker?.()" />
 </div>
 
 <style>

@@ -78,7 +78,7 @@ const required = checkRequired(form_blocks);
   </form>
 </Section>
 
-<style>
+<style lang="scss">
   form {
     display: flex;
     flex-direction: column;
@@ -97,8 +97,12 @@ const required = checkRequired(form_blocks);
     transition: background-color 0.2s ease-in-out;
   }
 
-  input[type="submit"]:hover {
-    background-color: rgb(var(--text-color) / 0.2);
+  input[type="submit"]{
+    border: var(--form-border);
+
+    &:hover {
+        background-color: rgb(var(--text-color) / 0.2);
+    }
   }
 </style>
 
