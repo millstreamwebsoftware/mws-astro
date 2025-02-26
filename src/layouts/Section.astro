@@ -22,7 +22,7 @@ export interface Props {
     background_fixed?: boolean;
     classes?: any;
     style?: Record<string, any>;
-    indent?: boolean;
+    indent?: ["no-indent", "no-indent-left", "no-indent-top", "no-indent-right", "no-indent-bottom"] | boolean;
     key?: string;
     section?: any;
 }
@@ -46,7 +46,7 @@ const {
 const background = background_color && convertColorString(background_color);
 const textColor = color && convertColorString(color);
 const id = `${component}-${key}`;
-const indent = Astro.props.indent ?? true;
+const indent = typeof Astro.props.indent === "boolean" ? !Astro.props.indent && "no-indent" : Astro.props.indent;
 
 const classList = clsx(classes).split(" ");
 
@@ -69,7 +69,7 @@ const expando = classList.includes("expando") ? true : false;
     class:list={[
         component,
         classes,
-        { "no-indent": !indent },
+        indent,
         { "background-color": background },
     ]}
     data-component={component}

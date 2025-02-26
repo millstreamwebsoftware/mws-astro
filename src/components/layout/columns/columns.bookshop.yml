@@ -6,6 +6,21 @@ spec:
   description: Layout content in columns.
   icon: view_column
   tags: []
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
   preview:
     subtext:
       - key: content_blocks[*]._bookshop_name
@@ -21,7 +36,16 @@ blueprint:
   content_blocks: [bookshop:structure:content_blocks]
   collapse: true
   layout: [1]
+  content:
   classes:
+  height:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
 
 _inputs:
   collapse:

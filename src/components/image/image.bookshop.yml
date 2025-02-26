@@ -6,10 +6,13 @@ spec:
   description: Display a single image.
   icon: image
   tags: ["image"]
+  place_groups_below: true
   groups:
     - heading: Section
+      collapsed: true
       inputs:
         - content
+        - classes
         - color
         - background_color
         - background_image
@@ -17,7 +20,6 @@ spec:
         - background_align
         - background_opacity
         - background_fixed
-        - classes
   preview:
     gallery:
       image:
@@ -40,27 +42,20 @@ blueprint:
   height: 50
   indent: true
   lightbox: true
-  # height:
-  color:
   content:
+  classes:
+  color:
   background_color:
   background_image:
   background_video:
   background_align:
   background_opacity:
   background_fixed:
-  classes:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
-  height:
-    type: range
-    options:
-      step: 1
-      max: 100
-      min: 0
   columns:
     type: number
     comment: Set the number of columns. 0 puts all images in one row.

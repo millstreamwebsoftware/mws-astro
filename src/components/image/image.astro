@@ -4,7 +4,6 @@ import Markdown from "@shared/Markdown.astro";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
-import { convertColorString } from "@mws-astro/util";
 
 export interface Props {
     image: any;
@@ -14,9 +13,6 @@ export interface Props {
     height: number;
     columns: number;
     aspect?: number;
-    indent: boolean;
-    foreground_color?: string;
-    background_color?: string;
     lightbox?: boolean;
     key?: string;
     classes?: any;
@@ -27,23 +23,16 @@ const {
     title,
     description,
     alt,
-    // height,
     aspect,
-    // indent,
-    foreground_color,
-    background_color,
     lightbox,
     key,
-    classes,
 } = Astro.props;
 
-const foreground = convertColorString(foreground_color);
-const background = convertColorString(background_color);
 const id = `image-${key}`;
 const figcaption = title || description;
 ---
 
-<Section component="image" classes={{ lightbox, ...classes }} {...Astro.props}>
+<Section component="image" classes={{ lightbox }} {...Astro.props}>
     <figure
         data-lightbox={lightbox && id}
         style={{
@@ -59,13 +48,7 @@ const figcaption = title || description;
 
         {
             figcaption && (
-                <figcaption
-                    style={{
-                        ...(background && { "--background-color": background }),
-                        ...(foreground && { "--text-color": foreground }),
-                        ...(foreground && { "--heading-color": foreground }),
-                    }}
-                >
+                <figcaption>
                     {title && <h3>{title}</h3>}
                     {description && <Markdown content={description} />}
                 </figcaption>
