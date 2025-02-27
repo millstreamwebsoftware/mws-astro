@@ -1,7 +1,7 @@
 ---
 import { Markdown as RemoteMarkdown } from "astro-remote";
 import { marked } from "marked";
-import { gfmHeadingId } from "marked-gfm-heading-id";
+// import { gfmHeadingId } from "marked-gfm-heading-id";
 import { replaceCmsEmbeds } from "@mws-astro/util";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Button from "@components/button/button.astro";
@@ -35,7 +35,7 @@ var md: string | undefined;
 
 // @ts-ignore
 if (ENV_BOOKSHOP_LIVE) {
-    marked.use(gfmHeadingId())
+    // marked.use(gfmHeadingId())
     md = await marked.parse(content);
 } else {
     // Get site specific custom snippets from src/snippets.ts
@@ -58,7 +58,6 @@ if (ENV_BOOKSHOP_LIVE) {
                   {content}
                   sanitize={{ allowComponents: true }}
                   components={substitutions}
-                  marked={{"extensions": [gfmHeadingId()]}}
               />
           )
 }
