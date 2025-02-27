@@ -61,7 +61,7 @@ const { id, currentPath } = Astro.props;
         right: 0;
         top: 0;
         display: grid;
-        z-index: 9999;
+        z-index: 8000;
         --text-color: var(--header-color);
         color: rgb(var(--header-color));
         height: var(--header-height);
@@ -70,14 +70,14 @@ const { id, currentPath } = Astro.props;
             rgba(var(--header-background-color)),
             rgba(var(--header-background-color-bottom))
         );
- 
+
         grid-template-areas: "logo navigation";
         grid-template-rows: 100%;
         grid-template-columns: 1fr auto;
-        
+
         /* grid-template-areas: "logo secondary" "logo navigation"; */
         /* grid-template-rows: 3.6rem 1fr; */
-        
+
         /* grid-template-columns: auto 1fr; */
     }
 
