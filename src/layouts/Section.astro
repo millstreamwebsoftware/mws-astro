@@ -14,6 +14,7 @@ export interface Props {
     height?: number;
     color?: string;
     content?: string;
+    align?: ["top", "center", "bottom"];
     background_color?: string;
     background_image?: string;
     background_video?: string;
@@ -48,6 +49,8 @@ const textColor = color && convertColorString(color);
 const id = `${component}-${key}`;
 const indent = typeof Astro.props.indent === "boolean" ? !Astro.props.indent && "no-indent" : Astro.props.indent;
 
+const align = Astro.props.align && "section-" + Astro.props.align;
+
 const classList = clsx(classes).split(" ");
 
 const stickers = classList // Resolve classes like class:list
@@ -70,6 +73,7 @@ const expando = classList.includes("expando") ? true : false;
         component,
         classes,
         indent,
+        align,
         { "background-color": background },
     ]}
     data-component={component}

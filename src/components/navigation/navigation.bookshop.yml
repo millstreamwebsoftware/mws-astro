@@ -3,9 +3,26 @@ spec:
   structures:
     - content_blocks
   label: Navigation
-  description: Display a navigaiton element
+  description: Display a navigation element
   icon: switch_access_shortcut
   tags: []
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - indent
+        - align
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
   preview:
     metadata:
       - text:
@@ -14,12 +31,26 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
+  filter:
   collection:
   maxDepth:
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
 
 _inputs:
   filter:
     type: text
+    label: Path
   collection:
     type: text
   maxDepth:

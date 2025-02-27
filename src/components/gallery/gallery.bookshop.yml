@@ -15,6 +15,7 @@ spec:
         - classes
         - height
         - indent
+        - align
         - color
         - background_color
         - background_image
@@ -47,6 +48,7 @@ blueprint:
   classes:
   height:
   indent:
+  align:
   color:
   background_color:
   background_image:
