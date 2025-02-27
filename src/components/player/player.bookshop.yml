@@ -5,7 +5,24 @@ spec:
   label: Video Player
   description: Embed a video player
   icon: movie
-  tags: []
+  tags: ["video"]
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - indent
+        - align
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
   preview:
     text: Video Player
     subtext:
@@ -20,3 +37,13 @@ blueprint:
   src:
   content:
   classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:

@@ -6,13 +6,48 @@ spec:
   description: Customisable Web Form
   icon: contact_support
   tags: ["form", "input"]
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - indent
+        - align
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
+  preview:
+    subtext:
+      - key: name
+    metadata:
+      - text:
+          - key: classes
+        icon: tag
 
 # Defines the structure of this component, as well as the default values
 blueprint:
   name: ""
   action: ""
   form_blocks: []
+  content:
   classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:

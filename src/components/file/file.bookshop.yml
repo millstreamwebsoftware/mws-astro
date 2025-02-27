@@ -6,6 +6,23 @@ spec:
   description: Display files to download.
   icon: file_present
   tags: ["file", "collection"]
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - indent
+        - align
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
   preview:
     subtext:
       - template: "{files[*].title|default=files[*].url}"
@@ -22,13 +39,23 @@ blueprint:
       description:
   show_filesize: true
   show_filetype: true
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
-  indent:
-    type: switch
   title:
     type: text
   description:
