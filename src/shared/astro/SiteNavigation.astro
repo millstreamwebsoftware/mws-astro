@@ -23,6 +23,7 @@ const showCaret = prefs?.header?.show_caret ?? true;
 const placement = prefs?.header?.center_dropdowns
     ? "bottom"
     : "bottom-start";
+const dropdownCaret = prefs?.header?.dropdown_caret ?? "fa6-solid:caret-down";
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -169,7 +170,7 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
                                             {children && (
                                                 <div class="dropdown-indicator">
                                                     <Icon
-                                                        name="fa6-solid:caret-down"
+                                                        name={dropdownCaret}
                                                         height="1.2em"
                                                     />
                                                 </div>
