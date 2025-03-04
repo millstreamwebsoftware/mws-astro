@@ -122,6 +122,8 @@ if (!ENV_BOOKSHOP_LIVE) {
 
 const id = `card-index-${key}`;
 
+const pagination = !!pageSize && cards && cards?.length > pageSize;
+
 // const cards = Object.values(cursor?.children).map((node) => {
 //   return node?.slug !== undefined && node.slug in data ? data[node.slug]
 // });
@@ -129,7 +131,7 @@ const id = `card-index-${key}`;
 
 <Section component="card-index" {...Astro.props}>
     <div class="card-index-container">
-        <div class="card-tools">
+        { (pagination || !!filters.length) && <div class="card-tools">
             {
                 !!filters.length && (
                     <div
@@ -145,7 +147,7 @@ const id = `card-index-${key}`;
                 )
             }
             {
-                !!pageSize && cards && cards?.length > pageSize && (
+                pagination && (
                     <div
                         class="card-pagination"
                         data-page-size={pageSize}
@@ -176,7 +178,7 @@ const id = `card-index-${key}`;
                     </div>
                 )
             }
-        </div>
+        </div>}
         <div class="card-items" style={{ "--columns": columns }}>
             {
                 cards &&
@@ -221,9 +223,13 @@ const id = `card-index-${key}`;
 
     .card-index-container {
         display: grid;
-        grid-template-areas: "tools" "items";
+        grid-template-areas: "items";
         gap: 3rem;
         grid-template-columns: 100%;
+    }
+
+    .card-index-container:has(.card-tools) {
+        grid-template-areas: "tools" "items";
     }
 
     button {

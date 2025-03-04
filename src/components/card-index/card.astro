@@ -174,13 +174,14 @@ function formatDate(date: Date) {
             margin-top: auto;
             padding: 1rem 2rem;
             background-color: rgb(var(--color-primary));
-            --text-color: 255 255 255;
-            color: rgb(var(--text-color));
+            /* --text-color: 255 255 255; */
+            color: rgb(var(--read-more-text-color, var(--text-color)));
 
             align-items: center;
             justify-content: space-between;
 
             p {
+                color: inherit;
                 margin: 0;
                 font-weight: bold;
             }
