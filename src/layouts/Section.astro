@@ -66,7 +66,7 @@ const expando = classList.includes("expando") ? true : false;
             "--text-color": textColor,
             "--heading-color": "var(--text-color)", // Needs to be redefined to update the value in this context
         }),
-        ...(height && { "--height": height + "vh" }),
+        ...(height && { "--height": height }),
         ...style,
     }}
     class:list={[
@@ -121,7 +121,7 @@ const expando = classList.includes("expando") ? true : false;
         position: relative;
         /* height: max(var(--height), fit-content); */
 
-        min-height: calc(var(--height) - var(--header-offset-transparent));
+        min-height: calc((var(--height) * 1vh) - var(--header-offset-transparent));
 
         --indent: var(--root-indent);
         padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);

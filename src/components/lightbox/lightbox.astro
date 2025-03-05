@@ -210,6 +210,11 @@ const { collection } = Astro.props;
         background-color: rgb(var(--article-background-color));
         overflow: scroll;
         --header-height: 0px;
+
+        container: lightbox;
+        section {
+            min-height: calc(var(--height) * 1cqh)
+        }
     }
 
     #lightbox .items figure {
