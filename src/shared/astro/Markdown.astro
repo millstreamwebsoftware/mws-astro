@@ -2,7 +2,7 @@
 import { Markdown as RemoteMarkdown } from "astro-remote";
 import { marked } from "marked";
 import { gfmHeadingId } from "marked-gfm-heading-id";
-import { replaceCmsEmbeds } from "@mws-astro/util";
+import { replaceCmsEmbeds, removeHTMLWhitespace } from "@mws-astro/util";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Button from "@components/button/button.astro";
 import Icon from "@shared/icon.astro";
@@ -15,7 +15,7 @@ import Player from "@components/player/player.astro";
 import Accordion from "@components/accordion/accordion.astro";
 import Navigation from "@components/navigation/navigation.astro";
 
-const content = await replaceCmsEmbeds(Astro.props.content);
+const content = removeHTMLWhitespace(replaceCmsEmbeds(Astro.props.content));
 
 var substitutions = {
     Accordion,
@@ -58,7 +58,7 @@ if (ENV_BOOKSHOP_LIVE) {
                   {content}
                   sanitize={{ allowComponents: true }}
                   components={substitutions}
-                  marked={{"extensions": [gfmHeadingId() as any]}}
+                  marked={{extensions: [gfmHeadingId() as any]}}
               />
           )
 }

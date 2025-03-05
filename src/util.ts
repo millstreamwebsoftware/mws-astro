@@ -11,22 +11,21 @@ export function convertColorString(
   return c.slice(0, 3).join(" ") + (c[3] != 1 ? " / " + c[3] : "");
 }
 
-export async function replaceCmsEmbeds(content: string) {
+export function replaceCmsEmbeds(content: string) {
   if (!content) return content;
 
   const embedRe = /<div[^>]*data-cms-embed="([^>"]*)"[^>]*>[^>]*\/div>/gm;
-
   return content.replaceAll(embedRe, (_, g1) => {
     return he.decode(atob(g1));
   });
 }
 
-export async function stripTrailingWhitespace(content: string) {
-  if (!content) return content;
+export function stripTrailingWhitespace(content: string) {
+  return content?.replaceAll(/[^\S\r\n]$/gm, "") ?? content;
+}
 
-  const whitespaceRe = /[^\S\r\n]$/gm;
-
-  return content.replaceAll(whitespaceRe, "");
+export function removeHTMLWhitespace(content: string) {
+  return content?.replaceAll(/>\n*?</gm, "><") ?? content;
 }
 
 export function bookshopName(p: string) {
