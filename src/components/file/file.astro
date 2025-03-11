@@ -134,7 +134,7 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                                     fit="contain"
                                 />
                             ) : (
-                                <img src={thumbnail} width={256} />
+                                <img src={thumbnail} width={256} class="thumbnail" />
                             ))}
                             <div class="file-details">
                                 <div class="file-heading">
@@ -202,6 +202,10 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
 
         &:hover {
             transform: scale(1.05);
+        }
+
+        .thumbnail {
+            width: 100%;
         }
 
         > .file-details {
