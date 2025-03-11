@@ -15,6 +15,7 @@ export interface Props {
     color?: string;
     content?: string;
     align?: ["top", "center", "bottom"];
+    animation?: ["fade","blur","slide-up","slide-right","slide-down","slide-left","grow","flare"];
     background_color?: string;
     background_image?: string;
     background_video?: string;
@@ -33,6 +34,7 @@ const {
     height,
     color,
     content,
+    animation,
     background_color,
     background_image,
     background_video,
@@ -77,6 +79,7 @@ const expando = classList.includes("expando") ? true : false;
         { "background-color": background },
     ]}
     data-component={component}
+    data-animation={animation}
     {id}
 >
     {
@@ -258,6 +261,107 @@ const expando = classList.includes("expando") ? true : false;
             }
         }
     }
+
+    [data-animation="fade"] {
+        .component-wrapper {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+        }
+    }
+
+    [data-animation="blur"] {
+        .component-wrapper {
+            filter: blur(5px);
+            transition: filter 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            filter: blur(0px);
+        }
+    }
+
+    [data-animation="slide-up"] {
+        .component-wrapper {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+            transform: translateY(0px);
+        }
+    }
+
+    [data-animation="slide-right"] {
+        .component-wrapper {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+            transform: translateX(0px);
+        }
+    }
+
+    [data-animation="slide-down"] {
+        .component-wrapper {
+            opacity: 0;
+            transform: translateY(-50px);
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+            transform: translateY(0px);
+        }
+    }
+
+    [data-animation="slide-left"] {
+        .component-wrapper {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+            transform: translateX(0px);
+        }
+    }
+
+
+    [data-animation="grow"] {
+        .component-wrapper {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+            transform: scale(1.0);
+        }
+    }
+
+    [data-animation="flare"] {
+        .component-wrapper {
+            opacity: 0;
+            filter: drop-shadow(0px 0px 20px white) brightness(5);
+            transition: filter 0.8s ease, opacity 0.8s ease;
+        }
+
+        &.scrolled .component-wrapper {
+            opacity: 1;
+            filter: drop-shadow(0px 0px 0px white) brightness(1);
+        }
+    }
 </style>
 
 <style is:global>
@@ -281,6 +385,7 @@ const expando = classList.includes("expando") ? true : false;
     // document.addEventListener("DOMContentLoaded", setupExpando);
     // document.addEventListener("astro:after-swap", setupExpando);
     setupExpando();
+    setupAnimation();
 
     function setupExpando() {
         const expandos = Array.from(
@@ -317,5 +422,18 @@ const expando = classList.includes("expando") ? true : false;
                 }
             });
         });
+    }
+
+    function setupAnimation() {
+      const animatedSections = Array.from(document.querySelectorAll("section[data-animation]"));
+      const observer = new IntersectionObserver((intersections) => {
+        intersections.forEach((intersect) => {
+          intersect.target.classList.toggle("scrolled", intersect.isIntersecting);
+        });
+      });
+
+      animatedSections.forEach((section) =>
+        observer.observe(section)
+      );
     }
 </script>
