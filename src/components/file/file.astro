@@ -92,38 +92,29 @@ function getIcon(path: string) {
 
 // @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE && files?.length) {
-    // const fs = await import("node:fs/promises").catch(() => {
-    //     return undefined;
-    // });
-    // const path = await import("node:path");
+    await Promise.all(
+        files.map(async (file) => {
+            file.size = await getFilesize(file.path);
 
-    // if (fs) {
-        await Promise.all(
-            files.map(async (file) => {
-                let realPath = file.path;
-                
-                file.size = await getFilesize(file.path);
-
-                if (show_thumbnail) {
-                    switch (getFileType(realPath)) {
-                        case "jpg":
-                        case "jpeg":
-                        case "png":
-                        case "gif":
-                        case "webp":
-                        case "avif":
-                        case "tiff":
-                            file.thumbnail = await resolvePath(file.path);
-                            break;
-                        case "pdf":
-                            file.thumbnail = await getPDFThumbnail(file.path);
-                            break;
-                        default:
-                    }
+            if (show_thumbnail) {
+                switch (getFileType(file.path)) {
+                    case "jpg":
+                    case "jpeg":
+                    case "png":
+                    case "gif":
+                    case "webp":
+                    case "avif":
+                    case "tiff":
+                        file.thumbnail = await resolvePath(file.path);
+                        break;
+                    case "pdf":
+                        file.thumbnail = (await getPDFThumbnail(file.path))?.replace(/^\/?public/, "");
+                        break;
+                    default:
                 }
-            }),
-        );
-    // }
+            }
+        }),
+    );
 }
 ---
 
@@ -134,7 +125,7 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                 files.map(({ path, title, description, size, thumbnail }) => {
                     return (
                         <li>
-                            {thumbnail && (
+                            {thumbnail && (getFileType(path) !== "pdf" ? (
                                 <Image
                                     image={thumbnail}
                                     alt=""
@@ -142,7 +133,9 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                                     quality="mid"
                                     fit="contain"
                                 />
-                            )}
+                            ) : (
+                                <img src={thumbnail} width={256} />
+                            ))}
                             <div class="file-details">
                                 <div class="file-heading">
                                     {show_icon && (
