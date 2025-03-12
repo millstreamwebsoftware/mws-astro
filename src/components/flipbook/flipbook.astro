@@ -16,19 +16,15 @@ const {title, url} = Astro.props;
 var thumbnail, filesize;
 
 if (url) {
-  thumbnail = await getPDFThumbnail(url);
+  thumbnail = (await getPDFThumbnail(url))?.replace(/^\/?public/, "");
   filesize = await getFilesize(url);
 }
 ---
 <Section component="flipbook" {...Astro.props}>
     <div class="flipbook" data-flipbook={url}>
         <div class="flipbook-preview">
-            {thumbnail && <Image
-                image={thumbnail}
-                alt=""
-                width={512}
-                quality="mid"
-                fit="contain"
+            {thumbnail && <img
+                src={thumbnail}
             />}
             <div class="flipbook-details">
                 {title && <h1>{title}</h1>}
@@ -52,23 +48,27 @@ if (url) {
 </Section>
 
 <script>
-import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
-import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
-type ResizeableCanvas = HTMLCanvasElement & {_resize?: Function};
+import type { PDFDocument } from "mupdf";
+// import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
+// import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
+// type ResizeableCanvas = HTMLCanvasElement & {_resize?: Function};
 
-var getDocument: Function | undefined = undefined;
-var TextLayer: any | undefined = undefined;
-var GlobalWorkerOptions: any | undefined = undefined;
+// var getDocument: Function | undefined = undefined;
+// var TextLayer: any | undefined = undefined;
+// var GlobalWorkerOptions: any | undefined = undefined;
+var mupdf: typeof import("mupdf") | undefined;
 
 setupFlipbook();
 
 async function importPDFJS() {
-  if (getDocument && TextLayer && GlobalWorkerOptions) return;
-  console.log("Imported PDF.JS");
+  // if (getDocument && TextLayer && GlobalWorkerOptions) return;
+  // console.log("Imported PDF.JS");
+  if (mupdf) return;
 
-  const PDFJS = await import("pdfjs-dist");
-  ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
-  GlobalWorkerOptions.workerSrc = PDFJSWorker;
+  mupdf = await import("mupdf");
+  // const PDFJS = await import("pdfjs-dist");
+  // ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
+  // GlobalWorkerOptions.workerSrc = PDFJSWorker;
 }
 
 async function setupFlipbook() {
@@ -97,20 +97,37 @@ async function setupFlipbook() {
       document.body.removeChild(a);
     }
 
+    async function fetchDocument(url: string): Promise<PDFDocument|undefined> {
+      if (!mupdf) return;
+      let response = await fetch(url);
+      if (!response.ok) {
+        console.error(`Cannot fetch document: ${response.statusText}`);
+        return;
+      }
+
+      let data = await response.arrayBuffer();
+      return mupdf.PDFDocument.openDocument(data, url) as PDFDocument;
+    }
+
     async function startFlipbook() {
       await importPDFJS();
+      if (!flipbookViewport || !flipbook.dataset.flipbook) return;
 
-      if (!flipbookViewport) return;
-      const loadTask = getDocument?.(flipbook.dataset.flipbook);
-      loadTask.onProgress = (progress: OnProgressParameters) => {
-        flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
-      };
+
+      // const loadTask = getDocument?.(flipbook.dataset.flipbook);
+      // loadTask.onProgress = (progress: OnProgressParameters) => {
+      //   flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
+      // };
       flipbook.classList.toggle("loading",true);
-      const pdf = await loadTask.promise;
+      // const pdf = await loadTask.promise;
+      const pdf = await fetchDocument(flipbook.dataset.flipbook);
+      if (!pdf) return;
       flipbook.classList.toggle("loading",false);
       flipbook.classList.toggle("loaded",true);
 
-      const singlePage = pdf.numPages === 1;
+      // const singlePage = pdf.numPages === 1;
+      const numPages = pdf.countPages();
+      const singlePage = numPages === 1;
       flipbook.classList.toggle("singlepage", singlePage);
 
       const spreadSize = 2 - Number(singlePage);
@@ -126,7 +143,8 @@ async function setupFlipbook() {
       function updateCounter() {
         if (!pageCounter) return;
 
-        pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), pdf.numPages), 1)}/${pdf.numPages}`;
+        // pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), pdf.numPages), 1)}/${pdf.numPages}`;
+        pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), numPages), 1)}/${numPages}`;
       }
 
       async function addSpread(prepend?: boolean) {
@@ -173,7 +191,7 @@ async function setupFlipbook() {
         if (page < 0) page = 0;
 
         // if (page < 0 - Number(evenSpreads)) page = 0 - Number(evenSpreads);
-        if (page > pdf.numPages) page = oldPage;
+        if (page > numPages) page = oldPage;
 
         if (page === oldPage) return;
 
@@ -208,11 +226,12 @@ async function setupFlipbook() {
         }
       })
 
-      async function renderPage(canvas: ResizeableCanvas, num: number) {
+      async function renderPage(canvas: HTMLCanvasElement, num: number) {
         const context = canvas.getContext("2d");
         const text = canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer");
+        if (!pdf || !mupdf || !context) return;
 
-        if (num < 0 || num >= pdf.numPages) {
+        if (num < 0 || num >= numPages) {
           // canvas.width = canvas.width;
           // text && (text.innerHTML = "");
           canvas.parentElement?.classList.toggle("blank-page", true);
@@ -220,55 +239,80 @@ async function setupFlipbook() {
           return;
         }
 
-        const page = await pdf.getPage(num+1);
-        var viewport = page.getViewport({scale: 1.5});
+        // const page = pdf.loadPage(num+1);
+        const page = pdf.loadPage(num);
+        // var viewport = page.getViewport({scale: 1.5});
 
-        if (canvas.height != viewport.height)
-        canvas.height = viewport.height;
+        // if (canvas.height != viewport.height)
+        // canvas.height = viewport.height;
 
-        if (canvas.width != viewport.width)
-        canvas.width = viewport.width;
+        // if (canvas.width != viewport.width)
+        // canvas.width = viewport.width;
 
-        if (!context) throw Error("Canvas context missing");
+        let pixmap = page.toPixmap(
+          // mupdf.Matrix.scale(0.5, 0.5),
+          mupdf.Matrix.identity,
+          mupdf.ColorSpace.DeviceRGB,
+          true,
+          true,
+        );
 
-        const renderTask = page.render({canvasContext: context, viewport}).promise;
-        const textContent = page.getTextContent().then(async (textContent: any) => {
-          if (!text) return;
+        const [width, height] = [pixmap.getWidth(), pixmap.getHeight()];
+        [canvas.width, canvas.height] = [width, height];
 
-          text.style.left = canvas.offsetLeft + 'px';
-          text.style.top = canvas.offsetTop + 'px';
-          text.style.height = canvas.offsetHeight + 'px';
-          text.style.width = canvas.offsetWidth + 'px';
+        // console.log(width, height);
 
-          const textLayer = new TextLayer({
-            textContentSource: textContent,
-            container: text,
-            viewport: viewport,
-          });
+        // console.log(pixmap.getPixels().slice(0, 64));
 
-          canvas._resize = () => {
-            const widthScaleFactor = canvas.clientWidth / (canvas.width / viewport.scale);
-            const heightScaleFactor = canvas.clientHeight / (canvas.height / viewport.scale);
-            const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
+        try {
+          const data = new ImageData(pixmap.getPixels(), width, height);
+          context.putImageData(data,0,0);
+        } catch (e) {
+          console.error(e);
+        }
 
-            text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
-          }
 
-          canvas._resize();
+        // console.log("aadad");
 
-          const observer = new ResizeObserver((entries) => {
-            entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
-          });
+        // const renderTask = page.render({canvasContext: context, viewport}).promise;
+        // const textContent = page.getTextContent().then(async (textContent: any) => {
+        //   if (!text) return;
 
-          observer.observe(canvas);
+        //   text.style.left = canvas.offsetLeft + 'px';
+        //   text.style.top = canvas.offsetTop + 'px';
+        //   text.style.height = canvas.offsetHeight + 'px';
+        //   text.style.width = canvas.offsetWidth + 'px';
 
-          text.innerHTML = "";
-          await textLayer.render();
+        //   const textLayer = new TextLayer({
+        //     textContentSource: textContent,
+        //     container: text,
+        //     viewport: viewport,
+        //   });
 
-          text.style.left = "";
-        });
+        //   canvas._resize = () => {
+        //     const widthScaleFactor = canvas.clientWidth / (canvas.width / viewport.scale);
+        //     const heightScaleFactor = canvas.clientHeight / (canvas.height / viewport.scale);
+        //     const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
 
-        return await Promise.all([renderTask, textContent]);
+        //     text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
+        //   }
+
+        //   canvas._resize();
+
+        //   const observer = new ResizeObserver((entries) => {
+        //     entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
+        //   });
+
+        //   observer.observe(canvas);
+
+        //   text.innerHTML = "";
+        //   await textLayer.render();
+
+        //   text.style.left = "";
+        // });
+
+        // return await Promise.all([renderTask, textContent]);
+
       }
 
       async function renderSpread(spread: HTMLDivElement) {
@@ -351,6 +395,12 @@ async function setupFlipbook() {
     gap: var(--column-gap);
 
     color: rgb(var(--text-color));
+
+    img {
+        min-height: 20rem;
+        max-height: 100%;
+        max-width: 100%;
+    }
 
     @media only screen and (max-width: 768px) {
         grid-template-columns: 1fr;
