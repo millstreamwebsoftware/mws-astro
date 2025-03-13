@@ -1,7 +1,6 @@
 ---
 import Section from "@layouts/Section.astro";
 import Icon from "@shared/icon.astro";
-import Image from "@shared/Image.astro";
 import { formatBytes } from "@mws-astro/util";
 import { getFilesize } from "@mws-astro/filesystem";
 import { getPDFThumbnail } from "@mws-astro/pdf";
@@ -16,19 +15,15 @@ const {title, url} = Astro.props;
 var thumbnail, filesize;
 
 if (url) {
-  thumbnail = await getPDFThumbnail(url);
+  thumbnail = (await getPDFThumbnail(url, 0, 1024))?.replace(/^\/?public/, "");
   filesize = await getFilesize(url);
 }
 ---
 <Section component="flipbook" {...Astro.props}>
     <div class="flipbook" data-flipbook={url}>
         <div class="flipbook-preview">
-            {thumbnail && <Image
-                image={thumbnail}
-                alt=""
-                width={512}
-                quality="mid"
-                fit="contain"
+            {thumbnail && <img
+                src={thumbnail}
             />}
             <div class="flipbook-details">
                 {title && <h1>{title}</h1>}
@@ -351,6 +346,12 @@ async function setupFlipbook() {
     gap: var(--column-gap);
 
     color: rgb(var(--text-color));
+
+    img {
+        min-height: 20rem;
+        max-height: 100%;
+        max-width: 100%;
+    }
 
     @media only screen and (max-width: 768px) {
         grid-template-columns: 1fr;
