@@ -8,6 +8,7 @@ type Image = {
     image: string;
     title?: string;
     description?: string;
+    alt?: string;
     link?: string;
 };
 
@@ -59,7 +60,7 @@ const id = `gallery-${key}`;
                 <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
                     <Image
                         image={asset.image}
-                        alt=""
+                        alt={asset.alt}
                         {fit}
                         width={1920 / columns}
                         quality="low"
@@ -92,7 +93,7 @@ const id = `gallery-${key}`;
                         >
                             <Image
                                 image={asset.image}
-                                alt=""
+                                alt={asset.alt}
                                 fit="contain"
                                 width={1920}
                                 quality="high"

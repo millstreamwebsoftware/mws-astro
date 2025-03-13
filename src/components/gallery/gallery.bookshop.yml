@@ -43,6 +43,7 @@ blueprint:
     - image:
       title:
       description:
+      alt:
       link:
   content:
   classes:
