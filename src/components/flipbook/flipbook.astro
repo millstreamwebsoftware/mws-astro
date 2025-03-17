@@ -118,6 +118,22 @@ async function setupFlipbook() {
       addSpread();
       addSpread(false);
 
+      var touchstart: Array<number> = [];
+      flipbookViewport.addEventListener('touchstart', function (e) {
+        touchstart = [e.changedTouches[0].screenX, e.changedTouches[0].screenY];
+      });
+      flipbookViewport.addEventListener('touchend', function (e) {
+        let touchvector = [e.changedTouches[0].screenX - touchstart[0], e.changedTouches[0].screenY - touchstart[1]];
+
+        let magnitude = Math.sqrt(touchvector[0] * touchvector[0] + touchvector[1] * touchvector[1]);
+        let direction = Math.abs(Math.atan2(touchvector[1], touchvector[0]) / Math.PI);
+
+        if (magnitude < Math.min(screen.width * 0.2, 250)) return;
+        if (direction > .2 && direction < .8) return;
+
+        turnPage(direction < .5 ? true : false);
+      });
+
       function updateCounter() {
         if (!pageCounter) return;
 
@@ -308,17 +324,11 @@ async function setupFlipbook() {
 }
 
 .toolbar {
-    /* position: absolute; */
-    /* bottom: 0; */
-    /* left: 50%; */
-
-    /* transform: translateX(-50%) translateY(110%); */
-    /* background-color: white; */
-
     display: flex;
     flex-direction: row;
     justify-content: center;
     margin-top: 1rem;
+    touch-action: manipulation;
 
     z-index: 999;
 
