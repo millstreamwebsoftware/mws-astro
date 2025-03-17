@@ -12,7 +12,8 @@ export interface Props {
 }
 
 const { action, name, form_blocks, classes, key } = Astro.props;
-const id = (name || "") + "-" + (key || "");
+// const id = (name || "") + "-" + (key || "");
+const id = name.toLowerCase().replaceAll(" ", "-");
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -66,7 +67,7 @@ const required = checkRequired(form_blocks);
       form_blocks.map((block: any, i: number) => {
         const Component = components[block._bookshop_name];
         if (Component) {
-          return <Component {...block} key={String(i) + (key || "")} />;
+          return <Component {...block} key={String(i) + "-" + (key || "")} />;
         }
         const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
         console.warn(warnstring);
