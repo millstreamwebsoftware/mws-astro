@@ -6,10 +6,41 @@ spec:
   description: Display events in a calendar.
   icon: event
   tags: []
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - indent
+        - align
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
+        - background_fit
 
 # Defines the structure of this component, as well as the default values
 blueprint:
   calendarEvents: []
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
@@ -19,10 +50,6 @@ _inputs:
     type: email
     label: Google Calendar ID
     comment: Look in the calendar settings to find this value, it will be formatted like 'abcd1234@group.calendar.google.com'
-  # url:
-  #   type: url
-  #   label: iCal URL
-  #   comment:
 
 _structures:
   calendarEvents:
@@ -31,6 +58,3 @@ _structures:
         value:
           name:
           googleCalendarId:
-      # - label: iCal
-      #   value:
-      #     url:

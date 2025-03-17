@@ -23,6 +23,7 @@ spec:
         - background_align
         - background_opacity
         - background_fixed
+        - background_fit
   preview:
     metadata:
       - text:
@@ -46,6 +47,7 @@ blueprint:
   background_align:
   background_opacity:
   background_fixed:
+  background_fit:
 
 _inputs:
   filter:

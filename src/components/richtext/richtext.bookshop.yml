@@ -22,6 +22,7 @@ spec:
         - background_align
         - background_opacity
         - background_fixed
+        - background_fit
   preview:
     image:
       - key: background_image
@@ -44,3 +45,4 @@ blueprint:
   background_align:
   background_opacity:
   background_fixed:
+  background_fit:

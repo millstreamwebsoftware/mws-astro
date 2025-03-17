@@ -20,6 +20,7 @@ spec:
         - background_align
         - background_opacity
         - background_fixed
+        - background_fit
   preview:
     gallery:
       image:
@@ -51,6 +52,7 @@ blueprint:
   background_align:
   background_opacity:
   background_fixed:
+  background_fit:
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:

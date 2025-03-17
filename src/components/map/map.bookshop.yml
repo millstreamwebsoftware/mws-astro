@@ -6,6 +6,24 @@ spec:
   description: Embed a map element
   icon: public
   tags: []
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - height
+        - indent
+        - align
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
+        - background_fit
 
 # Defines the structure of this component, as well as the default values
 blueprint:
@@ -14,11 +32,19 @@ blueprint:
   lng: 115.631223
   zoom: 12
   mapType: roadmap
-  # marker: false
-  height: 40
-  indent: true
-  # mapId:
-  # style:
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
 
 _inputs:
   location:

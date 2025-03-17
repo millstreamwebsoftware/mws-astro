@@ -2,10 +2,10 @@
 spec:
   structures:
     - content_blocks
-  label: Video Player
-  description: Embed a video player
-  icon: movie
-  tags: ["video"]
+  label: Flipbook
+  description: Display a PDF as a flipbook
+  icon: menu_book
+  tags: ["file"]
   place_groups_below: true
   groups:
     - heading: Section
@@ -25,9 +25,9 @@ spec:
         - background_fixed
         - background_fit
   preview:
-    text: Video Player
     subtext:
-      - key: src
+      - key: title
+      - key: url
     metadata:
       - text:
           - key: classes
@@ -35,7 +35,8 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
-  src:
+  title:
+  url:
   content:
   classes:
   height:
@@ -49,3 +50,15 @@ blueprint:
   background_opacity:
   background_fixed:
   background_fit:
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint
+_inputs:
+  title:
+    type: text
+  url:
+    type: document
+    label: PDF Document
+    options:
+      accepts_mime_type: application/pdf

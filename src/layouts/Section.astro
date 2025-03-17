@@ -15,16 +15,17 @@ export interface Props {
     color?: string;
     content?: string;
     align?: ["top", "center", "bottom"];
-    animation?: ["fade","blur","slide-up","slide-right","slide-down","slide-left","grow","flare"];
+    animation?: "fade" | "blur" | "slide-up" | "slide-right" | "slide-down" | "slide-left" | "grow" | "flare";
     background_color?: string;
     background_image?: string;
     background_video?: string;
     background_align?: CssAlign;
     background_opacity?: number;
     background_fixed?: boolean;
+    background_fit?: "cover" | "contain";
     classes?: any;
     style?: Record<string, any>;
-    indent?: ["no-indent", "no-indent-left", "no-indent-top", "no-indent-right", "no-indent-bottom"] | boolean;
+    indent?: "no-indent" | "no-indent-left" | "no-indent-top" | "no-indent-right" | "no-indent-bottom" | boolean;
     key?: string;
     section?: any;
 }
@@ -41,6 +42,7 @@ const {
     background_align,
     background_opacity,
     background_fixed,
+    background_fit,
     classes,
     style,
     key,
@@ -91,6 +93,7 @@ const expando = classList.includes("expando") ? true : false;
                     align={background_align}
                     opacity={background_opacity}
                     fixed={background_fixed}
+                    fit={background_fit}
                     background={true}
                     quality="mid"
                 />

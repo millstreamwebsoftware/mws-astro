@@ -21,6 +21,7 @@ spec:
         - background_align
         - background_opacity
         - background_fixed
+        - background_fit
   preview:
     subtext:
       - key: content_blocks[*]._bookshop_name
@@ -46,6 +47,7 @@ blueprint:
   background_align:
   background_opacity:
   background_fixed:
+  background_fit:
 
 _inputs:
   collapse:
