@@ -229,40 +229,30 @@ async function setupFlipbook() {
       async function renderPage(canvas: HTMLCanvasElement, num: number) {
         const context = canvas.getContext("2d");
         const text = canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer");
-        if (!pdf || !mupdf || !context) return;
+        if (!pdf || !mupdf || !context || !text) return;
 
         if (num < 0 || num >= numPages) {
-          // canvas.width = canvas.width;
-          // text && (text.innerHTML = "");
           canvas.parentElement?.classList.toggle("blank-page", true);
-
           return;
         }
 
-        // const page = pdf.loadPage(num+1);
         const page = pdf.loadPage(num);
-        // var viewport = page.getViewport({scale: 1.5});
 
-        // if (canvas.height != viewport.height)
-        // canvas.height = viewport.height;
-
-        // if (canvas.width != viewport.width)
-        // canvas.width = viewport.width;
+        const dpr = Math.max(window.devicePixelRatio, 3);
 
         let pixmap = page.toPixmap(
-          // mupdf.Matrix.scale(0.5, 0.5),
-          mupdf.Matrix.identity,
+          mupdf.Matrix.scale(dpr,dpr),
           mupdf.ColorSpace.DeviceRGB,
           true,
           true,
+          "view",
         );
+
+        // console.log(page.getBounds(), dpr, pixmap.getBounds());
+        let stext = page.toStructuredText("preserve-whitespace").asHTML(num);
 
         const [width, height] = [pixmap.getWidth(), pixmap.getHeight()];
         [canvas.width, canvas.height] = [width, height];
-
-        // console.log(width, height);
-
-        // console.log(pixmap.getPixels().slice(0, 64));
 
         try {
           const data = new ImageData(pixmap.getPixels(), width, height);
@@ -271,48 +261,29 @@ async function setupFlipbook() {
           console.error(e);
         }
 
+        text.innerHTML = stext.replaceAll(/(?<=style="[^<>]*)([0-9])pt/g,"$1px"); // .replaceAll(/(style=".*?[0-9])pt(;.*?[0-9])pt([";])/g,"$1px$2px$3");
 
-        // console.log("aadad");
+        // @ts-ignore
+        canvas._resize = () => {
+            if (!canvas.clientHeight || !canvas.clientWidth) return;
+            const widthScaleFactor = canvas.clientWidth / (width / dpr);
+            const heightScaleFactor = canvas.clientHeight / (height / dpr);
+            const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
 
-        // const renderTask = page.render({canvasContext: context, viewport}).promise;
-        // const textContent = page.getTextContent().then(async (textContent: any) => {
-        //   if (!text) return;
+            // console.log("width:",widthScaleFactor, "=", canvas.clientWidth, "/ (", width, "/", dpr, ")");
+            // console.log("height:",heightScaleFactor, "=", canvas.clientHeight, "/ (", height, "/", dpr, ")");
 
-        //   text.style.left = canvas.offsetLeft + 'px';
-        //   text.style.top = canvas.offsetTop + 'px';
-        //   text.style.height = canvas.offsetHeight + 'px';
-        //   text.style.width = canvas.offsetWidth + 'px';
+            canvas.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
+        }
 
-        //   const textLayer = new TextLayer({
-        //     textContentSource: textContent,
-        //     container: text,
-        //     viewport: viewport,
-        //   });
+        // @ts-ignore
+        canvas._resize();
 
-        //   canvas._resize = () => {
-        //     const widthScaleFactor = canvas.clientWidth / (canvas.width / viewport.scale);
-        //     const heightScaleFactor = canvas.clientHeight / (canvas.height / viewport.scale);
-        //     const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
+        const observer = new ResizeObserver((entries) => {
+          entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
+        });
 
-        //     text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
-        //   }
-
-        //   canvas._resize();
-
-        //   const observer = new ResizeObserver((entries) => {
-        //     entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
-        //   });
-
-        //   observer.observe(canvas);
-
-        //   text.innerHTML = "";
-        //   await textLayer.render();
-
-        //   text.style.left = "";
-        // });
-
-        // return await Promise.all([renderTask, textContent]);
-
+        observer.observe(canvas);
       }
 
       async function renderSpread(spread: HTMLDivElement) {
@@ -515,7 +486,7 @@ async function setupFlipbook() {
 
                 .textLayer {
                     right: 0;
-                    left: unset;
+                    /* left: unset; */
                 }
 
                 &::after {
@@ -567,127 +538,31 @@ async function setupFlipbook() {
         display: none;
     }
 
-    /* PDF.js styles */
-    .flipbook-page {
-        .textLayer {
-          position: absolute;
-          text-align: initial;
-          inset: 0;
-          overflow: clip;
-          opacity: 1;
-          line-height: 1;
-          text-size-adjust: none;
-          forced-color-adjust: none;
-          transform-origin: 0 0;
-          caret-color: CanvasText;
-          z-index: 0;
+    .flipbook-page > .textLayer {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
 
-          ::selection {
-              color: transparent;
-          }
+        span {
+            color: transparent !important;
 
-          &.highlighting {
-            touch-action: none;
-          }
-
-          :is(span, br) {
-            color: transparent;
-            position: absolute;
-            white-space: pre;
-            cursor: text;
-            transform-origin: 0% 0%;
-          }
-
-          > :not(.markedContent),
-          .markedContent span:not(.markedContent) {
-            z-index: 1;
-          }
-
-          /* Only necessary in Google Chrome, see issue 14205, and most unfortunately
-           * the problem doesn't show up in "text" reference tests. */
-          /*#if !MOZCENTRAL*/
-          span.markedContent {
-            top: 0;
-            height: 0;
-          }
-          /*#endif*/
-
-          span[role="img"] {
-            user-select: none;
-            cursor: default;
-          }
-
-          .highlight {
-            --highlight-bg-color: rgb(180 0 170 / 0.25);
-            --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
-            --highlight-backdrop-filter: none;
-            --highlight-selected-backdrop-filter: none;
-
-            margin: -1px;
-            padding: 1px;
-            background-color: var(--highlight-bg-color);
-            backdrop-filter: var(--highlight-backdrop-filter);
-            border-radius: 4px;
-
-            @media screen and (forced-colors: active) {
-              --highlight-bg-color: transparent;
-              --highlight-selected-bg-color: transparent;
-              --highlight-backdrop-filter: var(--hcm-highlight-filter);
-              --highlight-selected-backdrop-filter: var(
-                --hcm-highlight-selected-filter
-              );
+            &::selection {
+                color: transparent;
             }
+        }
 
-            &.appended {
-              position: initial;
+        opacity: 0.5;
+
+        & > div[id] {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform: scale(var(--scale-factor, 1));
+            transform-origin: top left;
+
+            & > p {
+                position: absolute;
             }
-
-            &.begin {
-              border-radius: 4px 0 0 4px;
-            }
-
-            &.end {
-              border-radius: 0 4px 4px 0;
-            }
-
-            &.middle {
-              border-radius: 0;
-            }
-
-            &.selected {
-              background-color: var(--highlight-selected-bg-color);
-              backdrop-filter: var(--highlight-selected-backdrop-filter);
-            }
-          }
-
-          ::selection {
-            /* stylelint-disable declaration-block-no-duplicate-properties */
-            /*#if !MOZCENTRAL*/
-            background: rgba(0 0 255 / 0.25);
-            /*#endif*/
-            /* stylelint-enable declaration-block-no-duplicate-properties */
-            background: color-mix(in srgb, AccentColor, transparent 75%);
-          }
-
-          /* Avoids https://github.com/mozilla/pdf.js/issues/13840 in Chrome */
-          /*#if !MOZCENTRAL*/
-          br::selection {
-            background: transparent;
-          }
-          /*#endif*/
-
-          .endOfContent {
-            display: block;
-            position: absolute;
-            inset: 100% 0 0;
-            z-index: 0;
-            cursor: default;
-            user-select: none;
-          }
-
-          &.selecting .endOfContent {
-            top: 0;
-          }
         }
     }
 </style>
