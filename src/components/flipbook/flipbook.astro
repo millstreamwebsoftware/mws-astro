@@ -93,7 +93,7 @@ async function setupFlipbook() {
 
     async function startFlipbook() {
       if (!flipbookViewport) return;
-      const loadTask = getDocument({url: flipbook.dataset.flipbook, useWasm: true});
+      const loadTask = getDocument({url: flipbook.dataset.flipbook});
       loadTask.onProgress = (progress: OnProgressParameters) => {
         flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
       };
