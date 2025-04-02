@@ -186,9 +186,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
 <script>
     import Glide from "@glidejs/glide";
-
-    // document.addEventListener("DOMContentLoaded", setupGlide);
-    // document.addEventListener("astro:after-swap", setupGlide);
     setupGlide();
 
     function setupGlide() {
@@ -304,31 +301,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         min-height: calc(var(--height) - var(--header-offset-transparent));
     }
 
-    /* .glide__slide {
-        background-color: var(--background-color);
-        position: relative;
-        padding: 4rem;
-        height: 100%;
-
-        .content {
-            position: relative;
-            display: flex;
-            height: 100%;
-            flex-direction: column;
-            justify-content: flex-end;
-            z-index: 10;
-        }
-
-        .slide__background {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: var(--background-fit);
-            object-position: center;
-        }
-    } */
-
     .glide__arrows {
         position: absolute;
         inset: 0;
@@ -424,8 +396,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
         .slider-item {
             position: absolute;
-            top: 0;
-            left: 0;
+            width: 100%;
+            /* top: 0; */
+            /* left: 0; */
+            inset: 0;
             order: 2;
             opacity: 0;
             z-index: 2;
@@ -434,7 +408,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         }
 
         .slider-item[data-fader] {
-            position: relative;
+            /* position: relative; */
             order: 1;
             opacity: 1;
             z-index: 1;

@@ -51,23 +51,22 @@ import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
 import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
 type ResizeableCanvas = HTMLCanvasElement & {_resize?: Function};
 
-var getDocument: Function | undefined = undefined;
-var TextLayer: any | undefined = undefined;
-var GlobalWorkerOptions: any | undefined = undefined;
 
 setupFlipbook();
 
-async function importPDFJS() {
-  if (getDocument && TextLayer && GlobalWorkerOptions) return;
-  console.log("Imported PDF.JS");
+// async function importPDFJS() {
+//   if (getDocument && TextLayer && GlobalWorkerOptions) return;
+//   console.log("Imported PDF.JS");
 
-  const PDFJS = await import("pdfjs-dist");
-  ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
-  GlobalWorkerOptions.workerSrc = PDFJSWorker;
-}
+//   const PDFJS = await import("pdfjs-dist");
+//   ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
+//   GlobalWorkerOptions.workerSrc = PDFJSWorker;
+// }
 
 async function setupFlipbook() {
   const flipbooks = document.querySelectorAll<HTMLElement>("[data-flipbook]");
+  const {getDocument, TextLayer, GlobalWorkerOptions} = await import("pdfjs-dist");
+  GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
   flipbooks.forEach(async (flipbook) => {
     const flipbookPreview = flipbook.querySelector<HTMLDivElement>(".flipbook-preview");
@@ -93,10 +92,8 @@ async function setupFlipbook() {
     }
 
     async function startFlipbook() {
-      await importPDFJS();
-
       if (!flipbookViewport) return;
-      const loadTask = getDocument?.(flipbook.dataset.flipbook);
+      const loadTask = getDocument({url: flipbook.dataset.flipbook});
       loadTask.onProgress = (progress: OnProgressParameters) => {
         flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
       };
