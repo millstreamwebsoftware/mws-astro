@@ -39,9 +39,10 @@ declare global {
     };
     header: {
       logo_image: string;
-      pin_header: boolean;
+      pin_header: boolean | string;
       navigation_menu_depth: number;
       show_logo: boolean;
+      show_logo_mobile: boolean;
       show_navigation: boolean;
       show_socials: boolean;
     };

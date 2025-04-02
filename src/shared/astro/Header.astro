@@ -1,5 +1,6 @@
 ---
-import preferences from "@data/preferences.json";
+import _preferences from "@data/preferences.json";
+const preferences = _preferences as unknown as Preferences;
 import Navigation from "./SiteNavigation.astro";
 
 export interface Props {
@@ -8,37 +9,14 @@ export interface Props {
 }
 
 const { id, currentPath } = Astro.props;
-
-// const headerItems: Record<string, boolean> = {
-//     logo: preferences.header.show_logo,
-//     navigation: preferences.header.show_navigation,
-//     social: preferences.header.show_socials,
-// };
-// const headerAreas =
-//     '"' +
-//     Object.keys(headerItems)
-//         .filter((k) => headerItems[k])
-//         .join(" ") +
-//     '"';
-
-
-// const headerBackgroundColor = convertColorString(
-//   preferences.header.background_top_color
-// );
-// const headerBackgroundColorBottom = convertColorString(
-//   preferences.header.background_bottom_color
-// );
-
-// +
-//     `--header-background-color: ${headerBackgroundColor};` +
-//     `--header-background-color-bottom: ${headerBackgroundColorBottom};`
 ---
 
 <header
     id="header"
     class:list={{
-        pinned: preferences.header.pin_header != "false",
-        contain: preferences.header.pin_header == "contain",
+        pinned: preferences.header.pin_header !== "false",
+        contain: preferences.header.pin_header === "contain",
+        "mobile-logo": preferences.header.show_logo_mobile ?? false,
     }}
 >
     {
@@ -91,8 +69,6 @@ const { id, currentPath } = Astro.props;
         left: 0;
         right: 0;
         top: 0;
-        /* bottom: calc(100% - var(--header-height)); */
-        /* height: var(--header-height); */
     }
 
     header.pinned.contain {
@@ -118,20 +94,6 @@ const { id, currentPath } = Astro.props;
         max-height: 100%;
         max-width: 100%;
     }
-
-    @media only screen and (max-width: 768px) {
-        .logo {
-            display: none;
-        }
-
-        header {
-            height: 0;
-        }
-
-        :where(:root) {
-            --header-height: 0;
-        }
-    }
 </style>
 
 <style lang="scss" is:global>
@@ -146,5 +108,32 @@ const { id, currentPath } = Astro.props;
     header .secondary li {
         font-size: var(--text-size-small);
         letter-spacing: 1px;
+    }
+
+    .mobile-nav {
+        #header.mobile-logo {
+            grid-template-areas: "logo";
+
+            .logo {
+                width: 100%;
+
+                img {
+                    width: 100%;
+                    object-position: center;
+                }
+            }
+        }
+
+        #header:not(.mobile-logo) {
+            height: 0;
+
+            .logo {
+                display: none;
+            }
+        }
+
+        body:has(> #header:not(.mobile-logo)) {
+            --header-height: 0;
+        }
     }
 </style>
