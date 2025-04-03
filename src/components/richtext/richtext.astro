@@ -1,7 +1,7 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     content: string;
     background_color?: string;
     classes?: any;

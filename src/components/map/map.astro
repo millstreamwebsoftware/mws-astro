@@ -1,19 +1,14 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 
-export interface props {
+export interface Props extends Partial<SectionProps> {
     location?: string;
     lat?: number;
     lng?: number;
     zoom?: number;
     mapType?: string;
     mapId?: string;
-    // marker?: boolean;
-    height: number;
-    style?: string;
-    indent?: boolean;
-    key?: string;
 }
 
 const {
@@ -21,11 +16,6 @@ const {
     lat,
     lng,
     zoom,
-    // marker = true,
-    // key,
-    // indent,
-    // mapId,
-    // style,
 } = Astro.props;
 
 // @ts-expect-error
@@ -35,7 +25,7 @@ const apiKey =
     bs || import.meta.env.DEV
         ? preferences.API.google_maps.dev_key
         : preferences.API.google_maps.api_key;
-// const height = Astro.props.height + "vh";
+
 const mapType = Astro.props.mapType ?? "roadmap";
 
 const mapMode = location ? "place" : "view";

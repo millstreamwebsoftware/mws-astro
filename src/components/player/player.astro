@@ -1,8 +1,8 @@
 ---
 import Video from "@shared/Video.astro";
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 
-interface Props {
+interface Props extends Partial<SectionProps> {
     src: string;
 }
 

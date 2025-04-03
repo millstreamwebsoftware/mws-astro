@@ -1,7 +1,7 @@
 ---
 import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
 import Icon from "@shared/icon.astro";
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
 const contentBlocks = Astro.props.content_blocks;
@@ -28,7 +28,7 @@ Object.entries(componentOverrides).forEach(
         (components[bookshopName(path)] = obj.default),
 );
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     content_blocks: any[];
     height: number;
     gap?: number;
@@ -42,9 +42,6 @@ export interface Props {
     transition?: string;
     animationDuration?: number;
     hoverpause?: boolean;
-    indent?: boolean;
-    classes?: string[];
-    key?: string;
 }
 
 // declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
@@ -58,7 +55,6 @@ const {
     transition,
     height,
     perView,
-    indent,
     bound,
     gap,
     autoplay,
@@ -104,14 +100,12 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 
 <Section
     component="slider"
-    {indent}
     style={{
         ...(animationDuration && {
             "--transition": `${animationDuration * 1000}ms`,
         }),
     }}
     {...Astro.props}
-    {key}
 >
     <Fragment>
         <div class:list={["glide", `slider-${glideOptions.sliderType}`]} {id} {...dataGlideOptions}>

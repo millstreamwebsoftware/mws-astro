@@ -2,10 +2,10 @@
 import SharedImage from "@shared/Image.astro";
 import Markdown from "@shared/Markdown.astro";
 import Lightbox from "@components/lightbox/lightbox.astro";
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     image: any;
     title?: string;
     description?: string;
@@ -14,8 +14,6 @@ export interface Props {
     columns: number;
     aspect?: number;
     lightbox?: boolean;
-    key?: string;
-    classes?: any;
 }
 
 const {

@@ -1,11 +1,11 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import Icon from "@shared/icon.astro";
 import { formatBytes } from "@mws-astro/util";
 import { getFilesize } from "@mws-astro/filesystem";
 import { getPDFThumbnail } from "@mws-astro/pdf";
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
   title?: string;
   url?: string;
 }

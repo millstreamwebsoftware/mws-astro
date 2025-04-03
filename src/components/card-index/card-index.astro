@@ -1,5 +1,5 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import Card from "@components/card-index/card.astro";
 import Icon from "@shared/icon.astro";
 import PlaceholderImage from "@components/card-index/card-index-placeholder.png";
@@ -12,7 +12,7 @@ import type { CollectionKey } from "astro:content";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Page from "@shared/Page.astro";
 
-interface Props {
+interface Props extends Partial<SectionProps> {
     target: string;
     include?: string[];
     filters?: string[];
@@ -21,7 +21,6 @@ interface Props {
     pageSize?: number;
     limit?: number;
     aspect?: number;
-    key?: string;
 }
 
 const {

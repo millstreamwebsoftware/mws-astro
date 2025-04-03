@@ -1,5 +1,5 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import Markdown from "@shared/Markdown.astro";
 // import fs from "node:fs/promises";
 // import { PDFiumLibrary } from "@hyzyla/pdfium";
@@ -10,7 +10,7 @@ import { formatBytes } from "@mws-astro/util";
 import { getFilesize, resolvePath } from "@mws-astro/filesystem";
 import { getPDFThumbnail } from "@mws-astro/pdf";
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     files?: [
         {
             path: string;

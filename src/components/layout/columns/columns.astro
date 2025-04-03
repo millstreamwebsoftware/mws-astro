@@ -1,8 +1,8 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     content_blocks: any[];
     collapse?: boolean;
     layout?: number[];

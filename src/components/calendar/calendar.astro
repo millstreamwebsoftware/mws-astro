@@ -1,5 +1,5 @@
 ---
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import _preferences from "@data/preferences.json";
 const preferences = _preferences as unknown as Preferences;
 
@@ -14,13 +14,11 @@ type EventSource =
 
 type ToolBar = { start?: string; center?: string; end?: string };
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     calendarEvents: [EventSource];
-    classes?: any;
-    key?: string;
 }
 
-const { calendarEvents, classes, key } = Astro.props;
+const { calendarEvents, key } = Astro.props;
 
 // const customButtons: Record<string, any> = {};
 const filterButtons: Record<string, any> = {};
@@ -56,7 +54,7 @@ const calendarOptions = {
 };
 ---
 
-<Section component="calendar" classes={{ ...classes }} {...Astro.props}>
+<Section component="calendar" {...Astro.props}>
     <script
         is:inline
         id={`calendar-events-${key}`}
@@ -91,43 +89,39 @@ const calendarOptions = {
         flip,
     } from "@floating-ui/dom";
     // import { createEvent } from "ics";
-    
-    
+
     var Calendar: any;
     var dayGridPlugin: any;
     var listPlugin: any;
     var googleCalendarPlugin: any;
     var createEvent: Function | undefined;
-    
+
     async function importCalendar() {
       if (Calendar && dayGridPlugin && listPlugin && googleCalendarPlugin && createEvent) return;
-      
+
       const fullCalendar = await import("@fullcalendar/core");
       ({Calendar} = fullCalendar);
-      
+
       dayGridPlugin = (await import("@fullcalendar/daygrid")).default;
       listPlugin = (await import("@fullcalendar/list")).default;
       googleCalendarPlugin = (await import("@fullcalendar/google-calendar")).default;
-      
+
       const ics = await import("ics");
       ({createEvent} = ics);
     }
-    
 
-    // document.addEventListener("DOMContentLoaded", setupCalendar);
-    // document.addEventListener("astro:after-swap", setupCalendar);
     setupCalendar();
 
     async function setupCalendar() {
         var calendarSections = document.querySelectorAll(
             'section[data-component="calendar"]',
         );
-        
+
         if (!calendarSections.length) return;
-        
+
         await importCalendar();
 
-        calendarSections.forEach((section) => {          
+        calendarSections.forEach((section) => {
             const calendarEl = section.querySelector(
                 "._calendar",
             ) as CalendarElement;
@@ -210,7 +204,7 @@ const calendarOptions = {
                 footerToolbar: calendarOptions.footerToolbar,
                 aspectRatio: 1.77,
                 height: getCalendarHeight(),
-            });            
+            });
             calendarEl.calendar = calendar;
             calendar.render();
         });
@@ -392,7 +386,7 @@ const calendarOptions = {
             mask-image: linear-gradient(to right, white calc(100% - 2rem), transparent);
             padding-right: 2rem;
         }
-        
+
         &:not(.fc-event-start):not(.fc-event-end) {
             border-radius: 0;
              mask-image: linear-gradient(to right, transparent, white 2rem, white calc(100% - 2rem), transparent);
@@ -488,7 +482,7 @@ const calendarOptions = {
     .fc-icon {
         line-height: 0.7;
     }
-    
+
     .fc-event, .fc-button {
         --calendar-contrast-color: 0 0 0;
         --calendar-color: 210 210 210;

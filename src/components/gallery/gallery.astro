@@ -1,7 +1,7 @@
 ---
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Image from "@shared/Image.astro";
-import Section from "@layouts/Section.astro";
+import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import Markdown from "@shared/Markdown.astro";
 
 type Image = {
@@ -12,7 +12,7 @@ type Image = {
     link?: string;
 };
 
-export interface Props {
+export interface Props extends Partial<SectionProps> {
     images: Image[];
     height: number;
     columns: number;
@@ -23,8 +23,6 @@ export interface Props {
     lightbox?: boolean;
     linkgallery?: boolean;
     placeholder?: boolean;
-    classes?: any;
-    key?: string;
 }
 
 const { height, linkgallery, key, classes } =
