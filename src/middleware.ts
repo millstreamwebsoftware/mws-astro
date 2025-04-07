@@ -23,25 +23,6 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
     currentPath,
   );
 
-  // console.log(ctx.locals.tree);
-  // console.log(
-  //   JSON.stringify(
-  //     ctx.locals.tree,
-  //     function (key, value) {
-  //       if (key == "parent") {
-  //         return value?.slug;
-  //       } else {
-  //         return value;
-  //       }
-  //     },
-  //     4,
-  //   ),
-  // );
-  // console.log(
-  //   "Parent:",
-  //   ctx.locals.tree?.children?.community?.children?.parish?.parent,
-  // );
-
   ctx.locals.path = currentPath;
   return next();
 });
@@ -92,6 +73,14 @@ export interface TreeNode {
 function stripIndex(slug: string) {
   return slug.replace(/\/?index$/, "");
 }
+
+// export interface TreeNode<T extends CollectionKey> {
+//   id?: string;
+//   children: TreeN<T>[];
+//   parent?: TreeN<T>;
+//   data: CollectionEntry<T>;
+//   selected?: Relationship;
+// }
 
 /**
  * Build a tree for navigation from the list of pages we get from the astro content collections api
