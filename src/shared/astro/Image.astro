@@ -1,4 +1,5 @@
 ---
+import { inferRemoteSize } from "@mws-astro/filesystem";
 import { Image as AstroImage } from "astro:assets";
 
 type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
@@ -28,20 +29,31 @@ const {
     quality = "high",
     opacity,
     fixed = false,
-    densities = [1.5, 2],
-    alt = "",
 } = Astro.props;
+
+const alt = Astro.props.alt ?? "";
 
 let astroImage;
 let placeholder = Astro.props.placeholder ?? true;
 const plSize = 16;
 let remote = false;
+let width, height;
 
 if (!Astro.props.image) console.warn(`Image is undefined on page ${Astro.url.toString()}`);
 
 if (typeof Astro.props.image == "string" && /^https?:\/\/.*/.test(Astro.props.image)) {
   remote = true;
   placeholder = false;
+
+  const remoteSize = await inferRemoteSize(Astro.props.image).catch(
+    (e) => {
+      console.warn(e);
+      return {width: undefined, height: undefined};
+    }
+  );
+
+  width ??= remoteSize.width;
+  height ??= remoteSize.height;
 }
 
 if (typeof Astro.props.image == "string" && !remote) {
@@ -65,17 +77,17 @@ if (typeof Astro.props.image == "string" && !remote) {
     "/public/**/*.tiff",
     "/public/**/*.avif",
   ]);
-  
+
   let imagePaths: (keyof typeof images)[] = Object.keys(images).filter((i) =>
       i.endsWith(Astro.props.image),
   );
-  
+
   if (imagePaths.length > 1) {
       console.warn(`Ambiguous image import ${Astro.props.image} -?-> ${imagePaths}!`);
   }
-  
+
   let imagePath = imagePaths[0];
-  
+
   if (imagePath in images) {
       astroImage = ((await images[imagePath]()) as any)?.default;
   } else {
@@ -86,12 +98,7 @@ if (typeof Astro.props.image == "string" && !remote) {
   }
 }
 
-// if (!astroImage) {
-//   placeholder = false;
-// }
-
 const image = astroImage ?? Astro.props.image;
-let width, height;
 
 if (image?.width && image?.height) {
     let aspect = image.width / image.height;
@@ -107,10 +114,13 @@ if (image?.width && image?.height) {
         height = image.height;
     }
 } else {
-    width = Astro.props.width ?? 256;
-    height = Astro.props.height ?? 256;
+    // width ??= Astro.props.width ?? 256;
+    // height ??= Astro.props.height ?? 256;
+    // densities = null;
     // aspect = width / height;
 }
+const density = 1 / (Math.max(width, height) / 1920);
+const densities = Astro.props.densities ?? [+density.toFixed(2), +(density/2).toFixed(2)];
 
 const style = {
     "--align": Astro.props.align ?? "center",
@@ -175,12 +185,11 @@ let fallbackImage: string | undefined;
 if (typeof image == "string" && !remote) {
   fallbackImage = image.replace(/^public/, "");
 }
-
 ---
 
 {fallbackImage ?
   <img src={fallbackImage} class:list={[classes, { background, fixed }]} {style} data-fit={fit} {alt} />
-  : 
+  :
   !!image && <AstroImage
       src={image}
       {alt}
@@ -188,8 +197,9 @@ if (typeof image == "string" && !remote) {
       {height}
       class:list={[classes, { background, fixed }]}
       style={Object.assign({}, placeholderStyle, style)}
-      densities={densities ? densities : undefined}
+      densities={densities ?? undefined}
       data-fit={fit}
+      inferSize={!remote}
       {quality}
   />
 }
