@@ -1,86 +1,141 @@
 ---
-import Image from "@shared/Image.astro";
+import {
+  default as Image,
+  type Props as ImageProps,
+} from "@shared/Image.astro";
+// import _preferences from "@data/preferences.json";
+// const preferences = _preferences as unknown as Preferences;
 
-const image = Astro.props.src;
+export interface Props {
+  image: ImageProps["image"];
+  src?: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+  title?: string;
+  description?: string;
+  fullwidth?: boolean;
+  align: "left" | "right";
+  fit: "contain" | "cover";
+  classes?: (string | string[])[];
+  class?: string;
+}
 
-const { width = 256, height = 256, class: classes, title, alt, ...props } = Astro.props;
+const {
+  alt,
+  classes = Astro.props.class,
+  title,
+  description,
+  width,
+  height,
+  fullwidth = false,
+  align = "left",
+  fit = "contain",
+} = Astro.props;
+
+const image = Astro.props.src ?? Astro.props.image;
 ---
 
-<figure class:list={[classes, "aside"]}>
-    <Image
-        {image}
-        {width}
-        {height}
-        {alt}
-        {...props}
-        fit="contain"
-        quality="mid"
-    />
-    {title && <figcaption>{title}</figcaption>}
+<figure
+  class:list={[
+    classes,
+    "aside",
+    { fullwidth },
+    align ? `align-${align}` : undefined,
+  ]}
+  {title}
+  style={{
+    ...(height && { "--figure-height": `${height}px` }),
+    ...(width && { "--figure-width": `${width}px` }),
+  }}
+>
+  <Image {image} {alt} {fit} {width} {height} {align} quality="mid" />
+  {description && <figcaption>{description}</figcaption>}
 </figure>
 
-<style>
-    figcaption {
-        font-size: var(--text-size-medium);
-        color: rgb(var(--text-color));
-        margin-top: 0.5em;
-    }
+<style lang="scss">
+  figcaption {
+    font-size: var(--text-size-medium);
+    color: rgb(var(--text-color));
+    margin-top: 0.5em;
+  }
 
-    figure {
-        margin: 3rem 0;
-    }
+  figure {
+    margin: 3rem 0;
+    width: var(--figure-width);
+    /* border: 1px solid red; */
+  }
 
-    figure:where(.align-left) {
-        margin: .5em 4rem 4rem 0;
-        float: left;
-    }
-    figure:where(.align-right) {
-        margin: .5em 0 4rem 4rem;
-        float: right;
-    }
-    figure:where(.align-center) {
-        position: relative;
-        float: none;
-        margin: 3rem 0;
-    }
+  figure.fullwidth {
+    width: 100%;
+  }
 
-    @media only screen and (max-width: 768px) {
-        figure:where(.align-left,.align-right,.align-center) {
-            float: none;
-            margin: 2rem 4rem 2rem 4rem;
-        }
+  figure:where(.align-left):not(.fullwidth) {
+    margin: 0.5em 4rem 4rem 0;
+    float: left;
+  }
+  figure:where(.align-right):not(.fullwidth) {
+    margin: 0.5em 0 4rem 4rem;
+    float: right;
+  }
+  figure:where(.align-center):not(.fullwidth) {
+    position: relative;
+    float: none;
+    margin: 3rem 0;
+  }
 
+  @media only screen and (max-width: 768px) {
+    figure:where(.align-left, .align-right, .align-center):not(.fullwidth) {
+      float: none;
+      margin: 2rem 4rem 2rem 4rem;
     }
+  }
 </style>
 
 <style is:global lang="scss">
-    figure.aside img {
-        max-height: 40rem;
-    }
-    figure.aside:where(.small) img {
-        max-height: 30rem;
-    }
-    figure.aside:where(.full) img {
-        max-height: unset;
+  figure.aside img {
+    /* max-height: 100%; */
+    max-height: var(--figure-height, 40rem);
+    max-width: 100%;
+  }
+  /* figure.aside:where(.small) img {
+    max-height: 30rem;
+  }
+  figure.aside:where(.full) img {
+    max-height: unset;
+  } */
+
+  figure.aside.fullwidth.align- {
+    &left {
+      --align: left;
     }
 
-    /* Live editor support */
-    .cms-editor-active .richtext > .component-wrapper img {
-        max-height: 40rem;
-        margin: 3rem 0;
-        object-fit: contain;
-
-        &:not(.align-left, .align-right) {
-            width: 100%;
-        }
-
-        &.align-left {
-            margin: 0 2rem 2rem 0;
-            float: left;
-        }
-        &.align-right {
-            margin: 0 0 2rem 2rem;
-            float: right;
-        }
+    &center {
+      --align: center;
     }
+
+    &right {
+      --align: right;
+    }
+  }
+
+  /* Live editor support */
+  .cms-editor-active .richtext > .component-wrapper img {
+    max-height: 40rem;
+    margin: 3rem 0;
+    object-fit: contain;
+
+    &:not(.align-left, .align-right) {
+      width: 100%;
+    }
+
+    &.align-left {
+      margin: 0 2rem 2rem 0;
+      float: left;
+    }
+    &.align-right {
+      margin: 0 0 2rem 2rem;
+      float: right;
+    }
+  }
 </style>

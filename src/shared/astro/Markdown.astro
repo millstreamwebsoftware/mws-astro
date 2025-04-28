@@ -18,47 +18,46 @@ import Navigation from "@components/navigation/navigation.astro";
 const content = removeHTMLWhitespace(replaceCmsEmbeds(Astro.props.content));
 
 var substitutions = {
-    Accordion,
-    blockquote: Blockquote,
-    Icon,
-    Newsletter: Mailbuild,
-    Facebook,
-    Social,
-    'a[class*="button"]': Button,
-    Player,
-    Navigation,
-    img: AsideImage,
-    Counter,
+  Accordion,
+  blockquote: Blockquote,
+  Icon,
+  Newsletter: Mailbuild,
+  Facebook,
+  Social,
+  'a[class*="button"]': Button,
+  Player,
+  Navigation,
+  img: AsideImage,
+  AsideImage,
+  Counter,
 };
 
 var md: string | undefined;
 
 // @ts-ignore
 if (ENV_BOOKSHOP_LIVE) {
-    marked.use(gfmHeadingId())
-    md = await marked.parse(content);
+  marked.use(gfmHeadingId());
+  md = await marked.parse(content);
 } else {
-    // Get site specific custom snippets from src/snippets.ts
-    const snippetGlob = import.meta.glob<Record<string, any>>(
-        "/src/snippets.ts",
-    );
+  // Get site specific custom snippets from src/snippets.ts
+  const snippetGlob = import.meta.glob<Record<string, any>>("/src/snippets.ts");
 
-    await snippetGlob?.["/src/snippets.ts"]?.()?.then(
-        ({ snippets }) => Object.assign(substitutions, snippets),
-        (error) => console.log(error),
-    );
+  await snippetGlob?.["/src/snippets.ts"]?.()?.then(
+    ({ snippets }) => Object.assign(substitutions, snippets),
+    (error) => console.log(error),
+  );
 }
 ---
 
 {
-    md
-        ? content && <Fragment set:html={md} />
-        : content && (
-              <RemoteMarkdown
-                  {content}
-                  sanitize={{ allowComponents: true }}
-                  components={substitutions}
-                  marked={{extensions: [gfmHeadingId() as any]}}
-              />
-          )
+  md
+    ? content && <Fragment set:html={md} />
+    : content && (
+        <RemoteMarkdown
+          {content}
+          sanitize={{ allowComponents: true }}
+          components={substitutions}
+          marked={{ extensions: [gfmHeadingId() as any] }}
+        />
+      )
 }

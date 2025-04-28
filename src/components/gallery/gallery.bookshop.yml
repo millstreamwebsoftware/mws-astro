@@ -40,6 +40,7 @@ blueprint:
   linkgallery: false
   lightbox: true
   placeholder: true
+  fit: cover
   images:
     - image:
       title:
@@ -89,3 +90,10 @@ _inputs:
     type: checkbox
     label: Link Gallery
     comment: Clicking gallery items redirects the user to their respective links
+  fit:
+    type: choice
+    options:
+      allow_empty: false
+      values:
+        - cover
+        - contain

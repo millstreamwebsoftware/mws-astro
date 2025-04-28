@@ -41,7 +41,7 @@ async function getAllCollections(
     if (k == "pages" || typeof collection == "string") return [k, collection];
 
     collection.forEach((entry: Record<string, any>) => {
-      entry._slug ?? (entry._slug = entry.slug);
+      entry._slug ??= entry.slug;
       entry.slug = `${k}/${entry._slug}`;
     });
 
@@ -102,7 +102,7 @@ function makeTree(
 
       return {
         slug,
-        href: page.data.status != "meta" ? "/" + slug : page.data.link,
+        href: page.data.status !== "meta" ? "/" + slug : page.data?.link,
         status: page.data.status,
         order: page.data.order,
         title: page.data.title,

@@ -1,6 +1,9 @@
 ---
 import { bookshopName } from "@mws-astro/util";
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@layouts/Section.astro";
 import Required from "./required.astro";
 
 export interface Props extends Partial<SectionProps> {
@@ -20,22 +23,24 @@ const componentImports = import.meta.glob(
   ["/src/mws-astro/src/components/form/**/*.astro"],
   {
     eager: true,
-  }
+  },
 );
 
 const componentOverrides = import.meta.glob(
   ["/src/components/form/**/*.astro"],
   {
     eager: true,
-  }
+  },
 );
 
 Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) => (components[bookshopName(path)] = obj.default)
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 // Recurse form_blocks to check for any required fields.
@@ -96,14 +101,48 @@ const required = checkRequired(form_blocks);
     background-color: rgb(var(--background-color));
     border-radius: var(--border-radius);
     transition: background-color 0.2s ease-in-out;
-  }
-
-  input[type="submit"]{
     border: var(--form-border);
 
     &:hover {
-        background-color: rgb(var(--text-color) / 0.2);
+      background-color: rgb(var(--text-color) / 0.2);
     }
+  }
+
+  form[data-status] input[type="submit"] {
+    display: none;
+  }
+
+  form::after {
+    display: block;
+    height: 2rem;
+    width: 100%;
+    border: var(--form-border);
+    border-radius: var(--border-radius);
+  }
+
+  form[data-status="uploading"]::after {
+    content: "";
+    background: linear-gradient(
+      to right,
+      rgb(var(--color-accent)) var(--progress, 0),
+      rgb(var(--form-background)) var(--progress, 0)
+    );
+  }
+
+  @keyframes throb {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.4;
+    }
+  }
+
+  form[data-status="uploaded"]::after {
+    content: "";
+    background-color: rgb(var(--color-accent));
+
+    animation: 1s ease infinite alternate throb;
   }
 </style>
 
@@ -113,3 +152,83 @@ const required = checkRequired(form_blocks);
     color: rgb(var(--placeholder-color));
   }
 </style>
+
+<script>
+  setupForm();
+
+  function setupForm() {
+    const forms =
+      document.querySelectorAll<HTMLFormElement>("section.form form");
+
+    forms.forEach(enhanceFormWithUploadProgress);
+  }
+
+  function enhanceFormWithUploadProgress(form: HTMLFormElement) {
+    // testing browser support. if no support for the required js APIs, the form will just be posted naturally with no progress showing.
+    var xhr = new XMLHttpRequest();
+    if (
+      !(xhr && "upload" in xhr && "onprogress" in xhr.upload) ||
+      !window.FormData
+    ) {
+      return;
+    }
+
+    const action = form.getAttribute("action");
+    if (!action) return;
+
+    form.addEventListener("submit", function (e) {
+      // prevent regular form posting
+      e.preventDefault();
+
+      xhr.upload.addEventListener(
+        "loadstart",
+        function () {
+          form.dataset.status = "uploading";
+          form.style.setProperty("--progress", "0%");
+        },
+        false,
+      );
+
+      xhr.upload.addEventListener(
+        "progress",
+        function (event) {
+          // displaying the progress value as text percentage, may instead update some CSS to show a bar
+          var percent = (100 * event.loaded) / event.total;
+          form.style.setProperty("--progress", percent.toFixed(2) + "%");
+        },
+        false,
+      );
+
+      xhr.upload.addEventListener(
+        "load",
+        function () {
+          // this will be displayed while the server is handling the response (all upload data has been transmitted by now)
+          form.dataset.status = "uploaded";
+        },
+        false,
+      );
+
+      xhr.addEventListener(
+        "readystatechange",
+        function (event) {
+          const t = event.target;
+          if (!(t instanceof XMLHttpRequest)) return;
+          if (t.readyState == 4 && t.responseText) {
+            form.dataset.status = "complete";
+            window.location.href = t.responseURL;
+          } else if (t.statusText) {
+            form.dataset.status = "error";
+            throw new Error(
+              `An error occured during form submission. ${t.status}: ${t.statusText}`,
+            );
+          }
+        },
+        false,
+      );
+
+      // posting the form with the same method and action as specified by the HTML markup
+      xhr.open(this.getAttribute("method") || "post", action, true);
+      xhr.send(new FormData(this));
+    });
+  }
+</script>

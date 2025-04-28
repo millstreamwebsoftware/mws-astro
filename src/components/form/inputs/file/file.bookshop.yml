@@ -1,0 +1,46 @@
+# Metadata about this component, to be used in the CMS
+spec:
+  structures:
+    - form_blocks
+  label: File Input
+  description: Upload files
+  icon: upload_file
+  tags: ["form", "input"]
+
+# Defines the structure of this component, as well as the default values
+blueprint:
+  name: ""
+  label: ""
+  accept: []
+  required:
+  multiple: false
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint
+_inputs:
+  name:
+    type: text
+    comment: >-
+      Unique name submitted with the value of the field.
+      Must start with a letter, numbers and the symbols "-","_",":","." are allowed.
+  label:
+    type: text
+  required:
+    type: checkbox
+    comment: Require this field to be filled to submit.
+  accept:
+    type: multiselect
+    label: Accepted File Types
+    comment: Select common types or specify a file extension (e.g. ".pdf", ".docx"). Leave empty to accept all types of file.
+    options:
+      allow_create: true
+      allow_empty: true
+      values:
+        - image/*
+        - video/*
+        - audio/*
+  multiple:
+    type: checkbox
+    label: Accept Multiple
+    comment: Allow users to upload more than one file to this input.

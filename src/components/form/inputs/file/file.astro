@@ -1,0 +1,36 @@
+---
+import Label from "@components/form/label.astro";
+export interface Props {
+  name: string;
+  label: string;
+  required: boolean;
+  accept: string[];
+  multiple: boolean;
+  key?: string;
+}
+
+const { name, label, accept, multiple, required, key } = Astro.props;
+const id = (name || "") + "-" + (key || "");
+---
+
+<div class="input file">
+  <Label for={id} {required}>{label}</Label>
+  <input
+    type="file"
+    name={name}
+    {id}
+    accept={accept.join(",")}
+    {multiple}
+    {required}
+    aria-required={required}
+  />
+</div>
+
+<style>
+  input {
+    /* width: 100%; */
+    /* background-color: rgb(var(--form-background)); */
+    border-radius: var(--border-radius);
+    border: var(--form-border);
+  }
+</style>
