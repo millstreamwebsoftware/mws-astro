@@ -63,6 +63,7 @@ const image = Astro.props.src ?? Astro.props.image;
   figure {
     margin: 3rem 0;
     width: var(--figure-width);
+    max-width: 100%;
     /* border: 1px solid red; */
   }
 
@@ -87,7 +88,7 @@ const image = Astro.props.src ?? Astro.props.image;
   @media only screen and (max-width: 768px) {
     figure:where(.align-left, .align-right, .align-center):not(.fullwidth) {
       float: none;
-      margin: 2rem 4rem 2rem 4rem;
+      margin: 2rem 0;
     }
   }
 </style>
