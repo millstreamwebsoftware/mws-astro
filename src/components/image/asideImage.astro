@@ -14,8 +14,6 @@ export interface Props {
   alt?: string;
   title?: string;
   description?: string;
-  fullwidth?: boolean;
-  align: "left" | "right";
   fit: "contain" | "cover";
   classes?: (string | string[])[];
   class?: string;
@@ -28,8 +26,6 @@ const {
   description,
   width,
   height,
-  fullwidth = false,
-  align = "left",
   fit = "contain",
 } = Astro.props;
 
@@ -40,16 +36,10 @@ const image = Astro.props.src ?? Astro.props.image;
   class:list={[
     classes,
     "aside",
-    { fullwidth },
-    align ? `align-${align}` : undefined,
   ]}
   {title}
-  style={{
-    ...(height && { "--figure-height": `${height}px` }),
-    ...(width && { "--figure-width": `${width}px` }),
-  }}
 >
-  <Image {image} {alt} {fit} {width} {height} {align} quality="mid" />
+  <Image {image} {alt} {fit} {width} {height} quality="mid" />
   {description && <figcaption>{description}</figcaption>}
 </figure>
 
@@ -60,69 +50,69 @@ const image = Astro.props.src ?? Astro.props.image;
     margin-top: 0.5em;
   }
 
-  figure {
-    margin: 3rem 0;
-    width: var(--figure-width);
+  figure,
+  figure.small {
+    max-width: 33%;
+  }
+
+  figure.medium {
+    max-width: 50%;
+  }
+
+  figure.large {
     max-width: 100%;
-    /* border: 1px solid red; */
   }
 
-  figure.fullwidth {
-    width: 100%;
-  }
-
-  figure:where(.align-left):not(.fullwidth) {
-    margin: 0.5em 4rem 4rem 0;
-    float: left;
-  }
-  figure:where(.align-right):not(.fullwidth) {
-    margin: 0.5em 0 4rem 4rem;
-    float: right;
-  }
-  figure:where(.align-center):not(.fullwidth) {
-    position: relative;
-    float: none;
-    margin: 3rem 0;
+  figure {
+    &:where(.align-left) {
+      margin: 0.5em 4rem 4rem 0;
+      float: left;
+    }
+    &:where(.align-right) {
+      margin: 0.5em 0 4rem 4rem;
+      float: right;
+    }
+    &:where(.align-center) {
+      position: relative;
+      max-width: 100%;
+      float: none;
+      margin: 3rem 0;
+    }
   }
 
   @media only screen and (max-width: 768px) {
-    figure:where(.align-left, .align-right, .align-center):not(.fullwidth) {
+    figure:where(.align-left, .align-right) {
       float: none;
-      margin: 2rem 0;
+      margin: 3rem 0;
+    }
+
+    figure {
+      max-width: 100%;
     }
   }
 </style>
 
 <style is:global lang="scss">
   figure.aside img {
-    /* max-height: 100%; */
-    max-height: var(--figure-height, 40rem);
     max-width: 100%;
-  }
-  /* figure.aside:where(.small) img {
     max-height: 30rem;
   }
-  figure.aside:where(.full) img {
-    max-height: unset;
-  } */
 
-  figure.aside.fullwidth.align- {
-    &left {
-      --align: left;
-    }
+  figure.aside.small img {
+    max-height: 30rem;
+  }
 
-    &center {
-      --align: center;
-    }
+  figure.aside.medium img {
+    max-height: 40rem;
+  }
 
-    &right {
-      --align: right;
-    }
+  figure.aside.large img {
+    max-height: 50rem;
   }
 
   /* Live editor support */
   .cms-editor-active .richtext > .component-wrapper img {
-    max-height: 40rem;
+    max-height: 30rem;
     margin: 3rem 0;
     object-fit: contain;
 
@@ -137,6 +127,14 @@ const image = Astro.props.src ?? Astro.props.image;
     &.align-right {
       margin: 0 0 2rem 2rem;
       float: right;
+    }
+
+    &.medium {
+      max-height: 40rem;
+    }
+
+    &.large {
+      max-height: 50rem;
     }
   }
 </style>

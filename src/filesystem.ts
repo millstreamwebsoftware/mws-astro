@@ -103,15 +103,11 @@ export async function inferRemoteSize(url: string) {
     () => undefined,
   );
   if (result && Date.now() < result.expires) {
-    console.log(
-      `[InferSize] Using cached image dimensions (${result.width}, ${result.height}) for ${url}`,
-    );
     return { width: result.width, height: result.height };
   }
 
   const remote = await fetch(url, {
     method: "HEAD",
-    // Revalidation headers are not really required here as the server will not return the body regardless.
     headers: {
       ...(result?.etag && { "If-None-Match": result.etag }),
       ...(result?.modified && { "If-Modified-Since": result.modified }),
@@ -129,16 +125,15 @@ export async function inferRemoteSize(url: string) {
     remote.headers.get("x-amz-meta-imagewidth"),
     remote.headers.get("x-amz-meta-imageheight"),
   ];
+
   if (!(width && height)) {
-    console.log(
-      `[InferSize] x-amz-meta-image* headers missing, falling back on Astro's InferSize method ${url}`,
-    );
-    let remote = await _inferRemoteSize(url);
-    ({ width, height } = remote);
+    if (remote.status === 304 && result?.width && result?.height) {
+      // Revalidate cache
+      [width, height] = [result.width, result.height];
+    } else {
+      ({ width, height } = await _inferRemoteSize(url));
+    }
   }
-  // throw Error(
-  //   `[InferSize] Remote server did not return x-amz-meta-imagewidth or x-amz-meta-imageheight header for ${url}`,
-  // );
 
   const maxAge =
     Number(
