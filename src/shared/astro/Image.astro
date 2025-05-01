@@ -12,15 +12,15 @@ export interface Props {
   fit?: "cover" | "contain";
   align?: CssAlign;
   alt?: string;
-  // aspect?: number;
   classes?: string;
   background?: boolean;
   opacity?: number;
   quality?: "low" | "mid" | "high" | "max" | number;
   fixed?: boolean;
   placeholder?: boolean;
-  // densities?: number[] | null;
   widths?: number[] | null;
+  displayWidth?: number;
+  displayWidthMobile?: number;
 }
 
 const {
@@ -31,8 +31,14 @@ const {
   opacity,
   fixed = false,
   alt = "",
+  displayWidth = 1,
+  displayWidthMobile = 1,
 } = Astro.props;
 
+const DESKTOP_WIDTH = 1920;
+const MOBILE_WIDTH = 768;
+const IMAGE_MIN_WIDTH = 256;
+const DPR = 2;
 
 // await and unwrap image
 let _image = ((i) => (typeof i === "object" && "default" in i ? i.default : i))(
@@ -103,39 +109,25 @@ if (typeof _image == "string" && !remote) {
     image = ((await images[imagePath]()) as any)?.default;
   } else {
     console.warn(`[Missing Image] ${_image} was requested but is missing.`);
-    // placeholder = false;
   }
 }
 
 image ??= _image;
 
-if (typeof image !== "string" && image?.width && image?.height) {
-  let aspect = image.width / image.height;
-
-  if (Astro.props.width != undefined) {
-    width = Astro.props.width;
-    height = Math.floor(width / aspect);
-  } else if (Astro.props.height != undefined) {
-    height = Astro.props.height;
-    width = Math.floor(height * aspect);
-  } else {
-    width = image.width;
-    height = image.height;
-  }
-}
-// else if (image?.width !== image?.height) {
-
 // Automatically generate two image widths unless disabled (widths === null || widths)
 if (widths === undefined && width && height) {
-  let w = Math.min(1920, width)
-  widths = [w, w / 2, w / 4];
-}
+  widths = [];
+  const maxWidth = Math.min(Math.max(DESKTOP_WIDTH * displayWidth * DPR, MOBILE_WIDTH * displayWidthMobile * DPR), width);
 
+  for (let w = maxWidth; w > IMAGE_MIN_WIDTH; w /= 2 ) {
+    widths.push(Math.ceil(w));
+  }
+}
+// console.log(image, width, widths, displayWidth, displayWidthMobile);
 
 // Generate sizes
+// TODO: Better image sizes for mobile - should sometimes be larger than desktop
 if (widths) {
-  // sizes = [];
-
   const _sizes = widths.toSorted((a,b) => b-a).reduce<string[]>((a, c, i, o) => {
     if (a.length)
     a.push(`(max-width: ${o[i-1]}px) ${c}px`);
@@ -145,16 +137,10 @@ if (widths) {
     return a;
   },[]);
 
-  _sizes.push("auto");
+  _sizes.push("auto"); // Currently only supported on chromium - Only when loading="lazy"
   _sizes.reverse();
-  sizes = _sizes.join(",\n");
+  sizes = _sizes.join(", ");
 }
-
-// (max-width: 360px) 240px,
-// (max-width: 720px) 540px,
-// (max-width: 1600px) 720px,
-// 1600px
-
 
 const style = {
   "--align": Astro.props.align ?? "center",

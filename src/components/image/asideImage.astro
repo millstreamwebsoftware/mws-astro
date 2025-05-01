@@ -3,6 +3,7 @@ import {
   default as Image,
   type Props as ImageProps,
 } from "@shared/Image.astro";
+import clsx from "clsx";
 // import _preferences from "@data/preferences.json";
 // const preferences = _preferences as unknown as Preferences;
 
@@ -30,6 +31,10 @@ const {
 } = Astro.props;
 
 const image = Astro.props.src ?? Astro.props.image;
+
+// Hint displayed image size to generate more optimal srcset
+const _classes = clsx(classes).split(" ");
+const imgSize = _classes.find((c) => c === "small" || c === "medium" || c === "large") || "small";
 ---
 
 <figure
@@ -39,7 +44,7 @@ const image = Astro.props.src ?? Astro.props.image;
   ]}
   {title}
 >
-  <Image {image} {alt} {fit} {width} {height} quality="mid" />
+  <Image {image} {alt} {fit} {width} {height} displayWidth={{"small": 0.33, "medium": 0.5, "large": 1}[imgSize]} quality="mid" />
   {description && <figcaption>{description}</figcaption>}
 </figure>
 

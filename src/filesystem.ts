@@ -99,12 +99,14 @@ export async function inferRemoteSize(url: string) {
     modified: z.string().nullish(),
   });
 
-  const result = await getCacheFile(cacheFileName, schema).catch(
-    () => undefined,
-  );
+  const result = await getCacheFile(cacheFileName, schema).catch(() => {
+    return undefined;
+  });
   if (result && Date.now() < result.expires) {
     return { width: result.width, height: result.height };
   }
+
+  const cacheMissReason = result ? "EXPIRE" : "NOFILE";
 
   const remote = await fetch(url, {
     method: "HEAD",
@@ -120,7 +122,6 @@ export async function inferRemoteSize(url: string) {
     );
 
   var width, height;
-
   [width, height] = [
     remote.headers.get("x-amz-meta-imagewidth"),
     remote.headers.get("x-amz-meta-imageheight"),
@@ -153,7 +154,7 @@ export async function inferRemoteSize(url: string) {
 
   await setCacheFile(cacheFileName, cache);
   console.log(
-    `[InferSize] Requested image dimensions (${cache.width}, ${cache.height}) from ${url}`,
+    `[InferSize][${cacheMissReason}] Requested image dimensions (${cache.width}, ${cache.height}) from ${url}`,
   );
   return { width: cache.width, height: cache.height };
 }
