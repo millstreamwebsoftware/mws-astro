@@ -15,7 +15,9 @@ export interface Props {
   alt?: string;
   title?: string;
   description?: string;
-  fit: "contain" | "cover";
+  fit?: "contain" | "cover";
+  size?: "small" | "medium" | "large";
+  align?: "left" | "center" | "right";
   classes?: (string | string[])[];
   class?: string;
 }
@@ -28,19 +30,25 @@ const {
   width,
   height,
   fit = "contain",
+  size,
+  align = "center",
 } = Astro.props;
 
 const image = Astro.props.src ?? Astro.props.image;
 
-// Hint displayed image size to generate more optimal srcset
 const _classes = clsx(classes).split(" ");
-const imgSize = _classes.find((c) => c === "small" || c === "medium" || c === "large") || "small";
+
+const imgAlign = align ?? _classes.find((c) => c === "align-left" || c === "align-center" || c === "align-right")?.substring(6) ?? "center";
+
+// Hint displayed image size to generate more optimal srcset
+const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || c === "large") ?? "small";
 ---
 
 <figure
   class:list={[
-    classes,
     "aside",
+    `align-${imgAlign}`,
+    imgSize
   ]}
   {title}
 >
@@ -125,20 +133,20 @@ const imgSize = _classes.find((c) => c === "small" || c === "medium" || c === "l
       width: 100%;
     }
 
-    &.align-left {
+    &[align="left"] {
       margin: 0 2rem 2rem 0;
       float: left;
     }
-    &.align-right {
+    &[align="right"] {
       margin: 0 0 2rem 2rem;
       float: right;
     }
 
-    &.medium {
+    &[size="medium"] {
       max-height: 40rem;
     }
 
-    &.large {
+    &[size="large"] {
       max-height: 50rem;
     }
   }
