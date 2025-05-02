@@ -130,7 +130,7 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
     float: none;
     object-fit: contain;
 
-    &:not(.align-left, .align-right) {
+    &:not([align="left"], [align="right"]) {
       width: 100%;
     }
 
