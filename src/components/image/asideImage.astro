@@ -137,9 +137,19 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
       margin: 0.5em 4rem 4rem 0;
       float: left;
     }
+    &[align="center"] {
+      position: relative;
+      max-width: 100%;
+      float: none;
+      margin: 3rem 0;
+    }
     &[align="right"] {
       margin: 0.5em 0 4rem 4rem;
       float: right;
+    }
+
+    &[size="small"] {
+      max-height: 30rem;
     }
 
     &[size="medium"] {
