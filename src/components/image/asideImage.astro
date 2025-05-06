@@ -52,7 +52,7 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
   ]}
   {title}
 >
-  <Image {image} {alt} {fit} {width} {height} displayWidth={{"small": 0.33, "medium": 0.5, "large": 1}[imgSize]} quality="mid" />
+  <Image {image} {alt} {fit} {width} {height} displayWidth={{"small": 0.33, "medium": 0.5, "large": 0.66}[imgSize]} quality="mid" />
   {description && <figcaption>{description}</figcaption>}
 </figure>
 
@@ -73,20 +73,21 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
   }
 
   figure.large {
-    max-width: 100%;
+    max-width: 66%;
   }
 
   figure {
-    &:where(.align-left) {
+    &.align-left {
       margin: 0.5em 4rem 4rem 0;
       float: left;
     }
-    &:where(.align-right) {
+    &.align-right {
       margin: 0.5em 0 4rem 4rem;
       float: right;
     }
-    &:where(.align-center) {
+    &.align-center {
       position: relative;
+      width: 100%;
       max-width: 100%;
       float: none;
       margin: 3rem 0;
@@ -94,13 +95,11 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
   }
 
   @media only screen and (max-width: 768px) {
-    figure:where(.align-left, .align-right) {
+    figure:is(.small,.medium,.large) {
+      max-width: 100%;
+      width: 100%;
       float: none;
       margin: 3rem 0;
-    }
-
-    figure {
-      max-width: 100%;
     }
   }
 </style>
@@ -134,9 +133,28 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
       width: 100%;
     }
 
+    &[size="small"] {
+      max-height: 30rem;
+      max-width: 33%;
+    }
+
+    &[size="medium"] {
+      max-height: 40rem;
+      max-width: 50%;
+    }
+
+    &[size="large"] {
+      max-height: 50rem;
+      max-width: 66%;
+    }
+
     &[align="left"] {
       margin: 0.5em 4rem 4rem 0;
       float: left;
+    }
+    &[align="right"] {
+      margin: 0.5em 0 4rem 4rem;
+      float: right;
     }
     &[align="center"] {
       position: relative;
@@ -144,21 +162,12 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
       float: none;
       margin: 3rem 0;
     }
-    &[align="right"] {
-      margin: 0.5em 0 4rem 4rem;
-      float: right;
-    }
 
-    &[size="small"] {
-      max-height: 30rem;
-    }
-
-    &[size="medium"] {
-      max-height: 40rem;
-    }
-
-    &[size="large"] {
-      max-height: 50rem;
+    @media only screen and (max-width: 768px) {
+      max-width: 100%;
+      width: 100%;
+      float: none;
+      margin: 3rem 0;
     }
   }
 </style>
