@@ -17,7 +17,9 @@ export interface Props {
   description?: string;
   fit?: "contain" | "cover";
   size?: "small" | "medium" | "large";
+  "data-size"?: "small" | "medium" | "large";
   align?: "left" | "center" | "right";
+  "data-align"?: "left" | "center" | "right";
   classes?: (string | string[])[];
   class?: string;
 }
@@ -30,8 +32,8 @@ const {
   width,
   height,
   fit = "contain",
-  size,
-  align = "center",
+  size = Astro.props["data-size"],
+  align = Astro.props["data-align"] ?? "center",
 } = Astro.props;
 
 const image = Astro.props.src ?? Astro.props.image;
@@ -42,6 +44,8 @@ const imgAlign = align ?? _classes.find((c) => c === "align-left" || c === "alig
 
 // Hint displayed image size to generate more optimal srcset
 const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || c === "large") ?? "small";
+
+(Astro.props.align || Astro.props.size) && console.warn("[AsideImage] Align/Size set");
 ---
 
 <figure
@@ -80,10 +84,12 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
     &.align-left {
       margin: 0.5em 4rem 4rem 0;
       float: left;
+      clear: left;
     }
     &.align-right {
       margin: 0.5em 0 4rem 4rem;
       float: right;
+      clear: right;
     }
     &.align-center {
       position: relative;
@@ -129,35 +135,33 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
     float: none;
     object-fit: contain;
 
-    &:not([align="left"], [align="right"]) {
-      width: 100%;
-    }
-
-    &[size="small"] {
+    &[data-size="small"] {
       max-height: 30rem;
       max-width: 33%;
     }
 
-    &[size="medium"] {
+    &[data-size="medium"] {
       max-height: 40rem;
       max-width: 50%;
     }
 
-    &[size="large"] {
+    &[data-size="large"] {
       max-height: 50rem;
       max-width: 66%;
     }
 
-    &[align="left"] {
+    &[data-align="left"] {
       margin: 0.5em 4rem 4rem 0;
       float: left;
+      clear: left;
     }
-    &[align="right"] {
+    &[data-align="right"] {
       margin: 0.5em 0 4rem 4rem;
       float: right;
+      clear: right;
     }
-    &[align="center"] {
-      position: relative;
+    &[data-align="center"] {
+      width: 100%;
       max-width: 100%;
       float: none;
       margin: 3rem 0;

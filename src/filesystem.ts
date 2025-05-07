@@ -118,7 +118,7 @@ export async function inferRemoteSize(url: string) {
 
   if (!remote.ok && remote.status !== 304)
     throw Error(
-      `[InferSize] Error response while contacting remote server: ${remote.status} - ${remote.statusText}`,
+      `[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`,
     );
 
   var width, height;
