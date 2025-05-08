@@ -28,6 +28,10 @@ export function removeHTMLWhitespace(content: string) {
   return content?.replaceAll(/>\n*?</gm, "><") ?? content;
 }
 
+export function forceHTMLBlocks(content: string) {
+  return content?.replaceAll(/^(<[^>]*?>)\n?/gm, "$1\n") ?? content;
+}
+
 export function bookshopName(p: string) {
   const parts = p
     .replace(/^.*components\//, "")

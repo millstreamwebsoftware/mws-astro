@@ -2,7 +2,7 @@
 import { Markdown as RemoteMarkdown } from "astro-remote";
 import { marked } from "marked";
 import { gfmHeadingId } from "marked-gfm-heading-id";
-import { replaceCmsEmbeds, removeHTMLWhitespace } from "@mws-astro/util";
+import { replaceCmsEmbeds, forceHTMLBlocks } from "@mws-astro/util";
 import Blockquote from "@components/blockquote/blockquote.astro";
 import Button from "@components/button/button.astro";
 import Icon from "@shared/icon.astro";
@@ -15,7 +15,8 @@ import Player from "@components/player/player.astro";
 import Accordion from "@components/accordion/accordion.astro";
 import Navigation from "@components/navigation/navigation.astro";
 
-const content = removeHTMLWhitespace(replaceCmsEmbeds(Astro.props.content));
+// Preprocess markdown to convert base64 encoded embeds to html, and force newlines after html elements
+const content = forceHTMLBlocks(replaceCmsEmbeds(Astro.props.content));
 
 var substitutions = {
   Accordion,
@@ -35,7 +36,7 @@ var substitutions = {
 var md: string | undefined;
 
 // @ts-ignore
-if (ENV_BOOKSHOP_LIVE) {
+if (ENV_BOOKSHOP_LIVE || true) {
   marked.use(gfmHeadingId());
   md = await marked.parse(content);
 } else {
