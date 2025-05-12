@@ -7,6 +7,7 @@ declare global {
       collections: Record<CollectionKey, CollectionEntry[]>;
       tree: TreeNode;
       path: string | undefined;
+      props: Record<string, any>;
     }
   }
 

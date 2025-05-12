@@ -23,6 +23,7 @@ export interface Props {
     background_opacity?: number;
     background_fixed?: boolean;
     background_fit?: "cover" | "contain";
+    background_loading?: "eager" | "lazy";
     classes?: any;
     style?: Record<string, any>;
     indent?: "no-indent" | "no-indent-left" | "no-indent-top" | "no-indent-right" | "no-indent-bottom" | boolean;
@@ -43,6 +44,7 @@ const {
     background_opacity,
     background_fixed,
     background_fit,
+    background_loading,
     classes,
     style,
     key,
@@ -95,12 +97,14 @@ const expando = classList.includes("expando") ? true : false;
                     fixed={background_fixed}
                     fit={background_fit}
                     background={true}
+                    loading={background_loading}
                     quality="mid"
                 />
             </div>
         )
     }
     {background_video && <Video src={background_video} background={true} />}
+    <slot name="background" />
     <div class="component-wrapper">
         {content && <div class="text-content"><Markdown {content}/></div>}
         <slot />

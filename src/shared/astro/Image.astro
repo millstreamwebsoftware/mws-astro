@@ -16,6 +16,7 @@ export interface Props {
   background?: boolean;
   opacity?: number;
   quality?: "low" | "mid" | "high" | "max" | number;
+  loading?: Parameters<typeof AstroImage>[0]["loading"];
   fixed?: boolean;
   placeholder?: boolean;
   widths?: number[] | null;
@@ -33,6 +34,7 @@ const {
   alt = "",
   displayWidth = 1,
   displayWidthMobile = 1,
+  loading = "lazy"
 } = Astro.props;
 
 const DESKTOP_WIDTH = 1920;
@@ -161,6 +163,7 @@ if (typeof image === "string" && !remote) {
       class:list={[classes, { background, fixed }]}
       {style}
       data-fit={fit}
+      {loading}
       {alt}
     />
   ) : (
@@ -176,6 +179,7 @@ if (typeof image === "string" && !remote) {
         widths={widths ?? undefined}
         sizes={sizes ?? undefined}
         data-fit={fit}
+        {loading}
         {quality}
       />
     )

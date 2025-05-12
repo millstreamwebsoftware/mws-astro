@@ -72,7 +72,7 @@ html {
 }
 
 @media only screen and (max-width: 768px) {
-  main {
+  header:not(.mobile-logo) + article > main {
     --header-offset-transparent: 0px;
   }
 }
@@ -143,6 +143,7 @@ form {
   }
 }
 
+a,
 p,
 li,
 input,

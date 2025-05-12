@@ -5,9 +5,10 @@ export interface Props {
     contentBlocks: any[];
     "bookshop:live"?: any;
     "data-lightbox"?: string;
+    _frontmatter?: any;
 }
 
-const { contentBlocks, "data-lightbox": lightbox } = Astro.props;
+const { contentBlocks, "data-lightbox": lightbox, _frontmatter } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -40,7 +41,8 @@ Object.entries(componentOverrides).forEach(
                 return (
                     <Component
                         {...block}
-                        _blocks={contentBlocks}
+                        {_frontmatter}
+                        background_loading={i ? "lazy" : "eager"}
                         key={String(i)}
                     />
                 );

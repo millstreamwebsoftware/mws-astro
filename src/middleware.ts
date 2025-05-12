@@ -24,6 +24,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
   );
 
   ctx.locals.path = currentPath;
+  ctx.locals.props = ctx.props?.page?.data;
   return next();
 });
 

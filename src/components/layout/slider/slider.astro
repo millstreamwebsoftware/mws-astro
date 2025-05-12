@@ -62,6 +62,8 @@ const {
     focusAt,
     focusAtCenter,
     hoverpause,
+    background_loading,
+    content,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 
@@ -84,6 +86,7 @@ if (glideOptions.sliderType == "fader") {
     glideOptions.perView = 1;
     glideOptions.focus = 0;
     glideOptions.animationDuration = 0;
+    delete Astro.props.content;
 }
 
 // if (ENV_EDITOR) glideOptions.sliderType = "slider";
@@ -120,6 +123,9 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                             var Component = components[block._bookshop_name];
                             if (block._bookshop_name === "layout/slider")
                                 Component = Astro.self;
+
+                            block.content ??= content;
+
                             if (Component) {
                                 return (
                                     <div class:list={["slider-item"]}>
@@ -128,6 +134,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
                                             key={
                                                 (key || "") + "-" + i.toString()
                                             }
+                                            background_loading={i ? "lazy" : background_loading}
                                         />
                                     </div>
                                 );
@@ -408,6 +415,22 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
             z-index: 1;
             transition-delay: var(--transition);
             transition: opacity 0s;
+        }
+
+        .slider-item {
+          display: none;
+        }
+
+        .glide__slide--active,
+        .slider-item:has(+ .glide__slide--active),
+        .glide__slide--active + .slider-item,
+         {
+          display: block;
+        }
+        .glide__slides:has(> .glide__slide--active:first-child) > .slider-item:last-child,
+        .glide__slides:has(> .glide__slide--active:last-child) > .slider-item:first-child {
+          display: block;
+          z-index: 0;
         }
     }
 
