@@ -214,8 +214,13 @@ const required = checkRequired(form_blocks);
           const t = event.target;
           if (!(t instanceof XMLHttpRequest)) return;
           if (t.readyState == 4 && t.responseText) {
+            const location = t.getResponseHeader("location");
+            if (!location)
+              throw new Error(
+                `An error occurred during form submission. No redirect Location returned from server.`,
+              );
             form.dataset.status = "complete";
-            window.location.href = t.responseURL;
+            window.location.href = location;
           } else if (t.statusText) {
             form.dataset.status = "error";
             throw new Error(
