@@ -5,6 +5,7 @@ import {
   type Props as SectionProps,
 } from "@layouts/Section.astro";
 import Required from "./required.astro";
+import Icon from "@shared/icon.astro";
 
 export interface Props extends Partial<SectionProps> {
   action: string;
@@ -81,6 +82,11 @@ const required = checkRequired(form_blocks);
     }
     <input type="hidden" name="_gotcha" />
     <input type="submit" value="Submit" />
+    <Icon
+      name="svg-spinners:3-dots-fade"
+      height="2.5rem"
+      class="loading-spinner"
+    />
   </form>
 </Section>
 
@@ -111,45 +117,21 @@ const required = checkRequired(form_blocks);
   form[data-status] input[type="submit"] {
     display: none;
   }
-
-  form::after {
-    display: block;
-    height: 2rem;
-    width: 100%;
-    border: var(--form-border);
-    border-radius: var(--border-radius);
-  }
-
-  form[data-status="uploading"]::after {
-    content: "";
-    background: linear-gradient(
-      to right,
-      rgb(var(--color-accent)) var(--progress, 0),
-      rgb(var(--form-background)) var(--progress, 0)
-    );
-  }
-
-  @keyframes throb {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0.4;
-    }
-  }
-
-  form[data-status="uploaded"]::after {
-    content: "";
-    background-color: rgb(var(--color-accent));
-
-    animation: 1s ease infinite alternate throb;
-  }
 </style>
 
 <style is:global>
   input::placeholder,
   textarea::placeholder {
     color: rgb(var(--placeholder-color));
+  }
+
+  .icon.loading-spinner {
+    display: none;
+    color: rgb(var(--text-color));
+  }
+
+  form[data-status] .icon.loading-spinner {
+    display: inline-block;
   }
 </style>
 
@@ -160,80 +142,13 @@ const required = checkRequired(form_blocks);
     const forms =
       document.querySelectorAll<HTMLFormElement>("section.form form");
 
-    forms.forEach(enhanceFormWithUploadProgress);
+    forms.forEach(addSubmissionSpinner);
   }
 
-  function enhanceFormWithUploadProgress(form: HTMLFormElement) {
-    // testing browser support. if no support for the required js APIs, the form will just be posted naturally with no progress showing.
-    var xhr = new XMLHttpRequest();
-    if (
-      !(xhr && "upload" in xhr && "onprogress" in xhr.upload) ||
-      !window.FormData
-    ) {
-      return;
-    }
-
-    const action = form.getAttribute("action");
-    if (!action) return;
-
-    form.addEventListener("submit", function (e) {
-      // prevent regular form posting
-      e.preventDefault();
-
-      xhr.upload.addEventListener(
-        "loadstart",
-        function () {
-          form.dataset.status = "uploading";
-          form.style.setProperty("--progress", "0%");
-        },
-        false,
-      );
-
-      xhr.upload.addEventListener(
-        "progress",
-        function (event) {
-          // displaying the progress value as text percentage, may instead update some CSS to show a bar
-          var percent = (100 * event.loaded) / event.total;
-          form.style.setProperty("--progress", percent.toFixed(2) + "%");
-        },
-        false,
-      );
-
-      xhr.upload.addEventListener(
-        "load",
-        function () {
-          // this will be displayed while the server is handling the response (all upload data has been transmitted by now)
-          form.dataset.status = "uploaded";
-        },
-        false,
-      );
-
-      xhr.addEventListener(
-        "readystatechange",
-        function (event) {
-          const t = event.target;
-          if (!(t instanceof XMLHttpRequest)) return;
-          if (t.readyState == 4 && t.responseText) {
-            const location = t.getResponseHeader("location");
-            if (!location)
-              throw new Error(
-                `An error occurred during form submission. No redirect Location returned from server.`,
-              );
-            form.dataset.status = "complete";
-            window.location.href = location;
-          } else if (t.statusText) {
-            form.dataset.status = "error";
-            throw new Error(
-              `An error occured during form submission. ${t.status}: ${t.statusText}`,
-            );
-          }
-        },
-        false,
-      );
-
-      // posting the form with the same method and action as specified by the HTML markup
-      xhr.open(this.getAttribute("method") || "post", action, true);
-      xhr.send(new FormData(this));
+  function addSubmissionSpinner(form: HTMLFormElement) {
+    form.removeAttribute("data-status");
+    form.addEventListener("submit", () => {
+      form.setAttribute("data-status", "submitting");
     });
   }
 </script>
