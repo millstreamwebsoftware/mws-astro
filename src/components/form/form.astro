@@ -12,10 +12,18 @@ export interface Props extends Partial<SectionProps> {
   name: string;
   form_blocks: any[];
   classes?: any;
+  enctype?: "application/x-www-form-urlencoded" | "multipart/form-data";
   key?: string;
 }
 
-const { action, name, form_blocks, classes, key } = Astro.props;
+const {
+  action,
+  name,
+  form_blocks,
+  classes,
+  key,
+  enctype = "multipart/form-data",
+} = Astro.props;
 // const id = (name || "") + "-" + (key || "");
 const id = name.toLowerCase().replaceAll(" ", "-");
 
@@ -55,13 +63,7 @@ const required = checkRequired(form_blocks);
 ---
 
 <Section component="form" class:list={["form", classes]} {...Astro.props}>
-  <form
-    method="post"
-    {action}
-    {name}
-    {id}
-    enctype="application/x-www-form-urlencoded"
-  >
+  <form method="post" {action} {name} {id} {enctype}>
     {
       required && (
         <p>
