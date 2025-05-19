@@ -25,14 +25,14 @@ export async function getPage(id: string) {
 }
 
 export async function getPageChildren(id: string) {
-  const idFragments = id.split("/");
+  const idFragments = id.replaceAll(/(^\/|\/?$)/g, "").split("/");
 
   const filter: Parameters<typeof getCollection<"pages">>[1] = ({
     id: EntryId,
     data,
   }) => {
     if (data.status !== "online") return false;
-    const entryFragments = EntryId.split("/");
+    const entryFragments = EntryId.replaceAll(/(^\/|\/?$)/g, "").split("/");
 
     if (entryFragments.at(-1) === "index.md") entryFragments.pop();
     if (entryFragments.length !== idFragments.length + 1) return false;
