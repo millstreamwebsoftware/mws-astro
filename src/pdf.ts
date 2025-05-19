@@ -1,7 +1,6 @@
 import { resolvePath } from "./filesystem";
 
 export async function getPDFThumbnail(file: string, pageNum = 0, res = 512) {
-  // @ts-expect-error
   if (!ENV_BOOKSHOP_LIVE) {
     const [fs, pdf, sharp, crypto] = await Promise.all([
       import("node:fs"),

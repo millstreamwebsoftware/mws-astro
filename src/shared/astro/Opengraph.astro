@@ -20,7 +20,6 @@ if (!thumbnail && preferences.general.default_sharing_image) {
     // ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
 }
 
-// @ts-expect-error
 if (thumbnail && !ENV_BOOKSHOP_LIVE) {
     let imgSrc;
 
@@ -28,7 +27,7 @@ if (thumbnail && !ENV_BOOKSHOP_LIVE) {
       try {
         imgSrc = await getImage({src: thumbnail, width: 1200, height: 630}).then((r) => r.src);
       } catch {
-        
+
       }
     } else {
         imgSrc = thumbnail?.src;

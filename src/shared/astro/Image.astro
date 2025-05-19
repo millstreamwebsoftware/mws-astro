@@ -59,7 +59,6 @@ if (!_image) console.warn(`Image is undefined on page ${Astro.url.toString()}`);
 if (typeof _image == "string" && /^https?:\/\/.*/.test(_image)) {
   remote = true;
 
-  // @ts-expect-error
   const remoteSize = ENV_BOOKSHOP_LIVE ? { width: undefined, height: undefined } : await inferRemoteSize(_image).catch((e) => {
     console.warn(e);
     return { width: undefined, height: undefined };

@@ -11,6 +11,8 @@ declare global {
     }
   }
 
+  var ENV_BOOKSHOP_LIVE: boolean;
+
   interface CalendarElement extends HTMLElement {
     calendar?: any;
   }

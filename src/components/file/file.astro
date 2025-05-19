@@ -90,7 +90,6 @@ function getIcon(path: string) {
     }
 }
 
-// @ts-expect-error
 if (!ENV_BOOKSHOP_LIVE && files?.length) {
     await Promise.all(
         files.map(async (file) => {

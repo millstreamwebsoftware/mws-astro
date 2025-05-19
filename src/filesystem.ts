@@ -6,7 +6,6 @@ var fs: typeof import("node:fs/promises") | undefined,
 const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
 
 async function ensureFS(): Promise<boolean> {
-  // @ts-expect-error
   if (!ENV_BOOKSHOP_LIVE) {
     if (!fs)
       fs =
