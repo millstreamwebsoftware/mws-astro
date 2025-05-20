@@ -65,6 +65,8 @@ _inputs:
     type: text
     label: Target
     comment: Path to fetch cards from.
+    options:
+      empty_type: string
   include:
     type: multiselect
     label: Include
@@ -109,7 +111,7 @@ _inputs:
     options:
       allow_create: true
   prefilter[*]:
-    type: string
+    type: text
   columns:
     type: number
     label: Columns

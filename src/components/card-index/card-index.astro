@@ -34,11 +34,19 @@ const {
 const filterMode = "ignore include"; //ignore include exclude
 var cards: CollectionEntry<"pages">[] = await getPageChildren(target);
 
+// cards?.sort(
+//     (a, b) => (b.data?.publishDate?.getTime() ?? NaN) - (a.data?.publishDate?.getTime() ?? NaN) ||
+//     a.data?.order - b.data?.order
+// );
+
 // Sort from newest to oldest, fall back on ascending order
-cards?.sort(
-    (a, b) => (b.data?.publishDate?.getTime() ?? NaN) - (a.data?.publishDate?.getTime() ?? NaN) ||
-    a.data?.order - b.data?.order
-);
+cards?.sort((a, b) => {
+  if (!a.data || !b.data) return a.id.localeCompare(b.id);
+  var cmp = 0;
+  if (a.data.publishDate instanceof Date && b.data.publishDate instanceof Date) cmp ||= b.data.publishDate.getTime() - a.data.publishDate.getTime();
+  if (typeof a.data.order === "number" && typeof b.data.order === "number") cmp ||= a.data.order - b.data.order;
+  return cmp;
+})
 
 // Prefilter cards
 const prefilters = prefilter.map((filter) => {
