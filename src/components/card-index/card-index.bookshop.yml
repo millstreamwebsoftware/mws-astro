@@ -89,7 +89,7 @@ _inputs:
       values:
         - categories
   prefilter:
-    type: multiselect
+    type: array
     label: Prefilter
     comment: Filter which cards will be displayed.
     context:
@@ -108,8 +108,6 @@ _inputs:
         Cards that match one of the filters will be displayed.
 
         E.g. `categories~=Blog` `categories~=News` will only display posts in the categories Blog or News.
-    options:
-      allow_create: true
   prefilter[*]:
     type: text
   columns:
