@@ -85,7 +85,7 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
 
 <Section component="card-index" {...Astro.props}>
     <div class="card-index-container">
-        { (pagination || !!filters.length) && <div class="card-tools">
+        { (pagination || !!filters?.length) && <div class="card-tools">
             {
                 !!filters.length && (
                     <div
