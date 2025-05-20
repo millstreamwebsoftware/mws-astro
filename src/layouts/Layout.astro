@@ -59,6 +59,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         <meta name="revision" content={git.long("./")} />
         <meta name="format-detection" content="telephone=no" />
         {status !== "online" && <meta name="robots" content="noindex" />}
+        <link rel="sitemap" href="/sitemap-index.xml" />
 
         <Opengraph {title} {description} {thumbnail} />
 
