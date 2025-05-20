@@ -249,9 +249,6 @@ const lightbox = include.includes("lightbox");
 <script>
     setupCardIndex();
 
-    // @ts-ignore
-    window.inEditorMode && document.addEventListener('cloudcannon:update', setupCardIndex);
-
     function setupCardIndex() {
         const cardIndexes = document.querySelectorAll<HTMLElement>(
             '.card-index-container'
