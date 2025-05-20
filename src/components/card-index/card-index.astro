@@ -2,15 +2,11 @@
 import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import Card from "@components/card-index/card.astro";
 import Icon from "@shared/icon.astro";
-import PlaceholderImage from "@components/card-index/card-index-placeholder.png";
-import { getTreeNode } from "@mws-astro/util";
-import { type AllCollections, type TreeNode } from "@mws-astro/middleware";
 import type { CollectionEntry } from "astro:content";
-import type { CollectionKey } from "astro:content";
-// import type { CollectionKey } from "astro:content";
-// import { type TreeNode } from "@mws-astro/middleware";
 import Lightbox from "@components/lightbox/lightbox.astro";
 import Page from "@shared/Page.astro";
+
+import { getPageChildren } from "@mws-astro/navigation";
 
 interface Props extends Partial<SectionProps> {
     target: string;
@@ -24,7 +20,7 @@ interface Props extends Partial<SectionProps> {
 }
 
 const {
-    target = "/pages/",
+    target = "",
     include = ["title", "description", "thumbnail", "link", "read-more"],
     columns = 4,
     filters = [""],
@@ -36,96 +32,47 @@ const {
 } = Astro.props;
 
 const filterMode = "ignore include"; //ignore include exclude
-var cards: undefined | TreeNode & CollectionEntry<CollectionKey>[];
+var cards: CollectionEntry<"pages">[] = await getPageChildren(target);
 
-// @ts-ignore
-if (!ENV_BOOKSHOP_LIVE) {
-    const data: AllCollections[keyof AllCollections] = Object.values(Astro.locals.collections).flat();
+// Sort from newest to oldest, fall back on ascending order
+cards?.sort(
+    (a, b) => (b.data?.publishDate?.getTime() ?? NaN) - (a.data?.publishDate?.getTime() ?? NaN) ||
+    a.data?.order - b.data?.order
+);
 
-    let cursor = getTreeNode(Astro.locals.tree, target, Astro.locals.path);
-    if (!cursor) return;
+// Prefilter cards
+const prefilters = prefilter.map((filter) => {
+  if (!filter) return;
+  let match: any;
 
-    cards =
-        cursor.children &&
-        Object.values(cursor.children).reduce<typeof data & typeof cursor>(
-            (cards, card) => {
-                let cardData = data.find((d) => d.slug === card.slug);
-                let obj = Object.assign({}, cardData);
-                obj = Object.assign(obj, card);
-                cards.push(obj);
-                return cards;
-            },
-            [],
-        );
+  // [attr~=value]
+  match = filter.match(/^(?<k>.*)~=(?<v>.*)$/)?.groups;
+  if (match)
+    return function IncludesFilter (card: any) {
+      return match.k in card.data && card.data?.[match.k]?.includes(match.v);
+    };
 
-    // cards?.[0].data.publishDate?.getTime();
+  // [attr=value]
+  match = filter.match(/^(?<k>.*)=(?<v>.*)$/)?.groups;
+  if (match)
+    return function EqualityFilter (card: any) {
+      return match.k in card.data && card.data?.[match.k] === match.v;
+    };
 
-    // Sort from newest to oldest, fall back on ascending order
-    cards?.sort(
-        (a, b) => (b.data.publishDate?.getTime() ?? NaN) - (a.data.publishDate?.getTime() ?? NaN) ||
-        a.data.order - b.data.order
-    );
+  // [attr]
+  return function IncludesAttrFilter (card: any) {return filter in card.data};
+}).filter((filter) => !!filter);
 
-    // Prefilter cards
-    const prefilters = prefilter.map((filter) => {
-      if (!filter) return;
-      let match: any;
+if (prefilters.length)
+cards = cards?.filter((card) => {
+  return prefilters.some((p) => p(card));
+});
 
-      // [attr~=value]
-      match = filter.match(/^(?<k>.*)~=(?<v>.*)$/)?.groups;
-      if (match)
-        return function IncludesFilter (card: any) {
-          return match.k in card.data && card.data?.[match.k]?.includes(match.v);
-        };
-
-      // [attr=value]
-      match = filter.match(/^(?<k>.*)=(?<v>.*)$/)?.groups;
-      if (match)
-        return function EqualityFilter (card: any) {
-          return match.k in card.data && card.data?.[match.k] === match.v;
-        };
-
-      // [attr]
-      return function IncludesAttrFilter (card: any) {return filter in card.data};
-    }).filter((filter) => !!filter);
-
-    if (prefilters.length)
-    cards = cards?.filter((card) => {
-      return prefilters.some((p) => p(card));
-    });
-
-    // Limit number of cards if required
-    cards = cards?.slice(0, limit || undefined);
-} else {
-    // Create placeholder cards for the live editor
-    cards = new Array(limit || pageSize || columns * 2).fill({
-        id: "bookshopPlaceholder",
-        slug: "bookshopPlaceholder",
-        body: "",
-        collection: "pages",
-        data: {
-            title: "Card Index Placeholder",
-            description:
-                "This is a placeholder item for previewing card indexes in the live editor. ",
-            categories: ["placeholder"],
-            thumbnail: PlaceholderImage,
-            status: "online",
-            order: 4,
-            content_blocks: [],
-            show_global_header: true,
-            show_global_footer: true,
-        },
-        render: undefined,
-    });
-}
+// Limit number of cards if required
+cards = cards?.slice(0, limit || undefined);
 
 const id = `card-index-${key}`;
-
 const pagination = !!pageSize && cards && cards?.length > pageSize;
-
-// const cards = Object.values(cursor?.children).map((node) => {
-//   return node?.slug !== undefined && node.slug in data ? data[node.slug]
-// });
 ---
 
 <Section component="card-index" {...Astro.props}>
@@ -278,7 +225,7 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
             &[data-status]:not([data-status="ignore"]) {
                 background-color: rgb(var(--text-color));
                 color: rgb(
-                    var(--background-color, var(--page-background-color))
+                    var(--background-color, var(--article-background-color))
                 );
             }
 
@@ -291,8 +238,6 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
 </style>
 
 <script>
-    // document.addEventListener("DOMContentLoaded", setupCardIndex);
-    // document.addEventListener("astro:after-swap", setupCardIndex);
     setupCardIndex();
 
     function setupCardIndex() {
@@ -303,11 +248,11 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
         if (!cardIndexes.length) return;
 
         cardIndexes.forEach((index) => {
+            setupPagination(index);
+
             const options = getFilterOptions(index);
             if (!options) return;
-
             createFilters(index, options);
-            setupPagination(index);
         });
     }
 
@@ -424,7 +369,7 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
                 : "") +
             (exclude.length
                 ? groupByDataFilter(exclude)
-                      .map((group) => `:is(${group.join(",")})`)
+                      .map((group) => `:not(${group.join(",")})`)
                       .join("")
                 : "");
 
@@ -459,7 +404,7 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
     }
 
     function setupPagination(index: HTMLElement) {
-        const paginator = index.querySelector<HTMLElement>(".card-pagination");
+        const paginator = index.querySelector(".card-pagination");
         if (!paginator) return;
 
         setPage(index, 0); // Init to page 0

@@ -1,15 +1,11 @@
 ---
-import type { CollectionKey } from "astro:content";
-import type { CollectionEntry } from "astro:content";
+import type { CollectionKey, CollectionEntry } from "astro:content";
 import Image from "@shared/Image.astro";
 import Markdown from "@shared/Markdown.astro";
 import Icon from "@shared/icon.astro";
-import type { TreeNode } from "@mws-astro/middleware";
-// import Page from "@shared/Page.astro";
-// import Lightbox from "@components/lightbox/lightbox.astro";
 
 interface Props {
-    card: CollectionEntry<CollectionKey> & TreeNode;
+    card: CollectionEntry<CollectionKey> & {link?: string};
     include: string[];
     filters: string[];
     aspect?: number;
@@ -56,7 +52,7 @@ function formatDate(date: Date) {
 ---
 
 <div class="card-index-card" {...filterData} data-lightbox={lightbox}>
-    {link && <a class="card-link" href={card?.href} />}
+    {link && <a class="card-link" href={card?.link} />}
     {
         thumbnail && (
             <div class="card-thumbnail">

@@ -1,4 +1,9 @@
-import { getCollection, getEntry, type CollectionEntry } from "astro:content";
+import {
+  getCollection,
+  getEntry,
+  type CollectionEntry,
+  type CollectionKey,
+} from "astro:content";
 
 export function urlToId(url: string) {
   var _url = url;
@@ -24,14 +29,21 @@ export async function getPage(id: string) {
   return frontmatter?.data;
 }
 
-export async function getPageChildren(id: string) {
-  const idFragments = id.replaceAll(/(^\/|\/?$)/g, "").split("/");
+export async function getPageChildren(
+  id: string,
+  collection: CollectionKey = "pages",
+) {
+  const idFragments = id
+    .replaceAll(/(^\/|\/?$)/g, "")
+    .split("/")
+    .filter((i) => i.length);
 
-  const filter: Parameters<typeof getCollection<"pages">>[1] = ({
+  const filter: Parameters<typeof getCollection<typeof collection>>[1] = ({
     id: EntryId,
+    collection,
     data,
   }) => {
-    if (data.status !== "online") return false;
+    if (collection === "pages" && data.status !== "online") return false;
     const entryFragments = EntryId.replaceAll(/(^\/|\/?$)/g, "").split("/");
 
     if (entryFragments.at(-1) === "index.md") entryFragments.pop();
@@ -44,7 +56,7 @@ export async function getPageChildren(id: string) {
     return true;
   };
 
-  return (await getCollection("pages", filter))
+  return (await getCollection(collection, filter))
     .toSorted(({ data: { order: a } }, { data: { order: b } }) => a - b)
     .map((page) => ({ ...page, link: getLink(page) }));
 }
