@@ -81,6 +81,7 @@ cards = cards?.slice(0, limit || undefined);
 
 const id = `card-index-${key}`;
 const pagination = !!pageSize && cards && cards?.length > pageSize;
+const lightbox = include.includes("lightbox");
 ---
 
 <Section component="card-index" {...Astro.props}>
@@ -137,11 +138,11 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
             {
                 cards &&
                     cards.map((card, i) => {
-                        return <Card {include} {card} {filters} {aspect} data-lightbox={`${id}-${i}`} />;
+                        return <Card {include} {card} {filters} {aspect} data-lightbox={lightbox ? `${id}-${i}` : undefined} />;
                     })
             }
         </div>
-        {include.includes("lightbox") && cards &&
+        {lightbox && cards &&
             <Lightbox collection={id}>
                 {cards.map((card, i) => {
                   return <Page contentBlocks={card.data["content_blocks"]} data-lightbox={`${id}-${i}`} />;
@@ -248,9 +249,12 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
 <script>
     setupCardIndex();
 
+    // @ts-ignore
+    window.inEditorMode && document.addEventListener('cloudcannon:update', setupCardIndex);
+
     function setupCardIndex() {
         const cardIndexes = document.querySelectorAll<HTMLElement>(
-            'section[data-component="card-index"]',
+            '.card-index-container'
         );
 
         if (!cardIndexes.length) return;
