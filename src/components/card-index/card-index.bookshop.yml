@@ -36,7 +36,7 @@ spec:
 
 blueprint:
   target: ""
-  include: []
+  include: ["title", "link"]
   filters: []
   prefilter: []
   columns: 4
@@ -81,6 +81,7 @@ _inputs:
         - read-more
         - lightbox
       allow_create: true
+      empty_type: array
   filters:
     type: multiselect
     label: User Filters
@@ -88,6 +89,8 @@ _inputs:
     options:
       values:
         - categories
+      allow_create: true
+      empty_type: array
   prefilter:
     type: array
     label: Prefilter
