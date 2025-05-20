@@ -25,6 +25,7 @@ export interface Props {
     currentPath?: string;
     thumbnail?: any;
     classes?: string[];
+    status?: any;
 }
 
 const {
@@ -36,6 +37,7 @@ const {
     currentPath,
     thumbnail,
     classes,
+    status = "online",
 } = Astro.props;
 import preferences from "@data/preferences.json";
 
@@ -56,6 +58,7 @@ headerHeight && (style["--header-height"] = headerHeight + "px");
         <meta name="generator" content={Astro.generator} />
         <meta name="revision" content={git.long("./")} />
         <meta name="format-detection" content="telephone=no" />
+        {status !== "online" && <meta name="robots" content="noindex" />}
 
         <Opengraph {title} {description} {thumbnail} />
 
