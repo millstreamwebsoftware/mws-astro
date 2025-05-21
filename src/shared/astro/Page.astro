@@ -31,9 +31,11 @@ Object.entries(componentOverrides).forEach(
     ([path, obj]: [string, any]) =>
         (components[bookshopName(path)] = obj.default),
 );
+
+const pagefind = _frontmatter?.status ? (_frontmatter.status === "online" ? "" : undefined) : true;
 ---
 
-<main data-pagefind-body={_frontmatter.status === "online" ? "" : undefined} data-lightbox={lightbox}>
+<main data-pagefind-body={pagefind} data-lightbox={lightbox}>
     {
         contentBlocks.map((block: any, i: number) => {
             const Component = components[block._bookshop_name];
