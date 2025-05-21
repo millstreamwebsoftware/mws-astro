@@ -105,6 +105,14 @@ body {
   max-width: 100%;
 }
 
+.text-content section {
+  margin-bottom: var(--column-gap);
+}
+
+.text-content section:last-child {
+  margin-bottom: 0;
+}
+
 section.no-indent {
   padding: 0;
 
