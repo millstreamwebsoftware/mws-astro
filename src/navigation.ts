@@ -61,6 +61,52 @@ export async function getPageChildren(
     .map((page) => ({ ...page, link: getLink(page) }));
 }
 
+export async function getPageAncestors(
+  id: string,
+  collection: CollectionKey = "pages",
+) {
+  const idFragments = id
+    .replaceAll(/(^\/|\/?$)/g, "")
+    .split("/")
+    .filter((i) => i.length);
+
+  const ancestors: CollectionEntry<typeof collection>[] = [];
+
+  for (let i = 0; i < idFragments.length; i++) {
+    const entryId = idFragments.slice(0, i + 1).join("/");
+    const entry =
+      (await getEntry({ collection, id: entryId })) ||
+      (await getEntry({ collection, id: `/${entryId}.md` })) ||
+      (await getEntry({ collection, id: `/${entryId}/index.md` }));
+
+    entry && ancestors.push(entry);
+  }
+
+  return ancestors.map((page) => ({ ...page, link: getLink(page) }));
+
+  // const filter: Parameters<typeof getCollection<typeof collection>>[1] = ({
+  //   id: EntryId,
+  //   collection,
+  //   data,
+  // }) => {
+  //   if (collection === "pages" && data.status !== "online") return false;
+  //   const entryFragments = EntryId.replaceAll(/(^\/|\/?$)/g, "").split("/");
+
+  //   if (entryFragments.at(-1) === "index.md") entryFragments.pop();
+  //   if (entryFragments.length !== idFragments.length + 1) return false;
+
+  //   for (let i = 0; i < idFragments.length; i++) {
+  //     if (entryFragments[i] !== idFragments[i]) return false;
+  //   }
+
+  //   return true;
+  // };
+
+  // return (await getCollection(collection, filter))
+  //   .toSorted(({ data: { order: a } }, { data: { order: b } }) => a - b)
+  //   .map((page) => ({ ...page, link: getLink(page) }));
+}
+
 export function getLink(page: CollectionEntry<"pages">) {
   return page.data.status === "online"
     ? `/${page.id
