@@ -66,7 +66,21 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             <>
                 <div id="mobile-nav-buttons">
                     <button id="mobile-nav-menu" aria-expanded="false">
-                        <Icon name="fa6-solid:bars" height="2rem" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                          <!-- Icon from Material Line Icons by Vjacheslav Trushkin - https://github.com/cyberalien/line-md/blob/master/license.txt - (Modified) -->
+                          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M5 12H19">
+                              <animate id="fwd" begin="indefinite" fill="freeze" attributeName="d" dur="0.2s" values="M5 12H19;M12 12H12"/>
+                              <animate id="bwd" begin="indefinite" fill="freeze" attributeName="d" dur="0.2s" values="M12 12H12;M5 12H19"/>
+                              <set fill="freeze" attributeName="opacity" begin="fwd.end" to="0"/>
+                              <set fill="freeze" attributeName="opacity" begin="bwd.begin" to="1"/>
+                            </path>
+                            <path d="M5 5L19 5M5 19L19 19">
+                              <animate begin="fwd.begin+0.1s" fill="freeze" attributeName="d" dur="0.2s" values="M5 5L19 5M5 19L19 19;M5 5L19 19M5 19L19 5"/>
+                              <animate begin="bwd.begin" fill="freeze" attributeName="d" dur="0.2s" values="M5 5L19 19M5 19L19 5;M5 5L19 5M5 19L19 19"/>
+                            </path>
+                          </g>
+                        </svg>
                     </button>
                     <a id="mobile-nav-home" href="/">
                         <Icon name="fa6-solid:house" height="2rem" />
@@ -568,6 +582,9 @@ const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.l
             let newState = navigation?.classList.toggle("expanded", open);
             if (newState === undefined) return;
             mobileNavButton?.setAttribute("aria-expanded", newState.toString());
+
+            // Trigger SVG animation
+            mobileNavButton?.querySelector<SVGAnimationElement>(`svg animate#${newState ? "fwd" : "bwd"}`)?.beginElement();
 
             // Fix/Unfix body to prevent scrolling through the menu
             if (newState) {
