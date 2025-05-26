@@ -129,7 +129,7 @@ if (widths === undefined && width && height) {
 
 // Generate sizes
 // TODO: Better image sizes for mobile - should sometimes be larger than desktop
-if (widths) {
+if (widths?.length) {
   const _sizes = widths.toSorted((a,b) => b-a).reduce<string[]>((a, c, i, o) => {
     if (a.length)
     a.push(`(max-width: ${o[i-1]}px) ${c}px`);
