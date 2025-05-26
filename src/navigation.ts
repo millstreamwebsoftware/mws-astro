@@ -57,7 +57,7 @@ export async function getPageChildren(
   };
 
   return (await getCollection(collection, filter))
-    .toSorted(({ data: { order: a } }, { data: { order: b } }) => a - b)
+    .sort(({ data: { order: a } }, { data: { order: b } }) => a - b)
     .map((page) => ({ ...page, link: getLink(page) }));
 }
 
