@@ -168,7 +168,7 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                                     </div>
                                 )}
                             </div>
-                            <a href={path} />
+                            <a href={path.startsWith("/") ? path : `/${path}`} />
                         </li>
                     );
                 })
