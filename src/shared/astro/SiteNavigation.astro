@@ -5,12 +5,11 @@ import { bookshopName } from "@mws-astro/util";
 import type { TreeNode } from "@mws-astro/middleware";
 
 export interface Props {
-    pages?: TreeNode;
-    id?: string;
-    depth?: number;
-    currentPath?: string;
+  pages?: TreeNode;
+  id?: string;
+  depth?: number;
+  currentPath?: string;
 }
-
 
 // const { id } = Astro.props;
 const prefs: Record<string, any> | typeof preferences = preferences;
@@ -20,1035 +19,1064 @@ const Wrapper = depth ? Fragment : "nav";
 const Items = depth ? Fragment : "div";
 const showHome = prefs?.header?.show_home ?? true;
 const showCaret = prefs?.header?.show_caret ?? true;
-const placement = prefs?.header?.center_dropdowns
-    ? "bottom"
-    : "bottom-start";
+const placement = prefs?.header?.center_dropdowns ? "bottom" : "bottom-start";
 const dropdownCaret = prefs?.header?.dropdown_caret ?? "fa6-solid:caret-down";
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-    ["/src/mws-astro/src/components/**/*.astro"],
-    {
-        eager: true,
-    },
+  ["/src/mws-astro/src/components/**/*.astro"],
+  {
+    eager: true,
+  },
 );
 
 const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-    eager: true,
+  eager: true,
 });
 
 Object.entries(componentImports).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 Object.entries(componentOverrides).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 const secondary: any = prefs.header?.secondary_navigation || [];
-const secondaryNavbar = (prefs?.header?.secondary_navbar ?? true) && secondary.length;
+const secondaryNavbar =
+  (prefs?.header?.secondary_navbar ?? true) && secondary.length;
 
 // !depth && console.log(pages.children.discover);
-
 ---
 
 <Wrapper
-    id="navigation"
-    role="navigation"
-    aria-label="Main menu"
-    data-placement={placement}
-    class:list={{"secondary-navbar": secondaryNavbar}}
+  id="navigation"
+  role="navigation"
+  aria-label="Main menu"
+  data-placement={placement}
+  class:list={{ "secondary-navbar": secondaryNavbar }}
 >
-    {
-        !depth && (
-            <>
-                <div id="mobile-nav-buttons">
-                    <button id="mobile-nav-menu" aria-expanded="false">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                          <!-- Icon from Material Line Icons by Vjacheslav Trushkin - https://github.com/cyberalien/line-md/blob/master/license.txt - (Modified) -->
-                          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                            <path d="M5 12H19">
-                              <animate id="fwd" begin="indefinite" fill="freeze" attributeName="d" dur="0.2s" values="M5 12H19;M12 12H12"/>
-                              <animate id="bwd" begin="indefinite" fill="freeze" attributeName="d" dur="0.2s" values="M12 12H12;M5 12H19"/>
-                              <set fill="freeze" attributeName="opacity" begin="fwd.end" to="0"/>
-                              <set fill="freeze" attributeName="opacity" begin="bwd.begin" to="1"/>
-                            </path>
-                            <path d="M5 5L19 5M5 19L19 19">
-                              <animate begin="fwd.begin+0.1s" fill="freeze" attributeName="d" dur="0.2s" values="M5 5L19 5M5 19L19 19;M5 5L19 19M5 19L19 5"/>
-                              <animate begin="bwd.begin" fill="freeze" attributeName="d" dur="0.2s" values="M5 5L19 19M5 19L19 5;M5 5L19 5M5 19L19 19"/>
-                            </path>
-                          </g>
-                        </svg>
-                    </button>
-                    <a id="mobile-nav-home" href="/">
-                        <Icon name="fa6-solid:house" height="2rem" />
-                    </a>
-                </div>
-                <div id="mobile-nav-overlay" />
-            </>
+  {
+    !depth && (
+      <>
+        <div id="mobile-nav-buttons">
+          <button id="mobile-nav-menu" aria-expanded="false">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+            >
+              <g
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+              >
+                <path d="M5 12H19">
+                  <animate
+                    id="fwd"
+                    begin="indefinite"
+                    fill="freeze"
+                    attributeName="d"
+                    dur="0.2s"
+                    values="M5 12H19;M12 12H12"
+                  />
+                  <animate
+                    id="bwd"
+                    begin="indefinite"
+                    fill="freeze"
+                    attributeName="d"
+                    dur="0.2s"
+                    values="M12 12H12;M5 12H19"
+                  />
+                  <set
+                    fill="freeze"
+                    attributeName="opacity"
+                    begin="fwd.end"
+                    to="0"
+                  />
+                  <set
+                    fill="freeze"
+                    attributeName="opacity"
+                    begin="bwd.begin"
+                    to="1"
+                  />
+                </path>
+                <path d="M5 5L19 5M5 19L19 19">
+                  <animate
+                    begin="fwd.begin+0.1s"
+                    fill="freeze"
+                    attributeName="d"
+                    dur="0.2s"
+                    values="M5 5L19 5M5 19L19 19;M5 5L19 19M5 19L19 5"
+                  />
+                  <animate
+                    begin="bwd.begin"
+                    fill="freeze"
+                    attributeName="d"
+                    dur="0.2s"
+                    values="M5 5L19 19M5 19L19 5;M5 5L19 5M5 19L19 19"
+                  />
+                </path>
+              </g>
+            </svg>
+          </button>
+          <a id="mobile-nav-home" href="/">
+            <Icon name="fa6-solid:house" height="2rem" />
+          </a>
+        </div>
+        <div id="mobile-nav-overlay" />
+      </>
+    )
+  }
+
+  <Items id="navigation-items">
+    <ul class:list={[`depth-${depth}`]}>
+      {
+        pages?.href && (
+          <li
+            class:list={[
+              {
+                selected: pages.selected === 2,
+              },
+              `depth-${depth}`,
+            ]}
+          >
+            {/* Add parent to child dropdown */}
+            <a
+              aria-selected={pages.selected === 2 ? "true" : "false"}
+              href={pages.href}
+            >
+              <span>{pages?.title}</span>
+            </a>
+          </li>
         )
-    }
+      }
+      {
+        pages?.children &&
+          Object.values(pages.children).map((page: TreeNode) => {
+            // Online  -- children if any visible
+            // Meta    -- visible if children or link
+            // Hidden  -- hide
+            // Offline -- hide
 
-    <Items id="navigation-items">
-        <ul class:list={[`depth-${depth}`]}>
-            {
-              pages?.href && (
-                  <li
-                      class:list={[
-                          {
-                              selected: pages.selected === 2,
-                          },
-                          `depth-${depth}`,
-                      ]}
+            // Hide self and children if Hidden of Offline
+            if (page.status === "hidden" || page.status === "offline") return;
+
+            // Check if we have children to display
+            const children =
+              page.children &&
+              Object.keys(page.children)?.length &&
+              Object.values(page.children).some(
+                (child) =>
+                  child.status === "online" ||
+                  (child.status === "meta" && child.link) ||
+                  (child.children && Object.keys(child.children).length),
+              );
+
+            // Hide meta pages without visible children or a link
+            if (page.status !== "online" && !children && !page.href) return;
+
+            // Skip home element if show_home is false
+            if (!showHome && page.href === "/") return;
+
+            // Skip pages that are not from the "pages" collection
+            if (page.collection && page.collection != "pages") return;
+
+            const id = `nav-${
+              page.slug || page.title?.toLowerCase().replaceAll(" ", "-")
+            }`;
+            return (
+              <Fragment>
+                <li
+                  class:list={[
+                    {
+                      active: page.selected,
+                      selected: page.selected === 2,
+                      children,
+                    },
+                    `depth-${depth}`,
+                  ]}
+                  aria-haspopup={children ? "menu" : undefined}
+                  aria-labelledby={id}
+                >
+                  <a
+                    tabindex="0"
+                    aria-selected={page.selected === 2 ? "true" : "false"}
+                    href={children ? undefined : (page.href ?? page.link)}
                   >
-                    { /* Add parent to child dropdown */ }
-                      <a
-                          aria-selected={
-                              pages.selected === 2 ? "true" : "false"
-                          }
-                          href={pages.href}
-                      >
-                          <span>{pages?.title}</span>
-                      </a>
-                  </li>
-              )
-            }
-            {
-                pages?.children &&
-                    Object.values(pages.children).map((page: TreeNode) => {
+                    <span {id}>
+                      {page?.title}
+                      {children && (
+                        <div class="dropdown-indicator">
+                          <Icon name={dropdownCaret} height="1.2em" />
+                        </div>
+                      )}
+                    </span>
+                  </a>
 
-                        // Online  -- children if any visible
-                        // Meta    -- visible if children or link
-                        // Hidden  -- hide
-                        // Offline -- hide
-
-
-                        // Hide self and children if Hidden of Offline
-                        if (page.status === "hidden" || page.status === "offline") return;
-
-                        // Check if we have children to display
-                        const children =
-                            page.children
-                            && Object.keys(page.children)?.length
-                            && Object.values(page.children).some(
-                              (child) => child.status === "online"
-                                || (child.status === "meta" && child.link
-                                  || child.children
-                                  && Object.keys(child.children).length
-                                )
-                            );
-
-                        // Hide meta pages without visible children or a link
-                        if (page.status !== "online" && !children && !page.href) return;
-
-                        // Skip home element if show_home is false
-                        if (!showHome && page.href === "/") return;
-
-                        // Skip pages that are not from the "pages" collection
-                        if (page.collection && page.collection != "pages")
-                            return;
-
-                        const id = `nav-${
-                            page.slug ||
-                            page.title?.toLowerCase().replaceAll(" ", "-")
-                        }`;
-                        return (
-                            <Fragment>
-                                <li
-                                    class:list={[
-                                        {
-                                            active: page.selected,
-                                            selected: page.selected === 2,
-                                            children,
-                                        },
-                                        `depth-${depth}`,
-                                    ]}
-                                    aria-haspopup={
-                                        children ? "menu" : undefined
-                                    }
-                                    aria-labelledby={id}
-                                >
-                                    <a
-                                        tabindex="0"
-                                        aria-selected={
-                                            page.selected === 2
-                                                ? "true"
-                                                : "false"
-                                        }
-                                        href={children ? undefined : page.href ?? page.link}
-                                    >
-                                        <span {id}>
-                                            {page?.title}
-                                            {children && (
-                                                <div class="dropdown-indicator">
-                                                    <Icon
-                                                        name={dropdownCaret}
-                                                        height="1.2em"
-                                                    />
-                                                </div>
-                                            )}
-                                        </span>
-                                    </a>
-
-                                    {children && (
-                                        <Astro.self
-                                            depth={depth}
-                                            pages={page}
-                                        />
-                                    )}
-                                </li>
-                            </Fragment>
-                        );
-                    })
-            }
-            {!!depth && showCaret && <div class="dropdown-caret" />}
-            {
-                !depth && !!secondary.length && (
-                    <li
-                        id="secondary-button"
-                        class:list={[
-                            `depth-${depth}`,
-                        ]}
-                    >
-                        <a href={pages.href}>
-                            <span>Quicklinks
-                            <div class="dropdown-indicator">
-                                <Icon
-                                    name="fa6-solid:caret-down"
-                                    height="1.2em"
-                                />
-                            </div>
-                            </span>
-                        </a>
-                        <ul id="secondary-items" class:list={["secondary", `depth-1`]}>
-                            {secondary.map((block: any, i: number) => {
-                                const Component = components[block._bookshop_name];
-                                if (Component) {
-                                    return (
-                                        <li>
-                                            <Component
-                                                {...block}
-                                                _blocks={secondary}
-                                                key={String(i)}
-                                            />
-                                        </li>
-                                    );
-                                }
-                                const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-                                console.warn(warnstring);
-                                return <div class="missing-component">{warnstring}</div>;
-                            })}
-                        </ul>
+                  {children && <Astro.self depth={depth} pages={page} />}
+                </li>
+              </Fragment>
+            );
+          })
+      }
+      {!!depth && showCaret && <div class="dropdown-caret" />}
+      {
+        !depth && !!secondary.length && (
+          <li id="secondary-button" class:list={[`depth-${depth}`]}>
+            <a href={pages.href}>
+              <span>
+                Quicklinks
+                <div class="dropdown-indicator">
+                  <Icon name="fa6-solid:caret-down" height="1.2em" />
+                </div>
+              </span>
+            </a>
+            <ul id="secondary-items" class:list={["secondary", `depth-1`]}>
+              {secondary.map((block: any, i: number) => {
+                const Component = components[block._bookshop_name];
+                if (Component) {
+                  return (
+                    <li>
+                      <Component
+                        {...block}
+                        _blocks={secondary}
+                        key={String(i)}
+                      />
                     </li>
-                )
-            }
-        </ul>
-    </Items>
+                  );
+                }
+                const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+                console.warn(warnstring);
+                return <div class="missing-component">{warnstring}</div>;
+              })}
+            </ul>
+          </li>
+        )
+      }
+    </ul>
+  </Items>
 </Wrapper>
 
 <script>
-    import {
-        computePosition,
-        type ComputePositionConfig,
-        type Placement,
-        autoUpdate,
-        offset,
-        shift,
-        flip,
-        size,
-        arrow,
-    } from "@floating-ui/dom";
+  import {
+    computePosition,
+    type ComputePositionConfig,
+    type Placement,
+    autoUpdate,
+    offset,
+    shift,
+    flip,
+    size,
+    arrow,
+  } from "@floating-ui/dom";
 
-    // document.addEventListener("DOMContentLoaded", setupNavigation);
-    // document.addEventListener("astro:after-swap", setupNavigation);
-    setupNavigation();
+  // document.addEventListener("DOMContentLoaded", setupNavigation);
+  // document.addEventListener("astro:after-swap", setupNavigation);
+  setupNavigation();
 
-    // function isOverflowing(element: HTMLElement) {
-    //   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
-    // }
+  // function isOverflowing(element: HTMLElement) {
+  //   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+  // }
 
+  function setupNavigation() {
+    const navigation = document.getElementById("navigation");
+    const secondary = document.getElementById("secondary-items");
+    const mobileNavButton = document.getElementById("mobile-nav-menu");
+    const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+    const placement: Placement =
+      (navigation &&
+        (navigation.dataset?.placement as Placement | undefined)) ||
+      "bottom-start";
+    const caretHeight = 20;
 
+    // const navTarget = null;
+    if (!navigation) return;
+    document.body.addEventListener("click", handleNavigationEvent);
+    document.body.addEventListener("keydown", handleNavigationEvent);
+    navigation.addEventListener("focusout", handleNavigationEvent);
 
-    function setupNavigation() {
-        const navigation = document.getElementById("navigation");
-        const secondary = document.getElementById("secondary-items");
-        const mobileNavButton = document.getElementById("mobile-nav-menu");
-        const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
-        const placement: Placement =
-            (navigation &&
-                (navigation.dataset?.placement as Placement | undefined)) ||
-            "bottom-start";
-        const caretHeight = 20;
+    const secondaryNavbar = navigation.matches(".secondary-navbar");
+    const navItems = navigation.querySelector("#navigation-items");
+    var mobileNavWidth = 768;
 
-        // const navTarget = null;
-        if (!navigation) return;
-        document.body.addEventListener("click", handleNavigationEvent);
-        document.body.addEventListener("keydown", handleNavigationEvent);
-        navigation.addEventListener("focusout", handleNavigationEvent);
+    function resizeHandler() {
+      const rect = navItems?.getBoundingClientRect();
+      if (!rect) return;
 
-        const secondaryNavbar = navigation.matches(".secondary-navbar");
-        const navItems = navigation.querySelector("#navigation-items");
-        var mobileNavWidth = 768;
+      if (
+        navItems?.scrollWidth &&
+        document.documentElement.clientWidth > mobileNavWidth &&
+        Math.abs(navItems.scrollWidth - rect.width) > 3
+      ) {
+        // Navigation is overflowing, switch to mobile navigation
+        mobileNavWidth = navItems.scrollWidth + rect.left;
+      }
 
-        function resizeHandler() {
-          const rect = navItems?.getBoundingClientRect();
-          if (!rect) return;
-
-          if (navItems?.scrollWidth && document.documentElement.clientWidth > mobileNavWidth && (Math.abs(navItems.scrollWidth - rect.width) > 3)) {
-            // Navigation is overflowing, switch to mobile navigation
-            mobileNavWidth = navItems.scrollWidth + rect.left;
-          }
-
-          document.documentElement.classList.toggle("mobile-nav", isMobileNav());
-          navigation?.classList.toggle("mobile-nav", isMobileNav());
-        }
-
-        window.addEventListener("resize", resizeHandler);
-        resizeHandler();
-
-        /**
-         * Close the dropdown of a given element, and cleanup
-         * @param target element to close the dropdown of
-         */
-        function closeNav(target: HTMLElement) {
-            if ("_cleanup" in target && target._cleanup instanceof Function) {
-                target._cleanup();
-            }
-        }
-
-        /**
-         * Close all dropdowns decending from target
-         * @param target defaults to navigation if unset
-         * @param inverse close all dropdowns outside of target
-         */
-        function closeAllNav(
-            target?: HTMLElement | undefined,
-            inverse?: boolean,
-        ) {
-            if (!navigation) throw Error("Navigation not found.");
-            if (target === undefined) target = navigation;
-            if (inverse) {
-                Array.from(
-                    navigation.querySelectorAll<HTMLElement>(".dropdown-open"),
-                )
-                    .filter((d) => !d.contains(target as Node))
-                    .forEach(closeNav);
-            } else
-                target
-                    ?.querySelectorAll<HTMLElement>(".dropdown-open")
-                    .forEach(closeNav);
-        }
-
-        /**
-         * Open the dropdown of the target element
-         * @param target element to open the dropdown of
-         * @param dropdownElement dropdown to open (optional)
-         */
-        function openNav(target: FloatingUIElement, dropdownElement?: HTMLElement) {
-            // Close all dropdowns that do not contain the new dropdown
-            closeAllNav(target, true);
-
-            if (target.matches("#secondary-button") && secondaryNavbar && !isMobileNav()) return;
-
-            const dropdown = dropdownElement ?? target.querySelector(":scope ul") as HTMLElement;
-            if (!dropdown) return;
-            const caret = dropdown.querySelector(
-                ":scope > .dropdown-caret",
-            ) as HTMLElement;
-
-            const options: ComputePositionConfig = dropdownOptions(target.classList.contains(
-                "depth-0"
-            ), caret);
-
-            const cleanup = autoUpdate(target, dropdown, () => {
-                computePosition(target, dropdown, options).then(
-                    ({ x, y, middlewareData, placement }) => {
-                        if (isMobileNav()) {
-                            Object.assign(dropdown.style, {
-                                left: null,
-                                top: null,
-                            });
-                            return;
-                        }
-
-                        Object.assign(dropdown.style, {
-                            left: `${x}px`,
-                            top: `${y}px`,
-                        });
-
-                        if (middlewareData.arrow) {
-                            let turn,
-                                top,
-                                right,
-                                bottom,
-                                left = null;
-                            let direction = placement.replace(/-.*/, "");
-                            let heightOffset = `${-caretHeight}px`;
-                            let widthOffset = `${-caretHeight}px`;
-
-                            // Position arrow based on placement direction
-                            switch (direction) {
-                                default:
-                                case "top":
-                                    left = `${middlewareData.arrow.x}px`;
-                                    bottom = heightOffset;
-                                    turn = 0.5;
-                                    break;
-
-                                case "bottom":
-                                    left = `${middlewareData.arrow.x}px`;
-                                    top = heightOffset;
-                                    turn = 0;
-                                    break;
-
-                                case "left":
-                                    top = `${middlewareData.arrow.y}px`;
-                                    right = widthOffset;
-                                    turn = 0.25;
-                                    break;
-
-                                case "right":
-                                    top = `${middlewareData.arrow.y}px`;
-                                    left = widthOffset;
-                                    turn = 0.75;
-                                    break;
-                            }
-
-                            Object.assign(caret.style, {
-                                transform: `rotate(${turn}turn)`,
-                                top,
-                                right,
-                                bottom,
-                                left,
-                            });
-                        }
-                    },
-                );
-            });
-
-            target._cleanup = () => {
-                cleanup();
-
-                target.classList.remove("dropdown-open");
-                target.setAttribute("aria-expanded", "false");
-                dropdown.classList.remove("open");
-                dropdown.setAttribute("style", "");
-            };
-
-            target.setAttribute("aria-expanded", "true");
-            target.classList.add("dropdown-open");
-            dropdown.classList.add("open");
-            // console.log(target, dropdown);
-        }
-
-        function dropdownOptions(vertical: boolean, caret: Element | undefined): ComputePositionConfig {
-          return vertical ? {
-                placement,
-                strategy: "fixed", // Probably depends on if the menu is fixed or not
-                middleware: [
-                    offset({
-                        mainAxis: caretHeight * 0.9 * Number(!!caret),
-                        crossAxis: 0,
-                    }),
-                    size({
-                        apply({ rects, elements, availableHeight }) {
-                            if (isMobileNav()) {
-                                Object.assign(elements.floating.style, {
-                                    maxHeight: null,
-                                    minWidth: null,
-                                });
-                                return;
-                            }
-                            Object.assign(elements.floating.style, {
-                                maxHeight: `${availableHeight}px`,
-                                minWidth: `${rects.reference.width}px`,
-                            });
-                        },
-                    }),
-                    shift(),
-                    caret && arrow({ element: caret, padding: 10 }),
-                ],
-            }
-          : {
-                placement: "right-start",
-                strategy: "fixed",
-                middleware: [
-                    offset({
-                        mainAxis: caretHeight * 0.9 * Number(!!caret),
-                        crossAxis: 0,
-                    }),
-                    shift(),
-                    size({
-                        apply({ elements, availableHeight }) {
-                            if (isMobileNav()) {
-                                Object.assign(elements.floating.style, {
-                                    maxHeight: null,
-                                });
-                                return;
-                            }
-                            Object.assign(elements.floating.style, {
-                                maxHeight: `${availableHeight}px`,
-                            });
-                        },
-                    }),
-                    flip(),
-                    caret && arrow({ element: caret, padding: 10 }),
-                ],
-            }
-
-        }
-
-
-        /**
-         * Media query to test if mobile nav should be shown
-         */
-        function isMobileNav(): boolean {
-            return window.innerWidth <= mobileNavWidth;
-        }
-
-        /**
-         * Update dropdown state after event
-         * @param this
-         * @param e
-         */
-        function handleNavigationEvent(this: HTMLElement, e: Event) {
-            if (e instanceof FocusEvent && e.type === "focusout") {
-                if (
-                    e.relatedTarget &&
-                    !navigation?.contains(e.relatedTarget as Element)
-                )
-                    closeAllNav();
-                return;
-            }
-
-            if (e instanceof KeyboardEvent) {
-                switch (e.key) {
-                    case "Escape":
-                        closeAllNav();
-
-                    default:
-                        return;
-
-                    case " ":
-                    case "Enter":
-                }
-            }
-
-            const target: HTMLElement | null = (
-                e.target as HTMLElement
-            ).closest("li, #navigation");
-
-            if (target && target.id === "secondary-button" && secondary) {
-                const state = !target.classList.contains("dropdown-open");
-
-                if (state) {
-                  openNav(target, secondary);
-                } else {
-                  closeNav(target);
-                  closeAllNav(target);
-                }
-
-                return;
-            };
-
-            if (
-                !target ||
-                target.id === "navigation" ||
-                false // !target.classList.contains("children")
-            ) {
-                closeAllNav();
-                return;
-            }
-
-            const state = !target.classList.contains("dropdown-open");
-
-            if (state) {
-                // Dropdown Open
-                openNav(target);
-            } else {
-                // Dropdown close
-                closeNav(target);
-                closeAllNav(target);
-            }
-        }
-
-        /**
-         * Opens and closes the mobile navigation menu
-         * @param open optionally override the toggle
-         */
-        function setModalState(open?: boolean) {
-            let newState = navigation?.classList.toggle("expanded", open);
-            if (newState === undefined) return;
-            mobileNavButton?.setAttribute("aria-expanded", newState.toString());
-
-            // Trigger SVG animation
-            mobileNavButton?.querySelector<SVGAnimationElement>(`svg animate#${newState ? "fwd" : "bwd"}`)?.beginElement();
-
-            // Fix/Unfix body to prevent scrolling through the menu
-            if (newState) {
-                document.body.style.top = `-${window.scrollY}px`;
-                document.documentElement.classList.toggle("mobile-noscroll", true);
-            } else {
-                const scrollY = document.body.style.top;
-                document.documentElement.classList.toggle("mobile-noscroll", false);
-                document.body.style.top = "";
-                window.scrollTo({
-                    left: 0,
-                    top: parseInt(scrollY || "0") * -1,
-                    behavior: "instant",
-                });
-            }
-        }
-
-        // Mobile Nav
-        mobileNavButton?.addEventListener("click", () => {
-            setModalState();
-        });
-
-        mobileNavOverlay?.addEventListener("click", () => {
-            setModalState(false);
-        });
+      document.documentElement.classList.toggle("mobile-nav", isMobileNav());
+      navigation?.classList.toggle("mobile-nav", isMobileNav());
     }
 
+    window.addEventListener("resize", resizeHandler);
+    resizeHandler();
 
+    /**
+     * Close the dropdown of a given element, and cleanup
+     * @param target element to close the dropdown of
+     */
+    function closeNav(target: HTMLElement) {
+      if ("_cleanup" in target && target._cleanup instanceof Function) {
+        target._cleanup();
+      }
+    }
+
+    /**
+     * Close all dropdowns decending from target
+     * @param target defaults to navigation if unset
+     * @param inverse close all dropdowns outside of target
+     */
+    function closeAllNav(target?: HTMLElement | undefined, inverse?: boolean) {
+      if (!navigation) throw Error("Navigation not found.");
+      if (target === undefined) target = navigation;
+      if (inverse) {
+        Array.from(navigation.querySelectorAll<HTMLElement>(".dropdown-open"))
+          .filter((d) => !d.contains(target as Node))
+          .forEach(closeNav);
+      } else
+        target
+          ?.querySelectorAll<HTMLElement>(".dropdown-open")
+          .forEach(closeNav);
+    }
+
+    /**
+     * Open the dropdown of the target element
+     * @param target element to open the dropdown of
+     * @param dropdownElement dropdown to open (optional)
+     */
+    function openNav(target: FloatingUIElement, dropdownElement?: HTMLElement) {
+      // Close all dropdowns that do not contain the new dropdown
+      closeAllNav(target, true);
+
+      if (
+        target.matches("#secondary-button") &&
+        secondaryNavbar &&
+        !isMobileNav()
+      )
+        return;
+
+      const dropdown =
+        dropdownElement ?? (target.querySelector(":scope ul") as HTMLElement);
+      if (!dropdown) return;
+      const caret = dropdown.querySelector(
+        ":scope > .dropdown-caret",
+      ) as HTMLElement;
+
+      const options: ComputePositionConfig = dropdownOptions(
+        target.classList.contains("depth-0"),
+        caret,
+      );
+
+      const cleanup = autoUpdate(target, dropdown, () => {
+        computePosition(target, dropdown, options).then(
+          ({ x, y, middlewareData, placement }) => {
+            if (isMobileNav()) {
+              Object.assign(dropdown.style, {
+                left: null,
+                top: null,
+              });
+              return;
+            }
+
+            Object.assign(dropdown.style, {
+              left: `${x}px`,
+              top: `${y}px`,
+            });
+
+            if (middlewareData.arrow) {
+              let turn,
+                top,
+                right,
+                bottom,
+                left = null;
+              let direction = placement.replace(/-.*/, "");
+              let heightOffset = `${-caretHeight}px`;
+              let widthOffset = `${-caretHeight}px`;
+
+              // Position arrow based on placement direction
+              switch (direction) {
+                default:
+                case "top":
+                  left = `${middlewareData.arrow.x}px`;
+                  bottom = heightOffset;
+                  turn = 0.5;
+                  break;
+
+                case "bottom":
+                  left = `${middlewareData.arrow.x}px`;
+                  top = heightOffset;
+                  turn = 0;
+                  break;
+
+                case "left":
+                  top = `${middlewareData.arrow.y}px`;
+                  right = widthOffset;
+                  turn = 0.25;
+                  break;
+
+                case "right":
+                  top = `${middlewareData.arrow.y}px`;
+                  left = widthOffset;
+                  turn = 0.75;
+                  break;
+              }
+
+              Object.assign(caret.style, {
+                transform: `rotate(${turn}turn)`,
+                top,
+                right,
+                bottom,
+                left,
+              });
+            }
+          },
+        );
+      });
+
+      target._cleanup = () => {
+        cleanup();
+
+        target.classList.remove("dropdown-open");
+        target.setAttribute("aria-expanded", "false");
+        dropdown.classList.remove("open");
+        dropdown.setAttribute("style", "");
+      };
+
+      target.setAttribute("aria-expanded", "true");
+      target.classList.add("dropdown-open");
+      dropdown.classList.add("open");
+      // console.log(target, dropdown);
+    }
+
+    function dropdownOptions(
+      vertical: boolean,
+      caret: Element | undefined,
+    ): ComputePositionConfig {
+      return vertical
+        ? {
+            placement,
+            strategy: "fixed", // Probably depends on if the menu is fixed or not
+            middleware: [
+              offset({
+                mainAxis: caretHeight * 0.9 * Number(!!caret),
+                crossAxis: 0,
+              }),
+              size({
+                apply({ rects, elements, availableHeight }) {
+                  if (isMobileNav()) {
+                    Object.assign(elements.floating.style, {
+                      maxHeight: null,
+                      minWidth: null,
+                    });
+                    return;
+                  }
+                  Object.assign(elements.floating.style, {
+                    maxHeight: `${availableHeight}px`,
+                    minWidth: `${rects.reference.width}px`,
+                  });
+                },
+              }),
+              shift(),
+              caret && arrow({ element: caret, padding: 10 }),
+            ],
+          }
+        : {
+            placement: "right-start",
+            strategy: "fixed",
+            middleware: [
+              offset({
+                mainAxis: caretHeight * 0.9 * Number(!!caret),
+                crossAxis: 0,
+              }),
+              shift(),
+              size({
+                apply({ elements, availableHeight }) {
+                  if (isMobileNav()) {
+                    Object.assign(elements.floating.style, {
+                      maxHeight: null,
+                    });
+                    return;
+                  }
+                  Object.assign(elements.floating.style, {
+                    maxHeight: `${availableHeight}px`,
+                  });
+                },
+              }),
+              flip(),
+              caret && arrow({ element: caret, padding: 10 }),
+            ],
+          };
+    }
+
+    /**
+     * Media query to test if mobile nav should be shown
+     */
+    function isMobileNav(): boolean {
+      return window.innerWidth <= mobileNavWidth;
+    }
+
+    /**
+     * Update dropdown state after event
+     * @param this
+     * @param e
+     */
+    function handleNavigationEvent(this: HTMLElement, e: Event) {
+      if (e instanceof FocusEvent && e.type === "focusout") {
+        if (
+          e.relatedTarget &&
+          !navigation?.contains(e.relatedTarget as Element)
+        )
+          closeAllNav();
+        return;
+      }
+
+      if (e instanceof KeyboardEvent) {
+        switch (e.key) {
+          case "Escape":
+            closeAllNav();
+
+          default:
+            return;
+
+          case " ":
+          case "Enter":
+        }
+      }
+
+      const target: HTMLElement | null = (e.target as HTMLElement).closest(
+        "li, #navigation",
+      );
+
+      if (target && target.id === "secondary-button" && secondary) {
+        const state = !target.classList.contains("dropdown-open");
+
+        if (state) {
+          openNav(target, secondary);
+        } else {
+          closeNav(target);
+          closeAllNav(target);
+        }
+
+        return;
+      }
+
+      if (
+        !target ||
+        target.id === "navigation" ||
+        false // !target.classList.contains("children")
+      ) {
+        closeAllNav();
+        return;
+      }
+
+      const state = !target.classList.contains("dropdown-open");
+
+      if (state) {
+        // Dropdown Open
+        openNav(target);
+      } else {
+        // Dropdown close
+        closeNav(target);
+        closeAllNav(target);
+      }
+    }
+
+    /**
+     * Opens and closes the mobile navigation menu
+     * @param open optionally override the toggle
+     */
+    function setModalState(open?: boolean) {
+      let newState = navigation?.classList.toggle("expanded", open);
+      if (newState === undefined) return;
+      mobileNavButton?.setAttribute("aria-expanded", newState.toString());
+
+      // Trigger SVG animation
+      mobileNavButton
+        ?.querySelector<SVGAnimationElement>(
+          `svg animate#${newState ? "fwd" : "bwd"}`,
+        )
+        ?.beginElement();
+
+      // Fix/Unfix body to prevent scrolling through the menu
+      if (newState) {
+        document.body.style.top = `-${window.scrollY}px`;
+        document.documentElement.classList.toggle("mobile-noscroll", true);
+      } else {
+        const scrollY = document.body.style.top;
+        document.documentElement.classList.toggle("mobile-noscroll", false);
+        document.body.style.top = "";
+        window.scrollTo({
+          left: 0,
+          top: parseInt(scrollY || "0") * -1,
+          behavior: "instant",
+        });
+      }
+    }
+
+    // Mobile Nav
+    mobileNavButton?.addEventListener("click", () => {
+      setModalState();
+    });
+
+    mobileNavOverlay?.addEventListener("click", () => {
+      setModalState(false);
+    });
+  }
 </script>
 
 <style lang="scss">
-    nav {
-        z-index: 999;
-        overflow: hidden;
+  nav {
+    z-index: 999;
+    overflow: hidden;
 
-        grid-template-areas: "logo navigation";
+    grid-template-areas: "logo navigation";
+  }
+
+  #navigation-items {
+    height: 100%;
+    max-width: 100vw;
+  }
+
+  #mobile-nav-buttons {
+    display: none;
+    z-index: 1000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 9rem;
+    grid-template-areas: "left centre right";
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+
+    :is(button, a) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgb(var(--mobile-header-color));
+
+      background-color: rgb(var(--mobile-header-background-color));
+      border: 2px solid rgb(var(--color-accent));
+      padding: 2rem;
+      border-radius: 6rem;
+      bottom: 0.5rem;
+      width: 8rem;
+      height: 8rem;
     }
 
-    #navigation-items {
-        height: 100%;
-        max-width: 100vw;
+    main {
+      --header-offset-transparent: var(--header-height);
     }
 
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 10rem;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+
+      background: linear-gradient(
+        to top,
+        rgb(var(--mobile-header-background-color)),
+        transparent
+      );
+    }
+  }
+
+  #mobile-nav-menu {
+    pointer-events: all;
+    grid-area: centre;
+
+    box-shadow: 0 0 2rem #0005;
+    /* border: 0; */
+    z-index: 10;
+  }
+
+  #mobile-nav-home {
+    opacity: 0;
+    pointer-events: none;
+    grid-area: left;
+    border: 2px solid rgb(var(--color-accent));
+    transform: translate(calc(25vw + 3rem)) scale(0.5);
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+    z-index: 5;
+  }
+
+  #mobile-nav-overlay {
+    display: none;
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-color: #0000;
+    transition: background-color 0.3s ease;
+  }
+
+  /* @media only screen and (max-width: 768px) { */
+  :where(#navigation.mobile-nav) {
     #mobile-nav-buttons {
-        display: none;
-        z-index: 1000;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 9rem;
-        grid-template-areas: "left centre right";
-        grid-template-columns: repeat(3, 1fr);
-        align-items: center;
-        justify-items: center;
-
-        :is(button, a) {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgb(var(--mobile-header-color));
-
-            background-color: rgb(var(--mobile-header-background-color));
-            border: 2px solid rgb(var(--color-accent));
-            padding: 2rem;
-            border-radius: 6rem;
-            bottom: 0.5rem;
-            width: 8rem;
-            height: 8rem;
-        }
-
-        main {
-          --header-offset-transparent: var(--header-height);
-        }
-
-        &::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 10rem;
-            z-index: 0;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-
-            background: linear-gradient(
-              to top,
-              rgb(var(--mobile-header-background-color)),
-              transparent
-            );
-        }
-    }
-
-    #mobile-nav-menu {
-        pointer-events: all;
-        grid-area: centre;
-
-        box-shadow: 0 0 2rem #0005;
-        /* border: 0; */
-        z-index: 10;
-    }
-
-    #mobile-nav-home {
-        opacity: 0;
-        pointer-events: none;
-        grid-area: left;
-        border: 2px solid rgb(var(--color-accent));
-        transform: translate(calc(25vw + 3rem)) scale(0.5);
-        transition:
-            transform 0.3s ease,
-            opacity 0.3s ease;
-        z-index: 5;
+      display: grid;
     }
 
     #mobile-nav-overlay {
-        display: none;
-        pointer-events: none;
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-        background-color: #0000;
-        transition: background-color 0.3s ease;
+      display: block;
     }
 
-    /* @media only screen and (max-width: 768px) { */
-    :where(#navigation.mobile-nav) {
-        #mobile-nav-buttons {
-            display: grid;
-        }
+    & {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      max-height: 100vh;
 
-        #mobile-nav-overlay {
-            display: block;
-        }
+      #navigation-items {
+        background: linear-gradient(
+          to bottom,
+          rgb(var(--mobile-header-background-color)),
+          rgb(var(--mobile-header-background-color-bottom))
+        );
 
-        & {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            pointer-events: none;
-            max-height: 100vh;
+        position: relative;
+        height: 100%;
+        max-height: 100vh;
+        overflow-y: scroll;
+        overscroll-behavior: contain;
 
-            #navigation-items {
-                background: linear-gradient(
-                    to bottom,
-                    rgb(var(--mobile-header-background-color)),
-                    rgb(var(--mobile-header-background-color-bottom))
-                );
+        box-shadow: 0 0 10rem #0003;
+        margin-right: 0;
 
-                position: relative;
-                height: 100%;
-                max-height: 100vh;
-                overflow-y: scroll;
-                overscroll-behavior: contain;
+        transition:
+          clip-path 0.3s ease-in-out,
+          opacity 0.3s ease-out,
+          transform 0.3s ease;
 
-                box-shadow: 0 0 10rem #0003;
-                margin-right: 0;
+        clip-path: circle(2rem at 50% calc(100% - 12rem));
+        opacity: 0;
+        transform: translate(0 10rem);
+      }
 
-                transition:
-                    clip-path 0.3s ease-in-out,
-                    opacity 0.3s ease-out,
-                    transform 0.3s ease;
+      ul.depth-0 {
+        margin: 2rem 2rem 10rem;
 
-                clip-path: circle(2rem at 50% calc(100% - 12rem));
-                opacity: 0;
-                transform: translate(0 10rem);
-            }
-
-            ul.depth-0 {
-                margin: 2rem 2rem 10rem;
-
-                height: fit-content;
-                flex-direction: column;
-
-                ul {
-                    margin-left: 3vw;
-                }
-            }
-        }
-
-        &.expanded {
-            #mobile-nav-buttons::after {
-                opacity: 1;
-                pointer-events: all;
-            }
-
-            #mobile-nav-home {
-                pointer-events: initial;
-                transform: translate(0) scale(1);
-                opacity: 1;
-                pointer-events: all;
-            }
-
-            #navigation-items {
-                clip-path: circle(150% at 50% calc(100% - 4.5rem));
-                pointer-events: initial;
-                transform: translate(0 0);
-                opacity: 1;
-            }
-
-            #mobile-nav-overlay {
-                display: block;
-                pointer-events: all;
-                background-color: #0004;
-            }
-        }
-
-        .depth-0 ul {
-            position: relative;
-            top: 0 !important;
-            left: 0 !important;
-            display: none;
-        }
-
-        .dropdown-open > ul {
-            display: flex;
-        }
+        height: fit-content;
+        flex-direction: column;
 
         ul {
-            flex-direction: column;
+          margin-left: 3vw;
         }
+      }
     }
 
-    .dropdown-open > a .dropdown-indicator {
-        transform: rotate(180deg);
+    &.expanded {
+      #mobile-nav-buttons::after {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      #mobile-nav-home {
+        pointer-events: initial;
+        transform: translate(0) scale(1);
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      #navigation-items {
+        clip-path: circle(150% at 50% calc(100% - 4.5rem));
+        pointer-events: initial;
+        transform: translate(0 0);
+        opacity: 1;
+      }
+
+      #mobile-nav-overlay {
+        display: block;
+        pointer-events: all;
+        background-color: #0004;
+      }
     }
 
-    /* @media screen and (min-width: 769px) { */
+    .depth-0 ul {
+      position: relative;
+      top: 0 !important;
+      left: 0 !important;
+      display: none;
+    }
 
-    html:not(.mobile-nav) #navigation {
-        ul.depth-0 {
-            height: 100%;
-            gap: 0.5vw;
+    .dropdown-open > ul {
+      display: flex;
+    }
 
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-auto-columns: auto;
-            grid-auto-flow: column;
-            grid-row-gap: 0;
+    ul {
+      flex-direction: column;
+    }
+  }
 
-            width: 100%;
+  .dropdown-open > a .dropdown-indicator {
+    transform: rotate(180deg);
+  }
 
-            position:relative;
-            /* height: var(--header-height); */
-        }
+  /* @media screen and (min-width: 769px) { */
 
-        &.secondary-navbar {
-            ul.depth-0 {
-                grid-template-rows: 3.6rem 1fr;
-                /* grid-template-columns: auto; */
-            }
+  html:not(.mobile-nav) #navigation {
+    ul.depth-0 {
+      height: 100%;
+      gap: 0.5vw;
 
-            li.depth-0 {
-                grid-row: 2 / 3;
-                height: 100%;
-            }
-        }
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-auto-columns: auto;
+      grid-auto-flow: column;
+      grid-row-gap: 0;
 
+      width: 100%;
 
-        li.depth-0 {
-            margin-bottom: 0;
+      position: relative;
+      /* height: var(--header-height); */
+    }
 
-            & > a {
-            height: 100%;
-            /* padding: 20px; */
-            color: rgb(var(--header-color));
-        }}
+    &.secondary-navbar {
+      ul.depth-0 {
+        grid-template-rows: 3.6rem 1fr;
+        /* grid-template-columns: auto; */
+      }
 
-        .depth-0 ul {
-            position: fixed;
+      li.depth-0 {
+        grid-row: 2 / 3;
+        height: 100%;
+      }
+    }
 
-            top: 0;
-            left: 0;
-            display: flex;
+    li.depth-0 {
+      margin-bottom: 0;
 
-            /* Workaround for https://github.com/philipwalton/flexbugs#flexbug-14 */
-            flex-direction: row;
-            flex-wrap: wrap;
-            writing-mode: vertical-lr;
+      & > a {
+        height: 100%;
+        /* padding: 20px; */
+        color: rgb(var(--header-color));
+      }
+    }
 
-            background-color: rgb(var(--header-background-color));
-            box-shadow: 2px 2px 16px #00000044;
-            border: 2px solid
-                color-mix(
-                    in oklab,
-                    rgb(var(--header-background-color)) 70%,
-                    rgb(var(--header-color))
-                );
-            border-radius: var(--border-radius);
+    .depth-0 ul {
+      position: fixed;
 
-            visibility: hidden;
-            pointer-events: none;
+      top: 0;
+      left: 0;
+      display: flex;
 
-            li {
-                writing-mode: horizontal-tb;
-            }
-        }
+      /* Workaround for https://github.com/philipwalton/flexbugs#flexbug-14 */
+      flex-direction: row;
+      flex-wrap: wrap;
+      writing-mode: vertical-lr;
 
-        .depth-1 a .dropdown-indicator {
-            transform: rotate(-90deg);
-        }
+      background-color: rgb(var(--header-background-color));
+      box-shadow: 2px 2px 16px #00000044;
+      border: 2px solid
+        color-mix(
+          in oklab,
+          rgb(var(--header-background-color)) 70%,
+          rgb(var(--header-color))
+        );
+      border-radius: var(--border-radius);
 
-        .depth-1 .dropdown-open > a .dropdown-indicator {
-            transform: rotate(90deg);
-        }
+      visibility: hidden;
+      pointer-events: none;
 
-        .dropdown-open > ul {
-            visibility: visible;
-            pointer-events: all;
+      li {
+        writing-mode: horizontal-tb;
+      }
+    }
 
-            & > .dropdown-caret {
-                display: block;
-            }
-        }
+    .depth-1 a .dropdown-indicator {
+      transform: rotate(-90deg);
+    }
 
-        .dropdown-caret {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            filter: drop-shadow(2px 2px 16px #00000088);
+    .depth-1 .dropdown-open > a .dropdown-indicator {
+      transform: rotate(90deg);
+    }
 
-            // Prevent shadow overlapping own menu
-            background-color: rgb(var(--header-background-color));
-            clip-path: polygon(-200% -200%, 300% -200%, 300% 100%, -200% 100%);
+    .dropdown-open > ul {
+      visibility: visible;
+      pointer-events: all;
 
-            mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 768 768'%3e%3cpath d='M576 576.003a192 192 0 0 0 192 192H0a192 192 0 0 0 192-192V384.005a192.004 192.004 0 0 1 192.004-192.003h.008a192 192 0 0 1 135.757 56.231A192 192 0 0 1 576 383.989z'/%3e%3c/svg%3e");
-            mask-repeat: no-repeat;
-        }
+      & > .dropdown-caret {
+        display: block;
+      }
     }
 
     .dropdown-caret {
-        display: none;
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      filter: drop-shadow(2px 2px 16px #00000088);
+
+      // Prevent shadow overlapping own menu
+      background-color: rgb(var(--header-background-color));
+      clip-path: polygon(-200% -200%, 300% -200%, 300% 100%, -200% 100%);
+
+      mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 768 768'%3e%3cpath d='M576 576.003a192 192 0 0 0 192 192H0a192 192 0 0 0 192-192V384.005a192.004 192.004 0 0 1 192.004-192.003h.008a192 192 0 0 1 135.757 56.231A192 192 0 0 1 576 383.989z'/%3e%3c/svg%3e");
+      mask-repeat: no-repeat;
     }
+  }
+
+  .dropdown-caret {
+    display: none;
+  }
 </style>
 
 <style lang="scss" is:global>
-    /* @media only screen and (max-width: 768px) { */
-        html.mobile-noscroll.mobile-nav {
-            overflow: hidden;
+  /* @media only screen and (max-width: 768px) { */
+  html.mobile-noscroll.mobile-nav {
+    overflow: hidden;
 
-            & > body {
-                position: fixed;
-                overflow: hidden;
-                width: min(100%, var(--page-max-width));
-            }
-        }
-    /* } */
+    & > body {
+      position: fixed;
+      overflow: hidden;
+      width: min(100%, var(--page-max-width));
+    }
+  }
+  /* } */
 
-    /* @media only screen and (min-width: 769px) { */
-        html.mobile-noscroll:not(.mobile-nav) > body {
-            top: 0 !important;
-        }
-    /* } */
+  /* @media only screen and (min-width: 769px) { */
+  html.mobile-noscroll:not(.mobile-nav) > body {
+    top: 0 !important;
+  }
+  /* } */
 
-    nav#navigation {
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .depth-1 {
-            a span {
-                padding: 0 10px;
-                margin: 0 5px;
-            }
-
-            li:first-of-type > a span {
-                margin-top: 5px;
-            }
-
-            li:last-of-type > a span {
-                margin-bottom: 5px;
-            }
-        }
-
-        .active > a span {
-            font-weight: bold;
-            border: 4px solid
-                color-mix(
-                    in oklab,
-                    rgb(var(--header-background-color)) 70%,
-                    rgb(var(--header-color))
-                );
-        }
-
-        a {
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-            text-decoration: none;
-            color: rgb(var(--header-color));
-            cursor: pointer;
-        }
-
-        a:hover span {
-            background-color: color-mix(
-                in oklab,
-                rgb(var(--header-background-color)) 70%,
-                rgb(var(--header-color))
-            );
-        }
-
-        a > span {
-            flex: 1 1 100%;
-            border: 4px solid #0000;
-            transition: background-color 0.1s ease-out;
-            border-radius: var(--border-radius);
-
-            line-height: 1.1;
-
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        li.depth-0 > a > span {
-            justify-content: center;
-        }
+  nav#navigation {
+    ul {
+      list-style-type: none;
+      padding: 0;
     }
 
-    li.depth-0 > a span {
-        padding: calc(var(--indent) * 0.02) calc(var(--indent) * 0.2);
+    .depth-1 {
+      a span {
+        padding: 0 10px;
+        margin: 0 5px;
+      }
+
+      li:first-of-type > a span {
+        margin-top: 5px;
+      }
+
+      li:last-of-type > a span {
+        margin-bottom: 5px;
+      }
     }
 
-    html:not(.mobile-nav) nav#navigation.secondary-navbar > #navigation-items > ul.depth-0 #secondary-button {
-        grid-row: 1 / 2;
-        /* grid-column: 1 / span 10; */
-        position: absolute;
-        left: 0;
-        right: 0;
-
-        > a {
-            display: none;
-        }
-
-        > #secondary-items {
-            flex-direction: row;
-            writing-mode: horizontal-tb;
-            padding-top: 0;
-            visibility: visible;
-            background-color: transparent;
-            --header-color: 255 255 255;
-            /* top: 0 !important; */
-            /* width: 100%; */
-            /* left: 0; */
-            right: calc(var(--indent) * 0.2);
-
-            position: absolute;
-
-            justify-content: flex-end;
-            align-items: center;
-            border: none;
-            box-shadow: none;
-            flex-wrap: nowrap;
-
-            pointer-events: all;
-
-            li, li a > span {
-                margin: 0;
-                /* border: 2px solid red; */
-            }
-        }
+    .active > a span {
+      font-weight: bold;
+      border: 4px solid
+        color-mix(
+          in oklab,
+          rgb(var(--header-background-color)) 70%,
+          rgb(var(--header-color))
+        );
     }
+
+    a {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      text-decoration: none;
+      color: rgb(var(--header-color));
+      cursor: pointer;
+    }
+
+    a:hover span {
+      background-color: color-mix(
+        in oklab,
+        rgb(var(--header-background-color)) 70%,
+        rgb(var(--header-color))
+      );
+    }
+
+    a > span {
+      flex: 1 1 100%;
+      border: 4px solid #0000;
+      transition: background-color 0.1s ease-out;
+      border-radius: var(--border-radius);
+
+      line-height: 1.1;
+
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    li.depth-0 > a > span {
+      justify-content: center;
+    }
+  }
+
+  li.depth-0 > a span {
+    padding: calc(var(--indent) * 0.02) calc(var(--indent) * 0.2);
+  }
+
+  html:not(.mobile-nav)
+    nav#navigation.secondary-navbar
+    > #navigation-items
+    > ul.depth-0
+    #secondary-button {
+    grid-row: 1 / 2;
+    /* grid-column: 1 / span 10; */
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    > a {
+      display: none;
+    }
+
+    > #secondary-items {
+      flex-direction: row;
+      writing-mode: horizontal-tb;
+      padding-top: 0;
+      visibility: visible;
+      background-color: transparent;
+      --header-color: 255 255 255;
+      /* top: 0 !important; */
+      /* width: 100%; */
+      /* left: 0; */
+      right: calc(var(--indent) * 0.2);
+
+      position: absolute;
+
+      justify-content: flex-end;
+      align-items: center;
+      border: none;
+      box-shadow: none;
+      flex-wrap: nowrap;
+
+      pointer-events: all;
+
+      li,
+      li a > span {
+        margin: 0;
+        /* border: 2px solid red; */
+      }
+    }
+  }
 </style>
