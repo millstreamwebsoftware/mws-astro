@@ -36,6 +36,7 @@ spec:
 blueprint:
   content_blocks: [bookshop:structure:content_blocks]
   collapse: true
+  fullwidth: false
   layout: [1]
   content:
   classes:
@@ -53,6 +54,10 @@ _inputs:
   collapse:
     type: checkbox
     comment: Restrict to one column at small screen sizes
+  fullwidth:
+    type: checkbox
+    label: Full Width
+    comment: Allow column items to fill the full width of the page
   layout:
     type: array
     comment: Set a fixed number of columns per row. The last row will be repeated in case of extra items.

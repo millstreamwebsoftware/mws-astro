@@ -5,12 +5,13 @@ import { bookshopName } from "@mws-astro/util";
 export interface Props extends Partial<SectionProps> {
     content_blocks: any[];
     collapse?: boolean;
+    fullwidth?: boolean;
     layout?: number[];
     classes?: any;
     key?: string;
 }
 
-const { collapse, layout, key } = Astro.props;
+const { collapse = true, layout, key, fullwidth = false } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
@@ -34,31 +35,6 @@ Object.entries(componentOverrides).forEach(
     ([path, obj]: [string, any]) =>
         (components[bookshopName(path)] = obj.default),
 );
-
-// const columnCount = contentBlocks.length;
-
-// let layoutCount = columnCount;
-// let columnLayout = "";
-
-// if (layout?.length) {
-//   for (let i = 0; i < layout.length; i++) {
-//     const n = layout[i];
-
-//     if (n === 1) {
-//       columnLayout += "1fr ";
-//     } else if (n) {
-//       columnLayout += `repeat(${n}, 1fr) `;
-//     } else {
-//       columnLayout += `repeat(${layoutCount}, 1fr)`;
-//       break;
-//     }
-
-//     layoutCount -= n;
-//     if (layoutCount < 1) {
-//       break;
-//     }
-//   }
-// }
 
 // Calculate the lowest common multiple to get the minimum number of columns
 const gcd = (a: number, b: number): number => (b == 0 ? a : gcd(b, a % b));
@@ -87,7 +63,8 @@ if (layout?.length) {
             const firstColumn = start === 1;
             const lastColumn = j + 1 === rowLayout;
 
-            const columnString = `${firstColumn ? start : start + 1} / span ${subcolumn + Number(firstColumn) + Number(lastColumn)}`;
+            // const columnString = `${firstColumn ? start : start + 1} / span ${subcolumn + Number(firstColumn) + Number(lastColumn)}`;
+            const columnString = `${start} / span ${subcolumn}`;
             const rowString = `${row} / span 1`;
             const cell = {
                 "first-in-row": firstColumn,
@@ -103,15 +80,11 @@ if (layout?.length) {
 }
 
 let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
-
-// console.log(items);
-// console.log(columnLayout);
-// const columnLayout = layout?.layout?.indexOf(0);
 ---
 
 <Section component="columns" {...Astro.props}>
     <div
-        class:list={["columns", { collapse }]}
+        class:list={["columns", { collapse, fullwidth }]}
         style={{ "--columns": columns }}
         data-columns={columns}
     >
@@ -149,10 +122,15 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         display: grid;
         grid-auto-flow: row;
         grid-template-columns:
-            var(--column-gap) repeat(var(--columns), minmax(min-content, 1fr))
-            var(--column-gap);
+            calc(1fr + var(--page-max-width-padding)),
+            repeat(calc(var(--columns) - 2), minmax(min-content, 1fr)),
+            calc(1fr + var(--page-max-width-padding));
 
         background-color: rgb(var(--background-color));
+    }
+
+    div.columns.fullwidth {
+      grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
     }
 
     .columns.no-indent {
@@ -194,7 +172,15 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     .columns-item > section {
         height: 100%;
         padding: calc(var(--column-gap));
-        /* padding: 0; */
+    }
+
+    div.columns:not(.fullwidth) .columns-item {
+      &.first-in-row > section > .component-wrapper {
+        margin-left: var(--page-max-width-padding);
+      }
+      &.last-in-row > section > .component-wrapper {
+        margin-right: var(--page-max-width-padding);
+      }
     }
 
     :where(.columns) > {
@@ -212,6 +198,10 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         }
     }
 
+    :is(main, article) > section.columns[data-component="columns"] > .component-wrapper {
+      margin: 0;
+    }
+
     @media only screen and (max-width: 768px) {
         div.columns.collapse.collapse {
             --columns: 1 !important;
@@ -225,30 +215,6 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
                 > section:not(.no-indent) {
                     padding: var(--indent);
                 }
-
-                /* &:first-child > section:not(.no-indent) {
-                    padding-top: calc(var(--indent) * var(--vertical-indent));
-                }
-                &:last-child > section:not(.no-indent) {
-                    padding-bottom: calc(
-                        var(--indent) * var(--vertical-indent)
-                    );
-                } */
-
-                /* section::after {
-                    left: calc(var(--indent) * -1);
-                    right: calc(var(--indent) * -1);
-                    top: 0;
-                    bottom: 0;
-                }
-
-                &:first-child section::after {
-                    top: calc(var(--indent) * -0.5);
-                }
-
-                &:last-child section::after {
-                    bottom: calc(var(--indent) * -0.5);
-                } */
             }
         }
     }
@@ -257,28 +223,4 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
         position: relative;
         z-index: 1;
     }
-
-    /* .columns-item section.background-color::after {
-        content: "";
-        position: absolute;
-        inset: calc(var(--column-gap) * -0.5);
-        background-color: rgb(var(--background-color));
-        z-index: -1;
-    }
-
-    .columns-item.first-in-column section::after {
-        top: calc(var(--indent) * -0.5);
-    }
-
-    .columns-item.last-in-column section::after {
-        bottom: calc(var(--indent) * -0.5);
-    }
-
-    .columns-item.first-in-row section::after {
-        left: calc(var(--indent) * -1);
-    }
-
-    .columns-item.last-in-row section::after {
-        right: calc(var(--indent) * -1);
-    } */
 </style>
