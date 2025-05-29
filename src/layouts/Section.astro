@@ -86,25 +86,24 @@ const expando = classList.includes("expando") ? true : false;
     data-animation={animation}
     {id}
 >
-    {
-        background_image && (
-            <div class="background" class:list={[{ fixed: background_fixed }]}>
-                <Image
-                    image={background_image}
-                    width={preferences.page.maximum_page_width}
-                    align={background_align}
-                    opacity={background_opacity}
-                    fixed={background_fixed}
-                    fit={background_fit}
-                    background={true}
-                    loading={background_loading}
-                    quality="mid"
-                />
-            </div>
-        )
+  {[Astro.slots.has('background'),background_image,background_video].some((i) => Boolean(i)) &&
+    <div class:list={["background",{fixed: background_fixed }]}>
+      {background_image && <Image
+          image={background_image}
+          width={preferences.page.maximum_page_width}
+          align={background_align}
+          opacity={background_opacity}
+          fixed={background_fixed}
+          fit={background_fit}
+          background={true}
+          loading={background_loading}
+          quality="mid"
+      />}
+      {background_video && <Video src={background_video} background={true} />}
+      <slot name="background" />
+    </div>
     }
-    {background_video && <Video src={background_video} background={true} />}
-    <slot name="background" />
+
     <div class="component-wrapper">
         {content && <div class="text-content"><Markdown {content}/></div>}
         <slot />
@@ -167,7 +166,6 @@ const expando = classList.includes("expando") ? true : false;
 
     .background.fixed {
         clip-path: inset(0);
-        z-index: -1;
     }
 
     .component-wrapper {
@@ -192,6 +190,7 @@ const expando = classList.includes("expando") ? true : false;
         .component-wrapper {
             max-height: 100%;
             overflow: hidden;
+            mask-image: linear-gradient(to bottom, white 60%, transparent);
         }
 
         .expando-button {
@@ -206,12 +205,6 @@ const expando = classList.includes("expando") ? true : false;
         top: 50%;
         backdrop-filter: blur(4px);
         z-index: 10;
-        background: linear-gradient(
-            to bottom,
-            transparent,
-            rgb(var(--background-color)) 80%
-        );
-        // background-color: rgb(var(--background-color) / 0.5);
         mask-image: linear-gradient(to bottom, transparent, white 60%);
     }
 
@@ -230,17 +223,17 @@ const expando = classList.includes("expando") ? true : false;
     }
 
     section.expando:not([data-expando]) .expando-button {
-        bottom: calc(var(--indent) * -0.25);
+        bottom: calc(var(--indent) * .1);
     }
 
     .expando-button {
         position: absolute;
         z-index: 11;
-        // bottom: 2rem;
         left: 50%;
         display: flex;
         transform: translate(-1.5rem);
-        transition: transform 0.5s ease;
+        transition: transform 0.2s ease;
+        align-items: center;
 
         color: rgb(var(--text-color));
 
@@ -248,8 +241,9 @@ const expando = classList.includes("expando") ? true : false;
             overflow: hidden;
             white-space: nowrap;
             text-indent: 1rem;
-            transition: clip-path 0.5s ease;
+            transition: clip-path 0.2s ease;
             clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+            line-height: 1;
         }
     }
 
@@ -267,6 +261,10 @@ const expando = classList.includes("expando") ? true : false;
                 clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
             }
         }
+    }
+
+    [data-animation] {
+      /* overflow: hidden; */
     }
 
     [data-animation="fade"] {
@@ -331,6 +329,8 @@ const expando = classList.includes("expando") ? true : false;
     }
 
     [data-animation="slide-left"] {
+        overflow: hidden;
+
         .component-wrapper {
             opacity: 0;
             transform: translateX(50px);
@@ -376,21 +376,16 @@ const expando = classList.includes("expando") ? true : false;
         > section.expando:not([data-expando])
         > .expando-overlay
         .expando-button {
-        /* height: var(--indent); */
 
         bottom: calc(var(--indent) * -0.5 - 1.5rem);
     }
 
     section.image figure > img {
-        /* height: var(--height); */
-        /* height: initial; */
         position: absolute;
     }
 </style>
 
 <script>
-    // document.addEventListener("DOMContentLoaded", setupExpando);
-    // document.addEventListener("astro:after-swap", setupExpando);
     setupExpando();
     setupAnimation();
 
