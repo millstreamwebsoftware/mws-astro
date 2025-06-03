@@ -20,6 +20,10 @@ function clog<T>(a: T): T {
   return a;
 }
 
+function stripIndex(slug: string) {
+  return slug.replace(/(\/|^)index$/, "");
+}
+
 export async function getPage(id: string) {
   const frontmatter =
     (await getEntry({ collection: "pages", id })) ||
@@ -109,10 +113,9 @@ export async function getPageAncestors(
 
 export function getLink(page: CollectionEntry<"pages">) {
   return page.data.status === "online"
-    ? `/${page.id
-        .replaceAll(/(^\/|\/?$)/g, "")
-        .replace(/\.md?/, "")
-        .replace(/index?/, "")}`
+    ? `/${stripIndex(
+        page.id.replaceAll(/(^\/|\/?$)/g, "").replace(/\.md?/, ""),
+      )}`
     : page.data.link || "";
 }
 

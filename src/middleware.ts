@@ -72,7 +72,7 @@ export interface TreeNode {
 }
 
 function stripIndex(slug: string) {
-  return slug.replace(/\/?index$/, "");
+  return slug.replace(/(\/|^)index$/, "");
 }
 
 // export interface TreeNode<T extends CollectionKey> {
