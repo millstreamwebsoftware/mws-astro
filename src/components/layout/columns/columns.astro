@@ -1,14 +1,17 @@
 ---
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
 export interface Props extends Partial<SectionProps> {
-    content_blocks: any[];
-    collapse?: boolean;
-    fullwidth?: boolean;
-    layout?: number[];
-    classes?: any;
-    key?: string;
+  content_blocks: any[];
+  collapse?: boolean;
+  fullwidth?: boolean;
+  layout?: number[];
+  classes?: any;
+  key?: string;
 }
 
 const { collapse = true, layout, key, fullwidth = false } = Astro.props;
@@ -16,24 +19,24 @@ const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-    ["/src/mws-astro/src/components/**/*.astro"],
-    {
-        eager: true,
-    },
+  ["/src/mws-astro/src/components/**/*.astro"],
+  {
+    eager: true,
+  },
 );
 
 const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-    eager: true,
+  eager: true,
 });
 
 Object.entries(componentImports).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 Object.entries(componentOverrides).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 // Calculate the lowest common multiple to get the minimum number of columns
@@ -45,182 +48,181 @@ let layoutBlocks: any[] = [];
 let columns = contentBlocks.length;
 
 if (layout?.length) {
-    columns = lcmAll(layout);
+  columns = lcmAll(layout);
 
-    let row = 0;
-    let i = 0;
-    while (i < contentBlocks.length) {
-        const rowLayout = layout.at(row++) || layout.at(-1); // Use last item in array if out of bounds
-        if (typeof rowLayout === "undefined")
-            throw Error("Undefined value in layout");
-        const subcolumn = columns / rowLayout;
+  let row = 0;
+  let i = 0;
+  while (i < contentBlocks.length) {
+    const rowLayout = layout.at(row++) || layout.at(-1); // Use last item in array if out of bounds
+    if (typeof rowLayout === "undefined")
+      throw Error("Undefined value in layout");
+    const subcolumn = columns / rowLayout;
 
-        for (let j = 0; j < rowLayout; j++) {
-            const block = contentBlocks.at(i++);
-            if (!block) break;
-            const start = j * subcolumn + 1;
+    for (let j = 0; j < rowLayout; j++) {
+      const block = contentBlocks.at(i++);
+      if (!block) break;
+      const start = j * subcolumn + 1;
 
-            const firstColumn = start === 1;
-            const lastColumn = j + 1 === rowLayout;
+      const firstColumn = start === 1;
+      const lastColumn = j + 1 === rowLayout;
 
-            // const columnString = `${firstColumn ? start : start + 1} / span ${subcolumn + Number(firstColumn) + Number(lastColumn)}`;
-            const columnString = `${start} / span ${subcolumn}`;
-            const rowString = `${row} / span 1`;
-            const cell = {
-                "first-in-row": firstColumn,
-                "last-in-row": lastColumn,
-                "first-in-column": row === 1,
-                "last-in-column": contentBlocks.length - i <= rowLayout - j,
-            };
+      // const columnString = `${firstColumn ? start : start + 1} / span ${subcolumn + Number(firstColumn) + Number(lastColumn)}`;
+      const columnString = `${start} / span ${subcolumn}`;
+      const rowString = `${row} / span 1`;
+      const cell = {
+        "first-in-row": firstColumn,
+        "last-in-row": lastColumn,
+        "first-in-column": row === 1,
+        "last-in-column": contentBlocks.length - i <= rowLayout - j,
+      };
 
-            Object.assign(block, { columnString, rowString, cell });
-            layoutBlocks.push(block);
-        }
+      Object.assign(block, { columnString, rowString, cell });
+      layoutBlocks.push(block);
     }
+  }
 }
 
 let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 ---
 
 <Section component="columns" {...Astro.props}>
-    <div
-        class:list={["columns", { collapse, fullwidth }]}
-        style={{ "--columns": columns }}
-        data-columns={columns}
-    >
-        {
-            items.map((block: any, i: any) => {
-                var Component = components[block._bookshop_name];
-                if (block._bookshop_name === "layout/columns")
-                    Component = Astro.self;
-                if (Component) {
-                    return (
-                        <div
-                            style={{
-                                "grid-row": block.rowString,
-                                "grid-column": block.columnString,
-                            }}
-                            class:list={["columns-item", block.cell]}
-                        >
-                            <Component
-                                {...block}
-                                key={(key || "") + "-" + i.toString()}
-                            />
-                        </div>
-                    );
-                }
-                const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-                console.warn(warnstring);
-                return <div class="missing-component">{warnstring}</div>;
-            })
+  <div
+    class:list={["columns", { collapse, fullwidth }]}
+    style={{ "--columns": columns }}
+    data-columns={columns}
+  >
+    {
+      items.map((block: any, i: any) => {
+        var Component = components[block._bookshop_name];
+        if (block._bookshop_name === "layout/columns") Component = Astro.self;
+        if (Component) {
+          return (
+            <div
+              style={{
+                "grid-row": block.rowString,
+                "grid-column": block.columnString,
+              }}
+              class:list={["columns-item", block.cell]}
+            >
+              <Component {...block} key={(key || "") + "-" + i.toString()} />
+            </div>
+          );
         }
-    </div>
+        const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+        console.warn(warnstring);
+        return <div class="missing-component">{warnstring}</div>;
+      })
+    }
+  </div>
 </Section>
 
 <style lang="scss">
-    div.columns {
-        display: grid;
-        grid-auto-flow: row;
-        grid-template-columns:
+  div.columns {
+    display: grid;
+    grid-auto-flow: row;
+    /* grid-template-columns:
             calc(1fr + var(--page-max-width-padding)),
             repeat(calc(var(--columns) - 2), minmax(min-content, 1fr)),
-            calc(1fr + var(--page-max-width-padding));
+            calc(1fr + var(--page-max-width-padding)); */
+    grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
 
-        background-color: rgb(var(--background-color));
+    background-color: rgb(var(--background-color));
+  }
+
+  div.columns.fullwidth {
+    grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
+  }
+
+  .columns.no-indent {
+    padding: 0;
+
+    &-top {
+      padding-top: 0;
     }
-
-    div.columns.fullwidth {
-      grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
+    &-bottom {
+      padding-bottom: 0;
     }
-
-    .columns.no-indent {
-        padding: 0;
-
-        &-top {
-            padding-top: 0;
-        }
-        &-bottom {
-            padding-bottom: 0;
-        }
-        &-left {
-            padding-left: 0;
-        }
-        &-right {
-            padding-right: 0;
-        }
+    &-left {
+      padding-left: 0;
     }
-
-    .columns-item {
-        min-width: 0;
+    &-right {
+      padding-right: 0;
     }
+  }
+
+  .columns-item {
+    min-width: 0;
+  }
 </style>
 
 <style is:global lang="scss">
-    .one-two > .component-wrapper > .columns {
-        grid-template-columns: var(--column-gap) 1fr 2fr var(--column-gap);
-    }
-    .two-one > .component-wrapper > .columns {
-        grid-template-columns: var(--column-gap) 2fr 1fr var(--column-gap);
-    }
-    .one-three > .component-wrapper > .columns {
-        grid-template-columns: var(--column-gap) 1fr 3fr var(--column-gap);
-    }
-    .three-one > .component-wrapper > .columns {
-        grid-template-columns: var(--column-gap) 3fr 1fr var(--column-gap);
-    }
+  .one-two > .component-wrapper > .columns {
+    grid-template-columns: var(--column-gap) 1fr 2fr var(--column-gap);
+  }
+  .two-one > .component-wrapper > .columns {
+    grid-template-columns: var(--column-gap) 2fr 1fr var(--column-gap);
+  }
+  .one-three > .component-wrapper > .columns {
+    grid-template-columns: var(--column-gap) 1fr 3fr var(--column-gap);
+  }
+  .three-one > .component-wrapper > .columns {
+    grid-template-columns: var(--column-gap) 3fr 1fr var(--column-gap);
+  }
 
-    .columns-item > section {
-        height: 100%;
-        padding: calc(var(--column-gap));
-    }
+  .columns-item > section {
+    height: 100%;
+    padding: calc(var(--column-gap));
+  }
 
-    div.columns:not(.fullwidth) .columns-item {
-      &.first-in-row > section > .component-wrapper {
-        margin-left: var(--page-max-width-padding);
+  div.columns:not(.fullwidth) .columns-item {
+    &.first-in-row > section > .component-wrapper {
+      margin-left: var(--page-max-width-padding);
+    }
+    &.last-in-row > section > .component-wrapper {
+      margin-right: var(--page-max-width-padding);
+    }
+  }
+
+  :where(.columns) > {
+    .first-in-row > section:not(.no-indent) {
+      padding-left: var(--indent);
+    }
+    .last-in-row > section:not(.no-indent) {
+      padding-right: var(--indent);
+    }
+    .first-in-column > section:not(.no-indent) {
+      padding-top: calc(var(--indent) * var(--vertical-indent));
+    }
+    .last-in-column > section:not(.no-indent) {
+      padding-bottom: calc(var(--indent) * var(--vertical-indent));
+    }
+  }
+
+  :is(main, article)
+    > section.columns[data-component="columns"]
+    > .component-wrapper {
+    margin: 0;
+  }
+
+  @media only screen and (max-width: 768px) {
+    div.columns.collapse.collapse {
+      --columns: 1 !important;
+      /* gap: var(--indent); */
+      grid-template-columns: 1fr;
+
+      > .columns-item {
+        grid-column: 1 / 2 !important;
+        grid-row: auto !important;
+
+        > section:not(.no-indent) {
+          padding: var(--indent);
+        }
       }
-      &.last-in-row > section > .component-wrapper {
-        margin-right: var(--page-max-width-padding);
-      }
     }
+  }
 
-    :where(.columns) > {
-        .first-in-row > section:not(.no-indent) {
-            padding-left: var(--indent);
-        }
-        .last-in-row > section:not(.no-indent) {
-            padding-right: var(--indent);
-        }
-        .first-in-column > section:not(.no-indent) {
-            padding-top: calc(var(--indent) * var(--vertical-indent));
-        }
-        .last-in-column > section:not(.no-indent) {
-            padding-bottom: calc(var(--indent) * var(--vertical-indent));
-        }
-    }
-
-    :is(main, article) > section.columns[data-component="columns"] > .component-wrapper {
-      margin: 0;
-    }
-
-    @media only screen and (max-width: 768px) {
-        div.columns.collapse.collapse {
-            --columns: 1 !important;
-            /* gap: var(--indent); */
-            grid-template-columns: 1fr;
-
-            > .columns-item {
-                grid-column: 1 / 2 !important;
-                grid-row: auto !important;
-
-                > section:not(.no-indent) {
-                    padding: var(--indent);
-                }
-            }
-        }
-    }
-
-    .columns-item section {
-        position: relative;
-        z-index: 1;
-    }
+  .columns-item section {
+    position: relative;
+    z-index: 1;
+  }
 </style>
