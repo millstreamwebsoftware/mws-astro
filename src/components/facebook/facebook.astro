@@ -3,148 +3,143 @@ import Section from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
 import Icon from "@shared/icon.astro";
 
-
 export interface Props {
-  url?: string,
+  url?: string;
 }
 
-const { url: facebookURL = preferences?.general?.social.find(
-    (e) => e?.name == "facebook",
-)?.link } = Astro.props;
+const {
+  url: facebookURL = preferences?.general?.social.find((e) => {
+    const hostname = new URL(e.link).hostname.replace(/^www\./, "");
+    return hostname === "facebook.com";
+  })?.link,
+} = Astro.props;
 
 const target = facebookURL && encodeURIComponent(facebookURL);
 const embedURL =
-    target &&
-    `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=500&height=700&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
+  target &&
+  `https://www.facebook.com/plugins/page.php?href=${target}&tabs=timeline&width=500&height=700&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`;
 ---
 
 <Section component="facebook">
-    {
-        embedURL && (
-            <div class="facebox-wrapper">
-                <div class="facebox">
-                    <div class="facebox-info">
-                        <a href={facebookURL}>
-                            <Icon
-                                name="fa6-brands:square-facebook"
-                                height="1.5em"
-                            />
-                            <p>View on Facebook</p>
-                        </a>
-                    </div>
-                    <div class="facebox-loading">
-                        <span>
-                            <Icon
-                                name="svg-spinners:90-ring-with-bg"
-                                height="2rem"
-                            />
-                        </span>
-                    </div>
+  {
+    embedURL && (
+      <div class="facebox-wrapper">
+        <div class="facebox">
+          <div class="facebox-info">
+            <a href={facebookURL}>
+              <Icon name="fa6-brands:square-facebook" height="1.5em" />
+              <p>View on Facebook</p>
+            </a>
+          </div>
+          <div class="facebox-loading">
+            <span>
+              <Icon name="svg-spinners:90-ring-with-bg" height="2rem" />
+            </span>
+          </div>
 
-                    <iframe
-                        data-target={facebookURL}
-                        src={embedURL}
-                        width="500"
-                        height="700"
-                        style="border:none;overflow:hidden;"
-                        allowfullscreen="true"
-                        loading="lazy"
-                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                        onload="this.closest('.facebox')?.classList.add('loaded')"
-                    />
-                </div>
-            </div>
-        )
-    }
+          <iframe
+            data-target={facebookURL}
+            src={embedURL}
+            width="500"
+            height="700"
+            style="border:none;overflow:hidden;"
+            allowfullscreen="true"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            onload="this.closest('.facebox')?.classList.add('loaded')"
+          />
+        </div>
+      </div>
+    )
+  }
 </Section>
 
 <style lang="scss">
-    .facebox-wrapper {
-        display: grid;
-        justify-content: center;
-        justify-items: center;
-        grid-template-columns: 1fr minmax(0, 500px) 1fr;
-        width: 100%;
+  .facebox-wrapper {
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    grid-template-columns: 1fr minmax(0, 500px) 1fr;
+    width: 100%;
 
-        > * {
-            grid-column: 2 / 3;
-            grid-row: 1 / 2;
-        }
+    > * {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
     }
+  }
 
-    .facebox {
-        /* padding: 1rem 2rem 2rem; */
-        // background-color: rgb(var(--text-color));
+  .facebox {
+    /* padding: 1rem 2rem 2rem; */
+    // background-color: rgb(var(--text-color));
 
-        border-radius: var(--border-radius);
-        min-width: 340px;
-        min-height: 500px;
-    }
+    border-radius: var(--border-radius);
+    min-width: 340px;
+    min-height: 500px;
+  }
 
-    .facebox-info {
-        font-size: var(--text-size-medium);
-        // --text-color: black;
+  .facebox-info {
+    font-size: var(--text-size-medium);
+    // --text-color: black;
 
+    color: inherit;
+    margin-bottom: 1rem;
+
+    a {
+      // color: rgb(var(--background-color), 255 255 255);
+
+      display: flex;
+      gap: 1em;
+      align-items: center;
+      justify-content: space-between;
+
+      p {
         color: inherit;
-        margin-bottom: 1rem;
-
-        a {
-            // color: rgb(var(--background-color), 255 255 255);
-
-            display: flex;
-            gap: 1em;
-            align-items: center;
-            justify-content: space-between;
-
-            p {
-                color: inherit;
-                margin-bottom: 0;
-            }
-        }
+        margin-bottom: 0;
+      }
     }
+  }
 
-    .facebox-loading {
-        position: absolute;
-        width: 2rem;
-        height: 2rem;
+  .facebox-loading {
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
 
-        top: calc(50% - 1rem);
-        left: calc(50% - 1rem);
-        z-index: 1;
-    }
+    top: calc(50% - 1rem);
+    left: calc(50% - 1rem);
+    z-index: 1;
+  }
 
-    iframe {
-        position: relative;
-        z-index: 2;
-    }
+  iframe {
+    position: relative;
+    z-index: 2;
+  }
 </style>
 
 <style is:global lang="scss">
-    /* Editor Fallback */
-    facebook {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-        height: 570px;
+  /* Editor Fallback */
+  facebook {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 570px;
 
-        &::before {
-            content: "👍 Facebook Embed";
-            font-size: var(--text-size-medium);
-            color: black;
+    &::before {
+      content: "👍 Facebook Embed";
+      font-size: var(--text-size-medium);
+      color: black;
 
-            position: absolute;
-            margin-left: calc(50% - 190px);
-            top: 0;
-            left: 0;
-            width: 380px;
-            height: 570px;
-            border: 1px solid grey;
-            background-color: white;
-            border-radius: .5rem;
+      position: absolute;
+      margin-left: calc(50% - 190px);
+      top: 0;
+      left: 0;
+      width: 380px;
+      height: 570px;
+      border: 1px solid grey;
+      background-color: white;
+      border-radius: 0.5rem;
 
-            text-align: center;
-            line-height: 570px;
-        }
+      text-align: center;
+      line-height: 570px;
     }
-
+  }
 </style>
