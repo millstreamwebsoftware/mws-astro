@@ -49,6 +49,7 @@ declare global {
       show_logo_mobile: boolean;
       show_navigation: boolean;
       show_socials: boolean;
+      show_arrow: boolean;
     };
     footer: {
       foreground_color?: string;

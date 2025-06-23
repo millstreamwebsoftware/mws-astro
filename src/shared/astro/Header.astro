@@ -45,15 +45,17 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     color: rgb(var(--header-color));
     height: var(--header-height);
 
-    /* grid-template-areas: "logo secondary" "logo navigation"; */
-    /* grid-template-rows: 3.6rem 1fr; */
-
     /* grid-template-columns: auto 1fr; */
-
     /* padding: 0 var(--page-max-width-padding); */
     padding: 0;
     padding-left: var(--page-safe-left-padding);
     padding-right: var(--page-safe-right-padding);
+
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--header-background-color)),
+      rgba(var(--header-background-color-bottom))
+    );
   }
 
   #header-items {
@@ -62,12 +64,6 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     grid-template-areas: "logo navigation";
     grid-template-rows: 100%;
     grid-template-columns: 1fr auto;
-
-    background: linear-gradient(
-      to bottom,
-      rgba(var(--header-background-color)),
-      rgba(var(--header-background-color-bottom))
-    );
   }
 
   header.pinned {
@@ -99,10 +95,18 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     display: flex;
     justify-content: center;
 
+    background: none;
+
     #header-items {
       border-radius: 9999px;
       border: var(--header-border-width) solid rgb(var(--header-border-color));
       padding: 0 2rem;
+
+      background: linear-gradient(
+        to bottom,
+        rgba(var(--header-background-color)),
+        rgba(var(--header-background-color-bottom))
+      );
     }
   }
 </style>
@@ -129,8 +133,10 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     --mobile-header-color: var(--header-color);
     --header-border-radius: var(--border-radius, 0);
     --header-dropdown-padding: 1rem;
-    --header-dropdown-caret-size: 20px;
     --mobile-header-margin: 0px;
+
+    --header-arrow-size: 12px;
+    --header-arrow-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   }
 
   :where(:root:has(#header.theme-pod)) {

@@ -1,6 +1,8 @@
 ---
 import { bookshopName } from "@mws-astro/util";
 import Icon from "@shared/icon.astro";
+import _preferences from "@data/preferences.json";
+const preferences = _preferences as unknown as Preferences;
 
 export interface Props {
   title: string;
@@ -49,8 +51,8 @@ Object.entries(componentOverrides).forEach(
   <span id={`${key}-label`} class="dropdown-label"
     >{title}<Icon name="carbon:caret-down" height="1em" /></span
   >
-  <div class="dropdown-arrow"></div>
   <div class="dropdown-items">
+    {preferences.header.show_arrow && <div class="dropdown-arrow" />}
     {
       items.map((item: any, i: number) => {
         var Component = components[item._bookshop_name];
@@ -92,16 +94,12 @@ Object.entries(componentOverrides).forEach(
   );
 
   const navigation = document.getElementById("navigation");
-  // if (!navigation) return;
 
   if (navigation) {
     document.body.addEventListener("click", handleNavigationEvent);
     document.body.addEventListener("keydown", handleNavigationEvent);
     navigation.addEventListener("focusout", handleNavigationEvent);
   }
-
-  // setupDropdowns();
-  // function setupDropdowns() {}
 
   function isMobileNav(): boolean {
     return document.body.classList.contains("mobile-nav");
@@ -146,11 +144,8 @@ Object.entries(componentOverrides).forEach(
     // Close all dropdowns that do not contain the new dropdown
     closeAllDropdowns(dropdown, true);
 
-    // const dropdown =
-    //   dropdownElement ?? target.querySelector<HTMLElement>(":scope ul");
-    // if (!dropdown) return;
-    // const caret = dropdown.querySelector<HTMLElement>(
-    //   ":scope > .dropdown-caret",
+    // // const caret = dropdown.querySelector<HTMLElement>(
+    // //   ":scope > .dropdown-overlay .dropdown-arrow",
     // );
 
     const dropdownItems = dropdown.querySelector<HTMLElement>(
@@ -158,9 +153,14 @@ Object.entries(componentOverrides).forEach(
     );
     if (!dropdownItems) return;
 
+    const caret = dropdownItems.querySelector<HTMLElement>(
+      ":scope > .dropdown-arrow",
+    );
+
     const options: ComputePositionConfig = dropdownOptions(
       dropdown,
       dropdownItems,
+      caret,
     );
 
     const cleanup = autoUpdate(dropdown, dropdownItems, () => {
@@ -189,13 +189,13 @@ Object.entries(componentOverrides).forEach(
               | "left"
               | "right"
               | "bottom";
-            const directions = ["top", "right", "bottom", "left"];
-            const toPx = (i?: number) => (i ? `${i}px` : undefined);
+            const px = (i?: number) => (i ? `${i}px` : undefined);
             const d = (dir: "top" | "left" | "right" | "bottom") =>
               dir === direction;
             const computedStyles = window.getComputedStyle(
               caret.parentElement!,
             );
+            const directions = ["top", "right", "bottom", "left"];
             const borderWidth = computedStyles.borderWidth
               .split(" ")
               .map(parseLength);
@@ -203,18 +203,24 @@ Object.entries(componentOverrides).forEach(
               borderWidth.length === 1
                 ? borderWidth[0]
                 : borderWidth[(directions.indexOf(direction) + 2) % 4];
-            const caretOffset = -(caretHeight + sideBorderWidth);
+            const caretOffset = -(
+              parseLength(
+                computedStyles.getPropertyValue("--header-arrow-size"),
+              ) + sideBorderWidth
+            );
+
+            const horizontal = d("left") || d("right");
 
             Object.assign(caret.style, {
               transform: `rotate(${{ bottom: 0, left: 0.25, top: 0.5, right: 0.75 }[direction]}turn)`,
-              top:
-                ((d("left") || d("right")) && toPx(middlewareData.arrow.y)) ||
-                (d("bottom") && toPx(caretOffset)),
-              right: d("left") && toPx(caretOffset),
-              bottom: d("top") && toPx(caretOffset),
-              left:
-                ((d("top") || d("bottom")) && toPx(middlewareData.arrow.x)) ||
-                (d("right") && toPx(caretOffset)),
+              top: horizontal
+                ? px(middlewareData.arrow.y)
+                : d("bottom") && px(caretOffset),
+              right: d("left") && px(caretOffset),
+              bottom: d("top") && px(caretOffset),
+              left: !horizontal
+                ? px(middlewareData.arrow.x)
+                : d("right") && px(caretOffset),
             });
           }
         },
@@ -238,16 +244,20 @@ Object.entries(componentOverrides).forEach(
     dropdown: HTMLElement,
     caret?: HTMLElement | null,
   ): ComputePositionConfig {
-    const placement = target.dataset.placement || "bottom-start";
+    const dropdownComputedStyles = window.getComputedStyle(dropdown);
+    const placement =
+      (target.dataset.placement as Placement | undefined) || "bottom-start";
     const vertical =
       placement?.startsWith("bottom") || placement?.startsWith("top");
-    const caretOffset = caret ? caretHeight * 0.9 : 0;
+    const caretOffset = caret
+      ? parseLength(
+          dropdownComputedStyles.getPropertyValue("--header-arrow-size"),
+        ) || 0
+      : 0;
     var dropdownMainOffset = 0,
       dropdownCrossOffset = 0;
 
     if (!vertical) {
-      const dropdownComputedStyles = window.getComputedStyle(dropdown);
-
       dropdownMainOffset = parseLength(dropdownComputedStyles.paddingRight);
       dropdownCrossOffset = parseLength(dropdownComputedStyles.paddingTop);
     }
@@ -394,6 +404,27 @@ Object.entries(componentOverrides).forEach(
     &.selected > .dropdown-label {
       font-weight: bold;
       letter-spacing: 0;
+    }
+
+    .dropdown-arrow {
+      display: none;
+      position: absolute;
+
+      z-index: 899;
+
+      height: var(--header-arrow-size);
+      width: var(--header-arrow-size);
+
+      background-color: inherit;
+      clip-path: var(
+        --header-arrow-clip-path,
+        polygon(50% 0%, 0% 100%, 100% 100%)
+      );
+    }
+
+    /* &.floating.dropdown-open > .dropdown-overlay .dropdown-arrow { */
+    &.floating.dropdown-open > .dropdown-items > .dropdown-arrow {
+      display: block;
     }
   }
 </style>
