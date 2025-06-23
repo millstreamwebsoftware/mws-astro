@@ -41,6 +41,7 @@ declare global {
       }[];
     };
     header: {
+      theme?: "single" | "pod";
       logo_image: string;
       pin_header: boolean | string;
       navigation_menu_depth: number;

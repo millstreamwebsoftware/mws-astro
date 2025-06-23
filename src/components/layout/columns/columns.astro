@@ -92,7 +92,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     data-columns={columns}
   >
     {
-      items.map((block: any, i: any) => {
+      items.map((block: any, i: number) => {
         var Component = components[block._bookshop_name];
         if (block._bookshop_name === "layout/columns") Component = Astro.self;
         if (Component) {

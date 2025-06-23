@@ -1,0 +1,44 @@
+---
+import Icon from "@shared/icon.astro";
+
+export interface Props {
+  title: string;
+  link: string;
+  selected?: "selected" | "ancestor" | false;
+}
+
+const { title, link, selected } = Astro.props;
+
+const external = /^[A-z1-9+.-]*:\/\/.*/.test(link);
+---
+
+<a href={link} class:list={[{ external, selected }]}
+  >{title}{external && <Icon name="carbon:launch" height="1em" />}
+</a>
+
+<style>
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5em;
+
+    color: var(--header-color);
+    font-size: var(--header-font-size);
+    padding: var(--header-item-padding);
+    border-radius: var(--header-item-border-radius);
+
+    text-decoration: none;
+    letter-spacing: 0.08ex;
+
+    &:hover {
+      color: rgb(var(--header-hover-color));
+      background-color: rgb(var(--header-hover-background-color));
+    }
+
+    &.selected {
+      font-weight: bold;
+      letter-spacing: 0;
+    }
+  }
+</style>

@@ -20,8 +20,21 @@ function clog<T>(a: T): T {
   return a;
 }
 
+function cleanId(slug: string) {
+  // return slug.match(/^\/?(.*?)(?:\/?index)?\.?(?:md|mdx)?\/?$/)?.[1] || "";
+  return stripIndex(stripFiletype(stripSlashes(slug)));
+}
+
+function stripSlashes(slug: string) {
+  return slug.replaceAll(/(^\/|\/?$)/g, "");
+}
+
 function stripIndex(slug: string) {
   return slug.replace(/(\/|^)index$/, "");
+}
+
+function stripFiletype(slug: string) {
+  return slug.replace(/\.(md|mdx)$/, "");
 }
 
 export async function getPage(id: string) {
@@ -37,18 +50,17 @@ export async function getPageChildren(
   id: string,
   collection: CollectionKey = "pages",
 ) {
-  const idFragments = id
-    .replaceAll(/(^\/|\/?$)/g, "")
+  const idFragments = stripSlashes(id)
     .split("/")
     .filter((i) => i.length);
 
   const filter: Parameters<typeof getCollection<typeof collection>>[1] = ({
-    id: EntryId,
+    id: entryId,
     collection,
     data,
   }) => {
     if (collection === "pages" && data.status !== "online") return false;
-    const entryFragments = EntryId.replaceAll(/(^\/|\/?$)/g, "").split("/");
+    const entryFragments = stripSlashes(entryId).split("/");
 
     if (entryFragments.at(-1) === "index.md") entryFragments.pop();
     if (entryFragments.length !== idFragments.length + 1) return false;
@@ -69,8 +81,7 @@ export async function getPageAncestors(
   id: string,
   collection: CollectionKey = "pages",
 ) {
-  const idFragments = id
-    .replaceAll(/(^\/|\/?$)/g, "")
+  const idFragments = stripSlashes(id)
     .split("/")
     .filter((i) => i.length);
 
@@ -113,9 +124,7 @@ export async function getPageAncestors(
 
 export function getLink(page: CollectionEntry<"pages">) {
   return page.data.status === "online"
-    ? `/${stripIndex(
-        page.id.replaceAll(/(^\/|\/?$)/g, "").replace(/\.md?/, ""),
-      )}`
+    ? `/${cleanId(page.id)}`
     : page.data.link || "";
 }
 
@@ -126,4 +135,82 @@ export function getSelected(page: CollectionEntry<"pages">, id: string) {
   // const entryFragments = page.id.split("/");
   // if (entryFragments.at(-1) === "index.md") entryFragments.pop();
   // if (entryFragments.length > idFragments.length) return false;
+}
+
+export interface TreeRoot {
+  children: Record<string, TreeNode<CollectionKey>>;
+}
+
+export interface TreeNode<T extends CollectionKey> {
+  id: string;
+  collection?: T;
+  data?: CollectionEntry<T>["data"];
+  children?: Record<string, TreeNode<CollectionKey>>;
+  parent?: TreeNode<CollectionKey> | TreeRoot;
+  selected?: "selected" | "ancestor" | null;
+}
+
+export function getTree(
+  items: CollectionEntry<CollectionKey>[],
+  { select, depth }: { select?: string; depth?: number } = {},
+) {
+  const tree: TreeRoot = { children: {} };
+
+  const treeItems: Array<TreeNode<CollectionKey>> = Array.from(items)
+    .map((item) => ({
+      id: cleanId(item.id),
+      collection: item.collection,
+      data: item.data,
+      selected: null,
+    }))
+    .filter((i) => !(depth && i.id.split("/").length > depth));
+
+  // Sort by path depth - ensuring parents are before descendants if they exist (breadth-first)
+  treeItems.sort((a, b) =>
+    a.id.split("/").length - b.id.split("/").length ||
+    (a.data?.order !== undefined && b.data?.order !== undefined)
+      ? a.data!.order - b.data!.order
+      : 0,
+  );
+
+  let selectedItem: TreeNode<CollectionKey> | undefined;
+
+  treeItems.forEach((item) => {
+    const fragments = item.id.split("/");
+    let cursor: TreeRoot | TreeNode<CollectionKey> = tree;
+    let parent: TreeNode<CollectionKey> | undefined = undefined;
+
+    for (var i = 0; i < fragments.length; i++) {
+      if (!("children" in cursor)) cursor.children = {};
+
+      if (!cursor.children!.hasOwnProperty(fragments[i])) {
+        cursor.children![fragments[i]] = {
+          id: cursor.children!.id + `/${fragments[i]}`,
+        };
+      }
+
+      cursor = cursor.children![fragments[i]];
+      cursor.parent = parent;
+      parent = cursor;
+    }
+
+    Object.assign(cursor, item);
+
+    if ("id" in cursor && select === cursor.id) {
+      selectedItem = cursor;
+    }
+  });
+
+  if (selectedItem) {
+    selectedItem.selected = "selected";
+
+    while (true) {
+      if (!(selectedItem && selectedItem.parent && "id" in selectedItem.parent))
+        break;
+      selectedItem = selectedItem.parent;
+      selectedItem.selected = "ancestor";
+    }
+  }
+
+  return tree;
 }

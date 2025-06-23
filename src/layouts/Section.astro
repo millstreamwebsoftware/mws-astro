@@ -10,432 +10,470 @@ import Video from "@shared/Video.astro";
 import Markdown from "@shared/Markdown.astro";
 
 export interface Props {
-    component: string;
-    height?: number;
-    color?: string;
-    content?: string;
-    align?: ["top", "center", "bottom"];
-    animation?: "fade" | "blur" | "slide-up" | "slide-right" | "slide-down" | "slide-left" | "grow" | "flare";
-    background_color?: string;
-    background_image?: string;
-    background_video?: string;
-    background_align?: CssAlign;
-    background_opacity?: number;
-    background_fixed?: boolean;
-    background_fit?: "cover" | "contain";
-    background_loading?: "eager" | "lazy";
-    classes?: any;
-    style?: Record<string, any>;
-    indent?: "no-indent" | "no-indent-left" | "no-indent-top" | "no-indent-right" | "no-indent-bottom" | boolean;
-    key?: string;
-    section?: any;
+  component: string;
+  height?: number;
+  color?: string;
+  content?: string;
+  align?: ["top", "center", "bottom"];
+  animation?:
+    | "fade"
+    | "blur"
+    | "slide-up"
+    | "slide-right"
+    | "slide-down"
+    | "slide-left"
+    | "grow"
+    | "flare";
+  background_color?: string;
+  background_image?: string;
+  background_video?: string;
+  background_align?: CssAlign;
+  background_opacity?: number;
+  background_fixed?: boolean;
+  background_fit?: "cover" | "contain";
+  background_loading?: "eager" | "lazy";
+  classes?: any;
+  style?: Record<string, any>;
+  indent?:
+    | "no-indent"
+    | "no-indent-left"
+    | "no-indent-top"
+    | "no-indent-right"
+    | "no-indent-bottom"
+    | boolean;
+  key?: string;
+  section?: any;
 }
 
 const {
-    component,
-    height,
-    color,
-    content,
-    animation,
-    background_color,
-    background_image,
-    background_video,
-    background_align,
-    background_opacity,
-    background_fixed,
-    background_fit,
-    background_loading,
-    classes,
-    style,
-    key,
+  component,
+  height,
+  color,
+  content,
+  animation,
+  background_color,
+  background_image,
+  background_video,
+  background_align,
+  background_opacity,
+  background_fixed,
+  background_fit,
+  background_loading,
+  classes,
+  style,
+  key,
 } = Object.assign({}, Astro.props, Astro.props?.section);
 
 const background = background_color && convertColorString(background_color);
 const textColor = color && convertColorString(color);
 const id = `${component}-${key}`;
-const indent = typeof Astro.props.indent === "boolean" ? !Astro.props.indent && "no-indent" : Astro.props.indent;
+const indent =
+  typeof Astro.props.indent === "boolean"
+    ? !Astro.props.indent && "no-indent"
+    : Astro.props.indent;
 
 const align = Astro.props.align && "section-" + Astro.props.align;
 
 const classList = clsx(classes).split(" ");
 
 const stickers = classList // Resolve classes like class:list
-    .filter((cl) => cl.startsWith("sticker-"));
+  .filter((cl) => cl.startsWith("sticker-"));
 
 const expando = classList.includes("expando") ? true : false;
 ---
 
 <section
-    style={{
-        ...(background && { "--background-color": background }),
-        ...(textColor && {
-            "--text-color": textColor,
-            "--heading-color": "var(--text-color)", // Needs to be redefined to update the value in this context
-        }),
-        ...(height && { "--height": height }),
-        ...style,
-    }}
-    class:list={[
-        component,
-        classes,
-        indent,
-        align,
-        { "background-color": background },
-    ]}
-    data-component={component}
-    data-animation={animation}
-    {id}
+  style={{
+    ...(background && { "--background-color": background }),
+    ...(textColor && {
+      "--text-color": textColor,
+      "--heading-color": "var(--text-color)", // Needs to be redefined to update the value in this context
+    }),
+    ...(height && { "--height": height }),
+    ...style,
+  }}
+  class:list={[
+    component,
+    classes,
+    indent,
+    align,
+    { "background-color": background },
+  ]}
+  data-component={component}
+  data-animation={animation}
+  {id}
 >
-  {[Astro.slots.has('background'),background_image,background_video].some((i) => Boolean(i)) &&
-    <div class:list={["background",{fixed: background_fixed }]}>
-      {background_image && <Image
-          image={background_image}
-          width={preferences.page.maximum_page_width}
-          align={background_align}
-          opacity={background_opacity}
-          fixed={background_fixed}
-          fit={background_fit}
-          background={true}
-          loading={background_loading}
-          quality="mid"
-      />}
-      {background_video && <Video src={background_video} background={true} />}
-      <slot name="background" />
-    </div>
-    }
+  {
+    [Astro.slots.has("background"), background_image, background_video].some(
+      (i) => Boolean(i),
+    ) && (
+      <div class:list={["background", { fixed: background_fixed }]}>
+        {background_image && (
+          <Image
+            image={background_image}
+            width={preferences.page.maximum_page_width}
+            align={background_align}
+            opacity={background_opacity}
+            fixed={background_fixed}
+            fit={background_fit}
+            background={true}
+            loading={background_loading}
+            quality="mid"
+          />
+        )}
+        {background_video && <Video src={background_video} background={true} />}
+        <slot name="background" />
+      </div>
+    )
+  }
 
-    <div class="component-wrapper">
-        {content && <div class="text-content"><Markdown {content}/></div>}
-        <slot />
-    </div>
+  <div class="component-wrapper">
     {
-        stickers.map((sticker) => {
-            return <Sticker name={sticker.replace(/^sticker-/, "")} />;
-        })
+      content && (
+        <div class="text-content">
+          <Markdown {content} />
+        </div>
+      )
     }
-    {
-        expando && (
-            <div class="expando-overlay">
-                <div class="expando-button" data-for={id}>
-                    <Icon name="fa6-solid:circle-chevron-down" height="3rem" />
-                    <p>Expand</p>
-                </div>
-            </div>
-        )
-    }
+    <slot />
+  </div>
+  {
+    stickers.map((sticker) => {
+      return <Sticker name={sticker.replace(/^sticker-/, "")} />;
+    })
+  }
+  {
+    expando && (
+      <div class="expando-overlay">
+        <div class="expando-button" data-for={id}>
+          <Icon name="fa6-solid:circle-chevron-down" height="3rem" />
+          <p>Expand</p>
+        </div>
+      </div>
+    )
+  }
 </section>
 
 <style lang="scss">
-    section {
-        position: relative;
-        /* height: max(var(--height), fit-content); */
+  section {
+    position: relative;
+    /* height: max(var(--height), fit-content); */
 
-        min-height: calc((var(--height) * 1vh) - var(--header-offset-transparent));
+    min-height: calc(
+      (var(--height) * 1vh) - var(--header-offset-transparent, 0px)
+    );
 
-        --indent: var(--root-indent);
-        padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
-        z-index: 0;
-        width: 100%;
+    --indent: var(--root-indent);
+    padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
+    z-index: 0;
+    width: 100%;
 
-        display: flex;
-        /* flex-direction: column; */
-        align-items: stretch;
-    }
+    display: flex;
+    /* flex-direction: column; */
+    align-items: stretch;
+  }
 
-    section.columns {
-        padding: 0;
-    }
+  section.columns {
+    padding: 0;
+  }
 
-    section.image {
-        user-select: none;
-        /* min-height: var(--height); */
-        /* height: min(var(--height), 100%); */
-    }
+  section.image {
+    user-select: none;
+    /* min-height: var(--height); */
+    /* height: min(var(--height), 100%); */
+  }
 
-    :not(section.richtext) > * > .text-content {
-        margin-bottom: var(--column-gap);
-    }
+  :not(section.richtext) > * > .text-content {
+    margin-bottom: var(--column-gap);
+  }
 
-    .background {
-        user-select: none;
-        pointer-events: none;
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-    }
+  .background {
+    user-select: none;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
 
-    .background.fixed {
-        clip-path: inset(0);
-    }
+  .background.fixed {
+    clip-path: inset(0);
+  }
+
+  .component-wrapper {
+    width: 100%;
+    /* height: 100%; */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  section.section-centre .component-wrapper,
+  section.section-center .component-wrapper {
+    justify-content: center;
+  }
+  section.section-bottom .component-wrapper {
+    justify-content: flex-end;
+  }
+
+  section[data-expando] {
+    height: calc(30vh + (var(--indent) * 2));
 
     .component-wrapper {
-        width: 100%;
-        /* height: 100%; */
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-
-    section.section-centre .component-wrapper,
-    section.section-center .component-wrapper {
-        justify-content: center;
-    }
-    section.section-bottom .component-wrapper {
-        justify-content: flex-end;
-    }
-
-    section[data-expando] {
-        height: calc(30vh + (var(--indent) * 2));
-
-        .component-wrapper {
-            max-height: 100%;
-            overflow: hidden;
-            mask-image: linear-gradient(to bottom, white 60%, transparent);
-        }
-
-        .expando-button {
-            bottom: calc(var(--indent) * 0.5 - 1.5rem);
-        }
-    }
-
-    [data-expando] > .expando-overlay::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        top: 50%;
-        backdrop-filter: blur(4px);
-        z-index: 10;
-        mask-image: linear-gradient(to bottom, transparent, white 60%);
-    }
-
-    .expando-overlay {
-        cursor: pointer;
-    }
-
-    section.columns .expando-overlay {
-        padding-bottom: 5rem;
-        margin-top: -2rem;
-    }
-    section:is(.no-indent, .no-indent-bottom) {
-        .expando-overlay {
-            padding-bottom: 5rem;
-        }
-    }
-
-    section.expando:not([data-expando]) .expando-button {
-        bottom: calc(var(--indent) * .1);
+      max-height: 100%;
+      overflow: hidden;
+      mask-image: linear-gradient(to bottom, white 60%, transparent);
     }
 
     .expando-button {
-        position: absolute;
-        z-index: 11;
-        left: 50%;
-        display: flex;
-        transform: translate(-1.5rem);
-        transition: transform 0.2s ease;
-        align-items: center;
+      bottom: calc(var(--indent) * 0.5 - 1.5rem);
+    }
+  }
 
-        color: rgb(var(--text-color));
+  [data-expando] > .expando-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    top: 50%;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    mask-image: linear-gradient(to bottom, transparent, white 60%);
+  }
 
-        p {
-            overflow: hidden;
-            white-space: nowrap;
-            text-indent: 1rem;
-            transition: clip-path 0.2s ease;
-            clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
-            line-height: 1;
-        }
+  .expando-overlay {
+    cursor: pointer;
+  }
+
+  section.columns .expando-overlay {
+    padding-bottom: 5rem;
+    margin-top: -2rem;
+  }
+  section:is(.no-indent, .no-indent-bottom) {
+    .expando-overlay {
+      padding-bottom: 5rem;
+    }
+  }
+
+  section.expando:not([data-expando]) .expando-button {
+    bottom: calc(var(--indent) * 0.1);
+  }
+
+  .expando-button {
+    position: absolute;
+    z-index: 11;
+    left: 50%;
+    display: flex;
+    transform: translate(-1.5rem);
+    transition: transform 0.2s ease;
+    align-items: center;
+
+    color: rgb(var(--text-color));
+
+    p {
+      overflow: hidden;
+      white-space: nowrap;
+      text-indent: 1rem;
+      transition: clip-path 0.2s ease;
+      clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+      line-height: 1;
+    }
+  }
+
+  .expando-overlay:hover .expando-button {
+    transform: translate(-50%);
+    p {
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+  }
+
+  @media (hover: none) {
+    .expando-button {
+      transform: translate(-50%);
+      p {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+      }
+    }
+  }
+
+  [data-animation] {
+    /* overflow: hidden; */
+  }
+
+  [data-animation="fade"] {
+    .component-wrapper {
+      opacity: 0;
+      transition: opacity 0.8s ease;
     }
 
-    .expando-overlay:hover .expando-button {
-        transform: translate(-50%);
-        p {
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-        }
+    &.scrolled .component-wrapper {
+      opacity: 1;
+    }
+  }
+
+  [data-animation="blur"] {
+    .component-wrapper {
+      filter: blur(5px);
+      transition: filter 0.8s ease;
     }
 
-    @media (hover: none) {
-        .expando-button {
-            transform: translate(-50%);
-            p {
-                clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-            }
-        }
+    &.scrolled .component-wrapper {
+      filter: blur(0px);
+    }
+  }
+
+  [data-animation="slide-up"] {
+    .component-wrapper {
+      opacity: 0;
+      transform: translateY(50px);
+      transition:
+        transform 0.8s ease,
+        opacity 0.8s ease;
     }
 
-    [data-animation] {
-      /* overflow: hidden; */
+    &.scrolled .component-wrapper {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+  }
+
+  [data-animation="slide-right"] {
+    .component-wrapper {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition:
+        transform 0.8s ease,
+        opacity 0.8s ease;
     }
 
-    [data-animation="fade"] {
-        .component-wrapper {
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
+    &.scrolled .component-wrapper {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }
 
-        &.scrolled .component-wrapper {
-            opacity: 1;
-        }
+  [data-animation="slide-down"] {
+    .component-wrapper {
+      opacity: 0;
+      transform: translateY(-50px);
+      transition:
+        transform 0.8s ease,
+        opacity 0.8s ease;
     }
 
-    [data-animation="blur"] {
-        .component-wrapper {
-            filter: blur(5px);
-            transition: filter 0.8s ease;
-        }
+    &.scrolled .component-wrapper {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+  }
 
-        &.scrolled .component-wrapper {
-            filter: blur(0px);
-        }
+  [data-animation="slide-left"] {
+    overflow: hidden;
+
+    .component-wrapper {
+      opacity: 0;
+      transform: translateX(50px);
+      transition:
+        transform 0.8s ease,
+        opacity 0.8s ease;
     }
 
-    [data-animation="slide-up"] {
-        .component-wrapper {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-        }
+    &.scrolled .component-wrapper {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }
 
-        &.scrolled .component-wrapper {
-            opacity: 1;
-            transform: translateY(0px);
-        }
+  [data-animation="grow"] {
+    .component-wrapper {
+      opacity: 0;
+      transform: scale(0.8);
+      transition:
+        transform 0.8s ease,
+        opacity 0.8s ease;
     }
 
-    [data-animation="slide-right"] {
-        .component-wrapper {
-            opacity: 0;
-            transform: translateX(-50px);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-        }
+    &.scrolled .component-wrapper {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-        &.scrolled .component-wrapper {
-            opacity: 1;
-            transform: translateX(0px);
-        }
+  [data-animation="flare"] {
+    .component-wrapper {
+      opacity: 0;
+      filter: drop-shadow(0px 0px 20px white) brightness(5);
+      transition:
+        filter 0.8s ease,
+        opacity 0.8s ease;
     }
 
-    [data-animation="slide-down"] {
-        .component-wrapper {
-            opacity: 0;
-            transform: translateY(-50px);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-        }
-
-        &.scrolled .component-wrapper {
-            opacity: 1;
-            transform: translateY(0px);
-        }
+    &.scrolled .component-wrapper {
+      opacity: 1;
+      filter: drop-shadow(0px 0px 0px white) brightness(1);
     }
-
-    [data-animation="slide-left"] {
-        overflow: hidden;
-
-        .component-wrapper {
-            opacity: 0;
-            transform: translateX(50px);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-        }
-
-        &.scrolled .component-wrapper {
-            opacity: 1;
-            transform: translateX(0px);
-        }
-    }
-
-
-    [data-animation="grow"] {
-        .component-wrapper {
-            opacity: 0;
-            transform: scale(0.8);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-        }
-
-        &.scrolled .component-wrapper {
-            opacity: 1;
-            transform: scale(1.0);
-        }
-    }
-
-    [data-animation="flare"] {
-        .component-wrapper {
-            opacity: 0;
-            filter: drop-shadow(0px 0px 20px white) brightness(5);
-            transition: filter 0.8s ease, opacity 0.8s ease;
-        }
-
-        &.scrolled .component-wrapper {
-            opacity: 1;
-            filter: drop-shadow(0px 0px 0px white) brightness(1);
-        }
-    }
+  }
 </style>
 
 <style is:global>
-    .columns-item
-        > section.expando:not([data-expando])
-        > .expando-overlay
-        .expando-button {
+  .columns-item
+    > section.expando:not([data-expando])
+    > .expando-overlay
+    .expando-button {
+    bottom: calc(var(--indent) * -0.5 - 1.5rem);
+  }
 
-        bottom: calc(var(--indent) * -0.5 - 1.5rem);
-    }
-
-    section.image figure > img {
-        position: absolute;
-    }
+  section.image figure > img {
+    position: absolute;
+  }
 </style>
 
 <script>
-    setupExpando();
-    setupAnimation();
+  setupExpando();
+  setupAnimation();
 
-    function setupExpando() {
-        const expandos = Array.from(
-            document.querySelectorAll(".expando-overlay"),
-        );
+  function setupExpando() {
+    const expandos = Array.from(document.querySelectorAll(".expando-overlay"));
 
-        expandos.forEach((expando) => {
-            expando.parentElement?.setAttribute("data-expando", "collapsed");
-            expando.addEventListener("click", (e) => {
-                const t = e?.currentTarget as HTMLElement;
-                if (!t) return;
-                const buttonIcon = t.querySelector(".expando-button .icon");
-                const buttonText = t.querySelector(".expando-button p");
-                const buttonOffset = buttonIcon?.getBoundingClientRect()?.top;
-                let state = t?.parentElement?.toggleAttribute("data-expando");
-                console.log(buttonOffset);
+    expandos.forEach((expando) => {
+      expando.parentElement?.setAttribute("data-expando", "collapsed");
+      expando.addEventListener("click", (e) => {
+        const t = e?.currentTarget as HTMLElement;
+        if (!t) return;
+        const buttonIcon = t.querySelector(".expando-button .icon");
+        const buttonText = t.querySelector(".expando-button p");
+        const buttonOffset = buttonIcon?.getBoundingClientRect()?.top;
+        let state = t?.parentElement?.toggleAttribute("data-expando");
+        console.log(buttonOffset);
 
-                if (buttonText)
-                    buttonText.innerHTML = state ? "Expand" : "Collapse";
-                if (buttonIcon) buttonIcon.classList.toggle("rot180", !state);
+        if (buttonText) buttonText.innerHTML = state ? "Expand" : "Collapse";
+        if (buttonIcon) buttonIcon.classList.toggle("rot180", !state);
 
-                // Scroll button to match old viewport position when collapsing
-                if (state && buttonOffset) {
-                    const newButtonBounds = buttonIcon?.getBoundingClientRect();
-                    const newButtonOffset = newButtonBounds
-                        ? newButtonBounds?.top + window.scrollY
-                        : undefined;
+        // Scroll button to match old viewport position when collapsing
+        if (state && buttonOffset) {
+          const newButtonBounds = buttonIcon?.getBoundingClientRect();
+          const newButtonOffset = newButtonBounds
+            ? newButtonBounds?.top + window.scrollY
+            : undefined;
 
-                    if (newButtonOffset)
-                        window.scrollTo({
-                            behavior: "instant",
-                            top: newButtonOffset - buttonOffset,
-                        });
-                }
+          if (newButtonOffset)
+            window.scrollTo({
+              behavior: "instant",
+              top: newButtonOffset - buttonOffset,
             });
-        });
-    }
-
-    function setupAnimation() {
-      const animatedSections = Array.from(document.querySelectorAll("section[data-animation]"));
-      const observer = new IntersectionObserver((intersections) => {
-        intersections.forEach((intersect) => {
-          intersect.target.classList.toggle("scrolled", intersect.isIntersecting);
-        });
+        }
       });
+    });
+  }
 
-      animatedSections.forEach((section) =>
-        observer.observe(section)
-      );
-    }
+  function setupAnimation() {
+    const animatedSections = Array.from(
+      document.querySelectorAll("section[data-animation]"),
+    );
+    const observer = new IntersectionObserver((intersections) => {
+      intersections.forEach((intersect) => {
+        intersect.target.classList.toggle("scrolled", intersect.isIntersecting);
+      });
+    });
+
+    animatedSections.forEach((section) => observer.observe(section));
+  }
 </script>

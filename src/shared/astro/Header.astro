@@ -3,14 +3,9 @@ import _preferences from "@data/preferences.json";
 const preferences = _preferences as unknown as Preferences;
 import Navigation from "./SiteNavigation.astro";
 
-export interface Props {
-  id?: string;
-  currentPath?: string;
-}
+export interface Props {}
 
-const theme: "pod" | "agency" | undefined = undefined;
-
-const { id, currentPath } = Astro.props;
+const theme: "pod" | "single" = preferences.header.theme || "single";
 ---
 
 <header
@@ -23,17 +18,19 @@ const { id, currentPath } = Astro.props;
     [`theme-${theme}`]: !!theme,
   }}
 >
-  {
-    preferences.header.show_logo && (
-      <a class="logo" href="/" title="Home">
-        <img
-          src={preferences.header.logo_image}
-          alt={`${preferences.general.site_name} Logo`}
-        />
-      </a>
-    )
-  }
-  {preferences.header.show_navigation && <Navigation {id} {currentPath} />}
+  <div id="header-items">
+    {
+      preferences.header.show_logo && (
+        <a class="logo" href="/" title="Home">
+          <img
+            src={preferences.header.logo_image}
+            alt={`${preferences.general.site_name} Logo`}
+          />
+        </a>
+      )
+    }
+    {preferences.header.show_navigation && <Navigation />}
+  </div>
 </header>
 
 <style>
@@ -42,27 +39,35 @@ const { id, currentPath } = Astro.props;
     left: 0;
     right: 0;
     top: 0;
-    display: grid;
+
     z-index: 8000;
     --text-color: var(--header-color);
     color: rgb(var(--header-color));
     height: var(--header-height);
-    background: linear-gradient(
-      to bottom,
-      rgba(var(--header-background-color)),
-      rgba(var(--header-background-color-bottom))
-    );
-
-    grid-template-areas: "logo navigation";
-    grid-template-rows: 100%;
-    grid-template-columns: 1fr auto;
 
     /* grid-template-areas: "logo secondary" "logo navigation"; */
     /* grid-template-rows: 3.6rem 1fr; */
 
     /* grid-template-columns: auto 1fr; */
 
-    padding: 0 var(--page-max-width-padding);
+    /* padding: 0 var(--page-max-width-padding); */
+    padding: 0;
+    padding-left: var(--page-safe-left-padding);
+    padding-right: var(--page-safe-right-padding);
+  }
+
+  #header-items {
+    height: 100%;
+    display: grid;
+    grid-template-areas: "logo navigation";
+    grid-template-rows: 100%;
+    grid-template-columns: 1fr auto;
+
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--header-background-color)),
+      rgba(var(--header-background-color-bottom))
+    );
   }
 
   header.pinned {
@@ -89,20 +94,60 @@ const { id, currentPath } = Astro.props;
   }
 
   .theme-pod {
-    border-radius: 9999px;
-    /* overflow: hidden; */
-    border: 2px solid rgb(var(--header-color));
-    /* margin: 1rem calc(4rem + var(--page-max-width-padding, 0)); */
+    margin-top: 1rem;
 
-    width: fit-content;
-    margin-left: 50%;
-    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
 
-    padding: 0 2rem;
+    #header-items {
+      border-radius: 9999px;
+      border: var(--header-border-width) solid rgb(var(--header-border-color));
+      padding: 0 2rem;
+    }
   }
 </style>
 
 <style lang="scss" is:global>
+  :where(:root) {
+    --header-background-color: 0 0 0 / 0.6;
+    --header-background-color-bottom: 0 0 0 / 0.3;
+    --header-color: 255 255 255;
+    --header-height: 80px;
+    --header-offset-transparent: 0px;
+    --header-hover-highlight: 40 40 40;
+
+    --header-font-size: var(--text-size-small);
+    --header-hover-color: var(--text-color);
+    --header-hover-background-color: var(--color-accent);
+    --header-item-padding: 0.5rem 1rem;
+    --header-item-border-radius: var(--border-radius);
+
+    --mobile-header-background-color: var(--header-background-color);
+    --mobile-header-background-color-bottom: var(
+      --header-background-color-bottom
+    );
+    --mobile-header-color: var(--header-color);
+    --header-border-radius: var(--border-radius, 0);
+    --header-dropdown-padding: 1rem;
+    --header-dropdown-caret-size: 20px;
+    --mobile-header-margin: 0px;
+  }
+
+  :where(:root:has(#header.theme-pod)) {
+    --header-height: 60px;
+    --header-offset-transparent: 0px;
+    --header-background-color: 240 240 240;
+    --header-background-color-bottom: var(--header-background-color);
+    --header-color: 0 0 0;
+    --header-hover-highlight: var(--color-accent);
+    --header-border-color: 220 220 220;
+    --header-border-width: 2px;
+    --header-border-radius: 20px;
+    --header-item-border-radius: 20px;
+    --header-dropdown-padding: 1rem;
+    --mobile-header-margin: 1rem;
+  }
+
   header .secondary ul.social {
     padding: 0;
   }

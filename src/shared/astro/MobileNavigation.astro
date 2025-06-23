@@ -1,0 +1,299 @@
+---
+import Icon from "./icon.astro";
+---
+
+<>
+  <div id="mobile-nav-buttons">
+    <button id="mobile-nav-menu" aria-expanded="false">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+      >
+        <g
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+        >
+          <path d="M5 12H19">
+            <animate
+              id="fwd"
+              begin="indefinite"
+              fill="freeze"
+              attributeName="d"
+              dur="0.2s"
+              values="M5 12H19;M12 12H12"></animate>
+            <animate
+              id="bwd"
+              begin="indefinite"
+              fill="freeze"
+              attributeName="d"
+              dur="0.2s"
+              values="M12 12H12;M5 12H19"></animate>
+            <set fill="freeze" attributeName="opacity" begin="fwd.end" to="0"
+            ></set>
+            <set fill="freeze" attributeName="opacity" begin="bwd.begin" to="1"
+            ></set>
+          </path>
+          <path d="M5 5L19 5M5 19L19 19">
+            <animate
+              begin="fwd.begin+0.1s"
+              fill="freeze"
+              attributeName="d"
+              dur="0.2s"
+              values="M5 5L19 5M5 19L19 19;M5 5L19 19M5 19L19 5"></animate>
+            <animate
+              begin="bwd.begin"
+              fill="freeze"
+              attributeName="d"
+              dur="0.2s"
+              values="M5 5L19 19M5 19L19 5;M5 5L19 5M5 19L19 19"></animate>
+          </path>
+        </g>
+      </svg>
+    </button>
+    <a id="mobile-nav-home" href="/">
+      <Icon name="fa6-solid:house" height="2rem" />
+    </a>
+  </div>
+  <!-- <div id="mobile-nav-overlay"></div> -->
+</>
+
+<script>
+  const navigation = document.getElementById("navigation");
+  const mobileNavButton = document.getElementById("mobile-nav-menu");
+  const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+
+  mobileNavButton?.addEventListener("click", () => {
+    setModalState();
+  });
+
+  mobileNavOverlay?.addEventListener("click", () => {
+    setModalState(false);
+  });
+
+  /**
+   * Opens and closes the mobile navigation menu
+   * @param open optionally override the toggle
+   */
+  function setModalState(open?: boolean) {
+    let newState = navigation?.classList.toggle("expanded", open);
+    if (newState === undefined) return;
+    mobileNavButton?.setAttribute("aria-expanded", newState.toString());
+
+    // Trigger SVG animation
+    mobileNavButton
+      ?.querySelector<SVGAnimationElement>(
+        `svg animate#${newState ? "fwd" : "bwd"}`,
+      )
+      ?.beginElement();
+
+    // Fix/Unfix body to prevent scrolling through the menu
+    if (newState) {
+      document.body.style.top = `-${window.scrollY}px`;
+      document.documentElement.classList.toggle("mobile-noscroll", true);
+    } else {
+      const scrollY = document.body.style.top;
+      document.documentElement.classList.toggle("mobile-noscroll", false);
+      document.body.style.top = "";
+      window.scrollTo({
+        left: 0,
+        top: parseInt(scrollY || "0") * -1,
+        behavior: "instant",
+      });
+    }
+  }
+</script>
+
+<style lang="scss">
+  #mobile-nav-buttons {
+    display: none;
+    z-index: 1000;
+    position: fixed;
+    bottom: env(safe-area-inset-bottom, 0);
+    left: 0;
+    width: 100vw;
+    padding-bottom: 1rem;
+    grid-template-areas: "left center right";
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+    touch-action: manipulation;
+    background-color: rgba(0 0 0 / 0.001);
+
+    :is(button, a) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgb(var(--mobile-header-color));
+      backdrop-filter: blur(4px);
+      background-color: rgb(var(--mobile-header-background-color));
+      border: 2px solid rgb(var(--color-accent));
+      padding: 2rem;
+      border-radius: 6rem;
+      bottom: 0.5rem;
+      width: var(--mobile-nav-button-size, 8rem);
+      height: 8rem;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 10rem;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+
+      background: linear-gradient(
+        to top,
+        rgb(var(--mobile-header-background-color)),
+        transparent
+      );
+    }
+
+    #mobile-nav-menu {
+      pointer-events: all;
+      grid-area: center;
+      box-shadow: 0 0 2rem #0005;
+      z-index: 10;
+    }
+
+    #mobile-nav-home {
+      opacity: 0;
+      pointer-events: none;
+      grid-area: left;
+      border: 2px solid rgb(var(--color-accent));
+      transform: translate(calc(25vw + 3rem)) scale(0.5);
+      transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+      z-index: 5;
+    }
+  }
+
+  #mobile-nav-overlay {
+    display: none;
+    pointer-events: none;
+    position: fixed;
+    inset: -1px;
+    z-index: -1;
+    background-color: #0000;
+    transition: background-color 0.3s ease;
+  }
+</style>
+
+<style lang="scss" is:global>
+  html.mobile-noscroll.mobile-nav {
+    overflow: hidden;
+
+    & > body {
+      position: fixed;
+      overflow: hidden;
+      width: min(100%, var(--page-max-width));
+    }
+  }
+
+  html.mobile-noscroll:not(.mobile-nav) > body {
+    top: 0 !important;
+  }
+
+  /* Mobile Navigation Visible */
+  #navigation.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+
+    /* iOS 26 workaround */
+    background-color: rgba(0 0 0 / 0.002);
+
+    --header-font-size: var(--text-size-xlarge);
+
+    #mobile-nav-buttons {
+      display: grid;
+    }
+
+    #mobile-nav-overlay {
+      z-index: 998;
+    }
+
+    #navigation-bars {
+      display: flex;
+      flex-direction: column;
+
+      background: linear-gradient(
+        to bottom,
+        rgb(var(--mobile-header-background-color)),
+        rgb(var(--mobile-header-background-color-bottom))
+      );
+
+      backdrop-filter: blur(4px);
+
+      border: var(--header-border-width) solid rgb(var(--header-border-color));
+      border-radius: var(--header-border-radius);
+
+      width: calc(100vw - (var(--mobile-header-margin) * 2));
+      max-height: calc(100dvh - (var(--mobile-header-margin) * 2));
+      padding: 1rem;
+      padding-bottom: calc(10rem + env(safe-area-inset-bottom, 0));
+      margin: var(--mobile-header-margin);
+
+      position: relative;
+      /* max-height: 100dvh; */
+      overflow-y: scroll;
+      overscroll-behavior: contain;
+
+      /* box-shadow: 0 0 10rem #0003; */
+      margin-right: 0;
+
+      transition:
+        clip-path 0.3s ease-in-out,
+        opacity 0.3s ease-out,
+        transform 0.3s ease;
+
+      clip-path: circle(2rem at 50% calc(100% - 12rem));
+      opacity: 0;
+      transform: translate(0 10rem);
+    }
+
+    .navigation-items {
+      display: contents;
+    }
+
+    /* Mobile Navigation Modal Open */
+    &.expanded {
+      #mobile-nav-buttons::after {
+        /* opacity: 1; */
+        /* pointer-events: all; */
+      }
+
+      #mobile-nav-home {
+        pointer-events: initial;
+        transform: translate(0) scale(1);
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      #navigation-bars {
+        visibility: visible;
+        clip-path: circle(150% at 50% calc(100% - 4.5rem));
+        pointer-events: initial;
+        transform: translate(0 0);
+        opacity: 1;
+      }
+
+      #mobile-nav-overlay {
+        display: block;
+        pointer-events: all;
+        background-color: #0004;
+      }
+    }
+  }
+</style>

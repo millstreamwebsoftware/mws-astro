@@ -3,6 +3,14 @@
 :where(:root) {
   --page-max-width: 1920px;
   --page-max-width-padding: calc(max(100vw - var(--page-max-width), 0vw) * 0.5);
+  --page-safe-left-padding: max(
+    var(--page-max-width-padding),
+    env(safe-area-inset-left)
+  );
+  --page-safe-right-padding: max(
+    var(--page-max-width-padding),
+    env(safe-area-inset-right)
+  );
 
   --root-indent: min(8vw, calc(var(--page-max-width) * 0.08));
   --indent: var(--root-indent);
@@ -27,29 +35,10 @@
   --color-primary: 24 58 78;
   --color-accent: 80 167 205;
   --text-color: var(--color-primary);
-  --heading-color: var(--text-color);
 
   --page-background-color: 255 255 255;
   --page-background-shadow: 0 0 0 / 0.3;
   --article-background-color: var(--page-background-color);
-
-  --header-background-color: 0 0 0 / 0.6;
-  --header-background-color-bottom: 0 0 0 / 0.3;
-  --header-color: 255 255 255;
-  --header-height: 100px;
-  --header-offset-transparent: 0px;
-
-  /* --nav-dropdown-border */
-
-  --mobile-header-background-color: var(--header-background-color);
-  --mobile-header-background-color-bottom: var(
-    --header-background-color-bottom
-  );
-  --mobile-header-color: var(--header-color);
-
-  --border-radius: 0.3rem;
-  --border-color: var(--text-color);
-  --border-width: 2px;
 
   --info-color: 147 205 223;
   --warning-color: 233 205 115;

@@ -1,0 +1,103 @@
+---
+import preferences from "@data/preferences.json";
+import Icon from "@shared/icon.astro";
+
+export interface Props {
+  // align?: string;
+  // "show-text"?: boolean;
+  socials?: [{ icon?: string; name: string; link: string }];
+}
+
+// const { align, "show-text": text } = Astro.props;
+
+const socialItems = Astro.props.socials?.length
+  ? Astro.props.socials
+  : preferences.general.social;
+
+function getIcon(link: string) {
+  if (link.startsWith("tel:")) return "fa6-solid:square-phone";
+  if (link.startsWith("mailto:")) return "fa6-solid:square-envelope";
+
+  const hostname = new URL(link).hostname.replace(/^www\./, "");
+  return (
+    {
+      "twitter.com": "fa6-brands:square-x-twitter",
+      "x.com": "fa6-brands:square-x-twitter",
+      "facebook.com": "fa6-brands:square-facebook",
+      "instagram.com": "fa6-brands:square-instagram",
+      "linkedin.com": "fa6-brands:linkedin",
+      "wa.me": "fa6-brands:square-whatsapp",
+      "youtube.com": "fa6-brands:square-youtube",
+    }[hostname] || "fa6-solid:square-up-right"
+  );
+}
+
+const socials: Record<string, string>[] = socialItems.map((s: any) => ({
+  icon: s.icon ?? getIcon(s.link),
+  link: s.link,
+  text: s.text,
+}));
+---
+
+<div class:list={["social"]}>
+  {
+    socials.map(
+      (s) =>
+        !!s.link && (
+          <a
+            href={s.link}
+            class="social-item"
+            rel="noopener noreferrer"
+            target="_blank"
+            title={s.title}
+          >
+            {s.icon && <Icon name={s.icon} height={"1.8em"} />}
+            {s.text && <span>{s.text}</span>}
+          </a>
+        ),
+    )
+  }
+</div>
+
+<style lang="scss">
+  .social {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    align-items: center;
+    padding: var(--header-item-padding);
+    padding-top: 0;
+    padding-bottom: 0;
+    gap: 1em;
+  }
+
+  a {
+    display: flex;
+    color: inherit;
+    font-size: inherit;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    text-decoration: none;
+
+    span {
+      margin: 0 0.5em;
+      white-space: nowrap;
+    }
+  }
+
+  .social-item {
+    width: min-content;
+  }
+
+  .social-item:hover {
+    color: rgb(var(--header-hover-background-color));
+  }
+</style>
+
+<style lang="scss" is:global>
+  navigation.mobile-nav .social {
+    justify-content: center;
+  }
+</style>

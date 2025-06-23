@@ -1,0 +1,32 @@
+# Metadata about this component, to be used in the CMS
+spec:
+  structures:
+    - secondary_navigation
+  label: Search
+  description: Add a search bar to the secondary navigation
+  icon: search
+  tags: []
+
+# Defines the structure of this component, as well as the default values
+blueprint:
+  hide:
+  endpoint:
+  param:
+
+_inputs:
+  hide:
+    type: choice
+    options:
+      values:
+        - highlight
+        - collapse
+  endpoint:
+    type: text
+    comment: Override the search destination. Defaults to "/search", but could be set to https://google.com/search or https://duckduckgo.com/ for example.
+  param:
+    type: text
+    comment: Override the search parameter. Defaults to "q" (e.g. /search?q=your+search), but can be changed for sites which use a different parameter.
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint

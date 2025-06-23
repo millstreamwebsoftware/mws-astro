@@ -1,0 +1,96 @@
+---
+import { bookshopName } from "@mws-astro/util";
+import { getTree, urlToId, type TreeNode } from "@mws-astro/navigation";
+import { getCollection, type CollectionKey } from "astro:content";
+
+export interface Props {
+  collection: CollectionKey;
+  show_home?: boolean;
+  depth?: number;
+  key: string;
+}
+
+const { collection, show_home = true, depth, key } = Astro.props;
+
+const components: Record<string, any> = {};
+const componentImports = import.meta.glob(
+  ["/src/mws-astro/src/components/navigation/**/*.astro"],
+  {
+    eager: true,
+  },
+);
+
+const componentOverrides = import.meta.glob(
+  ["/src/components/navigation/**/*.astro"],
+  {
+    eager: true,
+  },
+);
+
+Object.entries(componentImports).forEach(
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
+);
+
+Object.entries(componentOverrides).forEach(
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
+);
+
+function createTitle(id: string) {
+  return id
+    ?.split("/")
+    .at(-1)
+    ?.replaceAll("-", " ")
+    .replace(
+      /\w\S*/g,
+      (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase(),
+    );
+}
+
+function createNavBlock(item: TreeNode<CollectionKey>): any {
+  if (item.data?.status === "offline" || item.data?.status === "hidden")
+    return [];
+
+  if (item.children) {
+    return {
+      _bookshop_name: "navigation/dropdown",
+      id: item.id,
+      title: item.data?.title || createTitle(item.id) || "",
+      items: Object.values(item.children).flatMap(createNavBlock),
+      selected: item.selected,
+    };
+  }
+
+  if (item.data?.status === "meta" && !item.data?.link) return [];
+
+  return {
+    _bookshop_name: "navigation/link",
+    id: item.id,
+    title: item.data?.title || createTitle(item.id) || "",
+    link:
+      item.data?.status === "online" ? `/${item.id}` : item.data?.link || "",
+    selected: item.selected,
+  };
+}
+
+const tree = getTree(await getCollection(collection), {
+  select: urlToId(Astro.request.url),
+  depth,
+});
+const items = Object.values(tree.children).flatMap(createNavBlock);
+---
+
+<>
+  {
+    items.map((item: any, i: number) => {
+      var Component = components[item._bookshop_name];
+
+      if (item.id === "" && !show_home) return;
+
+      if (Component) {
+        return <Component {...item} key={(key || "") + "-" + i.toString()} />;
+      }
+    })
+  }
+</>

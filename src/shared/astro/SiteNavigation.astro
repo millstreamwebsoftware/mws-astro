@@ -1,37 +1,26 @@
 ---
-import Icon from "./icon.astro";
 import preferences from "@data/preferences.json";
 import { bookshopName } from "@mws-astro/util";
-import type { TreeNode } from "@mws-astro/middleware";
+import MobileNavigation from "./MobileNavigation.astro";
 
-export interface Props {
-  pages?: TreeNode;
-  id?: string;
-  depth?: number;
-  currentPath?: string;
-}
+export interface Props {}
 
 const prefs: Record<string, any> | typeof preferences = preferences;
-const depth = typeof Astro.props.depth === "number" ? ++Astro.props.depth : 0;
-const pages: TreeNode = Astro.props.pages ?? Astro.locals.tree; // If not given input - start with global nav
-const Wrapper = depth ? Fragment : "nav";
-const Items = depth ? Fragment : "div";
-const showHome = prefs?.header?.show_home ?? true;
-const showCaret = prefs?.header?.show_caret ?? true;
 const placement = prefs?.header?.center_dropdowns ? "bottom" : "bottom-start";
-const dropdownCaret = prefs?.header?.dropdown_caret ?? "fa6-solid:caret-down";
-
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/**/*.astro"],
+  ["/src/mws-astro/src/components/navigation/**/*.astro"],
   {
     eager: true,
   },
 );
 
-const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-  eager: true,
-});
+const componentOverrides = import.meta.glob(
+  ["/src/components/navigation/**/*.astro"],
+  {
+    eager: true,
+  },
+);
 
 Object.entries(componentImports).forEach(
   ([path, obj]: [string, any]) =>
@@ -43,260 +32,64 @@ Object.entries(componentOverrides).forEach(
     (components[bookshopName(path)] = obj.default),
 );
 
+const primary = prefs.header?.navigation || [
+  { _bookshop_name: "navigation/collection", collection: "pages" },
+];
+
 const secondary: any = prefs.header?.secondary_navigation || [];
-const secondaryNavbar =
-  (prefs?.header?.secondary_navbar ?? true) && secondary.length;
+const navBars = [primary, secondary];
 ---
 
-<Wrapper
+<nav
   id="navigation"
   role="navigation"
   aria-label="Main menu"
   data-placement={placement}
-  class:list={{
-    "secondary-navbar": secondaryNavbar,
-  }}
 >
-  {
-    !depth && (
-      <>
-        <div id="mobile-nav-buttons">
-          <button id="mobile-nav-menu" aria-expanded="false">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-            >
-              <g
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-              >
-                <path d="M5 12H19">
-                  <animate
-                    id="fwd"
-                    begin="indefinite"
-                    fill="freeze"
-                    attributeName="d"
-                    dur="0.2s"
-                    values="M5 12H19;M12 12H12"
-                  />
-                  <animate
-                    id="bwd"
-                    begin="indefinite"
-                    fill="freeze"
-                    attributeName="d"
-                    dur="0.2s"
-                    values="M12 12H12;M5 12H19"
-                  />
-                  <set
-                    fill="freeze"
-                    attributeName="opacity"
-                    begin="fwd.end"
-                    to="0"
-                  />
-                  <set
-                    fill="freeze"
-                    attributeName="opacity"
-                    begin="bwd.begin"
-                    to="1"
-                  />
-                </path>
-                <path d="M5 5L19 5M5 19L19 19">
-                  <animate
-                    begin="fwd.begin+0.1s"
-                    fill="freeze"
-                    attributeName="d"
-                    dur="0.2s"
-                    values="M5 5L19 5M5 19L19 19;M5 5L19 19M5 19L19 5"
-                  />
-                  <animate
-                    begin="bwd.begin"
-                    fill="freeze"
-                    attributeName="d"
-                    dur="0.2s"
-                    values="M5 5L19 19M5 19L19 5;M5 5L19 5M5 19L19 19"
-                  />
-                </path>
-              </g>
-            </svg>
-          </button>
-          <a id="mobile-nav-home" href="/">
-            <Icon name="fa6-solid:house" height="2rem" />
-          </a>
-        </div>
-        <div id="mobile-nav-overlay" />
-      </>
-    )
-  }
+  <MobileNavigation />
+  <div id="navigation-bars">
+    {
+      navBars.map((items: any, i: number) => {
+        if (!items.length) return; // Don't generate wrappers for empty bars
 
-  <Items id="navigation-items">
-    <ul class:list={[`depth-${depth}`]}>
-      {
-        pages?.href && (
-          <li
-            class:list={[
-              {
-                selected: pages.selected === 2,
-              },
-              `depth-${depth}`,
-            ]}
+        return (
+          <div
+            class="navigation-items"
+            class:list={[i ? "secondary" : "primary"]}
           >
-            {/* Add parent to child dropdown */}
-            <a
-              aria-selected={pages.selected === 2 ? "true" : "false"}
-              href={pages.href}
-            >
-              <span>{pages?.title}</span>
-            </a>
-          </li>
-        )
-      }
-      {
-        pages?.children &&
-          Object.values(pages.children).map((page: TreeNode) => {
-            // Online  -- children if any visible
-            // Meta    -- visible if children or link
-            // Hidden  -- hide
-            // Offline -- hide
-
-            // Hide self and children if Hidden of Offline
-            if (page.status === "hidden" || page.status === "offline") return;
-
-            // Check if we have children to display
-            const children =
-              page.children &&
-              Object.keys(page.children)?.length &&
-              Object.values(page.children).some(
-                (child) =>
-                  child.status === "online" ||
-                  (child.status === "meta" && child.link) ||
-                  (child.children && Object.keys(child.children).length),
-              );
-
-            // Hide meta pages without visible children or a link
-            if (page.status !== "online" && !children && !page.href) return;
-
-            // Skip home element if show_home is false
-            if (!showHome && page.href === "/") return;
-
-            // Skip pages that are not from the "pages" collection
-            if (page.collection && page.collection != "pages") return;
-
-            const id = `nav-${
-              page.slug || page.title?.toLowerCase().replaceAll(" ", "-")
-            }`;
-            return (
-              <Fragment>
-                <li
-                  class:list={[
-                    {
-                      active: page.selected,
-                      selected: page.selected === 2,
-                      children,
-                    },
-                    `depth-${depth}`,
-                  ]}
-                  aria-haspopup={children ? "menu" : undefined}
-                  aria-labelledby={id}
-                >
-                  <a
-                    tabindex="0"
-                    aria-selected={page.selected === 2 ? "true" : "false"}
-                    href={children ? undefined : (page.href ?? page.link)}
-                  >
-                    <span {id}>
-                      {page?.title}
-                      {children && (
-                        <div class="dropdown-indicator">
-                          <Icon name={dropdownCaret} height="1.2em" />
-                        </div>
-                      )}
-                    </span>
-                  </a>
-
-                  {children && <Astro.self depth={depth} pages={page} />}
-                </li>
-              </Fragment>
-            );
-          })
-      }
-      {!!depth && showCaret && <div class="dropdown-caret" />}
-      {
-        !depth && !!secondary.length && (
-          <li id="secondary-button" class:list={[`depth-${depth}`]}>
-            <a href={pages.href}>
-              <span>
-                Quicklinks
-                <div class="dropdown-indicator">
-                  <Icon name="fa6-solid:caret-down" height="1.2em" />
-                </div>
-              </span>
-            </a>
-            <ul id="secondary-items" class:list={["secondary", `depth-1`]}>
-              {secondary.map((block: any, i: number) => {
-                const Component = components[block._bookshop_name];
-                if (Component) {
-                  return (
-                    <li>
-                      <Component
-                        {...block}
-                        _blocks={secondary}
-                        key={String(i)}
-                      />
-                    </li>
-                  );
-                }
-                const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-                console.warn(warnstring);
-                return <div class="missing-component">{warnstring}</div>;
-              })}
-            </ul>
-          </li>
-        )
-      }
-    </ul>
-  </Items>
-</Wrapper>
+            {items.map((item: any, i: number) => {
+              var Component = components[item._bookshop_name];
+              if (Component) {
+                return (
+                  <div class:list={["navigation-item"]}>
+                    <Component
+                      {...item}
+                      horizontal={false}
+                      key={"navi-" + i.toString()}
+                    />
+                  </div>
+                );
+              } else {
+                console.warn(
+                  `[Navigation] Component "${item._bookshop_name}" could not be found.`,
+                );
+              }
+            })}
+          </div>
+        );
+      })
+    }
+  </div>
+</nav>
 
 <script>
-  import {
-    computePosition,
-    type ComputePositionConfig,
-    type Placement,
-    autoUpdate,
-    offset,
-    shift,
-    flip,
-    size,
-    arrow,
-    type SizeOptions,
-  } from "@floating-ui/dom";
-
   setupNavigation();
 
   function setupNavigation() {
     const navigation = document.getElementById("navigation");
-    const secondary = document.getElementById("secondary-items");
-    const mobileNavButton = document.getElementById("mobile-nav-menu");
-    const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
-    const verticalPlacement: Placement =
-      (navigation &&
-        (navigation.dataset?.placement as Placement | undefined)) ||
-      "bottom-start";
-    const caretHeight = 20;
+    const navItems = navigation?.querySelector("#navigation-bars");
+    if (!navigation || !navItems) return;
 
-    // const navTarget = null;
-    if (!navigation) return;
-    document.body.addEventListener("click", handleNavigationEvent);
-    document.body.addEventListener("keydown", handleNavigationEvent);
-    navigation.addEventListener("focusout", handleNavigationEvent);
-
-    const secondaryNavbar = navigation.matches(".secondary-navbar");
-    const navItems = navigation.querySelector("#navigation-items");
     var mobileNavWidth = 768;
 
     function resizeHandler() {
@@ -312,7 +105,7 @@ const secondaryNavbar =
         mobileNavWidth = navItems.scrollWidth + rect.left;
       }
 
-      document.documentElement.classList.toggle("mobile-nav", isMobileNav());
+      document.body.classList.toggle("mobile-nav", isMobileNav());
       navigation?.classList.toggle("mobile-nav", isMobileNav());
     }
 
@@ -320,305 +113,11 @@ const secondaryNavbar =
     resizeHandler();
 
     /**
-     * Close the dropdown of a given element, and cleanup
-     * @param target element to close the dropdown of
-     */
-    function closeNav(target: HTMLElement) {
-      if ("_cleanup" in target && target._cleanup instanceof Function) {
-        target._cleanup();
-      }
-    }
-
-    /**
-     * Close all dropdowns decending from target
-     * @param target defaults to navigation if unset
-     * @param inverse close all dropdowns outside of target
-     */
-    function closeAllNav(target?: HTMLElement | undefined, inverse?: boolean) {
-      if (!navigation) throw Error("Navigation not found.");
-      if (target === undefined) target = navigation;
-      if (inverse) {
-        Array.from(navigation.querySelectorAll<HTMLElement>(".dropdown-open"))
-          .filter((d) => !d.contains(target as Node))
-          .forEach(closeNav);
-      } else
-        target
-          ?.querySelectorAll<HTMLElement>(".dropdown-open")
-          .forEach(closeNav);
-    }
-
-    /**
-     * Open the dropdown of the target element
-     * @param target element to open the dropdown of
-     * @param dropdownElement dropdown to open (optional)
-     */
-    function openNav(target: FloatingUIElement, dropdownElement?: HTMLElement) {
-      // Close all dropdowns that do not contain the new dropdown
-      closeAllNav(target, true);
-
-      if (
-        target.matches("#secondary-button") &&
-        secondaryNavbar &&
-        !isMobileNav()
-      )
-        return;
-
-      const dropdown =
-        dropdownElement ?? target.querySelector<HTMLElement>(":scope ul");
-      if (!dropdown) return;
-      const caret = dropdown.querySelector<HTMLElement>(
-        ":scope > .dropdown-caret",
-      );
-
-      const options: ComputePositionConfig = dropdownOptions(
-        target,
-        dropdown,
-        caret,
-      );
-
-      const cleanup = autoUpdate(target, dropdown, () => {
-        computePosition(target, dropdown, options).then(
-          ({ x, y, middlewareData, placement }) => {
-            if (isMobileNav()) {
-              Object.assign(dropdown.style, {
-                left: null,
-                top: null,
-              });
-              return;
-            }
-
-            Object.assign(dropdown.style, {
-              left: `${x}px`,
-              top: `${y}px`,
-            });
-
-            if (middlewareData.arrow && caret) {
-              const direction = placement.replace(/-.*/, "") as
-                | "top"
-                | "left"
-                | "right"
-                | "bottom";
-              const directions = ["top", "right", "bottom", "left"];
-              const toPx = (i?: number) => (i ? `${i}px` : undefined);
-              const d = (dir: "top" | "left" | "right" | "bottom") =>
-                dir === direction;
-              const computedStyles = window.getComputedStyle(
-                caret.parentElement!,
-              );
-              const borderWidth = computedStyles.borderWidth
-                .split(" ")
-                .map(parseLength);
-              const sideBorderWidth =
-                borderWidth.length === 1
-                  ? borderWidth[0]
-                  : borderWidth[(directions.indexOf(direction) + 2) % 4];
-              const caretOffset = -(caretHeight + sideBorderWidth);
-
-              Object.assign(caret.style, {
-                transform: `rotate(${{ bottom: 0, left: 0.25, top: 0.5, right: 0.75 }[direction]}turn)`,
-                top:
-                  ((d("left") || d("right")) && toPx(middlewareData.arrow.y)) ||
-                  (d("bottom") && toPx(caretOffset)),
-                right: d("left") && toPx(caretOffset),
-                bottom: d("top") && toPx(caretOffset),
-                left:
-                  ((d("top") || d("bottom")) && toPx(middlewareData.arrow.x)) ||
-                  (d("right") && toPx(caretOffset)),
-              });
-            }
-          },
-        );
-      });
-
-      target._cleanup = () => {
-        cleanup();
-
-        target.classList.remove("dropdown-open");
-        target.setAttribute("aria-expanded", "false");
-        dropdown.classList.remove("open");
-        dropdown.setAttribute("style", "");
-      };
-
-      target.setAttribute("aria-expanded", "true");
-      target.classList.add("dropdown-open");
-      dropdown.classList.add("open");
-    }
-
-    function dropdownOptions(
-      target: HTMLElement,
-      dropdown: HTMLElement,
-      caret?: HTMLElement | null,
-    ): ComputePositionConfig {
-      const vertical = target.classList.contains("depth-0");
-      const placement = vertical ? verticalPlacement : "right-start";
-      const caretOffset = caretHeight * 0.9 * Number(!!caret);
-      var dropdownMainOffset = 0,
-        dropdownCrossOffset = 0;
-
-      if (!vertical) {
-        const dropdownComputedStyles = window.getComputedStyle(dropdown);
-
-        dropdownMainOffset = parseLength(dropdownComputedStyles.paddingRight);
-        dropdownCrossOffset = parseLength(dropdownComputedStyles.paddingTop);
-      }
-
-      const resizeHandler: SizeOptions["apply"] = ({
-        rects,
-        elements,
-        availableHeight,
-      }) => {
-        if (isMobileNav()) {
-          Object.assign(elements.floating.style, {
-            maxHeight: null,
-            minWidth: null,
-          });
-          return;
-        }
-        Object.assign(elements.floating.style, {
-          maxHeight: `${availableHeight}px`,
-          minWidth: `${rects.reference.width}px`,
-        });
-      };
-
-      return {
-        placement,
-        strategy: "fixed",
-        middleware: [
-          offset({
-            mainAxis: caretOffset + dropdownMainOffset,
-            crossAxis: -dropdownCrossOffset,
-          }),
-          size({ apply: resizeHandler, padding: 10 }),
-          shift({ padding: 10 }),
-          !vertical && flip(),
-          caret && arrow({ element: caret }),
-        ],
-      };
-    }
-
-    /**
-     * Attempt to convert a css length value (px) to a number, otherwise return 0
-     * @param length css pixel length string
-     */
-    function parseLength(length: string) {
-      if (length.endsWith("px")) return Number.parseInt(length);
-      console.warn(`String '${length}' could not be parsed as a length.`);
-      return 0;
-    }
-
-    /**
      * Query to test if mobile nav should be shown
      */
     function isMobileNav(): boolean {
       return window.innerWidth <= mobileNavWidth;
     }
-
-    /**
-     * Update dropdown state after event
-     * @param this
-     * @param e
-     */
-    function handleNavigationEvent(this: HTMLElement, e: Event) {
-      if (e instanceof FocusEvent && e.type === "focusout") {
-        if (
-          e.relatedTarget &&
-          !navigation?.contains(e.relatedTarget as Element)
-        )
-          closeAllNav();
-        return;
-      }
-
-      if (e instanceof KeyboardEvent) {
-        switch (e.key) {
-          case "Escape":
-            closeAllNav();
-
-          default:
-            return;
-
-          case " ":
-          case "Enter":
-        }
-      }
-
-      const target: HTMLElement | null = (e.target as HTMLElement).closest(
-        "li, #navigation",
-      );
-
-      if (target && target.id === "secondary-button" && secondary) {
-        const state = !target.classList.contains("dropdown-open");
-
-        if (state) {
-          openNav(target, secondary);
-        } else {
-          closeNav(target);
-          closeAllNav(target);
-        }
-
-        return;
-      }
-
-      if (
-        !target ||
-        target.id === "navigation" ||
-        false // !target.classList.contains("children")
-      ) {
-        closeAllNav();
-        return;
-      }
-
-      const state = !target.classList.contains("dropdown-open");
-
-      if (state) {
-        // Dropdown Open
-        openNav(target);
-      } else {
-        // Dropdown close
-        closeNav(target);
-        closeAllNav(target);
-      }
-    }
-
-    /**
-     * Opens and closes the mobile navigation menu
-     * @param open optionally override the toggle
-     */
-    function setModalState(open?: boolean) {
-      let newState = navigation?.classList.toggle("expanded", open);
-      if (newState === undefined) return;
-      mobileNavButton?.setAttribute("aria-expanded", newState.toString());
-
-      // Trigger SVG animation
-      mobileNavButton
-        ?.querySelector<SVGAnimationElement>(
-          `svg animate#${newState ? "fwd" : "bwd"}`,
-        )
-        ?.beginElement();
-
-      // Fix/Unfix body to prevent scrolling through the menu
-      if (newState) {
-        document.body.style.top = `-${window.scrollY}px`;
-        document.documentElement.classList.toggle("mobile-noscroll", true);
-      } else {
-        const scrollY = document.body.style.top;
-        document.documentElement.classList.toggle("mobile-noscroll", false);
-        document.body.style.top = "";
-        window.scrollTo({
-          left: 0,
-          top: parseInt(scrollY || "0") * -1,
-          behavior: "instant",
-        });
-      }
-    }
-
-    // Mobile Nav
-    mobileNavButton?.addEventListener("click", () => {
-      setModalState();
-    });
-
-    mobileNavOverlay?.addEventListener("click", () => {
-      setModalState(false);
-    });
   }
 </script>
 
@@ -626,426 +125,50 @@ const secondaryNavbar =
   nav {
     z-index: 999;
     overflow: hidden;
-    grid-template-areas: "logo navigation";
+    font-size: var(--header-font-size);
 
-    ul {
-      list-style-type: none;
-      padding: 0;
+    #navigation-bars {
+      z-index: 999;
     }
 
-    li {
-      margin: 0;
-      line-height: 1;
-    }
-
-    #navigation-items {
-      height: 100%;
-    }
-
-    li.depth-0 > a span {
-      border-top: 0;
-      border-left: 0;
-      border-right: 0;
-      height: 100%;
-    }
-
-    .active > a span {
-      font-weight: bold;
-      border: 4px solid
-        color-mix(
-          in oklab,
-          rgb(var(--header-background-color)) 70%,
-          rgb(var(--header-color))
-        );
-    }
-
-    a {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      flex-direction: row;
-      text-decoration: none;
-      color: rgb(var(--header-color));
-      cursor: pointer;
-    }
-
-    a:hover span {
-      background-color: color-mix(
-        in oklab,
-        rgb(var(--header-background-color)) 70%,
-        rgb(var(--header-color))
-      );
-    }
-
-    a > span {
-      flex: 1 1 100%;
-      border: 4px solid #0000;
-      padding: 5px 10px;
-      border-radius: var(--border-radius);
-      line-height: 1.1;
-      display: flex;
-      align-items: center;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 1rem;
-
-      user-select: none;
-    }
-  }
-
-  #mobile-nav-buttons {
-    display: none;
-    z-index: 1000;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100vw;
-    padding-bottom: 1rem;
-    grid-template-areas: "left center right";
-    grid-template-columns: repeat(3, 1fr);
-    align-items: center;
-    justify-items: center;
-
-    :is(button, a) {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgb(var(--mobile-header-color));
-
-      backdrop-filter: blur(4px);
-
-      background-color: rgb(var(--mobile-header-background-color));
-      border: 2px solid rgb(var(--color-accent));
-      padding: 2rem;
-      border-radius: 6rem;
-      bottom: 0.5rem;
-      width: var(--mobile-nav-button-size, 8rem);
-      height: 8rem;
-    }
-
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 10rem;
-      z-index: 0;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-
-      background: linear-gradient(
-        to top,
-        rgb(var(--mobile-header-background-color)),
-        transparent
-      );
-    }
-
-    #mobile-nav-menu {
-      pointer-events: all;
-      grid-area: center;
-      box-shadow: 0 0 2rem #0005;
-      z-index: 10;
-    }
-
-    #mobile-nav-home {
-      opacity: 0;
-      pointer-events: none;
-      grid-area: left;
-      border: 2px solid rgb(var(--color-accent));
-      transform: translate(calc(25vw + 3rem)) scale(0.5);
-      transition:
-        transform 0.3s ease,
-        opacity 0.3s ease;
-      z-index: 5;
-    }
-  }
-
-  #mobile-nav-overlay {
-    display: none;
-    pointer-events: none;
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-color: #0000;
-    transition: background-color 0.3s ease;
-  }
-
-  /* Mobile Navigation Visible */
-  .mobile-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-    max-height: 100vh;
-
-    #mobile-nav-buttons {
-      display: grid;
-    }
-
-    #mobile-nav-overlay {
-      display: block;
-    }
-
-    #navigation-items {
-      background: linear-gradient(
-        to bottom,
-        rgb(var(--mobile-header-background-color)),
-        rgb(var(--mobile-header-background-color-bottom))
-      );
-
-      backdrop-filter: blur(4px);
-
-      position: relative;
-      max-height: 100vh;
-      overflow-y: scroll;
-      overscroll-behavior: contain;
-
-      box-shadow: 0 0 10rem #0003;
-      margin-right: 0;
-
-      transition:
-        clip-path 0.3s ease-in-out,
-        opacity 0.3s ease-out,
-        transform 0.3s ease;
-
-      clip-path: circle(2rem at 50% calc(100% - 12rem));
-      opacity: 0;
-      transform: translate(0 10rem);
-    }
-
-    ul {
-      flex-direction: column;
-    }
-
-    ul.depth-0 {
-      margin: 2rem 2rem 10rem;
-
-      height: fit-content;
-      flex-direction: column;
-
-      ul {
-        margin-left: 3vw;
+    &:not(.mobile-nav) {
+      #navigation-bars {
+        display: grid;
         position: relative;
-        top: 0 !important;
-        left: 0 !important;
-        display: none;
+        height: var(--header-height);
+
+        grid-template-columns: minmax(0, 100%);
+        grid-template-rows: 1fr;
+        gap: 0.25rem;
+
+        &:has(> .secondary) {
+          grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
+
+          > .primary {
+            grid-row: 2 / 3;
+          }
+
+          > .secondary {
+            --header-font-size: var(--text-size-xsmall);
+            grid-row: 1 / 2;
+            font-size: var(--header-font-size);
+          }
+        }
       }
 
-      ul.open {
+      .navigation-items {
         display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+
+        /* .navigation-item {
+          display: contents;
+        } */
       }
     }
 
-    /* Mobile Navigation Modal Open */
-    &.expanded {
-      #mobile-nav-buttons::after {
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      #mobile-nav-home {
-        pointer-events: initial;
-        transform: translate(0) scale(1);
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      #navigation-items {
-        clip-path: circle(150% at 50% calc(100% - 4.5rem));
-        pointer-events: initial;
-        transform: translate(0 0);
-        opacity: 1;
-      }
-
-      #mobile-nav-overlay {
-        display: block;
-        pointer-events: all;
-        background-color: #0004;
-      }
-    }
-  }
-
-  .dropdown-open > a .dropdown-indicator {
-    transform: rotate(180deg);
-  }
-
-  /* Desktop Navigation */
-  html:not(.mobile-nav) #navigation {
-    ul.depth-0 {
-      height: 100%;
-      gap: 0.5vw;
-
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-auto-columns: auto;
-      grid-auto-flow: column;
-      grid-row-gap: 0;
-
-      width: 100%;
-      position: relative;
-    }
-
-    &.secondary-navbar {
-      ul.depth-0 {
-        grid-template-rows: 3.6rem 1fr;
-      }
-
-      li.depth-0 {
-        grid-row: 2 / 3;
-        height: 100%;
-      }
-    }
-
-    li.depth-0 {
-      margin-bottom: 0;
-
-      & > a {
-        height: 100%;
-        color: rgb(var(--header-color));
-      }
-    }
-
-    .depth-0 ul {
-      position: fixed;
-
-      top: 0;
-      left: 0;
-
-      /* Workaround for https://github.com/philipwalton/flexbugs#flexbug-14 */
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      writing-mode: vertical-lr;
-
-      gap: 0.5rem;
-      padding: 1rem;
-
-      background-color: rgb(var(--header-background-color));
-
-      transition: opacity 0.1s ease;
-      opacity: 0;
-
-      box-shadow: 2px 2px 16px #00000044;
-      border: 2px solid
-        color-mix(
-          in oklab,
-          rgb(var(--header-background-color)) 70%,
-          rgb(var(--header-color))
-        );
-      border-radius: var(--border-radius);
-
-      visibility: hidden;
-      pointer-events: none;
-
-      &.open {
-        opacity: 1;
-      }
-
-      li {
-        writing-mode: horizontal-tb;
-      }
-    }
-
-    li.depth-0 > a span {
-      padding-left: calc(var(--indent) * 0.2);
-      padding-right: calc(var(--indent) * 0.2);
-    }
-
-    .depth-1 a .dropdown-indicator {
-      transform: rotate(-90deg);
-    }
-
-    .depth-1 .dropdown-open > a .dropdown-indicator {
-      transform: rotate(90deg);
-    }
-
-    .dropdown-open > ul {
-      visibility: visible;
-      pointer-events: all;
-
-      & > .dropdown-caret {
-        display: block;
-      }
-    }
-
-    .dropdown-caret {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      filter: drop-shadow(2px 2px 16px #00000088);
-
-      /* Prevent shadow overlapping own menu */
-      background-color: rgb(var(--header-background-color));
-      clip-path: polygon(-200% -200%, 300% -200%, 300% 100%, -200% 100%);
-
-      mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 768 768'%3e%3cpath d='M576 576.003a192 192 0 0 0 192 192H0a192 192 0 0 0 192-192V384.005a192.004 192.004 0 0 1 192.004-192.003h.008a192 192 0 0 1 135.757 56.231A192 192 0 0 1 576 383.989z'/%3e%3c/svg%3e");
-      mask-repeat: no-repeat;
-    }
-  }
-
-  .dropdown-caret {
-    display: none;
-  }
-</style>
-
-<style lang="scss" is:global>
-  html.mobile-noscroll.mobile-nav {
-    overflow: hidden;
-
-    & > body {
-      position: fixed;
-      overflow: hidden;
-      width: min(100%, var(--page-max-width));
-    }
-  }
-
-  html.mobile-noscroll:not(.mobile-nav) > body {
-    top: 0 !important;
-  }
-
-  html:not(.mobile-nav)
-    nav#navigation.secondary-navbar
-    > #navigation-items
-    > ul.depth-0
-    #secondary-button {
-    grid-row: 1 / 2;
-    position: absolute;
-    left: 0;
-    right: 0;
-
-    > a {
-      display: none;
-    }
-
-    > #secondary-items {
-      --header-color: 255 255 255;
-      visibility: visible;
-      opacity: 1;
-
-      position: absolute;
-      width: 100%;
-      right: calc(var(--indent) * 0.2);
-      /* top: 0 !important; */
-      /* left: 0; */
-
-      writing-mode: horizontal-tb;
-      flex-direction: row;
-      justify-content: flex-end;
-      align-items: center;
-      flex-wrap: nowrap;
-
-      /* padding-top: 0; */
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      pointer-events: all;
-
-      li,
-      li a > span {
-        margin: 0;
-      }
+    .navigation-item {
+      display: contents;
     }
   }
 </style>

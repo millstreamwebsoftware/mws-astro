@@ -1,0 +1,92 @@
+---
+import Icon from "@shared/icon.astro";
+
+export interface Props {
+  hide?: "collapse" | "highlight";
+  endpoint?: string;
+  param?: string;
+}
+
+const { hide, endpoint = "/search", param = "q" } = Astro.props;
+---
+
+<form class:list={[hide]} name="search" action={endpoint} method="GET">
+  <input name={param} type="text" placeholder="Search" />
+  <button type="submit">
+    <Icon name="fa6-solid:magnifying-glass" height="1.2em" />
+  </button>
+</form>
+
+<style lang="scss">
+  input {
+    border: none;
+    background-color: white;
+    color: #222;
+    padding: 0 max(min(var(--header-item-border-radius, 0px), 1em), 0.5em);
+    border-radius: var(--header-item-border-radius);
+    height: 1.8em;
+    font-size: inherit;
+    width: 10em;
+  }
+
+  form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    padding: var(--header-item-padding);
+  }
+
+  button {
+    border: none;
+    padding: 0;
+    color: inherit;
+    padding-left: 0.5rem;
+    font-size: inherit;
+
+    &:hover {
+      color: rgb(var(--header-hover-hightlight));
+    }
+  }
+
+  .collapse {
+    @media (hover: hover) {
+      input {
+        transition: width 0.1s ease;
+      }
+
+      &:not(:hover, :focus-within) {
+        input {
+          width: 0;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  .highlight {
+    input {
+      background-color: transparent;
+      color: rgb(var(--header-color));
+
+      transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+    }
+
+    &:is(:hover, :focus-within) input {
+      background-color: white;
+      color: black;
+    }
+  }
+</style>
+
+<style lang="scss" is:global>
+  nav.mobile-nav form[name="search"] {
+    width: 100%;
+
+    input {
+      width: 100%;
+    }
+  }
+</style>
