@@ -38,26 +38,52 @@ Object.entries(componentOverrides).forEach(
 );
 
 function createTitle(id: string) {
-  return id
-    ?.split("/")
-    .at(-1)
-    ?.replaceAll("-", " ")
-    .replace(
-      /\w\S*/g,
-      (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase(),
-    );
+  return (
+    id
+      ?.split("/")
+      .at(-1)
+      ?.replaceAll("-", " ")
+      .replace(
+        /\w\S*/g,
+        (t) => t.charAt(0).toUpperCase() + t.substring(1).toLowerCase(),
+      ) || ""
+  );
+}
+
+/**
+ * Recursively search for a child item which should appear in navigation (online/meta with link).
+ * @param item
+ */
+function renderableChild(item: TreeNode<CollectionKey>) {
+  const renderable =
+    item.data?.status === "online" ||
+    (item.data?.status === "meta" &&
+      (item.data?.link ||
+        (item.children && Object.values(item.children).some(renderableChild))));
+  return renderable;
 }
 
 function createNavBlock(item: TreeNode<CollectionKey>): any {
   if (item.data?.status === "offline" || item.data?.status === "hidden")
     return [];
 
-  if (item.children) {
+  if (item.children && Object.values(item.children).some(renderableChild)) {
     return {
       _bookshop_name: "navigation/dropdown",
       id: item.id,
-      title: item.data?.title || createTitle(item.id) || "",
-      items: Object.values(item.children).flatMap(createNavBlock),
+      title: item.data?.title || createTitle(item.id),
+      items: [
+        item.data?.status === "online"
+          ? {
+              _bookshop_name: "navigation/link",
+              id: item.id,
+              title: item.data?.title || createTitle(item.id),
+              link: `/${item.id}`,
+              selected: item.selected,
+            }
+          : [],
+        Object.values(item.children).flatMap(createNavBlock),
+      ].flat(),
       selected: item.selected,
     };
   }
@@ -67,7 +93,7 @@ function createNavBlock(item: TreeNode<CollectionKey>): any {
   return {
     _bookshop_name: "navigation/link",
     id: item.id,
-    title: item.data?.title || createTitle(item.id) || "",
+    title: item.data?.title || createTitle(item.id),
     link:
       item.data?.status === "online" ? `/${item.id}` : item.data?.link || "",
     selected: item.selected,
