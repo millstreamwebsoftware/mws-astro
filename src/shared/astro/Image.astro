@@ -34,7 +34,7 @@ const {
   alt = "",
   displayWidth = 1,
   displayWidthMobile = 1,
-  loading = "lazy"
+  loading = "lazy",
 } = Astro.props;
 
 const DESKTOP_WIDTH = 1920;
@@ -59,10 +59,12 @@ if (!_image) console.warn(`Image is undefined on page ${Astro.url.toString()}`);
 if (typeof _image == "string" && /^https?:\/\/.*/.test(_image)) {
   remote = true;
 
-  const remoteSize = ENV_BOOKSHOP_LIVE ? { width: undefined, height: undefined } : await inferRemoteSize(_image).catch((e) => {
-    console.warn(e);
-    return { width: undefined, height: undefined };
-  });
+  const remoteSize = ENV_BOOKSHOP_LIVE
+    ? { width: undefined, height: undefined }
+    : await inferRemoteSize(_image).catch((e) => {
+        console.warn(e);
+        return { width: undefined, height: undefined };
+      });
 
   width ??= remoteSize.width;
   height ??= remoteSize.height;
@@ -119,25 +121,30 @@ image ??= _image;
 // Automatically generate two image widths unless disabled (widths === null || widths)
 if (widths === undefined && width && height) {
   widths = [];
-  const maxWidth = Math.min(Math.max(DESKTOP_WIDTH * displayWidth * DPR, MOBILE_WIDTH * displayWidthMobile * DPR), width);
+  const maxWidth = Math.min(
+    Math.max(
+      DESKTOP_WIDTH * displayWidth * DPR,
+      MOBILE_WIDTH * displayWidthMobile * DPR,
+    ),
+    width,
+  );
 
-  for (let w = maxWidth; w > IMAGE_MIN_WIDTH; w /= 2 ) {
+  for (let w = maxWidth; w > IMAGE_MIN_WIDTH; w /= 2) {
     widths.push(Math.ceil(w));
   }
 }
-// console.log(image, width, widths, displayWidth, displayWidthMobile);
 
 // Generate sizes
 // TODO: Better image sizes for mobile - should sometimes be larger than desktop
 if (widths) {
-  const _sizes = [...widths].sort((a,b) => b-a).reduce<string[]>((a, c, i, o) => {
-    if (a.length)
-    a.push(`(max-width: ${o[i-1]}px) ${c}px`);
-    else
-    a.push(`${c}px`);
+  const _sizes = [...widths]
+    .sort((a, b) => b - a)
+    .reduce<string[]>((a, c, i, o) => {
+      if (a.length) a.push(`(max-width: ${o[i - 1]}px) ${c}px`);
+      else a.push(`${c}px`);
 
-    return a;
-  },[]);
+      return a;
+    }, []);
 
   _sizes.push("auto"); // Currently only supported on chromium - Only when loading="lazy"
   _sizes.reverse();
@@ -153,6 +160,12 @@ let fallbackImage: string | undefined;
 
 if (typeof image === "string" && !remote) {
   fallbackImage = image.replace(/^\/?public\/?/, "/");
+} else if (typeof image === "string" && remote && !(width || height)) {
+  // We don't have the width/height of this remote image, so it cannot be processsed.
+  console.warn(
+    `[Missing Image] ${_image} was requested but its size could not be retrieved.`,
+  );
+  fallbackImage = image;
 }
 ---
 
