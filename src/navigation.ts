@@ -166,11 +166,12 @@ export function getTree(
     .filter((i) => !(depth && i.id.split("/").length > depth));
 
   // Sort by path depth - ensuring parents are before descendants if they exist (breadth-first)
-  treeItems.sort((a, b) =>
-    a.id.split("/").length - b.id.split("/").length ||
-    (a.data?.order !== undefined && b.data?.order !== undefined)
-      ? a.data!.order - b.data!.order
-      : 0,
+  treeItems.sort(
+    (a, b) =>
+      a.id.split("/").length - b.id.split("/").length ||
+      (a.data?.order !== undefined && b.data?.order !== undefined
+        ? a.data!.order - b.data!.order
+        : 0),
   );
 
   let selectedItem: TreeNode<CollectionKey> | undefined;
@@ -185,7 +186,9 @@ export function getTree(
 
       if (!cursor.children!.hasOwnProperty(fragments[i])) {
         cursor.children![fragments[i]] = {
-          id: cursor.children!.id + `/${fragments[i]}`,
+          id: stripSlashes(
+            ("id" in cursor ? cursor.id : "") + `/${fragments[i]}`,
+          ),
         };
       }
 
