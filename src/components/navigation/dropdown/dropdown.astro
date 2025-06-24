@@ -63,11 +63,13 @@ Object.entries(componentOverrides).forEach(
         }
         if (Component) {
           return (
-            <Component
-              {...item}
-              {horizontal}
-              key={(key || "") + "-" + i.toString()}
-            />
+            <div class="navigation-item">
+              <Component
+                {...item}
+                {horizontal}
+                key={(key || "") + "-" + i.toString()}
+              />
+            </div>
           );
         }
       })
@@ -274,9 +276,16 @@ Object.entries(componentOverrides).forEach(
         });
         return;
       }
+
+      // Unset minWidth so scrollWidth can collapse
+      Object.assign(elements.floating.style, {
+        minWidth: null,
+      });
+
+      // Set minWidth to at least scrollWidth to fix incorrect flexbox column sizing in firefox
       Object.assign(elements.floating.style, {
         maxHeight: `${availableHeight}px`,
-        minWidth: `${rects.reference.width}px`,
+        minWidth: `${Math.max(rects.reference.width, elements.floating.scrollWidth)}px`,
       });
     };
 
@@ -288,8 +297,8 @@ Object.entries(componentOverrides).forEach(
           mainAxis: caretOffset + dropdownMainOffset,
           crossAxis: -dropdownCrossOffset,
         }),
-        size({ apply: resizeHandler, padding: 10 }),
         shift({ padding: 10 }),
+        size({ apply: resizeHandler, padding: 10 }),
         !vertical && flip(),
         caret && arrow({ element: caret }),
       ],
@@ -357,16 +366,23 @@ Object.entries(componentOverrides).forEach(
   .dropdown {
     position: relative;
     display: block;
-    height: 100%;
 
     & > .dropdown-items {
       display: none;
       top: 0;
 
       flex-direction: column;
+      flex-wrap: wrap;
+      align-items: stretch;
 
       gap: 0.5rem;
       padding: 1rem;
+
+      z-index: 999;
+    }
+
+    .navigation-item {
+      display: contents;
     }
 
     &.floating > .dropdown-items {
