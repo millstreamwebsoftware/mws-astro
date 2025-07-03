@@ -6,25 +6,25 @@ spec:
   description: Rich text element.
   icon: edit_note
   tags: []
-  place_groups_below: true
-  groups:
-    - heading: Section
-      collapsed: true
-      inputs:
-        - classes
-        - height
-        - indent
-        - align
-        - color
-        - background_color
-        - background_image
-        - background_video
-        - background_align
-        - background_opacity
-        - background_fixed
-        - background_fit
-        - background_blend
-        - animation
+  # place_groups_below: true
+  # groups:
+  #   - heading: Section
+  #     collapsed: true
+  #     inputs:
+  #       - classes
+  #       - height
+  #       - indent
+  #       - align
+  #       - color
+  #       - background_color
+  #       - background_image
+  #       - background_video
+  #       - background_align
+  #       - background_opacity
+  #       - background_fixed
+  #       - background_fit
+  #       - background_blend
+  #       - animation
   preview:
     image:
       - key: background_image
@@ -36,17 +36,4 @@ spec:
 # Defines the structure of this component, as well as the default values
 blueprint:
   content:
-  classes:
-  height:
-  indent:
-  align:
-  color:
-  background_color:
-  background_image:
-  background_video:
-  background_align:
-  background_opacity:
-  background_fixed:
-  background_fit:
-  background_blend:
-  animation:
+  section:
