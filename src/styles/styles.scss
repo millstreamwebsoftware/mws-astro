@@ -170,11 +170,12 @@ select {
   color: rgb(var(--text-color));
 }
 
-section.richtext table {
+.text-content table {
   line-height: 1.6;
   font-family: var(--default-font-family);
   font-size: var(--text-size-medium);
   margin-bottom: 2em;
+  border-collapse: collapse;
 
   th {
     text-align: right;
@@ -183,54 +184,59 @@ section.richtext table {
 
   td {
     text-align: left;
-    vertical-align: baseline;
+    /* vertical-align: baseline; */
+    vertical-align: top;
     padding: calc(var(--indent) * 0.1);
+
+    border: 1px solid rgb(var(--text-color));
   }
 
-  @media only screen and (max-width: 768px) {
-    tbody {
-      display: flex;
-      flex-direction: column;
+  &:not(:has(td[rowspan], td[colspan])) {
+    @media only screen and (max-width: 768px) {
+      tbody {
+        display: flex;
+        flex-direction: column;
+      }
+      tr {
+        display: flex;
+        flex-direction: column;
+        counter-reset: column;
+        border-bottom: 1px solid
+          color-mix(
+            in oklch,
+            rgb(var(--background-color)) 90%,
+            rgb(var(--text-color))
+          );
+
+        &:last-child {
+          border-bottom: 0;
+        }
+
+        td {
+          position: relative;
+          margin-left: 2rem;
+        }
+
+        td > :is(p, h1, h2, h3, h4, h5, h6):first-child::before,
+        td:not(:has(:is(p, h1, h2, h3, h4, h5, h6):first-child))::before {
+          position: absolute;
+          content: counter(column) ".";
+          counter-increment: column;
+          opacity: 0.5;
+          line-height: inherit;
+          vertical-align: baseline;
+          left: -1.5rem;
+        }
+      }
     }
-    tr {
-      display: flex;
-      flex-direction: column;
-      counter-reset: column;
-      border-bottom: 1px solid
-        color-mix(
-          in oklch,
-          rgb(var(--background-color)) 90%,
-          rgb(var(--text-color))
-        );
 
-      &:last-child {
-        border-bottom: 0;
-      }
-
-      td {
-        position: relative;
-        margin-left: 2rem;
-      }
-
-      td > :is(p, h1, h2, h3, h4, h5, h6):first-child::before,
-      td:not(:has(:is(p, h1, h2, h3, h4, h5, h6):first-child))::before {
-        position: absolute;
-        content: counter(column) ".";
-        counter-increment: column;
-        opacity: 0.5;
-        line-height: inherit;
-        vertical-align: baseline;
-        left: -1.5rem;
-      }
+    tr:nth-child(even) {
+      background-color: color-mix(
+        in oklch,
+        rgb(var(--background-color)) 95%,
+        rgb(var(--text-color))
+      );
     }
-  }
-
-  tr:nth-child(even) {
-    background-color: color-mix(
-      in oklch,
-      rgb(var(--background-color)) 95%,
-      rgb(var(--text-color))
-    );
   }
 }
 
