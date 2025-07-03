@@ -157,16 +157,21 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
 <style is:global lang="scss">
   .one-two > .component-wrapper > .columns {
-    grid-template-columns: var(--column-gap) 1fr 2fr var(--column-gap);
+    grid-template-columns: 1fr 2fr;
   }
   .two-one > .component-wrapper > .columns {
-    grid-template-columns: var(--column-gap) 2fr 1fr var(--column-gap);
+    grid-template-columns: 2fr 1fr;
   }
   .one-three > .component-wrapper > .columns {
-    grid-template-columns: var(--column-gap) 1fr 3fr var(--column-gap);
+    grid-template-columns: 1fr 3fr;
   }
   .three-one > .component-wrapper > .columns {
-    grid-template-columns: var(--column-gap) 3fr 1fr var(--column-gap);
+    grid-template-columns: 3fr 1fr;
+  }
+
+  /* Millstream CMS Compatibility */
+  ._twoononenarrowfirst > .component-wrapper > .columns {
+    grid-template-columns: 1fr 2fr;
   }
 
   .columns-item > section {

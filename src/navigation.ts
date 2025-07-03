@@ -46,10 +46,10 @@ export async function getPage(id: string) {
   return frontmatter?.data;
 }
 
-export async function getPageChildren(
+export async function getPageChildren<T extends CollectionKey>(
   id: string,
-  collection: CollectionKey = "pages",
-) {
+  collection: T,
+): Promise<(CollectionEntry<T> & { link: string })[]> {
   const idFragments = stripSlashes(id)
     .split("/")
     .filter((i) => i.length);

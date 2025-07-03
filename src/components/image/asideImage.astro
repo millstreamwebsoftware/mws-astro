@@ -40,23 +40,35 @@ const image = Astro.props.src ?? Astro.props.image;
 
 const _classes = clsx(classes).split(" ");
 
-const imgAlign = align ?? _classes.find((c) => c === "align-left" || c === "align-center" || c === "align-right")?.substring(6) ?? "center";
+const imgAlign =
+  align ??
+  _classes
+    .find(
+      (c) => c === "align-left" || c === "align-center" || c === "align-right",
+    )
+    ?.substring(6) ??
+  "center";
 
 // Hint displayed image size to generate more optimal srcset
-const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || c === "large") ?? "small";
+const imgSize =
+  size ??
+  _classes.find((c) => c === "small" || c === "medium" || c === "large") ??
+  "small";
 
-(Astro.props.align || Astro.props.size) && console.warn("[AsideImage] Align/Size set");
+(Astro.props.align || Astro.props.size) &&
+  console.warn("[AsideImage] Align/Size set");
 ---
 
-<figure
-  class:list={[
-    "aside",
-    `align-${imgAlign}`,
-    imgSize
-  ]}
-  {title}
->
-  <Image {image} {alt} {fit} {width} {height} displayWidth={{"small": 0.33, "medium": 0.5, "large": 0.66}[imgSize]} quality="mid" />
+<figure class:list={["aside", `align-${imgAlign}`, imgSize]} {title}>
+  <Image
+    {image}
+    {alt}
+    {fit}
+    {width}
+    {height}
+    displayWidth={{ small: 0.33, medium: 0.5, large: 0.66 }[imgSize]}
+    quality="mid"
+  />
   {description && <figcaption>{description}</figcaption>}
 </figure>
 
@@ -101,12 +113,19 @@ const imgSize = size ?? _classes.find((c) => c === "small" || c === "medium" || 
   }
 
   @media only screen and (max-width: 768px) {
-    figure:is(.small,.medium,.large) {
+    figure:is(.small, .medium, .large) {
       max-width: 100%;
       width: 100%;
       float: none;
       margin: 3rem 0;
     }
+  }
+
+  figure:first-child {
+    margin-top: 0;
+  }
+  figure:last-child {
+    margin-bottom: 0;
   }
 </style>
 
