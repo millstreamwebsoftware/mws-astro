@@ -2,11 +2,12 @@
 import _preferences from "@data/preferences.json";
 const preferences: Preferences = _preferences as unknown as Preferences;
 import { getImage } from "astro:assets";
+import { inferRemoteSize } from "@mws-astro/filesystem";
 
 export interface Props {
-    title?: string;
-    description?: string;
-    thumbnail?: any;
+  title?: string;
+  description?: string;
+  thumbnail?: any;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -16,57 +17,59 @@ let ogImageURL: URL | undefined;
 let pagefindImage;
 
 if (!thumbnail && preferences.general.default_sharing_image) {
-    thumbnail = preferences.general.default_sharing_image;
-    // ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
+  thumbnail = preferences.general.default_sharing_image;
+  // ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
 }
 
 if (thumbnail && !ENV_BOOKSHOP_LIVE) {
-    let imgSrc;
+  let imgSrc;
 
-    if (typeof thumbnail == "string") {
-      try {
-        imgSrc = await getImage({src: thumbnail, width: 1200, height: 630}).then((r) => r.src);
-      } catch {
+  if (typeof thumbnail == "string" && /^https?:\/\/.*/.test(thumbnail)) {
+    try {
+      const { width, height } = await inferRemoteSize(thumbnail);
 
-      }
-    } else {
-        imgSrc = thumbnail?.src;
-    }
+      if (width && height)
+        imgSrc = await getImage({ src: thumbnail, width, height }).then(
+          (r) => r.src,
+        );
+    } catch {}
+  } else {
+    imgSrc = thumbnail?.src;
+  }
 
-    if (imgSrc) {
-        ogImageURL = new URL(imgSrc, Astro.site);
-        pagefindImage = imgSrc;
-    }
+  if (imgSrc) {
+    ogImageURL = new URL(imgSrc, Astro.site);
+    pagefindImage = imgSrc;
+  }
 }
-
 
 const title = Astro.props.title ?? preferences.general.site_name;
 const description =
-    Astro.props.description ?? preferences.general.default_site_description;
+  Astro.props.description ?? preferences.general.default_site_description;
 const pageTitle = Astro.props.title
-    ? Astro.props.title + preferences.general.browser_window_title_suffix
-    : preferences.general.site_name;
+  ? Astro.props.title + preferences.general.browser_window_title_suffix
+  : preferences.general.site_name;
 ---
 
 <>
-    <title>{pageTitle}</title>
-    <meta
-        property="og:title"
-        content={title}
-        data-pagefind-meta="title[content]"
-    />
-    <meta property="og:site_name" content={preferences.general.site_name} />
-    {description && <meta property="og:description" content={description} />}
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalURL} />
-    {ogImageURL && <meta property="og:image" content={ogImageURL} />}
-    {
-        pagefindImage && (
-            <meta
-                property="pagefind:image"
-                content={pagefindImage}
-                data-pagefind-meta="image[content]"
-            />
-        )
-    }
+  <title>{pageTitle}</title>
+  <meta
+    property="og:title"
+    content={title}
+    data-pagefind-meta="title[content]"
+  />
+  <meta property="og:site_name" content={preferences.general.site_name} />
+  {description && <meta property="og:description" content={description} />}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+  {
+    pagefindImage && (
+      <meta
+        property="pagefind:image"
+        content={pagefindImage}
+        data-pagefind-meta="image[content]"
+      />
+    )
+  }
 </>

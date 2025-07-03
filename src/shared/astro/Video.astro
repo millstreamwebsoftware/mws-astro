@@ -23,8 +23,15 @@ const {
   controls,
 } = Astro.props;
 
-const url = new URL(src);
+var url;
 var embed: string | null = null;
+
+try {
+  url = new URL(src);
+} catch (e) {
+  console.warn(e);
+  return;
+}
 
 if (url.hostname.endsWith("vimeo.com")) {
   // Vimeo

@@ -2,7 +2,8 @@ import { z } from "astro/zod";
 import { inferRemoteSize as _inferRemoteSize } from "astro:assets";
 
 var fs: typeof import("node:fs/promises") | undefined,
-  path: typeof import("node:path") | undefined;
+  path: typeof import("node:path") | undefined,
+  createHash: (typeof import("node:crypto"))["createHash"] | undefined;
 const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
 
 async function ensureFS(): Promise<boolean> {
@@ -19,7 +20,9 @@ async function ensureFS(): Promise<boolean> {
           console.error("node:path import failed"),
         )) ?? undefined;
 
-    return Boolean(fs) && Boolean(path);
+    if (!createHash) ({ createHash } = await import("node:crypto"));
+
+    return Boolean(fs) && Boolean(path) && Boolean(createHash);
   }
 
   return false;
@@ -82,11 +85,20 @@ export async function setCacheFile(file: string, obj: any) {
 }
 
 export async function inferRemoteSize(url: string) {
+  if (!(await ensureFS())) throw Error("[InferSize] Node imports failed.");
+
+  const hash = createHash!("sha256");
+  hash.update(url);
+  const urlHash = hash.digest("base64url");
+
   const cacheFileName =
     url
       .split("/")
       .at(-1)
-      ?.replace(/[?#].*/, "") + ".json";
+      ?.replace(/[?#].*/, "") +
+    "." +
+    urlHash.slice(0, 8) +
+    ".json";
   if (!cacheFileName) throw Error("[InferSize] Cache File naming failed.");
 
   const schema = z.object({
