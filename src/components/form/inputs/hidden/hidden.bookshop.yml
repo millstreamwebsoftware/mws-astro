@@ -1,0 +1,48 @@
+# Metadata about this component, to be used in the CMS
+spec:
+  structures:
+    - form_blocks
+  label: Text Input
+  description: Short Text Field
+  icon: notes
+  tags: ["form", "input"]
+
+# Defines the structure of this component, as well as the default values
+blueprint:
+  name: ""
+  label: ""
+  placeholder: ""
+  required:
+  minlength: 0
+  maxlength: 0
+
+# Overrides any fields in the blueprint when viewing this component in the component browser
+preview:
+# Any extra CloudCannon inputs configuration to apply to the blueprint
+_inputs:
+  name:
+    type: text
+    comment: >-
+      Unique name submitted with the value of the field.
+      Must start with a letter, numbers and the symbols "-","_",":","." are allowed.
+  label:
+    type: text
+  placeholder:
+    type: text
+  required:
+    type: checkbox
+    comment: Require this field to be filled to submit.
+  minlength:
+    type: number
+    label: Minimum Length
+    comment: Minimum number of characters in submitted text. Set to 0 to disable.
+    options:
+      step: 1
+      min: 0
+  maxlength:
+    type: number
+    label: Maximum Length
+    comment: Maximum number of characters in submitted text. Set to 0 to disable.
+    options:
+      step: 1
+      min: 0
