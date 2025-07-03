@@ -23,6 +23,8 @@ spec:
         - background_opacity
         - background_fixed
         - background_fit
+        - background_blend
+        - animation
   preview:
     image:
       - key: background_image
@@ -46,3 +48,5 @@ blueprint:
   background_opacity:
   background_fixed:
   background_fit:
+  background_blend:
+  animation:
