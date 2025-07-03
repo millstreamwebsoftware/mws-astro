@@ -31,6 +31,7 @@ export interface Props {
   background_opacity?: number;
   background_fixed?: boolean;
   background_fit?: "cover" | "contain";
+  background_blend?: CSSMixBlendMode;
   background_loading?: "eager" | "lazy";
   classes?: any;
   style?: Record<string, any>;
@@ -42,7 +43,7 @@ export interface Props {
     | "no-indent-bottom"
     | boolean;
   key?: string;
-  section?: any;
+  section?: Props;
 }
 
 const {
@@ -57,12 +58,13 @@ const {
   background_align,
   background_opacity,
   background_fixed,
+  background_blend,
   background_fit,
   background_loading,
   classes,
   style,
   key,
-} = Object.assign({}, Astro.props, Astro.props?.section);
+} = Astro.props?.section || Astro.props;
 
 const background = background_color && convertColorString(background_color);
 const textColor = color && convertColorString(color);
@@ -107,7 +109,12 @@ const expando = classList.includes("expando") ? true : false;
     [Astro.slots.has("background"), background_image, background_video].some(
       (i) => Boolean(i),
     ) && (
-      <div class:list={["background", { fixed: background_fixed }]}>
+      <div
+        class:list={["background", { fixed: background_fixed }]}
+        style={{
+          ...(background_blend && { "--background-blend": background_blend }),
+        }}
+      >
         {background_image && (
           <Image
             image={background_image}
@@ -159,9 +166,7 @@ const expando = classList.includes("expando") ? true : false;
     position: relative;
     /* height: max(var(--height), fit-content); */
 
-    min-height: calc(
-      (var(--height) * 1vh) - var(--header-offset-transparent, 0px)
-    );
+    min-height: calc((var(--height) * 1vh) - var(--header-content-offset, 0px));
 
     --indent: var(--root-indent);
     padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
@@ -193,6 +198,8 @@ const expando = classList.includes("expando") ? true : false;
     position: absolute;
     inset: 0;
     z-index: -1;
+
+    mix-blend-mode: var(--background-blend);
   }
 
   .background.fixed {
