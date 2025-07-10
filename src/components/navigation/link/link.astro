@@ -4,15 +4,18 @@ import Icon from "@shared/icon.astro";
 export interface Props {
   title: string;
   link: string;
+  new_tab?: boolean;
   selected?: "selected" | "ancestor" | false;
 }
 
 const { title, link, selected } = Astro.props;
 
 const external = /^[A-z1-9+.-]*:\/\/.*/.test(link);
+
+const new_tab = (Astro.props.new_tab ?? external) ? {target: "_blank", rel: "noopener"} : {};
 ---
 
-<a href={link} class:list={[{ external, selected }]}
+<a href={link} class:list={[{ external, selected }]} {...new_tab}
   >{title}{external && <Icon name="carbon:launch" height="1em" />}
 </a>
 
