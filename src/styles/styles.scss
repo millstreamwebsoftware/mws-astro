@@ -64,10 +64,8 @@ html {
   }
 }
 
-@media only screen and (max-width: 768px) {
-  header:not(.mobile-logo) + article > main {
-    --header-offset-transparent: 0px;
-  }
+body.mobile-nav > header:not(.mobile-logo) + article > main {
+  --header-content-offset: 0px;
 }
 
 article {
@@ -87,6 +85,7 @@ article {
 
 body {
   position: relative;
+  background-color: rgb(var(--page-background-color));
 }
 
 :is(main, article) > section:not(.slider, .image) {
@@ -135,14 +134,14 @@ section.no-indent {
 }
 
 main {
-  padding-top: var(--header-height);
+  padding-top: var(--header-content-offset, var(--header-height));
 }
 
 main:has(:is(.image, .slider):first-child) {
-  padding-top: var(--header-offset-transparent);
+  padding-top: var(--header-content-offset);
 
   > :first-child .glide__arrows {
-    top: calc(var(--header-height) - var(--header-offset-transparent));
+    top: calc(var(--header-height) - var(--header-content-offset));
   }
 }
 

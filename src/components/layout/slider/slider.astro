@@ -299,7 +299,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
 
     .glide__slides {
-        min-height: calc(var(--height) - var(--header-offset-transparent));
+        min-height: calc(var(--height) - var(--header-content-offset));
     }
 
     .glide__arrows {
@@ -459,6 +459,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     }
 
     #slider-0 .slider-item > section > .component-wrapper {
-        padding-top: calc(var(--header-height) - var(--header-offset-transparent));
+        padding-top: calc(var(--header-height) - var(--header-content-offset));
     }
 </style>

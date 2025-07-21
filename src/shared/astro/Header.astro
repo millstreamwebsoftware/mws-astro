@@ -130,10 +130,12 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     --mobile-header-background-color-bottom: var(
       --header-background-color-bottom
     );
-    --mobile-header-color: var(--header-color);
-    --header-border-radius: var(--border-radius, 0);
-    --header-dropdown-padding: 1rem;
     --mobile-header-margin: 0px;
+    --mobile-header-color: var(--header-color);
+    --mobile-header-font-size: var(--text-size-xlarge);
+
+    --header-dropdown-padding: 1rem;
+    --header-border-radius: var(--border-radius, 0);
 
     --header-arrow-size: 12px;
     --header-arrow-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
@@ -141,7 +143,7 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
 
   :where(:root:has(#header.theme-pod)) {
     --header-height: 60px;
-    --header-offset-transparent: 0px;
+    --header-content-offset: 0px;
     --header-background-color: 240 240 240;
     --header-background-color-bottom: var(--header-background-color);
     --header-color: 0 0 0;
@@ -160,7 +162,6 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
 
   header .secondary li {
     font-size: var(--text-size-small);
-    letter-spacing: 1px;
   }
 
   .mobile-nav {

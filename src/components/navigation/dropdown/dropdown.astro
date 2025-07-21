@@ -61,9 +61,10 @@ Object.entries(componentOverrides).forEach(
           Component = Astro.self;
           horizontal = true;
         }
+        const collection = item.collection;
         if (Component) {
           return (
-            <div class="navigation-item">
+            <div class="navigation-item" data-component={item._bookshop_name} data-collection={collection}>
               <Component
                 {...item}
                 {horizontal}
@@ -409,7 +410,6 @@ Object.entries(componentOverrides).forEach(
       font-size: var(--header-font-size);
       padding: var(--header-item-padding);
       border-radius: var(--header-item-border-radius);
-      letter-spacing: 0.08ex;
 
       &:hover {
         color: rgb(var(--header-hover-color));
@@ -419,7 +419,6 @@ Object.entries(componentOverrides).forEach(
 
     &.selected > .dropdown-label {
       font-weight: bold;
-      letter-spacing: 0;
     }
 
     .dropdown-arrow {
@@ -442,5 +441,11 @@ Object.entries(componentOverrides).forEach(
     &.floating.dropdown-open > .dropdown-items > .dropdown-arrow {
       display: block;
     }
+  }
+</style>
+
+<style is:global>
+  .dropdown-open > .dropdown-label .icon {
+    transform: rotate(180deg);
   }
 </style>

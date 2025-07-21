@@ -59,9 +59,11 @@ const navBars = [primary, secondary];
           >
             {items.map((item: any, i: number) => {
               var Component = components[item._bookshop_name];
+
+              const collection = item.collection;
               if (Component) {
                 return (
-                  <div class:list={["navigation-item"]}>
+                  <div class:list={["navigation-item"]} data-component={item._bookshop_name} data-collection={collection}>
                     <Component
                       {...item}
                       horizontal={false}
@@ -87,35 +89,46 @@ const navBars = [primary, secondary];
 
   function setupNavigation() {
     const navigation = document.getElementById("navigation");
-    const navItems = navigation?.querySelector("#navigation-bars");
-    if (!navigation || !navItems) return;
+    const navItemsContainer = navigation?.querySelector("#navigation-bars");
+    if (!navigation || !navItemsContainer) return;
 
     var mobileNavWidth = 768;
 
     function resizeHandler() {
-      const rect = navItems?.getBoundingClientRect();
-      if (!rect) return;
+      if (!navigation || !navItemsContainer) return;
+      const navBars = navItemsContainer.querySelectorAll<HTMLElement>('.navigation-items');
 
-      if (
-        navItems?.scrollWidth &&
-        document.documentElement.clientWidth > mobileNavWidth &&
-        Math.abs(navItems.scrollWidth - rect.width) > 3
-      ) {
-        // Navigation is overflowing, switch to mobile navigation
-        mobileNavWidth = navItems.scrollWidth + rect.left;
+      let overflowDetected = false;
+      let maxNeededWidth = 0;
+
+      navBars.forEach((bar: HTMLElement) => {
+        const originalJustify = bar.style.justifyContent;
+        // Temporarily align items left to measure true scrollWidth
+        bar.style.justifyContent = 'flex-start';
+
+        const rect = bar.getBoundingClientRect();
+        if (bar.scrollWidth > bar.clientWidth) {
+          overflowDetected = true;
+          const neededWidth = bar.scrollWidth + rect.left;
+          if (neededWidth > maxNeededWidth) maxNeededWidth = neededWidth;
+        }
+
+        // Restore original alignment
+        bar.style.justifyContent = originalJustify;
+      });
+
+      if (overflowDetected) {
+        mobileNavWidth = maxNeededWidth;
       }
 
       document.body.classList.toggle("mobile-nav", isMobileNav());
-      navigation?.classList.toggle("mobile-nav", isMobileNav());
+      navigation.classList.toggle("mobile-nav", isMobileNav());
     }
 
     window.addEventListener("resize", resizeHandler);
     resizeHandler();
 
-    /**
-     * Query to test if mobile nav should be shown
-     */
-    function isMobileNav(): boolean {
+    function isMobileNav() {
       return window.innerWidth <= mobileNavWidth;
     }
   }

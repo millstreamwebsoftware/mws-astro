@@ -59,7 +59,7 @@ import Icon from "./icon.astro";
       <Icon name="fa6-solid:house" height="2rem" />
     </a>
   </div>
-  <!-- <div id="mobile-nav-overlay"></div> -->
+  <div id="mobile-nav-overlay"></div>
 </>
 
 <script>
@@ -164,7 +164,7 @@ import Icon from "./icon.astro";
       z-index: 10;
     }
 
-    #mobile-nav-home {
+    :where(#mobile-nav-home) {
       opacity: 0;
       pointer-events: none;
       grid-area: left;
@@ -181,7 +181,16 @@ import Icon from "./icon.astro";
     display: none;
     pointer-events: none;
     position: fixed;
-    inset: -1px;
+    /* inset: 0px; */
+
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    backdrop-filter: blur(4px);
+
+    mask-image: linear-gradient(to bottom, transparent, black 20%);
+
     z-index: -1;
     background-color: #0000;
     transition: background-color 0.3s ease;
@@ -203,7 +212,6 @@ import Icon from "./icon.astro";
     top: 0 !important;
   }
 
-  /* Mobile Navigation Visible */
   #navigation.mobile-nav {
     position: fixed;
     bottom: 0;
@@ -211,10 +219,11 @@ import Icon from "./icon.astro";
     right: 0;
     pointer-events: none;
 
+    --header-color: var(--mobile-header-color);
+    --header-font-size: var(--mobile-header-font-size);
+
     /* iOS 26 workaround */
     background-color: rgba(0 0 0 / 0.002);
-
-    --header-font-size: var(--text-size-xlarge);
 
     #mobile-nav-buttons {
       display: grid;
@@ -241,8 +250,10 @@ import Icon from "./icon.astro";
 
       width: calc(100vw - (var(--mobile-header-margin) * 2));
       max-height: calc(100dvh - (var(--mobile-header-margin) * 2));
-      padding: 1rem;
       padding-bottom: calc(10rem + env(safe-area-inset-bottom, 0));
+      padding-left: calc(1rem + env(safe-area-inset-left, 0));
+      padding-right: calc(1rem + env(safe-area-inset-right, 0));
+      padding-top: calc(1rem + env(safe-area-inset-top, 0));
       margin: var(--mobile-header-margin);
 
       position: relative;
@@ -265,6 +276,10 @@ import Icon from "./icon.astro";
 
     .navigation-items {
       display: contents;
+/*
+      a, .span {
+        color: rgb(var(--mobile-header-color));
+      } */
     }
 
     /* Mobile Navigation Modal Open */

@@ -58,10 +58,10 @@ if (url.hostname.endsWith("vimeo.com")) {
   url.hostname.endsWith("youtu.be")
 ) {
   // Youtube
-  var vidId: string | null;
+  var vidId: string | undefined | null;
 
   if (url.pathname.startsWith("/watch")) vidId = url.searchParams.get("v");
-  else vidId = url.pathname.substring(1);
+  else vidId = url.pathname.substring(1).split("/").at(-1);
 
   if (vidId) {
     // `https://www.youtube.com/embed/${vidId}`

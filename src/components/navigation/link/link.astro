@@ -6,16 +6,17 @@ export interface Props {
   link: string;
   new_tab?: boolean;
   selected?: "selected" | "ancestor" | false;
+  key?: string;
 }
 
-const { title, link, selected } = Astro.props;
+const { title, link, selected, key } = Astro.props;
 
 const external = /^[A-z1-9+.-]*:\/\/.*/.test(link);
 
 const new_tab = (Astro.props.new_tab ?? external) ? {target: "_blank", rel: "noopener"} : {};
 ---
 
-<a href={link} class:list={[{ external, selected }]} {...new_tab}
+<a id={key} href={link} class:list={[{ external, selected: selected === "selected" }]} {...new_tab}
   >{title}{external && <Icon name="carbon:launch" height="1em" />}
 </a>
 
@@ -26,13 +27,12 @@ const new_tab = (Astro.props.new_tab ?? external) ? {target: "_blank", rel: "noo
     justify-content: flex-start;
     gap: 0.5em;
 
-    color: var(--header-color);
+    color: rgb(var(--header-color));
     font-size: var(--header-font-size);
     padding: var(--header-item-padding);
     border-radius: var(--header-item-border-radius);
 
     text-decoration: none;
-    letter-spacing: 0.08ex;
 
     &:hover {
       color: rgb(var(--header-hover-color));
@@ -41,7 +41,6 @@ const new_tab = (Astro.props.new_tab ?? external) ? {target: "_blank", rel: "noo
 
     &.selected {
       font-weight: bold;
-      letter-spacing: 0;
     }
   }
 </style>
