@@ -49,7 +49,7 @@ export async function getPage(id: string) {
 export async function getPageChildren<T extends CollectionKey>(
   id: string,
   collection: T,
-): Promise<(CollectionEntry<T> & { link: string })[]> {
+): Promise<(CollectionEntry<T> & { link: string | undefined })[]> {
   const idFragments = stripSlashes(id)
     .split("/")
     .filter((i) => i.length);
@@ -125,7 +125,7 @@ export async function getPageAncestors(
 export function getLink(page: CollectionEntry<"pages">) {
   return page.data.status === "online"
     ? `/${cleanId(page.id)}`
-    : page.data.link || "";
+    : page.data.link || undefined;
 }
 
 export function getSelected(page: CollectionEntry<"pages">, id: string) {
@@ -137,24 +137,26 @@ export function getSelected(page: CollectionEntry<"pages">, id: string) {
   // if (entryFragments.length > idFragments.length) return false;
 }
 
-export interface TreeRoot {
-  children: Record<string, TreeNode<CollectionKey>>;
+export interface TreeRoot<T extends CollectionKey> {
+  collection?: T;
+  children: Record<string, TreeNode<T>>;
 }
 
 export interface TreeNode<T extends CollectionKey> {
   id: string;
   collection?: T;
   data?: CollectionEntry<T>["data"];
-  children?: Record<string, TreeNode<CollectionKey>>;
-  parent?: TreeNode<CollectionKey> | TreeRoot;
+  children?: Record<string, TreeNode<T>>;
+  parent?: TreeNode<T> | TreeRoot<T>;
   selected?: "selected" | "ancestor" | null;
+  link?: string;
 }
 
-export function getTree(
-  items: CollectionEntry<CollectionKey>[],
+export function getTree<T extends CollectionKey>(
+  items: CollectionEntry<T>[],
   { select, depth }: { select?: string; depth?: number } = {},
 ) {
-  const tree: TreeRoot = { children: {} };
+  const tree: TreeRoot<T> = { children: {} };
 
   const treeItems: Array<TreeNode<CollectionKey>> = Array.from(items)
     .map((item) => ({
@@ -162,6 +164,7 @@ export function getTree(
       collection: item.collection,
       data: item.data,
       selected: null,
+      link: getLink(item),
     }))
     .filter((i) => !(depth && i.id.split("/").length > depth));
 
@@ -174,12 +177,12 @@ export function getTree(
         : 0),
   );
 
-  let selectedItem: TreeNode<CollectionKey> | undefined;
+  let selectedItem: TreeNode<T> | undefined;
 
   treeItems.forEach((item) => {
     const fragments = item.id.split("/");
-    let cursor: TreeRoot | TreeNode<CollectionKey> = tree;
-    let parent: TreeNode<CollectionKey> | undefined = undefined;
+    let cursor: TreeRoot<T> | TreeNode<T> = tree;
+    let parent: TreeNode<T> | undefined = undefined;
 
     for (var i = 0; i < fragments.length; i++) {
       if (!("children" in cursor)) cursor.children = {};
@@ -216,4 +219,58 @@ export function getTree(
   }
 
   return tree;
+}
+
+export function getTreeNode<T extends CollectionKey>(
+  tree: TreeRoot<T> | TreeNode<T>,
+  path: string | undefined,
+  relpath: string = "",
+  // parent: boolean = false,
+): TreeRoot<T> | TreeNode<T> | undefined {
+  if (!path) return tree;
+
+  const abspath = path.startsWith("/") ? path : relpath + "/" + path;
+
+  const targetFragments = abspath?.split("/").filter((frg) => frg !== "");
+  let cursor: TreeRoot<T> | TreeNode<T> = tree;
+  if (!cursor?.children) return;
+
+  for (let i = 0; i < targetFragments.length; i++) {
+    let fragment = targetFragments[i];
+
+    if (/^\.\.?$/.test(fragment)) {
+      if (fragment.length < 2) {
+        continue;
+      }
+
+      if (!("parent" in cursor)) continue;
+
+      if (!cursor.parent) {
+        // console.warn(
+        //   `Could not resolve path ${abspath} - Attempted to access undefined parent`,
+        // );
+        // console.log(tree);
+        // return;
+        cursor = tree;
+        continue;
+      }
+
+      cursor = cursor.parent;
+    } else {
+      if (cursor?.children == undefined || !(fragment in cursor.children)) {
+        console.warn(`Could not resolve path ${abspath}`);
+        return;
+      }
+
+      cursor = cursor.children[fragment];
+    }
+  }
+
+  // Reorder tree to place children inside their sibling index (/file/index -> /file/)
+  if (cursor.children?.index) {
+    cursor = Object.assign(Object.assign({}, cursor), cursor.children.index);
+    delete cursor.children?.index;
+  }
+
+  return cursor;
 }

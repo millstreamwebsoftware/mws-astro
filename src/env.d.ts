@@ -1,15 +1,9 @@
 import type { CollectionEntry, CollectionKey } from "astro:content";
-import type { TreeNode } from "@mws-astro/middleware";
 
 declare global {
-  namespace App {
-    interface Locals {
-      collections: Record<CollectionKey, CollectionEntry[]>;
-      tree: TreeNode;
-      path: string | undefined;
-      props: Record<string, any>;
-    }
-  }
+  type Prettify<T> = {
+    [K in keyof T]: T[K];
+  } & {};
 
   var ENV_BOOKSHOP_LIVE: boolean;
 

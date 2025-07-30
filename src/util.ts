@@ -1,6 +1,5 @@
 import colorString from "color-string";
 import he from "he";
-import type { TreeNode } from "@mws-astro/middleware";
 
 export function convertColorString(
   color: string | undefined,
@@ -47,58 +46,6 @@ export function bookshopName(p: string) {
 
 export function trimFilePath(p: string) {
   return p.replace(/.*(\/src\/.*)/, "$1");
-}
-
-export function getTreeNode(
-  tree: TreeNode,
-  path: string | undefined,
-  relpath: string = "",
-  // parent: boolean = false,
-): TreeNode | undefined {
-  if (!path) return tree;
-
-  const abspath = path.startsWith("/") ? path : relpath + "/" + path;
-
-  const targetFragments = abspath?.split("/").filter((frg) => frg !== "");
-  let cursor = tree;
-  if (!cursor?.children) return;
-
-  for (let i = 0; i < targetFragments.length; i++) {
-    let fragment = targetFragments[i];
-
-    if (/^\.\.?$/.test(fragment)) {
-      if (fragment.length < 2) {
-        continue;
-      }
-
-      if (!cursor.parent) {
-        // console.warn(
-        //   `Could not resolve path ${abspath} - Attempted to access undefined parent`,
-        // );
-        // console.log(tree);
-        // return;
-        cursor = tree;
-        continue;
-      }
-
-      cursor = cursor.parent;
-    } else {
-      if (cursor?.children == undefined || !(fragment in cursor.children)) {
-        console.warn(`Could not resolve path ${abspath}`);
-        return;
-      }
-
-      cursor = cursor.children[fragment];
-    }
-  }
-
-  // Reorder tree to place children inside their sibling index (/file/index -> /file/)
-  if (cursor.children?.index) {
-    cursor = Object.assign(Object.assign({}, cursor), cursor.children.index);
-    delete cursor.children?.index;
-  }
-
-  return cursor;
 }
 
 export function formatBytes(bytes: number, decimals = 2) {

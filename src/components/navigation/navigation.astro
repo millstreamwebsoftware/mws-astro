@@ -1,142 +1,172 @@
 ---
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
-import { getTreeNode } from "@mws-astro/util";
-import type { TreeNode } from "@mws-astro/middleware";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@layouts/Section.astro";
 import Icon from "@shared/icon.astro";
+import {
+  getTree,
+  urlToId,
+  type TreeNode,
+  getTreeNode,
+} from "@mws-astro/navigation";
+import { getCollection, type CollectionKey } from "astro:content";
 
 interface Props extends Partial<SectionProps> {
-    tree?: TreeNode;
-    collection?: string;
-    maxDepth?: number;
-    filter?: string;
-    depth?: number;
-    parent?: boolean;
-    hide_cousins?: boolean;
-    icon?: string;
+  path?: string;
+  tree?: TreeNode<CollectionKey>;
+  collection?: CollectionKey;
+  maxDepth?: number;
+  filter?: string;
+  depth?: number;
+  parent?: boolean;
+  hide_cousins?: boolean;
+  icon?: string;
 }
 
 const depth = (Astro.props.depth ?? -1) + 1;
 const {
-    maxDepth = 1,
-    filter = undefined,
-    collection,
-    parent = true,
-    hide_cousins = false,
-    icon = "",
+  path = Astro.props.filter || undefined,
+  maxDepth = 1,
+  collection = "pages",
+  parent = true,
+  hide_cousins = false,
+  icon = "",
 } = Astro.props;
 
-let tree = Astro.props.tree ?? undefined;
-// @ts-ignore
-if (!ENV_BOOKSHOP_LIVE && !tree) {
-    // Get this page to check if it has children
-    if (!filter) tree = getTreeNode(Astro.locals.tree, ".", Astro.locals.path);
+// const tree = await getPageChildren(urlToId(Astro.request.url), collection);
+const currentPath = urlToId(Astro.request.url);
 
-    // console.log(`${tree?.title} children: ${!!tree?.children}`)
+const tree =
+  Astro.props.tree ??
+  getTreeNode(
+    getTree(await getCollection(collection), {
+      select: currentPath,
+    }),
+    path,
+    currentPath,
+  );
 
-    tree = getTreeNode(Astro.locals.tree, filter ?? tree?.children ? "." : "..", Astro.locals.path);
-}
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
 ---
 
 <ComponentWrapper component="navigation" {...Astro.props}>
-    <Wrapper>
-        { parent && tree?.slug && <div data-depth={depth}>
-            <a
-                href={tree?.href || tree?.link}
-                aria-selected={
-                    tree.selected === 2 ? "true" : "false"
-                }
-            >
-                {icon && <Icon name={icon} height="1em" />}
-                {tree.title}
-            </a>
+  <Wrapper>
+    {
+      parent && tree && "link" in tree && (
+        <div data-depth={depth}>
+          <a
+            href={tree?.link}
+            aria-selected={tree.selected === "selected" ? "true" : "false"}
+          >
+            {icon && <Icon name={icon} height="1em" />}
+            {tree.data?.title}
+          </a>
         </div>
-        }
-        {
-            tree?.children != undefined &&
-                Object.entries(tree.children).map(([, child]) => {
-                    if (collection && child.collection != collection) return;
+      )
+    }
+    {
+      tree?.children !== undefined &&
+        Object.entries(tree.children).map(([, child]) => {
+          if (collection && child.collection != collection) return;
 
-                    const hasChildren =
-                        child.children && Object.keys(child.children).length;
+          const hasChildren =
+            child.children && Object.keys(child.children).length;
 
-                    // Don't render meta nodes without online children
-                    if (child.status !== "online" && !hasChildren && !child.href) return;
+          // Don't render meta nodes without online children
+          if (
+            child.data &&
+            child.data.status !== "online" &&
+            !hasChildren &&
+            !child.link
+          )
+            return;
 
-                    const displayChildren =
-                        depth < (maxDepth - 1) &&
-                        hasChildren &&
-                        (hide_cousins // Don't render children of unselected nodes
-                            ? child?.selected == undefined || child?.selected
-                            : true);
+          const displayChildren =
+            depth < maxDepth - 1 &&
+            hasChildren &&
+            (hide_cousins // Don't render children of unselected nodes
+              ? child?.selected == undefined || child?.selected
+              : true);
 
-                    let link =
-                        child.href ??
-                        (child.children && // Redirect to first child page if no page exists and not rendering children
-                            !displayChildren &&
-                            Object.values(child.children)[0]?.href) ?? child.link;
+          const selected = child.selected === "selected";
+          // let link =
+          //   child.href ??
+          //   (child.children && // Redirect to first child page if no page exists and not rendering children
+          //     !displayChildren &&
+          //     Object.values(child.children)[0]?.href) ??
+          //   child.link;
 
-                    return (
-                        <>
-                            <div
-                                data-depth={depth}
-                                class:list={{ "has-children": displayChildren }}
-                            >
-                                <a
-                                    href={link || undefined}
-                                    aria-selected={
-                                        child.selected === 2 ? "true" : "false"
-                                    }
-                                >
-                                    {icon && <Icon name={icon} height="1em" />}
-                                    {child.title}
-                                </a>
-                                {!!displayChildren && (
-                                    <div class="children">
-                                        <Astro.self
-                                            tree={child}
-                                            {depth}
-                                            {maxDepth}
-                                            {hide_cousins}
-                                            {icon}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    );
-                })
-        }
-    </Wrapper>
+          return (
+            <>
+              <div
+                data-depth={depth}
+                class:list={{ "has-children": displayChildren }}
+              >
+                <a
+                  href={child.link}
+                  aria-selected={selected}
+                  class:list={[{ selected }]}
+                >
+                  {icon && <Icon name={icon} height="1em" />}
+                  {child.data?.title}
+                </a>
+                {!!displayChildren && (
+                  <div class="children">
+                    <Astro.self
+                      tree={child}
+                      {depth}
+                      {maxDepth}
+                      {hide_cousins}
+                      {icon}
+                      parent={false}
+                    />
+                  </div>
+                )}
+              </div>
+            </>
+          );
+        })
+    }
+  </Wrapper>
 </ComponentWrapper>
 
 <style>
-    a {
-        display: block;
-        font-size: var(--text-size-medium);
-        text-decoration: none;
+  :where(a) {
+    display: block;
+    font-size: var(--text-size-medium);
+    text-decoration: none;
+
+    &.selected {
+      font-weight: bold;
     }
+  }
 </style>
 
 <style lang="scss" is:global>
-    section.navigation svg {
-        justify-self: center;
-        height: 100%;
+  section.navigation {
+    :where(nav) .children {
+      margin-left: 2rem;
     }
 
-    /* Editor Fallback */
-    navigation {
-        display: block;
-        border: 1px solid grey;
-        background-color: white;
-        border-radius: .5rem;
-        padding: 1rem 2rem;
-
-        &::before {
-            content: "🧭 Navigation";
-            font-size: var(--text-size-medium);
-
-        }
+    svg {
+      justify-self: center;
+      height: 100%;
     }
+  }
+
+  /* Editor Fallback */
+  navigation {
+    display: block;
+    border: 1px solid grey;
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1rem 2rem;
+
+    &::before {
+      content: "🧭 Navigation";
+      font-size: var(--text-size-medium);
+    }
+  }
 </style>
