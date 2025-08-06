@@ -10,9 +10,11 @@ import { bookshopName } from "@mws-astro/util";
 
 import { getPageChildren } from "@mws-astro/navigation";
 import type { AstroInstance } from "astro";
+import type { CollectionKey } from "astro:content";
 
 interface Props extends Partial<SectionProps> {
   target: string;
+  collection: CollectionKey;
   include?: string[];
   filters?: string[];
   prefilter?: string[];
@@ -26,6 +28,7 @@ interface Props extends Partial<SectionProps> {
 const {
   target = "",
   include,
+  collection = "pages",
   columns = 4,
   filters = [],
   prefilter = [],
@@ -66,7 +69,7 @@ Object.entries(componentOverrides).forEach(
 const Card = components[cardProps._bookshop_name];
 
 const filterMode = "ignore include"; //ignore include exclude
-var cards = await getPageChildren(target, "pages");
+var cards = await getPageChildren(target, collection);
 
 // Sort from newest to oldest, fall back on ascending order
 cards?.sort((a, b) => {
