@@ -27,8 +27,9 @@ const new_tab = (Astro.props.new_tab ?? external) ? {target: "_blank", rel: "noo
     justify-content: flex-start;
     gap: 0.5em;
 
-    color: rgb(var(--header-color));
+    color: inherit;
     font-size: var(--header-font-size);
+    font-weight: inherit;
     padding: var(--header-item-padding);
     border-radius: var(--header-item-border-radius);
 

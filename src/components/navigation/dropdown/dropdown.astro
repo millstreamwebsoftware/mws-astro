@@ -10,9 +10,10 @@ export interface Props {
   horizontal?: boolean;
   selected?: "selected" | "ancestor" | false;
   key: string;
+  d?: number;
 }
 
-const { title, items, horizontal = false, selected, key } = Astro.props;
+const { title, items, horizontal = false, selected, key, d } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -38,6 +39,8 @@ Object.entries(componentOverrides).forEach(
   ([path, obj]: [string, any]) =>
     (components[bookshopName(path)] = obj.default),
 );
+
+const _d = d !== undefined;
 ---
 
 <div
@@ -64,11 +67,12 @@ Object.entries(componentOverrides).forEach(
         const collection = item.collection;
         if (Component) {
           return (
-            <div class="navigation-item" data-component={item._bookshop_name} data-collection={collection}>
+            <div class:list={["navigation-item", {[`d${d}`]: _d}]} data-component={item._bookshop_name} data-collection={collection}>
               <Component
                 {...item}
                 {horizontal}
                 key={(key || "") + "-" + i.toString()}
+                d={(_d && d + 1) || undefined}
               />
             </div>
           );
@@ -389,9 +393,11 @@ Object.entries(componentOverrides).forEach(
     &.floating > .dropdown-items {
       position: fixed;
       box-shadow: 2px 2px 16px #00000044;
-      background-color: rgb(var(--header-background-color));
-      border: var(--header-border-width) solid rgb(var(--header-border-color));
+      background-color: rgb(var(--header-dropdown-background-color, var(--header-background-color)));
+      border: var(--header-dropdown-border-width,var(--header-border-width)) solid rgb(var(--header-dropdown-border-color, var(--header-border-color)));
       border-radius: var(--header-border-radius);
+
+      color: rgb(var(--header-dropdown-color,var(--header-color)));
     }
 
     &.dropdown-open > .dropdown-items {
@@ -406,10 +412,11 @@ Object.entries(componentOverrides).forEach(
       height: 100%;
       gap: 0.5em;
 
-      color: rgb(var(--header-color));
       font-size: var(--header-font-size);
       padding: var(--header-item-padding);
       border-radius: var(--header-item-border-radius);
+      color: inherit;
+      font-weight: inherit;
 
       &:hover {
         color: rgb(var(--header-hover-color));
@@ -448,4 +455,8 @@ Object.entries(componentOverrides).forEach(
   .dropdown-open > .dropdown-label .icon {
     transform: rotate(180deg);
   }
+
+  /*.dropdown.floating .navigation-item :is(a,span) {
+    color: rgb(var(--header-dropdown-color,var(--header-color)));
+  }*/
 </style>

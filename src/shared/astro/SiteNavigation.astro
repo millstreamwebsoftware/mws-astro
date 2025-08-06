@@ -63,11 +63,12 @@ const navBars = [primary, secondary];
               const collection = item.collection;
               if (Component) {
                 return (
-                  <div class:list={["navigation-item"]} data-component={item._bookshop_name} data-collection={collection}>
+                  <div class:list={["navigation-item", {"d0": item._bookshop_name !== "navigation/collection"}]} data-component={item._bookshop_name} data-collection={collection}>
                     <Component
                       {...item}
                       horizontal={false}
                       key={"navi-" + i.toString()}
+                      d={0}
                     />
                   </div>
                 );
@@ -139,6 +140,7 @@ const navBars = [primary, secondary];
     z-index: 999;
     overflow: hidden;
     font-size: var(--header-font-size);
+    font-weight: var(--header-font-weight);
 
     #navigation-bars {
       z-index: 999;
