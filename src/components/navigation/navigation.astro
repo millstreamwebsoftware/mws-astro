@@ -21,16 +21,18 @@ interface Props extends Partial<SectionProps> {
   depth?: number;
   parent?: boolean;
   hide_cousins?: boolean;
+  show_home?: boolean;
   icon?: string;
 }
 
 const depth = (Astro.props.depth ?? -1) + 1;
 const {
-  path = Astro.props.filter || undefined,
-  maxDepth = 1,
+  path = Astro.props.filter || "..",
+  maxDepth = 2,
   collection = "pages",
   parent = true,
   hide_cousins = false,
+  show_home = false,
   icon = "",
 } = Astro.props;
 
@@ -47,6 +49,19 @@ const tree =
     currentPath,
   );
 
+function isRenderedItem(item: TreeNode<CollectionKey>) {
+  switch (item.data?.status) {
+    default:
+    case "online":
+      return true;
+    case "meta":
+      if ((item.children && Object.keys(item.children).length && Object.values(item.children).some(isRenderedItem)) || item.link) return true;
+    case "hidden":
+    case "offline":
+      return false;
+  }
+}
+
 const ComponentWrapper = depth ? Fragment : Section;
 const Wrapper = depth ? Fragment : "nav";
 ---
@@ -54,8 +69,8 @@ const Wrapper = depth ? Fragment : "nav";
 <ComponentWrapper component="navigation" {...Astro.props}>
   <Wrapper>
     {
-      parent && tree && "link" in tree && (
-        <div data-depth={depth}>
+      parent && tree && ("link" in tree || "data" in tree) && (
+        <div data-depth={depth - 1}>
           <a
             href={tree?.link}
             aria-selected={tree.selected === "selected" ? "true" : "false"}
@@ -70,33 +85,23 @@ const Wrapper = depth ? Fragment : "nav";
       tree?.children !== undefined &&
         Object.entries(tree.children).map(([, child]) => {
           if (collection && child.collection != collection) return;
+          if (child.id === "" && !show_home) return;
 
           const hasChildren =
             child.children && Object.keys(child.children).length;
 
-          // Don't render meta nodes without online children
-          if (
-            child.data &&
-            child.data.status !== "online" &&
-            !hasChildren &&
-            !child.link
-          )
-            return;
+          if (!isRenderedItem(child)) return;
 
           const displayChildren =
             depth < maxDepth - 1 &&
             hasChildren &&
             (hide_cousins // Don't render children of unselected nodes
-              ? child?.selected == undefined || child?.selected
+              ? child?.selected === undefined || child?.selected
               : true);
 
           const selected = child.selected === "selected";
-          // let link =
-          //   child.href ??
-          //   (child.children && // Redirect to first child page if no page exists and not rendering children
-          //     !displayChildren &&
-          //     Object.values(child.children)[0]?.href) ??
-          //   child.link;
+          const link = child.link || (hasChildren && !displayChildren && Object.values(child.children!)[0].link) || undefined;
+          const external = link && /^[A-z1-9+.-]*:\/\/.*/.test(link);
 
           return (
             <>
@@ -105,12 +110,13 @@ const Wrapper = depth ? Fragment : "nav";
                 class:list={{ "has-children": displayChildren }}
               >
                 <a
-                  href={child.link}
+                  href={link}
                   aria-selected={selected}
                   class:list={[{ selected }]}
                 >
                   {icon && <Icon name={icon} height="1em" />}
                   {child.data?.title}
+                  {external && <Icon name="carbon:launch" height="1em" />}
                 </a>
                 {!!displayChildren && (
                   <div class="children">

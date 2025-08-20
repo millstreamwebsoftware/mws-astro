@@ -5,13 +5,18 @@ import {
   type CollectionKey,
 } from "astro:content";
 
-export function urlToId(url: string) {
-  var _url = url;
+export function urlToId(url: string | URL) {
+  var _url = undefined;
 
-  try {
-    _url = new URL(url).pathname;
-  } catch {}
+  if (url instanceof URL) {
+    _url = url.pathname;
+  } else {
+    try {
+      _url = new URL(url).pathname;
+    } catch {}
+  }
 
+  if (!_url) return "";
   return _url.replaceAll(/(^\/|\/$)/g, "");
 }
 
@@ -21,7 +26,6 @@ function clog<T>(a: T): T {
 }
 
 function cleanId(slug: string) {
-  // return slug.match(/^\/?(.*?)(?:\/?index)?\.?(?:md|mdx)?\/?$/)?.[1] || "";
   return stripIndex(stripFiletype(stripSlashes(slug)));
 }
 
@@ -98,43 +102,13 @@ export async function getPageAncestors(
   }
 
   return ancestors.map((page) => ({ ...page, link: getLink(page) }));
-
-  // const filter: Parameters<typeof getCollection<typeof collection>>[1] = ({
-  //   id: EntryId,
-  //   collection,
-  //   data,
-  // }) => {
-  //   if (collection === "pages" && data.status !== "online") return false;
-  //   const entryFragments = EntryId.replaceAll(/(^\/|\/?$)/g, "").split("/");
-
-  //   if (entryFragments.at(-1) === "index.md") entryFragments.pop();
-  //   if (entryFragments.length !== idFragments.length + 1) return false;
-
-  //   for (let i = 0; i < idFragments.length; i++) {
-  //     if (entryFragments[i] !== idFragments[i]) return false;
-  //   }
-
-  //   return true;
-  // };
-
-  // return (await getCollection(collection, filter))
-  //   .toSorted(({ data: { order: a } }, { data: { order: b } }) => a - b)
-  //   .map((page) => ({ ...page, link: getLink(page) }));
 }
 
-export function getLink(page: CollectionEntry<"pages">) {
+export function getLink<T extends CollectionEntry<CollectionKey>>(page: T) {
+  const collection = page.collection === "pages" ? "" : `/${page.collection}`;
   return page.data.status === "online"
-    ? `/${cleanId(page.id)}`
+    ? `${collection}/${cleanId(page.id)}`.toLowerCase()
     : page.data.link || undefined;
-}
-
-export function getSelected(page: CollectionEntry<"pages">, id: string) {
-  if (page.id === id) return true;
-  return false;
-  // const idFragments = id.split("/");
-  // const entryFragments = page.id.split("/");
-  // if (entryFragments.at(-1) === "index.md") entryFragments.pop();
-  // if (entryFragments.length > idFragments.length) return false;
 }
 
 export interface TreeRoot<T extends CollectionKey> {
@@ -160,7 +134,7 @@ export function getTree<T extends CollectionKey>(
 
   const treeItems: Array<TreeNode<CollectionKey>> = Array.from(items)
     .map((item) => ({
-      id: cleanId(item.id),
+      id: cleanId(item.id).toLowerCase(),
       collection: item.collection,
       data: item.data,
       selected: null,
