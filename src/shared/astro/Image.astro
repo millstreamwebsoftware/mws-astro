@@ -1,9 +1,28 @@
 ---
 import { inferRemoteSize } from "@mws-astro/filesystem";
 import { Image as AstroImage } from "astro:assets";
+import _preferences from "@data/preferences.json";
+import { getImage } from "astro:assets";
+const preferences = _preferences as unknown as Preferences;
 
 type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
 export type CssAlign = `${CssAlignment} ${CssAlignment}` | CssAlignment;
+
+type ImageSource = {
+  imageSource: "public"
+  image: string,
+} | {
+  imageSource: "remote"
+  image: string,
+} | {
+  imageSource: "assets"
+  image: ImageMetadata | Promise<{default: ImageMetadata}>,
+};
+
+const DESKTOP_WIDTH = 1920;
+const MOBILE_WIDTH = 768;
+const IMAGE_MIN_WIDTH = 256;
+const DPR = 2;
 
 export interface Props {
   image: Parameters<typeof AstroImage>[0]["src"];
@@ -37,90 +56,117 @@ const {
   loading = "lazy",
 } = Astro.props;
 
-const DESKTOP_WIDTH = 1920;
-const MOBILE_WIDTH = 768;
-const IMAGE_MIN_WIDTH = 256;
-const DPR = 2;
+// Get an ImgixClient instance if @imgix/js-core is installed and imgix is configured in preferences
+const ixDomain = preferences.API?.imgix?.domain;
+const ix = ixDomain ?
+  await import("@imgix/js-core").then(
+    ({default: ImgixClient}) => new ImgixClient({
+      domain: ixDomain,
+      secureURLToken: preferences.API?.imgix?.token
+    }),
+    () => undefined)
+  : undefined;
 
-// await and unwrap image
-let _image = ((i) => (typeof i === "object" && "default" in i ? i.default : i))(
-  await Astro.props.image,
-);
-let image: typeof _image;
-// let densities = Astro.props.densities;
-let widths = Astro.props.widths;
-let sizes: string;
-let remote = false;
-let width, height;
+const imageAssets = import.meta.glob([
+  // Assets
+  "/src/assets/**/*.svg",
+  "/src/assets/**/*.png",
+  "/src/assets/**/*.jpg",
+  "/src/assets/**/*.jpeg",
+  "/src/assets/**/*.webp",
+  "/src/assets/**/*.gif",
+  "/src/assets/**/*.tiff",
+  "/src/assets/**/*.avif",
+], {eager: true, import: "default"});
 
-if (!_image) console.warn(`Image is undefined on page ${Astro.url.toString()}`);
+// Set image with type assurances provided by imageSource
+const {image, imageSource} = ((image): ImageSource => {
+  if (typeof image === "object")
+    return {image, imageSource: "assets"};
 
-// Image is remote
-if (typeof _image == "string" && /^https?:\/\/.*/.test(_image)) {
-  remote = true;
+  if (/^https?:\/\/.*/.test(image))
+    return {image, imageSource: "remote"};
 
-  const remoteSize = ENV_BOOKSHOP_LIVE
-    ? { width: undefined, height: undefined }
-    : await inferRemoteSize(_image).catch((e) => {
-        console.warn(e);
-        return { width: undefined, height: undefined };
+  let imageKey = Object.keys(imageAssets).find((k) => k === `/src${image}`);
+  if (imageKey)
+    return {
+      image: imageAssets[`/src${image}`] as Promise<{default: ImageMetadata}>,
+      imageSource: "assets",
+    };
+
+  return {image, imageSource: "public"};
+})(Astro.props.image);
+
+var src: string | undefined;
+var srcset: string | undefined;
+var srcWidth: number | undefined;
+var srcHeight: number | undefined;
+var sizes: string | undefined;
+
+switch (imageSource) {
+  case "remote":
+    // Skip processing of SVGs
+    if (/\.svg(?:\?.*)?$/.test(image)) {
+      src = image;
+      break;
+    }
+
+    if (ix) {
+      src = ix.buildURL(image, {}, {});
+      srcset = ix.buildSrcSet(image, {
+        auto: "format",
+        fit: "max", // Contain output within width and height without scaling up
+        q: typeof quality === "number" ? quality : {"low": 50, "mid": 60, "high": 75, "max": 100}[quality]
+      }, {
+        maxWidth: DESKTOP_WIDTH * displayWidth * DPR,
+        minWidth: 128,
       });
 
-  width ??= remoteSize.width;
-  height ??= remoteSize.height;
-  image = _image;
+      let widths = srcset.split(",").map((src) => parseInt(src.split(" ")[1]));
+      sizes = createImageSizes(widths);
+      break;
+    }
+
+    // Don't optimise remote images in the editor
+    if (ENV_BOOKSHOP_LIVE) {
+      src = image;
+      break;
+    }
+
+    // Get image width and allow fall-through to handle remote image via Astro's asset pipeline
+    ({width: srcWidth, height: srcHeight} =
+      await inferRemoteSize(image).catch((e) => {
+          console.warn(e);
+          return { width: undefined, height: undefined };
+        }));
+  case "assets":
+    let w = srcWidth ?? (await image as ImageMetadata).width;
+    let h = srcHeight ?? (await image as ImageMetadata).height;
+
+    let widths = Astro.props.widths === undefined ? createImageWidths(w, h) : Astro.props.widths ?? undefined;
+    sizes = widths && widths.length > 1 && createImageSizes(widths) || undefined;
+
+    // Don't bother using widths/sizes for images with one width
+    if (widths && widths.length < 2) {
+      widths = undefined;
+      sizes = undefined;
+    }
+
+    ({src, srcSet: {attribute: srcset}} = await getImage({src: image, width: srcWidth, height: srcHeight, widths, sizes, quality}));
+    break;
+  case "public":
+    src = image.replace(/^\/?public\/?/, "/");
+    break;
 }
 
-// Image is an SVG - Disable generating widths
-if (/\.svg(?:\?.*)?$/.test(typeof _image === "string" ? _image : _image.src)) {
-  widths = null;
-}
+const style = {
+  "--align": Astro.props.align ?? "center",
+  "--opacity": opacity,
+};
 
-// Image is local
-if (typeof _image == "string" && !remote) {
-  const images = import.meta.glob([
-    // Assets
-    "/src/assets/**/*.svg",
-    "/src/assets/**/*.png",
-    "/src/assets/**/*.jpg",
-    "/src/assets/**/*.jpeg",
-    "/src/assets/**/*.webp",
-    "/src/assets/**/*.gif",
-    "/src/assets/**/*.tiff",
-    "/src/assets/**/*.avif",
-    // Public
-    "/public/**/*.svg",
-    "/public/**/*.png",
-    "/public/**/*.jpg",
-    "/public/**/*.jpeg",
-    "/public/**/*.webp",
-    "/public/**/*.gif",
-    "/public/**/*.tiff",
-    "/public/**/*.avif",
-  ]);
+function createImageWidths(width: number, _height: number) {
+  let widths: number[] = [];
 
-  let imagePaths: (keyof typeof images)[] = Object.keys(images).filter((i) =>
-    i.endsWith(_image),
-  );
-
-  if (imagePaths.length > 1) {
-    console.warn(`Ambiguous image import ${_image} -?-> ${imagePaths}!`);
-  }
-
-  let imagePath = imagePaths[0];
-
-  if (imagePath in images) {
-    image = ((await images[imagePath]()) as any)?.default;
-  } else {
-    console.warn(`[Missing Image] ${_image} was requested but is missing.`);
-  }
-}
-
-image ??= _image;
-
-// Automatically generate two image widths unless disabled (widths === null || widths)
-if (widths === undefined && width && height) {
-  widths = [];
   const maxWidth = Math.min(
     Math.max(
       DESKTOP_WIDTH * displayWidth * DPR,
@@ -132,11 +178,13 @@ if (widths === undefined && width && height) {
   for (let w = maxWidth; w > IMAGE_MIN_WIDTH; w /= 2) {
     widths.push(Math.ceil(w));
   }
+
+  return widths;
 }
 
 // Generate sizes
 // TODO: Better image sizes for mobile - should sometimes be larger than desktop
-if (widths) {
+function createImageSizes(widths: number[]) {
   const _sizes = [...widths]
     .sort((a, b) => b - a)
     .reduce<string[]>((a, c, i, o) => {
@@ -148,56 +196,20 @@ if (widths) {
 
   _sizes.push("auto"); // Currently only supported on chromium - Only when loading="lazy"
   _sizes.reverse();
-  sizes = _sizes.join(", ");
+  return _sizes.join(", ");
 }
 
-const style = {
-  "--align": Astro.props.align ?? "center",
-  "--opacity": opacity,
-};
-
-let fallbackImage: string | undefined;
-
-if (typeof image === "string" && !remote) {
-  fallbackImage = image.replace(/^\/?public\/?/, "/");
-} else if (typeof image === "string" && remote && !(width || height)) {
-  // We don't have the width/height of this remote image, so it cannot be processsed.
-  console.warn(
-    `[Missing Image] ${_image} was requested but its size could not be retrieved.`,
-  );
-  fallbackImage = image;
-}
 ---
-
-{
-  fallbackImage ? (
-    <img
-      src={fallbackImage}
-      class:list={[classes, { background, fixed }]}
-      {style}
-      data-fit={fit}
-      {loading}
-      {alt}
-    />
-  ) : (
-    typeof image !== "undefined" && (
-      // @ts-ignore
-      <AstroImage
-        src={image}
-        {alt}
-        {width}
-        {height}
-        class:list={[classes, { background, fixed }]}
-        {style}
-        widths={widths ?? undefined}
-        sizes={sizes ?? undefined}
-        data-fit={fit}
-        {loading}
-        {quality}
-      />
-    )
-  )
-}
+<img
+  {src}
+  {srcset}
+  {sizes}
+  {alt}
+  class:list={[classes, { background, fixed }]}
+  {style}
+  data-fit={fit}
+  {loading}
+  />
 
 <style>
   img {
