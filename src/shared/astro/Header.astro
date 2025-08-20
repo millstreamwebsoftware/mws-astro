@@ -117,10 +117,12 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     --header-background-color-bottom: 0 0 0 / 0.3;
     --header-color: 255 255 255;
     --header-height: 80px;
-    --header-content-offset: 0px;
+    --header-content-offset: 0px; // Offset all content below opaque header elements
+
     --header-hover-highlight: 40 40 40;
 
     --header-font-size: var(--text-size-small);
+    --header-font-weight: 400;
     --header-hover-color: var(--text-color);
     --header-hover-background-color: var(--color-accent);
     --header-item-padding: 0.5rem 1rem;

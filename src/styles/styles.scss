@@ -88,41 +88,13 @@ body {
   background-color: rgb(var(--page-background-color));
 }
 
-/* :is(main, article) > section:not(.slider, .image) {
-  padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
-
-  > .component-wrapper {
-    margin: 0 var(--page-max-width-padding);
-  }
-} */
-
-/* main {
-  padding-top: var(--header-content-offset, var(--header-height));
-} */
-
 main {
   padding-top: var(--header-content-offset, 0px);
 }
 
-main > :first-child > .component-wrapper {
-  margin-top: calc(var(--header-height) - var(--header-content-offset));
-}
-
 main > :first-child:is(.slider) > .component-wrapper {
   margin-top: 0;
-
-  /* .slider-item > section .component-wrapper {
-    margin-top: calc(var(--header-height) - var(--header-content-offset));
-  } */
 }
-
-/* main:has(:is(.image, .slider):first-child) {
-  padding-top: var(--header-content-offset);
-
-  > :first-child .glide__arrows {
-    top: calc(var(--header-height) - var(--header-content-offset));
-  }
-} */
 
 [data-component="columns"] {
   padding: 0;

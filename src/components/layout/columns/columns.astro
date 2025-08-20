@@ -157,16 +157,16 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
 <style is:global lang="scss">
   .one-two > .component-wrapper > .columns {
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: calc(1fr + var(--page-max-width-padding)) calc(2fr + var(--page-max-width-padding));
   }
   .two-one > .component-wrapper > .columns {
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: calc(2fr + var(--page-max-width-padding)) calc(1fr + var(--page-max-width-padding));
   }
   .one-three > .component-wrapper > .columns {
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: calc(1fr + var(--page-max-width-padding)) calc(3fr + var(--page-max-width-padding));
   }
   .three-one > .component-wrapper > .columns {
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: calc(3fr + var(--page-max-width-padding)) calc(1fr + var(--page-max-width-padding));
   }
 
   /* Millstream CMS Compatibility */
@@ -208,6 +208,22 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     > .component-wrapper {
     margin: 0;
   }
+
+  main > section.columns:first-of-type > .component-wrapper > .columns {
+    > .first-in-column > section > .component-wrapper {
+        margin-top: calc(var(--header-height) - var(--header-content-offset));
+      }
+
+    @media only screen and (max-width: 768px) {
+      &.collapse > .first-in-column:not(:first-child) > section > .component-wrapper {
+        margin-top: 0;
+      }
+    }
+  }
+
+  /*main > section.columns:first-of-type > .component-wrapper > .columns > .columns-item.first-in-column.first-in-row > section > .component-wrapper {
+    margin-top: calc(var(--header-height) - var(--header-content-offset));
+  }*/
 
   @media only screen and (max-width: 768px) {
     div.columns.collapse.collapse {
