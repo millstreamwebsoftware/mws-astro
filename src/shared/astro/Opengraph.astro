@@ -16,23 +16,41 @@ let thumbnail = Astro.props.thumbnail;
 let ogImageURL: URL | undefined;
 let pagefindImage;
 
+// Get an ImgixClient instance if @imgix/js-core is installed and imgix is configured in preferences
+const ixDomain = preferences.API?.imgix?.domain;
+const ix = ixDomain ?
+  await import("@imgix/js-core").then(
+    ({default: ImgixClient}) => new ImgixClient({
+      domain: ixDomain,
+      secureURLToken: preferences.API?.imgix?.token
+    }),
+    () => undefined)
+  : undefined;
+
 if (!thumbnail && preferences.general.default_sharing_image) {
   thumbnail = preferences.general.default_sharing_image;
-  // ogImageURL = new URL(preferences.general.default_sharing_image, Astro.site);
 }
 
 if (thumbnail && !ENV_BOOKSHOP_LIVE) {
   let imgSrc;
 
   if (typeof thumbnail == "string" && /^https?:\/\/.*/.test(thumbnail)) {
-    try {
-      const { width, height } = await inferRemoteSize(thumbnail);
+    if (ix) {
+      imgSrc = ix.buildURL(thumbnail, {
+        w: 1024,
+        h: 1024,
+        fit: "max",
+      }, {});
+    } else {
+      try {
+        const { width, height } = await inferRemoteSize(thumbnail);
 
-      if (width && height)
-        imgSrc = await getImage({ src: thumbnail, width, height }).then(
-          (r) => r.src,
-        );
-    } catch {}
+        if (width && height)
+          imgSrc = await getImage({ src: thumbnail, width, height }).then(
+            (r) => r.src,
+          );
+      } catch {console.warn(`/!\\ An error occured while generating the thumbnail for ${Astro.url.toString()}`)}
+    }
   } else {
     imgSrc = thumbnail?.src;
   }

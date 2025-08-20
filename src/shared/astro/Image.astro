@@ -118,7 +118,7 @@ switch (imageSource) {
         fit: "max", // Contain output within width and height without scaling up
         q: typeof quality === "number" ? quality : {"low": 50, "mid": 60, "high": 75, "max": 100}[quality]
       }, {
-        maxWidth: DESKTOP_WIDTH * displayWidth * DPR,
+        maxWidth: Math.floor(DESKTOP_WIDTH * displayWidth * DPR),
         minWidth: 128,
       });
 
