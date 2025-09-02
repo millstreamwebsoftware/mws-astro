@@ -53,17 +53,17 @@ export async function getPage(id: string) {
 export async function getPageChildren<T extends CollectionKey>(
   id: string,
   collection: T,
+  filter: (entry: CollectionEntry<T>) => boolean = () => true,
 ): Promise<(CollectionEntry<T> & { link: string | undefined })[]> {
   const idFragments = stripSlashes(id)
     .split("/")
     .filter((i) => i.length);
 
-  const filter: Parameters<typeof getCollection<typeof collection>>[1] = ({
+  const childfilter: Parameters<typeof getCollection<typeof collection>>[1] = ({
     id: entryId,
-    collection,
     data,
   }) => {
-    if (collection === "pages" && data.status !== "online") return false;
+    if ("status" in data && data.status !== "online") return false;
     const entryFragments = stripSlashes(entryId).split("/");
 
     if (entryFragments.at(-1) === "index.md") entryFragments.pop();
@@ -76,7 +76,10 @@ export async function getPageChildren<T extends CollectionKey>(
     return true;
   };
 
-  return (await getCollection(collection, filter))
+  const _filter = (entry: CollectionEntry<T>) =>
+    [childfilter, filter].every((f) => f(entry));
+
+  return (await getCollection(collection, _filter))
     .sort(({ data: { order: a } }, { data: { order: b } }) => a - b)
     .map((page) => ({ ...page, link: getLink(page) }));
 }
