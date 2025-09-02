@@ -101,7 +101,13 @@ const prefilters = prefilter
     match = filter.match(/^(?<k>.*)~=(?<v>.*)$/)?.groups;
     if (match)
       return function IncludesFilter(card: any) {
-        return match.k in card.data && (card.data?.[match.k] as string)?.split(" ").includes(match.v);
+        let data = match.k in card.data && card.data?.[match.k];
+        if (!data) return undefined;
+
+        if (typeof data === "string") return data.split(" ").includes(match.v);
+        if ("includes" in data) return data.includes(match.v);
+
+        return undefined;
       };
 
     // [attr=value]
