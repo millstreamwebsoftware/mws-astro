@@ -36,6 +36,7 @@ spec:
 
 blueprint:
   target: ""
+  collection:
   card:
     - _bookshop_name: card-index/cards/card
       include: ["title", "link"]
