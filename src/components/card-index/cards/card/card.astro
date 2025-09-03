@@ -45,7 +45,7 @@ function formatDate(date: Date) {
   <div class="card-text">
     {title && <h2>{title}</h2>}
     {description && <Markdown content={description} />}
-    {publishDate && <p>{formatDate(publishDate)}</p>}
+    {publishDate && publishDate instanceof Date && <p>{formatDate(publishDate)}</p>}
     {
       Object.entries(cardData).map(([k, v]) => {
         if (dataExclude.includes(k)) return;
