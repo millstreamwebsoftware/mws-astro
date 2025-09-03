@@ -78,6 +78,18 @@ const { collection } = Astro.props;
                 box.classList.add("select-previous");
             }
 
+            // Allow Images to load
+            children.at(newIndex)?.querySelectorAll("img").forEach( (img) => {
+                if (!img.dataset?.src) return;
+                img.setAttribute("src",img.dataset?.src);
+                if (img.dataset?.srcset)
+                img.setAttribute("srcset",img.dataset?.srcset);
+
+                delete img.dataset.src;
+                delete img.dataset.srcset;
+              }
+            )
+
             children.at(index)?.classList.remove("selected");
             children.at(newIndex)?.classList.add("selected");
         };
@@ -90,6 +102,16 @@ const { collection } = Astro.props;
         selected.classList.add("selected");
 
         select(0); //Update Counter
+
+        // Force images to lazyload
+        box.querySelectorAll("img").forEach((img) => {
+            if (img.parentElement?.matches(".selected")) return;
+            img.dataset.src = img.getAttribute("src") || undefined;
+            img.dataset.srcset = img.getAttribute("srcset") || undefined;
+            img.setAttribute("src", "#");
+            img.removeAttribute("srcset");
+          }
+        )
 
         box.setAttribute("tabindex", "0");
         box = document.body.appendChild(box);
@@ -184,7 +206,6 @@ const { collection } = Astro.props;
         height: 100%;
         flex-direction: column;
         justify-content: center;
-        // z-index: 3;
     }
 
     html.lightbox-noscroll {
