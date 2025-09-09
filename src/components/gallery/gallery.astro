@@ -4,7 +4,7 @@ import Image from "@shared/Image.astro";
 import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import Markdown from "@shared/Markdown.astro";
 
-type Image = {
+export type Image = {
     image: string;
     title?: string;
     description?: string;
@@ -14,31 +14,28 @@ type Image = {
 
 export interface Props extends Partial<SectionProps> {
     images: Image[];
-    height: number;
     columns: number;
-    gap: boolean;
+    gap?: boolean;
     fit?: "cover" | "contain";
-    aspect: number;
-    indent: boolean;
+    aspect?: number;
     lightbox?: boolean;
     linkgallery?: boolean;
     placeholder?: boolean;
 }
 
-const { height, linkgallery, key, classes } =
-    Astro.props;
+const {
+  linkgallery,
+  key,
+  classes,
+  aspect = 1.0,
+  gap = true,
+  fit = "cover"
+} = Astro.props;
 
 const images = Astro.props.images.filter((img) => !!img);
 const lightbox = Astro.props.lightbox && !linkgallery;
 const columns = Astro.props.columns || images.length;
-const aspect = Astro.props.aspect ?? 1.0;
-const gap = Astro.props.gap ?? true;
-const fit = Astro.props.fit ?? "cover";
 const id = `gallery-${key}`;
-
-// const sizes = `(max-width: 768px) calc((100vw / 2) - (${
-//     gap ? "2rem" : "0"
-// } * 2)), calc((100vw / ${columns}) - (${gap ? "2rem" : "0"} * ${columns}))`;
 ---
 
 <Section
@@ -46,7 +43,6 @@ const id = `gallery-${key}`;
     {...Astro.props}
     classes={[{ lightbox }, classes]}
     style={{
-        "--height": height,
         "--columns": columns,
         "--aspect": aspect,
         ...(!gap && { "--gallery-gap": 0 }),
