@@ -14,7 +14,7 @@ export interface Props {
   height?: number;
   color?: string;
   content?: string;
-  align?: ["top", "center", "bottom"];
+  align?: "top" | "center" | "bottom";
   animation?:
     | "fade"
     | "blur"
@@ -169,7 +169,7 @@ const expando = classList.includes("expando") ? true : false;
     min-height: calc((var(--height) * 1vh) - var(--header-content-offset, 0px));
 
     --indent: var(--root-indent);
-    padding: calc(var(--indent) * var(--vertical-indent)) var(--indent);
+    padding: calc(var(--indent) * var(--vertical-indent)) calc(var(--indent) + var(--page-max-width-padding));
     z-index: 0;
     width: 100%;
 

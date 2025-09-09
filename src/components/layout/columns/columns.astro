@@ -179,10 +179,10 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   }
 
   div.columns:not(.fullwidth) .columns-item {
-    &.first-in-row > section > .component-wrapper {
+    &.first-in-row > section:not(.no-indent) > .component-wrapper {
       margin-left: var(--page-max-width-padding);
     }
-    &.last-in-row > section > .component-wrapper {
+    &.last-in-row > section:not(.no-indent) > .component-wrapper {
       margin-right: var(--page-max-width-padding);
     }
   }
