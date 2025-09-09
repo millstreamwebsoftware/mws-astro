@@ -1,20 +1,41 @@
 ---
 import Page from "@shared/Page.astro";
+import type { CollectionEntry, CollectionKey } from "astro:content";
 import Layout from "./Layout.astro";
+import { bookshopName } from "@mws-astro/util";
 
 type Props = {
-  frontmatter: any;
-  id?: string;
-  currentPath?: string;
+  page: CollectionEntry<CollectionKey>;
 };
 
-if (!Astro.props.frontmatter) {
-  throw new Error("Page frontmatter must be defined");
+const page = Astro.props.page;
+const { id, data: props } = page;
+
+const renderers: Record<string, any> = {};
+const rendererImports = import.meta.glob("src/components/**/*.schema.astro", {
+    eager: true,
+});
+
+Object.entries(rendererImports).forEach(
+    ([path, obj]: [string, any]) => {
+      let name = path.match(/.*\/(.*?)\.schema\.astro$/)?.[1];
+      if (!name) return;
+      renderers[name] = obj.default;
+    }
+);
+
+var Renderer = Page;
+
+if (props._schema && props._schema in renderers) {
+  Renderer = renderers[props._schema];
 }
-const props = Astro.props.frontmatter;
-const { id, currentPath } = Astro.props;
+else if (!props.content_blocks) {
+    throw new Error(
+        `Tried to output page with unsupported schema: ${props._schema}`,
+    );
+}
 ---
 
-<Layout {...props} {id} {currentPath}>
-  <Page bookshop:live contentBlocks={props.content_blocks} _frontmatter={props} />
+<Layout {page}>
+  <Renderer bookshop:live {page} />
 </Layout>

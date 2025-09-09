@@ -1,34 +1,24 @@
 ---
-import Header from "@shared/Header.astro";
-
-// import Header from "@mws-astro/shared/svelte/header.svelte";
+import preferences from "@data/preferences.json";
 import Footer from "@shared/Footer.astro";
+import Header from "@shared/Header.astro";
 import Opengraph from "@shared/Opengraph.astro";
-// import { getTree } from "@mws-astro/navigation";
-// import { ViewTransitions } from "astro:transitions";
-// transition:animate="none"
-// transition:persist
-// transition:animate="fade"
+import type { CollectionEntry, CollectionKey } from "astro:content";
 
 import * as git from "git-rev-sync";
 
+import "@custom/custom.scss";
+import "@styles/styles.scss";
 import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
-import "@styles/styles.scss";
-import "@custom/custom.scss";
 
 export interface Props {
-  title?: string;
-  description?: string;
-  id?: string;
-  content_blocks?: Array<Record<string, any>>;
-  show_global_header?: boolean;
-  show_global_footer?: boolean;
-  thumbnail?: any;
-  classes?: string[];
-  status?: any;
+  page: CollectionEntry<CollectionKey>,
+  classes: string;
 }
+
+const {classes} = Astro.props;
 
 const {
   title,
@@ -36,10 +26,8 @@ const {
   show_global_header,
   show_global_footer,
   thumbnail,
-  classes,
   status = "online",
-} = Astro.props;
-import preferences from "@data/preferences.json";
+} = Astro.props.page.data;
 
 const pageWidth = preferences.page.maximum_page_width;
 ---

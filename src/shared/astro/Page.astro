@@ -1,14 +1,14 @@
 ---
 import { bookshopName } from "@mws-astro/util";
+import type { CollectionEntry, CollectionKey } from "astro:content";
 
 export interface Props {
-    contentBlocks: any[];
+    page: CollectionEntry<CollectionKey>,
     "bookshop:live"?: any;
     "data-lightbox"?: string;
-    _frontmatter?: any;
 }
 
-const { contentBlocks, "data-lightbox": lightbox, _frontmatter } = Astro.props;
+const { page, "data-lightbox": lightbox } = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -32,18 +32,17 @@ Object.entries(componentOverrides).forEach(
         (components[bookshopName(path)] = obj.default),
 );
 
-const pagefind = _frontmatter?.status ? (_frontmatter.status === "online" ? "" : undefined) : true;
+const pagefind = page.data?.status ? (page.data.status === "online" ? "" : undefined) : true;
 ---
 
 <main data-pagefind-body={pagefind} data-lightbox={lightbox}>
     {
-        contentBlocks.map((block: any, i: number) => {
+        page.data.content_blocks?.map((block: any, i: number) => {
             const Component = components[block._bookshop_name];
             if (Component) {
                 return (
                     <Component
                         {...block}
-                        {_frontmatter}
                         background_loading={i ? "lazy" : "eager"}
                         key={String(i)}
                     />
