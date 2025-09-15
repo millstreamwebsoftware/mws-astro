@@ -127,6 +127,8 @@ export interface TreeNode<T extends CollectionKey> {
   parent?: TreeNode<T> | TreeRoot<T>;
   selected?: "selected" | "ancestor" | null;
   link?: string;
+  type: "directory" | "page";
+  status: "online" | "hidden" | "meta" | "offline";
 }
 
 export function getTree<T extends CollectionKey>(
@@ -136,13 +138,18 @@ export function getTree<T extends CollectionKey>(
   const tree: TreeRoot<T> = { children: {} };
 
   const treeItems: Array<TreeNode<CollectionKey>> = Array.from(items)
-    .map((item) => ({
-      id: cleanId(item.id).toLowerCase(),
-      collection: item.collection,
-      data: item.data,
-      selected: null,
-      link: getLink(item),
-    }))
+    .map(
+      (item) =>
+        ({
+          id: cleanId(item.id).toLowerCase(),
+          collection: item.collection,
+          data: item.data,
+          selected: null,
+          link: getLink(item),
+          type: "page",
+          status: item.data?.status || "online",
+        }) as TreeNode<T>,
+    )
     .filter((i) => !(depth && i.id.split("/").length > depth));
 
   // Sort by path depth - ensuring parents are before descendants if they exist (breadth-first)
@@ -169,6 +176,8 @@ export function getTree<T extends CollectionKey>(
           id: stripSlashes(
             ("id" in cursor ? cursor.id : "") + `/${fragments[i]}`,
           ),
+          type: "directory",
+          status: "meta",
         };
       }
 

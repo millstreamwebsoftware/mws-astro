@@ -57,16 +57,17 @@ function createTitle(id: string) {
  */
 function renderableChild(item: TreeNode<CollectionKey>) {
   const renderable =
-    item.data?.status === "online" ||
-    (item.data?.status === "meta" &&
-      (item.data?.link ||
-        (item.children && Object.values(item.children).some(renderableChild))));
+    item.status === "online" ||
+    (item.status === "meta" &&
+      (!!item.data?.link ||
+        (item.children &&
+          Object.values(item.children).some(renderableChild)))) ||
+    false;
   return renderable;
 }
 
 function createNavBlock(item: TreeNode<CollectionKey>): any {
-  if (item.data?.status === "offline" || item.data?.status === "hidden")
-    return [];
+  if (item.status === "offline" || item.status === "hidden") return [];
 
   if (item.children && Object.values(item.children).some(renderableChild)) {
     return {
@@ -89,7 +90,7 @@ function createNavBlock(item: TreeNode<CollectionKey>): any {
     };
   }
 
-  if (item.data?.status === "meta" && !item.data?.link) return [];
+  if (item.status === "meta" && !item.data?.link) return [];
 
   return {
     _bookshop_name: "navigation/link",
@@ -107,7 +108,6 @@ const tree = getTree(await getCollection(collection), {
 });
 const items = Object.values(tree.children).flatMap(createNavBlock);
 
-
 const _d = d !== undefined;
 ---
 
@@ -119,9 +119,18 @@ const _d = d !== undefined;
       if (item.id === "" && !show_home) return;
 
       if (Component) {
-        return (<div class:list={["navigation-item", {[`d${d}`]: _d}]} data-component={item._bookshop_name}>
-          <Component d={(_d && d + 1) || undefined} {...item} key={(key || "") + "-" + i.toString()} />
-        </div>);
+        return (
+          <div
+            class:list={["navigation-item", { [`d${d}`]: _d }]}
+            data-component={item._bookshop_name}
+          >
+            <Component
+              d={(_d && d + 1) || undefined}
+              {...item}
+              key={(key || "") + "-" + i.toString()}
+            />
+          </div>
+        );
       }
     })
   }
