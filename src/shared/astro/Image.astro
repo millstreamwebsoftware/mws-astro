@@ -8,16 +8,19 @@ const preferences = _preferences as unknown as Preferences;
 type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
 export type CssAlign = `${CssAlignment} ${CssAlignment}` | CssAlignment;
 
-type ImageSource = {
-  imageSource: "public"
-  image: string,
-} | {
-  imageSource: "remote"
-  image: string,
-} | {
-  imageSource: "assets"
-  image: ImageMetadata | Promise<{default: ImageMetadata}>,
-};
+type ImageSource =
+  | {
+      imageSource: "public";
+      image: string;
+    }
+  | {
+      imageSource: "remote";
+      image: string;
+    }
+  | {
+      imageSource: "assets";
+      image: ImageMetadata | Promise<{ default: ImageMetadata }>;
+    };
 
 const DESKTOP_WIDTH = 1920;
 const MOBILE_WIDTH = 768;
@@ -58,43 +61,46 @@ const {
 
 // Get an ImgixClient instance if @imgix/js-core is installed and imgix is configured in preferences
 const ixDomain = preferences.API?.imgix?.domain;
-const ix = ixDomain ?
-  await import("@imgix/js-core").then(
-    ({default: ImgixClient}) => new ImgixClient({
-      domain: ixDomain,
-      secureURLToken: preferences.API?.imgix?.token
-    }),
-    () => undefined)
+const ix = ixDomain
+  ? await import("@imgix/js-core").then(
+      ({ default: ImgixClient }) =>
+        new ImgixClient({
+          domain: ixDomain,
+          secureURLToken: preferences.API?.imgix?.token,
+        }),
+      () => undefined,
+    )
   : undefined;
 
-const imageAssets = import.meta.glob([
-  // Assets
-  "/src/assets/**/*.svg",
-  "/src/assets/**/*.png",
-  "/src/assets/**/*.jpg",
-  "/src/assets/**/*.jpeg",
-  "/src/assets/**/*.webp",
-  "/src/assets/**/*.gif",
-  "/src/assets/**/*.tiff",
-  "/src/assets/**/*.avif",
-], {eager: true, import: "default"});
+const imageAssets = import.meta.glob(
+  [
+    // Assets
+    "/src/assets/**/*.svg",
+    "/src/assets/**/*.png",
+    "/src/assets/**/*.jpg",
+    "/src/assets/**/*.jpeg",
+    "/src/assets/**/*.webp",
+    "/src/assets/**/*.gif",
+    "/src/assets/**/*.tiff",
+    "/src/assets/**/*.avif",
+  ],
+  { eager: true, import: "default" },
+);
 
 // Set image with type assurances provided by imageSource
-const {image, imageSource} = ((image): ImageSource => {
-  if (typeof image === "object")
-    return {image, imageSource: "assets"};
+const { image, imageSource } = ((image): ImageSource => {
+  if (typeof image === "object") return { image, imageSource: "assets" };
 
-  if (/^https?:\/\/.*/.test(image))
-    return {image, imageSource: "remote"};
+  if (/^https?:\/\/.*/.test(image)) return { image, imageSource: "remote" };
 
   let imageKey = Object.keys(imageAssets).find((k) => k === `/src${image}`);
   if (imageKey)
     return {
-      image: imageAssets[`/src${image}`] as Promise<{default: ImageMetadata}>,
+      image: imageAssets[`/src${image}`] as Promise<{ default: ImageMetadata }>,
       imageSource: "assets",
     };
 
-  return {image, imageSource: "public"};
+  return { image, imageSource: "public" };
 })(Astro.props.image);
 
 var src: string | undefined;
@@ -113,14 +119,21 @@ switch (imageSource) {
 
     if (ix) {
       src = ix.buildURL(image, {}, {});
-      srcset = ix.buildSrcSet(image, {
-        auto: "format",
-        fit: "max", // Contain output within width and height without scaling up
-        q: typeof quality === "number" ? quality : {"low": 50, "mid": 60, "high": 75, "max": 100}[quality]
-      }, {
-        maxWidth: Math.floor(DESKTOP_WIDTH * displayWidth * DPR),
-        minWidth: 128,
-      });
+      srcset = ix.buildSrcSet(
+        image,
+        {
+          auto: "format",
+          fit: "max", // Contain output within width and height without scaling up
+          q:
+            typeof quality === "number"
+              ? quality
+              : { low: 50, mid: 60, high: 75, max: 100 }[quality],
+        },
+        {
+          maxWidth: Math.floor(DESKTOP_WIDTH * displayWidth * DPR),
+          minWidth: 128,
+        },
+      );
 
       let widths = srcset.split(",").map((src) => parseInt(src.split(" ")[1]));
       sizes = createImageSizes(widths);
@@ -134,17 +147,28 @@ switch (imageSource) {
     }
 
     // Get image width and allow fall-through to handle remote image via Astro's asset pipeline
-    ({width: srcWidth, height: srcHeight} =
-      await inferRemoteSize(image).catch((e) => {
-          console.warn(e);
-          return { width: undefined, height: undefined };
-        }));
-  case "assets":
-    let w = srcWidth ?? (await image as ImageMetadata).width;
-    let h = srcHeight ?? (await image as ImageMetadata).height;
+    ({ width: srcWidth, height: srcHeight } = await inferRemoteSize(
+      image,
+    ).catch((e) => {
+      console.warn(e);
+      return { width: undefined, height: undefined };
+    }));
 
-    let widths = Astro.props.widths === undefined ? createImageWidths(w, h) : Astro.props.widths ?? undefined;
-    sizes = widths && widths.length > 1 && createImageSizes(widths) || undefined;
+    if (!(srcWidth && srcHeight)) {
+      console.warn(`[Image] Failed to get remote size for image: ${image}`);
+      src = image;
+      break;
+    }
+  case "assets":
+    let w = srcWidth ?? ((await image) as ImageMetadata).width;
+    let h = srcHeight ?? ((await image) as ImageMetadata).height;
+
+    let widths =
+      Astro.props.widths === undefined
+        ? createImageWidths(w, h)
+        : (Astro.props.widths ?? undefined);
+    sizes =
+      (widths && widths.length > 1 && createImageSizes(widths)) || undefined;
 
     // Don't bother using widths/sizes for images with one width
     if (widths && widths.length < 2) {
@@ -152,7 +176,17 @@ switch (imageSource) {
       sizes = undefined;
     }
 
-    ({src, srcSet: {attribute: srcset}} = await getImage({src: image, width: srcWidth, height: srcHeight, widths, sizes, quality}));
+    ({
+      src,
+      srcSet: { attribute: srcset },
+    } = await getImage({
+      src: image,
+      width: srcWidth,
+      height: srcHeight,
+      widths,
+      sizes,
+      quality,
+    }));
     break;
   case "public":
     src = image.replace(/^\/?public\/?/, "/");
@@ -198,8 +232,8 @@ function createImageSizes(widths: number[]) {
   _sizes.reverse();
   return _sizes.join(", ");
 }
-
 ---
+
 <img
   {src}
   {srcset}
@@ -209,7 +243,7 @@ function createImageSizes(widths: number[]) {
   {style}
   data-fit={fit}
   {loading}
-  />
+/>
 
 <style>
   img {
