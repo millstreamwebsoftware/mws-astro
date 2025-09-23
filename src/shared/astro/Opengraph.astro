@@ -6,7 +6,7 @@ import { inferRemoteSize } from "@mws-astro/filesystem";
 
 export interface Props {
   title?: string;
-  description?: string;
+  description?: string | null;
   thumbnail?: any;
 }
 
@@ -18,13 +18,15 @@ let pagefindImage;
 
 // Get an ImgixClient instance if @imgix/js-core is installed and imgix is configured in preferences
 const ixDomain = preferences.API?.imgix?.domain;
-const ix = ixDomain ?
-  await import("@imgix/js-core").then(
-    ({default: ImgixClient}) => new ImgixClient({
-      domain: ixDomain,
-      secureURLToken: preferences.API?.imgix?.token
-    }),
-    () => undefined)
+const ix = ixDomain
+  ? await import("@imgix/js-core").then(
+      ({ default: ImgixClient }) =>
+        new ImgixClient({
+          domain: ixDomain,
+          secureURLToken: preferences.API?.imgix?.token,
+        }),
+      () => undefined,
+    )
   : undefined;
 
 if (!thumbnail && preferences.general.default_sharing_image) {
@@ -36,11 +38,15 @@ if (thumbnail && !ENV_BOOKSHOP_LIVE) {
 
   if (typeof thumbnail == "string" && /^https?:\/\/.*/.test(thumbnail)) {
     if (ix) {
-      imgSrc = ix.buildURL(thumbnail, {
-        w: 1024,
-        h: 1024,
-        fit: "max",
-      }, {});
+      imgSrc = ix.buildURL(
+        thumbnail,
+        {
+          w: 1024,
+          h: 1024,
+          fit: "max",
+        },
+        {},
+      );
     } else {
       try {
         const { width, height } = await inferRemoteSize(thumbnail);
@@ -49,7 +55,11 @@ if (thumbnail && !ENV_BOOKSHOP_LIVE) {
           imgSrc = await getImage({ src: thumbnail, width, height }).then(
             (r) => r.src,
           );
-      } catch {console.warn(`/!\\ An error occured while generating the thumbnail for ${Astro.url.toString()}`)}
+      } catch {
+        console.warn(
+          `/!\\ An error occured while generating the thumbnail for ${Astro.url.toString()}`,
+        );
+      }
     }
   } else {
     imgSrc = thumbnail?.src;

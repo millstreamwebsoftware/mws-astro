@@ -2,40 +2,35 @@
 import Page from "@shared/Page.astro";
 import type { CollectionEntry, CollectionKey } from "astro:content";
 import Layout from "./Layout.astro";
-import { bookshopName } from "@mws-astro/util";
 
 type Props = {
-  page: CollectionEntry<CollectionKey>;
+  page: { data: CollectionEntry<CollectionKey>["data"] };
 };
 
-const page = Astro.props.page;
-const { id, data: props } = page;
+const { data: props } = Astro.props.page;
 
 const renderers: Record<string, any> = {};
 const rendererImports = import.meta.glob("src/components/**/*.schema.astro", {
-    eager: true,
+  eager: true,
 });
 
-Object.entries(rendererImports).forEach(
-    ([path, obj]: [string, any]) => {
-      let name = path.match(/.*\/(.*?)\.schema\.astro$/)?.[1];
-      if (!name) return;
-      renderers[name] = obj.default;
-    }
-);
+Object.entries(rendererImports).forEach(([path, obj]: [string, any]) => {
+  let name = path.match(/.*\/(.*?)\.schema\.astro$/)?.[1];
+  if (!name) return;
+  renderers[name] = obj.default;
+});
 
 var Renderer = Page;
 
-if (props._schema && props._schema in renderers) {
+if (props?._schema && props._schema in renderers) {
   Renderer = renderers[props._schema];
-}
-else if (!props.content_blocks) {
-    throw new Error(
-        `Tried to output page with unsupported schema: ${props._schema}`,
-    );
+} else if (!props?.content_blocks) {
+  throw new Error(
+    `Tried to output page with unsupported schema: ${props?._schema}`,
+  );
 }
 ---
 
-<Layout {page}>
-  <Renderer bookshop:live {page} />
+<Layout {...props}>
+  <Renderer {...props} bookshop:live />
 </Layout>

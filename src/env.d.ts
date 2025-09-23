@@ -19,6 +19,8 @@ declare global {
     map?: any;
   }
 
+  type PageStatus = "online" | "hidden" | "meta" | "offline";
+
   type CSSMixBlendMode =
     | "normal"
     | "multiply"
