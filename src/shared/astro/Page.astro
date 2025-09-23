@@ -1,56 +1,60 @@
 ---
 import { bookshopName } from "@mws-astro/util";
-import type { CollectionEntry, CollectionKey } from "astro:content";
 
 export interface Props {
-    page: CollectionEntry<CollectionKey>,
-    "bookshop:live"?: any;
-    "data-lightbox"?: string;
+  status?: PageStatus;
+  content_blocks: any;
+  "bookshop:live"?: boolean;
+  "data-lightbox"?: string;
 }
 
-const { page, "data-lightbox": lightbox } = Astro.props;
+const {
+  status = "online",
+  content_blocks,
+  "data-lightbox": lightbox,
+} = Astro.props;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-    ["/src/mws-astro/src/components/**/*.astro"],
-    {
-        eager: true,
-    },
+  ["/src/mws-astro/src/components/**/*.astro"],
+  {
+    eager: true,
+  },
 );
 
 const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-    eager: true,
+  eager: true,
 });
 
 Object.entries(componentImports).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 Object.entries(componentOverrides).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
-const pagefind = page.data?.status ? (page.data.status === "online" ? "" : undefined) : true;
+const pagefind = status ? (status === "online" ? "" : undefined) : true;
 ---
 
 <main data-pagefind-body={pagefind} data-lightbox={lightbox}>
-    {
-        page.data.content_blocks?.map((block: any, i: number) => {
-            const Component = components[block._bookshop_name];
-            if (Component) {
-                return (
-                    <Component
-                        {...block}
-                        background_loading={i ? "lazy" : "eager"}
-                        key={String(i)}
-                    />
-                );
-            }
-            const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-            console.warn(warnstring);
-            return <div class="missing-component">{warnstring}</div>;
-        })
-    }
+  {
+    content_blocks?.map((block: any, i: number) => {
+      const Component = components[block._bookshop_name];
+      if (Component) {
+        return (
+          <Component
+            {...block}
+            background_loading={i ? "lazy" : "eager"}
+            key={String(i)}
+          />
+        );
+      }
+      const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+      console.warn(warnstring);
+      return <div class="missing-component">{warnstring}</div>;
+    })
+  }
 </main>

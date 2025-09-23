@@ -3,7 +3,6 @@ import preferences from "@data/preferences.json";
 import Footer from "@shared/Footer.astro";
 import Header from "@shared/Header.astro";
 import Opengraph from "@shared/Opengraph.astro";
-import type { CollectionEntry, CollectionKey } from "astro:content";
 
 import * as git from "git-rev-sync";
 
@@ -14,20 +13,24 @@ import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
 
 export interface Props {
-  page: CollectionEntry<CollectionKey>,
-  classes: string;
+  title?: string;
+  description?: string | null;
+  thumbnail?: any;
+  status?: PageStatus;
+  show_global_header?: boolean;
+  show_global_footer?: boolean;
+  classes?: any;
 }
-
-const {classes} = Astro.props;
 
 const {
   title,
   description,
-  show_global_header,
-  show_global_footer,
   thumbnail,
   status = "online",
-} = Astro.props.page.data;
+  show_global_header = true,
+  show_global_footer = true,
+  classes,
+} = Astro.props;
 
 const pageWidth = preferences.page.maximum_page_width;
 ---

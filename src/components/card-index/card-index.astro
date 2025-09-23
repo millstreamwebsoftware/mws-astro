@@ -94,7 +94,10 @@ const prefilters = prefilter
     match = filter.match(/^(?<k>.*)\*=(?<v>.*)$/)?.groups;
     if (match)
       return function IncludesFilter(card: any) {
-        return match.k in card.data && (card.data?.[match.k] as string)?.includes(match.v);
+        return (
+          match.k in card.data &&
+          (card.data?.[match.k] as string)?.includes(match.v)
+        );
       };
 
     // [attr~=value]
@@ -137,8 +140,6 @@ const pagination = !!pageSize && cards && cards?.length > pageSize;
 const lightbox =
   include?.includes("lightbox") || cardProps.include?.includes("lightbox");
 
-
-
 // function getFilterString(value: any): string | undefined {
 //   let filterString;
 
@@ -150,8 +151,6 @@ const lightbox =
 
 //   return filterString;
 // }
-
-
 
 // // {key: Set(value1,value2), key2: Set(valueA,valueB)}
 // const filterEntries = !!filters?.length && Object.fromEntries(
@@ -185,27 +184,25 @@ const lightbox =
         </div>
       )
     }
-    {pagination && (
-      <div
-        class="card-pagination"
-        data-page-size={pageSize}
-        data-page={0}
-      >
-        <button data-action="0">
-          <Icon name="fa6-solid:backward-step" height="1.5rem" />
-        </button>
-        <button data-action="-1">
-          <Icon name="fa6-solid:angle-left" height="1.5rem" />
-        </button>
-        <input type="number" value="1" min="1" />
-        <button data-action="+1">
-          <Icon name="fa6-solid:angle-right" height="1.5rem" />
-        </button>
-        <button data-action="Infinity">
-          <Icon name="fa6-solid:forward-step" height="1.5rem" />
-        </button>
-      </div>
-    )}
+    {
+      pagination && (
+        <div class="card-pagination" data-page-size={pageSize} data-page={0}>
+          <button data-action="0">
+            <Icon name="fa6-solid:backward-step" height="1.5rem" />
+          </button>
+          <button data-action="-1">
+            <Icon name="fa6-solid:angle-left" height="1.5rem" />
+          </button>
+          <input type="number" value="1" min="1" />
+          <button data-action="+1">
+            <Icon name="fa6-solid:angle-right" height="1.5rem" />
+          </button>
+          <button data-action="Infinity">
+            <Icon name="fa6-solid:forward-step" height="1.5rem" />
+          </button>
+        </div>
+      )
+    }
     <div class="card-items" style={{ "--columns": columns }}>
       {
         cards &&
@@ -247,12 +244,7 @@ const lightbox =
       lightbox && cards && (
         <Lightbox collection={id}>
           {cards.map((card, i) => {
-            return (
-              <Page
-                contentBlocks={card.data["content_blocks"]}
-                data-lightbox={`${id}-${i}`}
-              />
-            );
+            return <Page {...card.data} data-lightbox={`${id}-${i}`} />;
           })}
         </Lightbox>
       )
@@ -295,9 +287,6 @@ const lightbox =
     grid-template-areas: "items";
     grid-template-columns: 100%;
 
-
-
-
     &:has(.card-pagination) {
       grid-template-areas: "pagination" "items";
     }
@@ -309,7 +298,8 @@ const lightbox =
     &:has(.card-tools):has(.card-pagination) {
       grid-template-areas: "tools" "pagination" "items";
 
-      &.layout-left, &.layout-right {
+      &.layout-left,
+      &.layout-right {
         grid-template-rows: min-content 1fr;
       }
 
@@ -323,7 +313,6 @@ const lightbox =
       }
     }
   }
-
 
   .card-index-item {
     display: contents;
@@ -353,7 +342,7 @@ const lightbox =
 </style>
 
 <style lang="scss" is:global>
-  .card-index-container:is(.layout-left,.layout-right) .card-filter-set {
+  .card-index-container:is(.layout-left, .layout-right) .card-filter-set {
     p {
       padding-left: 0;
     }
@@ -380,9 +369,8 @@ const lightbox =
     gap: 2rem;
     flex-wrap: wrap;
 
-
     .filter-item {
-      padding: .2rem 1rem;
+      padding: 0.2rem 1rem;
 
       border: 1px solid currentColor;
       border-radius: var(--border-radius);
@@ -533,16 +521,18 @@ const lightbox =
       })
       .join("");
 
-    filters.querySelector<HTMLButtonElement>('button[data-filter="clear"]')?.addEventListener("click", clearFilters);
+    filters
+      .querySelector<HTMLButtonElement>('button[data-filter="clear"]')
+      ?.addEventListener("click", clearFilters);
 
     // filters.addEventListener("click", evaluateFilters);
     filters.addEventListener("change", evaluateFilters);
   }
 
   function clearFilters(e: Event) {
-    const index: HTMLElement | null = (e.currentTarget as HTMLButtonElement).closest(
-      ".card-index-container",
-    );
+    const index: HTMLElement | null = (
+      e.currentTarget as HTMLButtonElement
+    ).closest(".card-index-container");
     if (!index) return;
 
     const filters = Array.from(
@@ -551,7 +541,7 @@ const lightbox =
 
     if (!filters.length) return;
 
-    filters.forEach(filter => {
+    filters.forEach((filter) => {
       filter.checked = false;
     });
 
@@ -566,9 +556,7 @@ const lightbox =
     // if (!clickedButton.matches("button")) return;
     // if (!clickedButton.matches("button")) return;
 
-    const index: HTMLElement | null = target.closest(
-      ".card-index-container",
-    );
+    const index: HTMLElement | null = target.closest(".card-index-container");
     if (!index) return;
 
     const filters = Array.from(
@@ -626,9 +614,7 @@ const lightbox =
     //         .join("")
     //     : "");
 
-    const include = filters.filter(
-      (filter) => filter.checked,
-    );
+    const include = filters.filter((filter) => filter.checked);
 
     const selector =
       "*" +

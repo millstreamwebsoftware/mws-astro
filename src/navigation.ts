@@ -20,11 +20,6 @@ export function urlToId(url: string | URL) {
   return _url.replaceAll(/(^\/|\/$)/g, "");
 }
 
-function clog<T>(a: T): T {
-  console.log(a);
-  return a;
-}
-
 function cleanId(slug: string) {
   return stripIndex(stripFiletype(stripSlashes(slug)));
 }
