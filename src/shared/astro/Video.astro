@@ -85,7 +85,11 @@ if (url.hostname.endsWith("vimeo.com")) {
 ---
 
 <div class:list={["video-wrapper", { background }]}>
-  {embed && <iframe src={embed} allowfullscreen allow="autoplay" />}
+  {
+    embed && !ENV_BOOKSHOP_LIVE && (
+      <iframe src={embed} allowfullscreen allow="autoplay" />
+    )
+  }
 </div>
 <style lang="scss">
   .video-wrapper.background {
