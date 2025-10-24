@@ -36,6 +36,11 @@ Object.entries(componentOverrides).forEach(
     (components[bookshopName(path)] = obj.default),
 );
 
+if (ENV_BOOKSHOP_LIVE) {
+  console.info("[Page] Props:", Astro.props);
+  console.info("[Page] Content Blocks:", Object.keys(components));
+}
+
 const pagefind = status ? (status === "online" ? "" : undefined) : true;
 ---
 
