@@ -20,11 +20,15 @@ Object.entries(rendererImports).forEach(([path, obj]: [string, any]) => {
   renderers[name] = obj.default;
 });
 
-var Renderer = Page;
+// var Renderer = Page;
+
+var Renderer;
 
 if (props?._schema && props._schema in renderers) {
   Renderer = renderers[props._schema];
-} else if (!props?.content_blocks) {
+}
+
+if (Renderer === undefined && !("content_blocks" in props)) {
   throw new Error(
     `Tried to output page with unsupported schema: ${props?._schema}`,
   );
@@ -32,5 +36,15 @@ if (props?._schema && props._schema in renderers) {
 ---
 
 <Layout {...props}>
-  <Renderer {...props} content_blocks={props.content_blocks} bookshop:live />
+  {
+    Renderer === undefined ? (
+      <Page {...props} content_blocks={props.content_blocks} bookshop:live />
+    ) : (
+      <Renderer
+        {...props}
+        content_blocks={props.content_blocks}
+        bookshop:live
+      />
+    )
+  }
 </Layout>
