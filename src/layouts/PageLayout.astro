@@ -32,5 +32,5 @@ if (props?._schema && props._schema in renderers) {
 ---
 
 <Layout {...props}>
-  <Renderer {...props} bookshop:live />
+  <Renderer {...props} content_blocks={props.content_blocks} bookshop:live />
 </Layout>
