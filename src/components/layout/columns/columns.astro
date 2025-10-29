@@ -122,7 +122,11 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     grid-auto-flow: row;
     background-color: rgb(var(--background-color));
 
-    grid-template-columns: var(--page-max-width-padding) var(--layout) var(--page-max-width-padding);
+    grid-template-columns:
+      var(--page-max-width-padding)
+      var(--layout)
+      var(--page-max-width-padding);
+
     &.fullwidth {
       grid-template-columns: 0 var(--layout) 0;
     }
@@ -155,6 +159,7 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 </style>
 
 <style is:global lang="scss">
+  /* Millstream CMS Compatibility */
   :is(.one-two, ._twoononenarrowfirst) > .component-wrapper > .columns {
     --layout: 1fr 2fr;
   }
@@ -166,11 +171,6 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
   }
   .three-one > .component-wrapper > .columns {
     --layout: 3fr 1fr;
-  }
-
-  /* Millstream CMS Compatibility */
-  ._twoononenarrowfirst > .component-wrapper > .columns {
-    grid-template-columns: 1fr 2fr;
   }
 
   .columns-item > section {
@@ -210,11 +210,14 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
 
   main > section.columns:first-of-type > .component-wrapper > .columns {
     > .first-in-column > section > .component-wrapper {
-        margin-top: calc(var(--header-height) - var(--header-content-offset));
-      }
+      margin-top: calc(var(--header-height) - var(--header-content-offset));
+    }
 
     @media only screen and (max-width: 768px) {
-      &.collapse > .first-in-column:not(:first-child) > section > .component-wrapper {
+      &.collapse
+        > .first-in-column:not(:first-child)
+        > section
+        > .component-wrapper {
         margin-top: 0;
       }
     }
@@ -228,7 +231,6 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     div.columns.collapse.collapse {
       --columns: 1 !important;
       /*--layout: 1fr !important;*/
-      /* gap: var(--indent); */
       grid-template-columns: 1fr;
 
       > .columns-item {
