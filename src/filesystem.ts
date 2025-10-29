@@ -152,7 +152,7 @@ export async function inferRemoteSize(url: string) {
       remote.headers
         .get("Cache-Control")
         ?.match(/.*(?:s-)?max-age=([0-9]*).*/)?.[1],
-    ) || 0;
+    ) * 1000 || 0;
 
   const cache = schema.parse({
     url,
@@ -165,7 +165,7 @@ export async function inferRemoteSize(url: string) {
 
   await setCacheFile(cacheFileName, cache);
   console.log(
-    `[InferSize][${cacheMissReason}] Requested image dimensions (${cache.width}, ${cache.height}) from ${url}`,
+    `[InferSize][${cacheMissReason}] Requested image dimensions (${cache.width}, ${cache.height}) from ${url}. The cache will last until ${new Date(cache.expires).toString()}`,
   );
   return { width: cache.width, height: cache.height };
 }
