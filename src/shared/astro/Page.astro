@@ -2,17 +2,18 @@
 import { bookshopName } from "@mws-astro/util";
 
 export interface Props {
-  status?: PageStatus;
-  content_blocks: any;
+  contentBlocks: any[];
   "bookshop:live"?: boolean;
   "data-lightbox"?: string;
 }
 
-const {
-  status = "online",
-  content_blocks,
-  "data-lightbox": lightbox,
-} = Astro.props;
+const { contentBlocks, "data-lightbox": lightbox } = Astro.props;
+
+const frontmatter = contentBlocks.find(
+  (b) => b._bookshop_name === "_meta",
+)?.frontmatter;
+
+const status = frontmatter?.status;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
@@ -46,12 +47,14 @@ const pagefind = status ? (status === "online" ? "" : undefined) : true;
 
 <main data-pagefind-body={pagefind} data-lightbox={lightbox}>
   {
-    content_blocks?.map((block: any, i: number) => {
+    contentBlocks?.map((block: any, i: number) => {
+      if ((block._bookshop_name as string).startsWith("_")) return;
       const Component = components[block._bookshop_name];
       if (Component) {
         return (
           <Component
             {...block}
+            _meta={frontmatter}
             background_loading={i ? "lazy" : "eager"}
             key={String(i)}
           />

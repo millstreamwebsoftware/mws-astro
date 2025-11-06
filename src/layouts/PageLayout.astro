@@ -4,10 +4,13 @@ import type { CollectionEntry, CollectionKey } from "astro:content";
 import Layout from "./Layout.astro";
 
 type Props = {
-  page: { data: CollectionEntry<CollectionKey>["data"] };
+  frontmatter: CollectionEntry<CollectionKey>["data"];
 };
 
-const { data: props } = Astro.props.page;
+const props = Astro.props.frontmatter;
+// const contentBlocks = props.content_blocks;
+
+const { content_blocks: contentBlocks, _schema } = props;
 
 const renderers: Record<string, any> = {};
 const rendererImports = import.meta.glob("src/components/**/*.schema.astro", {
@@ -20,29 +23,27 @@ Object.entries(rendererImports).forEach(([path, obj]: [string, any]) => {
   renderers[name] = obj.default;
 });
 
-// var Renderer = Page;
-
 var Renderer = undefined;
 
-if (props?._schema && props._schema in renderers) {
-  Renderer = renderers[props._schema];
-} else if (!props.content_blocks) {
-  throw new Error(
-    `Tried to output page with unsupported schema: ${props._schema}`,
-  );
+if (_schema && _schema in renderers) {
+  Renderer = renderers[_schema];
+} else if (!contentBlocks) {
+  throw new Error(`Tried to output page with unsupported schema: ${_schema}`);
 }
+
+// Pass frontmatter into the live context hidden within contentBlocks
+contentBlocks.unshift({
+  _bookshop_name: "_meta",
+  frontmatter: { ...props, content_blocks: undefined },
+});
 ---
 
 <Layout {...props}>
   {
-    typeof Renderer === "undefined" ? (
-      <Page {...props} content_blocks={props.content_blocks} bookshop:live />
+    Renderer ? (
+      <Renderer bookshop:live {contentBlocks} />
     ) : (
-      <Renderer
-        {...props}
-        content_blocks={props.content_blocks}
-        bookshop:live
-      />
+      <Page bookshop:live {contentBlocks} />
     )
   }
 </Layout>

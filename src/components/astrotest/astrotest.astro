@@ -1,24 +1,33 @@
 ---
 export interface Props {
-  text: string;
+  text?: string;
+  _meta?: any;
 }
 
-const { text } = Astro.props;
+const { text, _meta } = Astro.props;
 
 const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
-
-//{typeof Astro.locals === "object" && <Debug locals={Object.keys(Astro.locals)} />}
 ---
 
 <div>
   <p>
     Live Editing Status: <span id="astro-test">{String(ENV_EDITOR)}</span>
   </p>
-  <p>Test data: <span>{text}</span></p>
-  <p>Middleware: <span>{typeof Astro.locals}</span></p>
+  {
+    text && (
+      <p>
+        Test data: <span>{text}</span>
+      </p>
+    )
+  }
+  {_meta && <pre>{_meta.toString()}</pre>}
 </div>
 
 <style>
+  pre {
+    display: none;
+  }
+
   #astro-test {
     background-color: lightcoral;
     border: 1px solid grey;

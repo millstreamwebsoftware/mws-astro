@@ -244,7 +244,12 @@ const lightbox =
       lightbox && cards && (
         <Lightbox collection={id}>
           {cards.map((card, i) => {
-            return <Page {...card.data} data-lightbox={`${id}-${i}`} />;
+            return (
+              <Page
+                contentBlocks={card.data.content_blocks}
+                data-lightbox={`${id}-${i}`}
+              />
+            );
           })}
         </Lightbox>
       )
