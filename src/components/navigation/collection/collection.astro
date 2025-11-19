@@ -120,16 +120,11 @@ const _d = d !== undefined;
 
       if (Component) {
         return (
-          <div
-            class:list={["navigation-item", { [`d${d}`]: _d }]}
-            data-component={item._bookshop_name}
-          >
-            <Component
-              d={(_d && d + 1) || undefined}
-              {...item}
-              key={(key || "") + "-" + i.toString()}
-            />
-          </div>
+          <Component
+            d={(_d && d + 1) || undefined}
+            {...item}
+            key={(key || "") + "-" + i.toString()}
+          />
         );
       }
     })

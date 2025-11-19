@@ -49,6 +49,7 @@ const _d = d !== undefined;
   aria-labelledby={`${key}-label`}
   aria-haspopup="menu"
   data-placement={horizontal ? "right-start" : "bottom-start"}
+  data-depth={d}
   tabindex="0"
 >
   <span id={`${key}-label`} class="dropdown-label"
@@ -64,17 +65,14 @@ const _d = d !== undefined;
           Component = Astro.self;
           horizontal = true;
         }
-        const collection = item.collection;
         if (Component) {
           return (
-            <div class:list={["navigation-item", {[`d${d}`]: _d}]} data-component={item._bookshop_name} data-collection={collection}>
-              <Component
-                {...item}
-                {horizontal}
-                key={(key || "") + "-" + i.toString()}
-                d={(_d && d + 1) || undefined}
-              />
-            </div>
+            <Component
+              d={(_d && d + 1) || undefined}
+              {...item}
+              {horizontal}
+              key={(key || "") + "-" + i.toString()}
+            />
           );
         }
       })
@@ -393,11 +391,15 @@ const _d = d !== undefined;
     &.floating > .dropdown-items {
       position: fixed;
       box-shadow: 2px 2px 16px #00000044;
-      background-color: rgb(var(--header-dropdown-background-color, var(--header-background-color)));
-      border: var(--header-dropdown-border-width,var(--header-border-width)) solid rgb(var(--header-dropdown-border-color, var(--header-border-color)));
+      background-color: rgb(
+        var(--header-dropdown-background-color, var(--header-background-color))
+      );
+      border: var(--header-dropdown-border-width, var(--header-border-width))
+        solid
+        rgb(var(--header-dropdown-border-color, var(--header-border-color)));
       border-radius: var(--header-border-radius);
 
-      color: rgb(var(--header-dropdown-color,var(--header-color)));
+      color: rgb(var(--header-dropdown-color, var(--header-color)));
     }
 
     &.dropdown-open > .dropdown-items {

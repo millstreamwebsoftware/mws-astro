@@ -7,16 +7,25 @@ export interface Props {
   new_tab?: boolean;
   selected?: "selected" | "ancestor" | false;
   key?: string;
+  d?: number;
 }
 
-const { title, link, selected, key } = Astro.props;
+const { title, link, selected, key, d } = Astro.props;
 
 const external = /^[A-z1-9+.-]*:\/\/.*/.test(link);
 
-const new_tab = (Astro.props.new_tab ?? external) ? {target: "_blank", rel: "noopener"} : {};
+const new_tab =
+  (Astro.props.new_tab ?? external)
+    ? { target: "_blank", rel: "noopener" }
+    : {};
 ---
 
-<a id={key} href={link} class:list={[{ external, selected: selected === "selected" }]} {...new_tab}
+<a
+  id={key}
+  href={link}
+  class:list={[{ external, selected: selected === "selected" }]}
+  data-depth={d}
+  {...new_tab}
   >{title}{external && <Icon name="carbon:launch" height="1em" />}
 </a>
 

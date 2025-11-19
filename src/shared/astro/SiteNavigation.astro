@@ -63,21 +63,12 @@ const navBars = [primary, secondary];
               const collection = item.collection;
               if (Component) {
                 return (
-                  <div
-                    class:list={[
-                      "navigation-item",
-                      { d0: item._bookshop_name !== "navigation/collection" },
-                    ]}
-                    data-component={item._bookshop_name}
-                    data-collection={collection}
-                  >
-                    <Component
-                      {...item}
-                      horizontal={false}
-                      key={"navi-" + i.toString()}
-                      d={0}
-                    />
-                  </div>
+                  <Component
+                    {...item}
+                    horizontal={false}
+                    key={"navi-" + i.toString()}
+                    d={0}
+                  />
                 );
               } else {
                 console.warn(
