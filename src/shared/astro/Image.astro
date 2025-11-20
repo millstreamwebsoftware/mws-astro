@@ -93,10 +93,11 @@ const { image, imageSource } = ((image): ImageSource => {
 
   if (/^https?:\/\/.*/.test(image)) return { image, imageSource: "remote" };
 
-  let imageKey = Object.keys(imageAssets).find((k) => k === `/src${image}`);
+  // let imageKey = Object.keys(imageAssets).find((k) => k === `/src${image}`);
+  let imageKey = Object.keys(imageAssets).find((k) => k.endsWith(image));
   if (imageKey)
     return {
-      image: imageAssets[`/src${image}`] as Promise<{ default: ImageMetadata }>,
+      image: imageAssets[imageKey] as Promise<{ default: ImageMetadata }>,
       imageSource: "assets",
     };
 
@@ -160,8 +161,8 @@ switch (imageSource) {
       break;
     }
   case "assets":
-    let w = srcWidth ?? ((await image) as ImageMetadata).width;
-    let h = srcHeight ?? ((await image) as ImageMetadata).height;
+    let w = srcWidth ?? ((await image) as ImageMetadata)?.width;
+    let h = srcHeight ?? ((await image) as ImageMetadata)?.height;
 
     let widths =
       Astro.props.widths === undefined
