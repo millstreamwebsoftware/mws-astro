@@ -1,0 +1,53 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Section from "@layouts/Section.astro";
+---
+
+<Layout title="Search" show_global_header={true} show_global_footer={true}>
+    <main>
+        <Section component="search">
+            <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+            <script is:inline src="/pagefind/pagefind-ui.js"></script>
+            <div id="search"></div>
+            <script is:inline>
+                window.addEventListener("DOMContentLoaded", () => {
+                    let search = new PagefindUI({
+                        element: "#search",
+                        showSubResults: true,
+                    });
+
+                    let searchParams = new URLSearchParams(
+                        window.location.search,
+                    );
+                    if (searchParams.has("q")) {
+                        search.triggerSearch(searchParams.get("q"));
+                    }
+                });
+            </script>
+        </Section>
+    </main>
+</Layout>
+
+<style is:global lang="scss">
+    .pagefind-ui {
+        --pagefind-ui-border-radius: var(--border-radius);
+        --pagefind-ui-text: rgb(var(--text-color));
+        
+        form.pagefind-ui__form::before {
+            background-color: rgb(var(--color-accent));
+        }
+        
+        input.pagefind-ui__search-input, button.pagefind-ui__search-clear {
+            color: rgb(var(--color-accent));
+        }
+    }
+
+    .pagefind-ui
+        li.pagefind-ui__result
+        > div.pagefind-ui__result-thumb
+        > img.pagefind-ui__result-image {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+</style>

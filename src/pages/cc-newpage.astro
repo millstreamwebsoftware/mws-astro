@@ -1,0 +1,14 @@
+---
+import PageLayout from "@layouts/PageLayout.astro";
+import { frontmatter } from "schemas/page.md";
+import { type CollectionEntry } from "astro:content";
+
+const page: Pick<CollectionEntry<"pages">, "id" | "data"> = {
+  id: "new-page",
+  data: frontmatter as CollectionEntry<"pages">["data"],
+};
+
+// if (BUILDMODE !== "EDITOR") return Astro.rewrite("/");
+---
+
+<PageLayout frontmatter={page.data} />
