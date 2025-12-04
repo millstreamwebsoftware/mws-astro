@@ -1,7 +1,12 @@
 export default (options?: Options): import("astro").AstroIntegration => ({
   name: "mws-astro",
   hooks: {
-    "astro:config:setup": ({ injectRoute }) => {
+    "astro:config:setup": ({ injectRoute, updateConfig }) => {
+      // Allow vite to import css from the sanitize.css subpackage
+      updateConfig({
+        vite: { ssr: { noExternal: ["sanitize.css"] } },
+      });
+
       injectRoute({
         pattern: "[...slug]",
         entrypoint: "src/mws-astro/src/pages/pages.astro",

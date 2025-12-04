@@ -1,6 +1,6 @@
 {
   "name": "@millstreamwebsoftware/mws-astro",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "type": "module",
   "baseUrl": ".",
@@ -16,8 +16,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "astro": "^5.16.3",
-    "prettier": "^3.7.3",
+    "astro": "^5.16.4",
+    "prettier": "^3.7.4",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.9.3"
   },
