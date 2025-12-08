@@ -153,8 +153,31 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     }
   }
 
-  .columns-item {
+  :where(.columns-item) {
     min-width: 0;
+
+    > :global(section) {
+      height: 100%;
+
+      &:not(.no-indent) {
+        padding: calc(var(--column-gap));
+      }
+    }
+  }
+
+  :where(.columns) > {
+    .first-in-row > :global(:where(section:not(.no-indent))) {
+      padding-left: var(--indent);
+    }
+    .last-in-row > :global(:where(section:not(.no-indent))) {
+      padding-right: var(--indent);
+    }
+    .first-in-column > :global(:where(section:not(.no-indent))) {
+      padding-top: calc(var(--indent) * var(--vertical-indent));
+    }
+    .last-in-column > :global(:where(section:not(.no-indent))) {
+      padding-bottom: calc(var(--indent) * var(--vertical-indent));
+    }
   }
 </style>
 
@@ -173,32 +196,12 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     --layout: 3fr 1fr;
   }
 
-  .columns-item > section {
-    height: 100%;
-    padding: calc(var(--column-gap));
-  }
-
   div.columns:not(.fullwidth) .columns-item {
     &.first-in-row > section:not(.no-indent) > .component-wrapper {
       margin-left: var(--page-max-width-padding);
     }
     &.last-in-row > section:not(.no-indent) > .component-wrapper {
       margin-right: var(--page-max-width-padding);
-    }
-  }
-
-  :where(.columns) > {
-    .first-in-row > section:not(.no-indent) {
-      padding-left: var(--indent);
-    }
-    .last-in-row > section:not(.no-indent) {
-      padding-right: var(--indent);
-    }
-    .first-in-column > section:not(.no-indent) {
-      padding-top: calc(var(--indent) * var(--vertical-indent));
-    }
-    .last-in-column > section:not(.no-indent) {
-      padding-bottom: calc(var(--indent) * var(--vertical-indent));
     }
   }
 
