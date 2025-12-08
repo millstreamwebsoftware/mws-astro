@@ -1,4 +1,5 @@
 @import "src/styles/editor.css";
+@layer component;
 
 :where(:root) {
   --page-max-width: 1920px;
