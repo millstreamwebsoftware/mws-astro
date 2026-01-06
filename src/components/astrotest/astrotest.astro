@@ -1,4 +1,6 @@
 ---
+import { BUILDMODE } from 'astro:env/server';
+
 export interface Props {
   text?: string;
   _meta?: any;
@@ -6,12 +8,12 @@ export interface Props {
 
 const { text, _meta } = Astro.props;
 
-const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
+// const ENV_EDITOR: boolean = ENV_BOOKSHOP_LIVE || false;
 ---
 
 <div>
   <p>
-    Live Editing Status: <span id="astro-test">{String(ENV_EDITOR)}</span>
+    Editing Status: <span id="astro-test">{String(BUILDMODE)}</span>
   </p>
   {
     text && (

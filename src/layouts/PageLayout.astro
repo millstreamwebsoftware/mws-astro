@@ -41,9 +41,9 @@ contentBlocks.unshift({
 <Layout {...props}>
   {
     Renderer ? (
-      <Renderer bookshop:live {contentBlocks} />
+      <Renderer {contentBlocks} />
     ) : (
-      <Page bookshop:live {contentBlocks} />
+      <Page {contentBlocks} />
     )
   }
 </Layout>

@@ -9,6 +9,7 @@ import Icon from "@shared/icon.astro";
 import { formatBytes } from "@mws-astro/util";
 import { getFilesize, resolvePath } from "@mws-astro/filesystem";
 import { getPDFThumbnail } from "@mws-astro/pdf";
+import { BUILDMODE } from "astro:env/server";
 
 export interface Props extends Partial<SectionProps> {
     files?: [
@@ -90,7 +91,7 @@ function getIcon(path: string) {
     }
 }
 
-if (!ENV_BOOKSHOP_LIVE && files?.length) {
+if (BUILDMODE !== "EDITOR" && files?.length) {
     await Promise.all(
         files.map(async (file) => {
             file.size = await getFilesize(file.path);

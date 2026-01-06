@@ -14,6 +14,7 @@ import AsideImage from "@components/image/asideImage.astro";
 import Player from "@components/player/player.astro";
 import Accordion from "@components/accordion/accordion.astro";
 import Navigation from "@components/navigation/navigation.astro";
+import { BUILDMODE } from "astro:env/server";
 
 // Preprocess markdown to convert base64 encoded embeds to html, and force newlines after html elements
 const content = forceHTMLBlocks(replaceCmsEmbeds(Astro.props.content));
@@ -35,8 +36,7 @@ var substitutions = {
 
 var md: string | undefined;
 
-// @ts-ignore
-if (ENV_BOOKSHOP_LIVE) {
+if (BUILDMODE === "EDITOR") {
   marked.use(gfmHeadingId());
   md = await marked.parse(content);
 } else {

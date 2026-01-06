@@ -12,6 +12,12 @@ import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
 
+import { BUILDMODE } from "astro:env/server";
+if (BUILDMODE === "EDITOR") {
+  import("@mws-astro/register-components");
+}
+
+
 export interface Props {
   title?: string;
   description?: string | null;

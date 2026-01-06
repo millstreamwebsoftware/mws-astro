@@ -1,7 +1,8 @@
+import { BUILDMODE } from "astro:env/server";
 import { resolvePath } from "./filesystem";
 
 export async function getPDFThumbnail(file: string, pageNum = 0, res = 512) {
-  if (!ENV_BOOKSHOP_LIVE) {
+  if (BUILDMODE !== "EDITOR") {
     const [fs, pdf, sharp, crypto] = await Promise.all([
       import("node:fs"),
       import("mupdf"),
