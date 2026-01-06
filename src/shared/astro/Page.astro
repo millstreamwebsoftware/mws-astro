@@ -1,6 +1,5 @@
 ---
 import { bookshopName } from "@mws-astro/util";
-import { BUILDMODE } from "astro:env/server";
 
 export interface Props {
   contentBlocks: any[];
@@ -38,10 +37,10 @@ Object.entries(componentOverrides).forEach(
     (components[bookshopName(path)] = obj.default),
 );
 
-if (BUILDMODE === "EDITOR") {
-  console.info("[Page] Props:", Astro.props);
-  console.info("[Page] Content Blocks:", Object.keys(components));
-}
+// if (BUILDMODE === "EDITOR") {
+//   console.info("[Page] Props:", Astro.props);
+//   console.info("[Page] Content Blocks:", Object.keys(components));
+// }
 
 const pagefind = status ? (status === "online" ? "" : undefined) : true;
 ---

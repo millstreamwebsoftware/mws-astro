@@ -1,6 +1,6 @@
 import { z } from "astro/zod";
 import { inferRemoteSize as _inferRemoteSize } from "astro:assets";
-import { BUILDMODE } from "astro:env/server";
+// import { BUILDMODE } from "astro:env/server";
 
 var fs: typeof import("node:fs/promises") | undefined,
   path: typeof import("node:path") | undefined,
@@ -8,25 +8,21 @@ var fs: typeof import("node:fs/promises") | undefined,
 const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
 
 async function ensureFS(): Promise<boolean> {
-  if (BUILDMODE !== "EDITOR") {
-    if (!fs)
-      fs =
-        (await import("node:fs/promises").catch(() =>
-          console.error("node:fs/promises import failed"),
-        )) ?? undefined;
+  if (!fs)
+    fs =
+      (await import("node:fs/promises").catch(() =>
+        console.error("node:fs/promises import failed"),
+      )) ?? undefined;
 
-    if (!path)
-      path =
-        (await import("node:path").catch(() =>
-          console.error("node:path import failed"),
-        )) ?? undefined;
+  if (!path)
+    path =
+      (await import("node:path").catch(() =>
+        console.error("node:path import failed"),
+      )) ?? undefined;
 
-    if (!createHash) ({ createHash } = await import("node:crypto"));
+  if (!createHash) ({ createHash } = await import("node:crypto"));
 
-    return Boolean(fs) && Boolean(path) && Boolean(createHash);
-  }
-
-  return false;
+  return Boolean(fs) && Boolean(path) && Boolean(createHash);
 }
 
 export async function resolvePath(file: string): Promise<string | undefined> {

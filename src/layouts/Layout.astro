@@ -12,12 +12,10 @@ import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
 
-// import { BUILDMODE } from "astro:env/server";
+import { BUILDMODE } from "astro:env/server";
 // if (BUILDMODE === "EDITOR") {
 //   import("@mws-astro/register-components");
 // }
-
-import "@mws-astro/register-components";
 
 export interface Props {
   title?: string;
@@ -61,6 +59,8 @@ const pageWidth = preferences.page.maximum_page_width;
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <Opengraph {title} {description} {thumbnail} />
+
+    {BUILDMODE === "EDITOR" && <script src="@mws-astro/register-components"></script> }
 
     <script>
       window.addEventListener(

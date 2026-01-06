@@ -1,7 +1,6 @@
 ---
 import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
 import preferences from "@data/preferences.json";
-import { BUILDMODE } from "astro:env/server";
 
 export interface Props extends Partial<SectionProps> {
     location?: string;
@@ -19,7 +18,7 @@ const {
     zoom,
 } = Astro.props;
 
-const bs = BUILDMODE === "EDITOR";
+const bs = typeof window !== undefined;
 
 const apiKey =
     bs || import.meta.env.DEV

@@ -1,6 +1,4 @@
 ---
-import { BUILDMODE } from 'astro:env/server';
-
 export interface Props {
   text?: string;
   _meta?: any;
@@ -12,9 +10,6 @@ const { text, _meta } = Astro.props;
 ---
 
 <div>
-  <p>
-    Editing Status: <span id="astro-test">{String(BUILDMODE)}</span>
-  </p>
   {
     text && (
       <p>

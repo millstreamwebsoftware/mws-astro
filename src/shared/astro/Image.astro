@@ -3,7 +3,6 @@ import { inferRemoteSize } from "@mws-astro/filesystem";
 import { Image as AstroImage } from "astro:assets";
 import _preferences from "@data/preferences.json";
 import { getImage } from "astro:assets";
-import { BUILDMODE } from "astro:env/server";
 const preferences = _preferences as unknown as Preferences;
 
 type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
@@ -143,7 +142,7 @@ switch (imageSource) {
     }
 
     // Don't optimise remote images in the editor
-    if (BUILDMODE === "EDITOR") {
+    if (typeof window !== undefined) {
       src = image;
       break;
     }

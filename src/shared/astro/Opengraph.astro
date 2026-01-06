@@ -3,7 +3,6 @@ import _preferences from "@data/preferences.json";
 const preferences: Preferences = _preferences as unknown as Preferences;
 import { getImage } from "astro:assets";
 import { inferRemoteSize } from "@mws-astro/filesystem";
-import { BUILDMODE } from "astro:env/server";
 
 export interface Props {
   title?: string;
@@ -34,7 +33,7 @@ if (!thumbnail && preferences.general.default_sharing_image) {
   thumbnail = preferences.general.default_sharing_image;
 }
 
-if (thumbnail && BUILDMODE !== "EDITOR") {
+if (thumbnail && typeof window === undefined) {
   let imgSrc;
 
   if (typeof thumbnail == "string" && /^https?:\/\/.*/.test(thumbnail)) {
