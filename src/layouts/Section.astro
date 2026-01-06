@@ -138,7 +138,7 @@ const expando = classList.includes("expando") ? true : false;
   <div class="component-wrapper">
     {
       content && (
-        <div class="text-content">
+        <div class="text-content" data-editable="text" data-prop="content">
           <Markdown {content} />
         </div>
       )

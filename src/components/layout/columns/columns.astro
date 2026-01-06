@@ -90,6 +90,10 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     class:list={["columns", { collapse, fullwidth }]}
     style={{ "--columns": columns }}
     data-columns={columns}
+    data-editable="array"
+    data-prop="content_blocks"
+    data-id-key="_bookshop_name"
+    data-component-key="_bookshop_name"
   >
     {
       items.map((block: any, i: number) => {
@@ -103,8 +107,9 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
                 "grid-column": block.columnString,
               }}
               class:list={["columns-item", block.cell]}
+              data-editable="array-item"
             >
-              <Component {...block} key={(key || "") + "-" + i.toString()} />
+              <Component {...block} key={(key || "") + "-" + i.toString()} data-id={block._bookshop_name} data-component={block._bookshop_name} />
             </div>
           );
         }
