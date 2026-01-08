@@ -57,9 +57,9 @@ registerAstroComponent("counter", Counter);
 registerAstroComponent("astrotest", Astrotest);
 registerAstroComponent("player", Player);
 
+registerAstroComponent("navigation", Navigation);
 registerAstroComponent("navigation/dropdown", Dropdown);
 registerAstroComponent("navigation/collection", Collection);
-registerAstroComponent("navigation", Navigation);
 registerAstroComponent("navigation/quicklink", Quicklink);
 registerAstroComponent("navigation/search", Search);
 registerAstroComponent("navigation/social", SocialNavigation);

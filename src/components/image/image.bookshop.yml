@@ -41,7 +41,7 @@ blueprint:
   description:
   alt:
   height: 50
-  indent: true
+  indent:
   lightbox: true
   content:
   classes:

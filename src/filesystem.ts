@@ -8,21 +8,25 @@ var fs: typeof import("node:fs/promises") | undefined,
 const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
 
 async function ensureFS(): Promise<boolean> {
-  if (!fs)
-    fs =
-      (await import("node:fs/promises").catch(() =>
-        console.error("node:fs/promises import failed"),
-      )) ?? undefined;
+  if (import.meta.env.SSR) {
+    if (!fs)
+      fs =
+        (await import("node:fs/promises").catch(() =>
+          console.error("node:fs/promises import failed"),
+        )) ?? undefined;
 
-  if (!path)
-    path =
-      (await import("node:path").catch(() =>
-        console.error("node:path import failed"),
-      )) ?? undefined;
+    if (!path)
+      path =
+        (await import("node:path").catch(() =>
+          console.error("node:path import failed"),
+        )) ?? undefined;
 
-  if (!createHash) ({ createHash } = await import("node:crypto"));
+    if (!createHash) ({ createHash } = await import("node:crypto"));
 
-  return Boolean(fs) && Boolean(path) && Boolean(createHash);
+    return Boolean(fs) && Boolean(path) && Boolean(createHash);
+  }
+  console.warn("filesystem is not available on the client");
+  return false;
 }
 
 export async function resolvePath(file: string): Promise<string | undefined> {

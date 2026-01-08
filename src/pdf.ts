@@ -1,18 +1,23 @@
 import { resolvePath } from "./filesystem";
 
+var fs: typeof import("node:fs") | undefined,
+  pdf: typeof import("mupdf") | undefined,
+  sharp: typeof import("sharp") | undefined,
+  createHash: (typeof import("node:crypto"))["createHash"] | undefined;
+
 export async function getPDFThumbnail(file: string, pageNum = 0, res = 512) {
-  if (typeof window === undefined) {
-    const [fs, pdf, sharp, crypto] = await Promise.all([
+  if (import.meta.env.SSR) {
+    [fs, pdf, sharp, createHash] = await Promise.all([
       import("node:fs"),
       import("mupdf"),
-      import("sharp"),
-      import("crypto"),
+      import("sharp").then((s) => s.default),
+      import("crypto").then((c) => c.createHash),
     ]);
 
     const filePath = await resolvePath(file);
     if (!filePath) return;
 
-    const hash = crypto.createHash("md5");
+    const hash = createHash("md5");
 
     hash.update(`${file}${pageNum}${res}`, "utf-8");
     let thumbPath = `${filePath}.${hash.digest("hex").slice(0, 6)}.webp`;
@@ -38,7 +43,7 @@ export async function getPDFThumbnail(file: string, pageNum = 0, res = 512) {
       true,
     );
 
-    await sharp.default(pixmap.asPNG()).webp({ quality: 60 }).toFile(thumbPath);
+    await sharp(pixmap.asPNG()).webp({ quality: 60 }).toFile(thumbPath);
 
     console.log(
       `[PDF Thumbnailer] Generated ${thumbPath} in ${(performance.now() - time).toFixed(0)}ms`,
@@ -46,4 +51,6 @@ export async function getPDFThumbnail(file: string, pageNum = 0, res = 512) {
 
     return thumbPath;
   }
+
+  console.warn("filesystem is not available on the client");
 }

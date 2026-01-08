@@ -35,7 +35,7 @@ var substitutions = {
 
 var md: string | undefined;
 
-if (typeof window !== undefined) {
+if (!import.meta.env.SSR) {
   marked.use(gfmHeadingId());
   md = await marked.parse(content);
 } else {
