@@ -15,6 +15,7 @@ preview:
       icon: tag
 
 value:
+  _bookshop_name: layout/columns
   content_blocks:
   collapse: true
   fullwidth: false

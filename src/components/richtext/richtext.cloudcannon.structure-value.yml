@@ -1,6 +1,7 @@
 label: Content
 icon: edit_note
 value:
+  _bookshop_name: richtext
   content:
   classes:
   height:
