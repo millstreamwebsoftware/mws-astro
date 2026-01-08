@@ -1,0 +1,49 @@
+label: Content
+icon: edit_note
+value:
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
+  background_blend:
+  animation:
+
+preview:
+  image:
+    - key: background_image
+  metadata:
+    - text:
+        - key: classes
+      icon: tag
+
+picker_preview:
+  subtext: Rich text element.
+
+place_groups_below: true
+groups:
+  - heading: Section
+    collapsed: true
+    inputs:
+      - classes
+      - height
+      - indent
+      - align
+      - color
+      - background_color
+      - background_image
+      - background_video
+      - background_align
+      - background_opacity
+      - background_fixed
+      - background_fit
+      - background_blend
+      - animation

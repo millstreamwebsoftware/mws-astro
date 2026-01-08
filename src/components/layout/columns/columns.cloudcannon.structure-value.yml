@@ -1,0 +1,71 @@
+label: Columns
+icon: view_column
+
+picker_preview:
+  subtext: Layout content in columns.
+
+preview:
+  subtext:
+    - key: content_blocks[*]._bookshop_name
+  image:
+    - key: background_image
+  metadata:
+    - text:
+        - key: classes
+      icon: tag
+
+value:
+  content_blocks:
+  collapse: true
+  fullwidth: false
+  layout: [1]
+  content:
+  classes:
+  height:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
+
+_inputs:
+  content_blocks:
+    type: array
+    options:
+      structures: _structures.content_blocks
+  collapse:
+    type: checkbox
+    comment: Restrict to one column at small screen sizes
+  fullwidth:
+    type: checkbox
+    label: Full Width
+    comment: Allow column items to fill the full width of the page
+  layout:
+    type: array
+    comment: Set a fixed number of columns per row. The last row will be repeated in case of extra items.
+  layout[*]:
+    type: range
+    options:
+      min: 1
+      step: 1
+      max: 6
+
+place_groups_below: true
+groups:
+  - heading: Section
+    collapsed: true
+    inputs:
+      - content
+      - classes
+      - height
+      - color
+      - background_color
+      - background_image
+      - background_video
+      - background_align
+      - background_opacity
+      - background_fixed
+      - background_fit
