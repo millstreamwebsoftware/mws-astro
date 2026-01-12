@@ -1,0 +1,109 @@
+label: Gallery
+icon: photo_library
+
+picker_preview:
+  subtext: Display images in a gallery.
+tags: ["image", "collection"]
+
+preview:
+  image:
+    - key: image[0].image
+  metadata:
+    - text:
+        - key: classes
+      icon: tag
+
+value:
+  _bookshop_name: gallery
+  columns: 0
+  gap: true
+  aspect: 1
+  linkgallery: false
+  lightbox: true
+  placeholder: true
+  fit: cover
+  images:
+    - image:
+      title:
+      description:
+      alt:
+      link:
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
+
+_inputs:
+  columns:
+    type: number
+    comment: Set the number of columns. 0 puts all images in one row.
+    options:
+      step: 1
+      min: 0
+  aspect:
+    type: range
+    options:
+      step: 0.1
+      max: 2
+      min: 0.5
+  images:
+    type: array
+  images[*]:
+    type: object
+    options:
+      preview:
+        icon: image
+        image:
+          - key: image
+        text:
+          - key: title
+          - key: alt
+        subtext:
+          - key: description
+          - key: link
+  title:
+    type: text
+  description:
+    type: markdown
+  lightbox:
+    type: checkbox
+    hidden: linkgallery
+  linkgallery:
+    type: checkbox
+    label: Link Gallery
+    comment: Clicking gallery items redirects the user to their respective links
+  fit:
+    type: choice
+    options:
+      allow_empty: false
+      values:
+        - cover
+        - contain
+
+place_groups_below: true
+groups:
+  - heading: Section
+    collapsed: true
+    inputs:
+      - content
+      - classes
+      - height
+      - indent
+      - align
+      - color
+      - background_color
+      - background_image
+      - background_video
+      - background_align
+      - background_opacity
+      - background_fixed
+      - background_fit
