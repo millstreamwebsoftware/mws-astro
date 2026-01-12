@@ -1,6 +1,6 @@
 import { z } from "astro/zod";
 import { inferRemoteSize as _inferRemoteSize } from "astro:assets";
-// import { BUILDMODE } from "astro:env/server";
+// import { BUILDMODE } from "astro:env/client";
 
 var fs: typeof import("node:fs/promises") | undefined,
   path: typeof import("node:path") | undefined,
