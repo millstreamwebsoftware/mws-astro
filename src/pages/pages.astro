@@ -1,7 +1,7 @@
 ---
 import PageLayout from "@layouts/PageLayout.astro";
 import { getCollection, type CollectionEntry, type CollectionKey} from "astro:content";
-import { BUILDMODE } from "astro:env/server";
+import { BUILDMODE } from "astro:env/client";
 import { collections } from "src/content/config";
 
 export interface Props {
