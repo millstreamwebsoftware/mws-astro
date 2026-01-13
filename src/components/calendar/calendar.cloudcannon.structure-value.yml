@@ -1,0 +1,64 @@
+label: Calendar
+icon: event
+
+picker_preview:
+  subtext: Display events in a calendar.
+
+preview:
+  subtext:
+    - template: "{calendarEvents[*].name}"
+
+value:
+  _bookshop_name: calendar
+  calendarEvents: []
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
+
+_inputs:
+  calendarEvents:
+    type: array
+    label: Calendars
+    options:
+      structures: _structures.calendarEvents
+  googleCalendarId:
+    type: email
+    label: Google Calendar ID
+    comment: Look in the calendar settings to find this value, it will be formatted like 'abcd1234@group.calendar.google.com'
+
+_structures:
+  calendarEvents:
+    values:
+      - label: Google Calendar
+        value:
+          name:
+          googleCalendarId:
+
+place_groups_below: true
+groups:
+  - heading: Section
+    collapsed: true
+    inputs:
+      - content
+      - classes
+      - height
+      - indent
+      - align
+      - color
+      - background_color
+      - background_image
+      - background_video
+      - background_align
+      - background_opacity
+      - background_fixed
+      - background_fit

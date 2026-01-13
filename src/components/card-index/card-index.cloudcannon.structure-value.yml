@@ -1,0 +1,57 @@
+label: Card Index
+icon: recent_actors
+
+preview:
+  subtext:
+    - key: target
+  image:
+    - key: background_image
+  metadata:
+    - text:
+        - key: classes
+      icon: tag
+
+value:
+  target: ""
+  collection:
+  card:
+    - _bookshop_name: card-index/cards/card
+      include: ["title", "link"]
+      layout: "vertical"
+  filters: []
+  prefilter: []
+  columns: 4
+  pageSize: 0
+  limit: 0
+  content:
+  classes:
+  height:
+  indent:
+  align:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
+
+place_groups_below: true
+groups:
+  - heading: Section
+    collapsed: true
+    inputs:
+      - content
+      - classes
+      - height
+      - indent
+      - align
+      - color
+      - background_color
+      - background_image
+      - background_video
+      - background_align
+      - background_opacity
+      - background_fixed
+      - background_fit
