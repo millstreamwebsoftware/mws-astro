@@ -19,7 +19,14 @@ for await (const file of fs.glob("./**/_cloudcannon/info.json")) {
   ccInfoPath ??= file;
 }
 
-ccInfoPath ??= path.join(buildPath, "_cloudcannon/info.json");
+ccInfoPath ??= "";
+
+if (!ccInfoPath.length)
+  throw Error(
+    `Could not locate _cloudcannon/info.json, is this running on CloudCannon?`,
+  );
+
+// ccInfoPath ??= path.join(buildPath, "_cloudcannon/info.json");
 
 const ccJson: Record<string, any> = await fs.readFile(ccInfoPath).then(
   (c) => JSON.parse(c.toString()),
@@ -33,32 +40,46 @@ ccJson._structures.content_blocks.values ??
 
 for await (const file of fs.glob("**/*.cloudcannon.*.*")) {
   var entry: any;
+  const structures = [];
+  const f = (await fs.readFile(file)).toString();
+  const l1 = f.split("\n")[0];
 
   switch (true) {
     case file.endsWith(".yml"):
     case file.endsWith(".yaml"):
-      entry = yaml.load((await fs.readFile(file)).toString());
+      entry = yaml.load(f);
+      if (l1.startsWith("#!")) {
+        structures.push(
+          ...l1
+            .substring(2)
+            .split(",")
+            .map((s) => s.trim()),
+        );
+      }
       break;
     case file.endsWith(".json"):
-      entry = JSON.parse((await fs.readFile(file)).toString());
+      entry = JSON.parse(f);
       break;
     default:
       console.warn(`No parser for file ${file}`);
       continue;
   }
-  // console.log(`[Cloudcannon API Connector] Read ${file}.`);
 
-  if (!entry?.value?._bookshop_name)
-    entry.value._bookshop_name = path.basename(file).split(".")[0];
+  if (!structures.length) structures.push("content_blocks");
 
-  ccJson._structures.content_blocks.values.push(entry);
+  for (const structure of structures) {
+    if (!entry?.value?._bookshop_name)
+      entry.value._bookshop_name = path.basename(file).split(".")[0];
 
-  console.log(
-    `[Cloudcannon API Connector] Added structure value ${entry.value._bookshop_name} to content_blocks.`,
-  );
+    if (typeof ccJson._structures[structure] === "undefined")
+      ccJson._structures[structure] = { values: [] };
+    ccJson._structures[structure].values.push(entry);
+
+    console.log(
+      `[Cloudcannon API Connector] Added structure value ${entry.value._bookshop_name} to ${structure}.`,
+    );
+  }
 }
-
-ccJson._structures.content_blocks.label = "Content Blocks - API Test";
 
 await fs.mkdir(path.dirname(ccInfoPath), { recursive: true }).then(
   () => fs.writeFile(ccInfoPath, JSON.stringify(ccJson, undefined, 4)),
