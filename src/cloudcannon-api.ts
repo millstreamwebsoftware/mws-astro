@@ -10,7 +10,16 @@ if (!fs.readdir(rootPath).then((f) => f.includes("astro.config.mjs"))) {
 
 // const buildPath = path.join(rootPath, "dist");
 const buildPath = rootPath;
-const ccInfoPath = path.join(buildPath, "_cloudcannon/info.json");
+var ccInfoPath: string;
+
+for await (const file of fs.glob("./**/_cloudcannon/info.json")) {
+  console.log(
+    `[Cloudcannon API Connector] Located _cloudcannon/info.json at ${file}`,
+  );
+  ccInfoPath ??= file;
+}
+
+ccInfoPath ??= path.join(buildPath, "_cloudcannon/info.json");
 
 const ccJson: Record<string, any> = await fs.readFile(ccInfoPath).then(
   (c) => JSON.parse(c.toString()),
