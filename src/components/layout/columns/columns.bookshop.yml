@@ -24,7 +24,7 @@ spec:
         - background_fit
   preview:
     subtext:
-      - key: content_blocks[*]._bookshop_name
+      - template: "{content_blocks[*]._bookshop_name}"
     image:
       - key: background_image
     metadata:
@@ -34,7 +34,7 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
-  content_blocks: [bookshop:structure:content_blocks]
+  content_blocks: []
   collapse: true
   fullwidth: false
   layout: [1]
@@ -51,6 +51,10 @@ blueprint:
   background_fit:
 
 _inputs:
+  content_blocks:
+    type: array
+    options:
+      structure: _structures.content_blocks
   collapse:
     type: checkbox
     comment: Restrict to one column at small screen sizes
@@ -78,10 +82,3 @@ _inputs:
       - no-indent-bottom
       - no-indent-left
       - no-indent-right
-
-# Overrides any fields in the blueprint when viewing this component in the component browser
-preview:
-# Any extra CloudCannon inputs configuration to apply to the blueprint
-# _inputs:
-#   description:
-#     type: markdown
