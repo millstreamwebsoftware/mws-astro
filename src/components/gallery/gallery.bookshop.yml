@@ -26,7 +26,9 @@ spec:
         - background_fit
   preview:
     image:
-      - key: image[0].image
+      - template: "{images[0].image}"
+    subtext:
+      - key: content
     metadata:
       - text:
           - key: classes
@@ -34,6 +36,12 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
+  images:
+    - image:
+      title:
+      description:
+      alt:
+      link:
   columns: 0
   gap: true
   aspect: 1
@@ -41,12 +49,6 @@ blueprint:
   lightbox: true
   placeholder: true
   fit: cover
-  images:
-    - image:
-      title:
-      description:
-      alt:
-      link:
   content:
   classes:
   height:
@@ -61,8 +63,6 @@ blueprint:
   background_fixed:
   background_fit:
 
-# Overrides any fields in the blueprint when viewing this component in the component browser
-preview:
 # Any extra CloudCannon inputs configuration to apply to the blueprint
 _inputs:
   columns:
@@ -71,6 +71,12 @@ _inputs:
     options:
       step: 1
       min: 0
+  gap:
+    type: checkbox
+    comment: Style the gallery with space between images.
+  placeholder:
+    type: checkbox
+    hidden: true
   aspect:
     type: range
     options:
@@ -85,6 +91,7 @@ _inputs:
     type: markdown
   lightbox:
     type: checkbox
+    comment: Clicking images opens a fullscreen image viewer.
     hidden: linkgallery
   linkgallery:
     type: checkbox
