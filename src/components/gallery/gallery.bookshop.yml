@@ -26,7 +26,7 @@ spec:
         - background_fit
   preview:
     image:
-      - template: "{image[0].image}"
+      - template: "{images[0].image}"
     subtext:
       - key: content
     metadata:
