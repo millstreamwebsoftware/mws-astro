@@ -6,7 +6,7 @@ import { default as Section, type Props as SectionProps } from "@layouts/Section
 import preferences from "@data/preferences.json";
 
 export interface Props extends Partial<SectionProps> {
-    image: any;
+    image: string;
     title?: string;
     description?: string;
     alt: string;
@@ -31,7 +31,7 @@ const figcaption = title || description;
 ---
 
 <Section component="image" classes={{ lightbox }} {...Astro.props}>
-    <figure
+  {image && (<figure
         data-lightbox={lightbox && id}
         style={{
             ...(aspect && { "--aspect": aspect }),
@@ -52,10 +52,10 @@ const figcaption = title || description;
                 </figcaption>
             )
         }
-    </figure>
+    </figure>)}
 
     {
-        lightbox && (
+        lightbox && image && (
             <Lightbox collection={id}>
                 <figure
                     data-lightbox={id}

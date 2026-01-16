@@ -87,6 +87,11 @@ const imageAssets = import.meta.glob(
   { eager: true, import: "default" },
 );
 
+if (!(Astro.props.image ?? false)) {
+  console.warn("[Image] Image src was undefined.", Astro.props);
+  return;
+}
+
 // Set image with type assurances provided by imageSource
 const { image, imageSource } = ((image): ImageSource => {
   if (typeof image === "object") return { image, imageSource: "assets" };
