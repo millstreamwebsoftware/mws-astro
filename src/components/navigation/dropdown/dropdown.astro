@@ -256,8 +256,9 @@ const _d = d !== undefined;
       placement?.startsWith("bottom") || placement?.startsWith("top");
     const caretOffset = caret
       ? parseLength(
-          dropdownComputedStyles.getPropertyValue("--header-arrow-size"),
-        ) || 0
+          dropdownComputedStyles.getPropertyValue("--header-arrow-height") ||
+            dropdownComputedStyles.getPropertyValue("--header-arrow-size"),
+        )
       : 0;
     var dropdownMainOffset = 0,
       dropdownCrossOffset = 0;
@@ -309,13 +310,22 @@ const _d = d !== undefined;
   }
 
   /**
-   * Attempt to convert a css length value (px) to a number, otherwise return 0
+   * Attempt to convert a css length value string (px/rem) to pixels, otherwise return 0
    * @param length css pixel length string
    */
-  function parseLength(length: string) {
+  function parseLength(length: string): number {
     if (length.endsWith("px")) return Number.parseInt(length);
+    if (length.endsWith("rem"))
+      return convertRemToPixels(Number.parseFloat(length));
     console.warn(`String '${length}' could not be parsed as a length.`);
     return 0;
+  }
+
+  /** Convert rem to pixels if required */
+  function convertRemToPixels(rem: number): number {
+    return (
+      rem * parseFloat(getComputedStyle(document.documentElement).fontSize)
+    );
   }
 
   /**
@@ -436,10 +446,10 @@ const _d = d !== undefined;
 
       z-index: 899;
 
-      height: var(--header-arrow-size);
-      width: var(--header-arrow-size);
+      height: var(--header-arrow-height, var(--header-arrow-size));
+      width: var(--header-arrow-width, var(--header-arrow-size));
 
-      background-color: inherit;
+      background-color: var(--header-arrow-color, inherit);
       clip-path: var(
         --header-arrow-clip-path,
         polygon(50% 0%, 0% 100%, 100% 100%)
