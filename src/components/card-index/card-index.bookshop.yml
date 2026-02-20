@@ -38,9 +38,9 @@ blueprint:
   target: ""
   collection:
   card:
-    - _bookshop_name: card-index/cards/card
-      include: ["title", "link"]
-      layout: "vertical"
+    _bookshop_name: card-index/cards/card
+    include: ["title", "link"]
+    layout: "vertical"
   filters: []
   prefilter: []
   columns: 4
@@ -77,7 +77,7 @@ _inputs:
   card:
     type: object
     options:
-      structures: _structures.card-index
+      structures: _structures.card_index
   filters:
     type: multiselect
     label: User Filters

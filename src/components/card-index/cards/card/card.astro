@@ -19,9 +19,9 @@ const cardProps = Object.fromEntries(
   Object.entries(card).filter(([k]) => include.includes(k)),
 );
 
-const { title, description, thumbnail, slug, publishDate, ...cardData } =
+const { title, description, thumbnail, publishDate, categories, ...cardData } =
   cardProps;
-const link = slug || include.includes("link");
+const link = include.includes("link");
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-AU", {
@@ -43,29 +43,51 @@ function formatDate(date: Date) {
     )
   }
   <div class="card-text">
+    {
+      categories?.length && (
+        <div class="card-categories">
+          {categories.map((c) => {
+            return <span class="category">{c}</span>;
+          })}
+        </div>
+      )
+    }
     {title && <h2>{title}</h2>}
     {description && <Markdown content={description} />}
-    {publishDate && publishDate instanceof Date && <p>{formatDate(publishDate)}</p>}
+    {
+      publishDate && publishDate instanceof Date && (
+        <p>{formatDate(publishDate)}</p>
+      )
+    }
     {
       Object.entries(cardData).map(([k, v]) => {
         if (dataExclude.includes(k)) return;
-        let dateString;
-        if (v instanceof Date) dateString = formatDate(v);
+        // let dateString: string | undefined;
+        // if (v instanceof Date) dateString = formatDate(v);
         return (
           <div
             class="card-data"
             {...{
               "data-key": k,
-              "data-value": dateString ? v.getTime() : v,
+              "data-value": v instanceof Date ? v.getTime() : v,
             }}
           >
             <Fragment>
               <p class="data-key">{k}</p>
 
               {Array.isArray(v) ? (
-                v.map((vv) => <p class="data-value">{vv}</p>)
+                v.map((vv) => (
+                  <p class="data-value" data-value={vv}>
+                    {vv}
+                  </p>
+                ))
               ) : (
-                <p class="data-value">{dateString ?? v}</p>
+                <p
+                  class="data-value"
+                  data-value={v instanceof Date ? v.getTime() : v}
+                >
+                  {v instanceof Date ? formatDate(v) : v}
+                </p>
               )}
             </Fragment>
           </div>
@@ -84,134 +106,151 @@ function formatDate(date: Date) {
 </div>
 
 <style lang="scss">
-  .card-index-card {
-    display: grid;
-    overflow: hidden;
-    border-radius: var(--border-radius);
-    /* grid-template-rows: min-content auto auto; */
-    /* grid-auto-rows: auto; */
+  @layer site, component;
+  @layer component {
+    .card-index-card {
+      display: grid;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      /* grid-template-rows: min-content auto auto; */
+      /* grid-auto-rows: auto; */
 
-    grid-template-areas: "thumbnail" "text" "read-more";
+      grid-template-areas: "thumbnail" "text" "read-more";
 
-    &.horizontal {
-      /* grid-auto-flow: column; */
-      grid-template-columns: 25% auto;
-      grid-template-rows: auto auto;
+      &.horizontal {
+        /* grid-auto-flow: column; */
+        grid-template-columns: 25% auto;
+        grid-template-rows: auto auto;
 
-      grid-template-areas: "thumbnail text" "read-more read-more";
+        grid-template-areas: "thumbnail text" "read-more read-more";
+
+        .card-text {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .card-thumbnail {
+          border-bottom: 0;
+
+          &::after {
+            content: none;
+          }
+        }
+      }
+
+      position: relative;
+      flex: 0 1 512px;
+
+      box-shadow: 0 0 1rem rgb(var(--text-color) / 0.2);
+
+      border-radius: var(--border-radius);
+      background-color: rgb(var(--background-color));
+
+      transition:
+        filter 0.4s ease,
+        opacity 0.4s ease,
+        transform 0.4s ease;
+
+      > a {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: block;
+        border: var(--hover-border-width, 4px) solid transparent;
+        border-radius: inherit;
+        transition:
+          background-color 0.2s ease-in-out,
+          border 0.2s ease-in-out;
+      }
+
+      &:hover > a {
+        background-color: rgb(var(--text-color) / 0.1);
+        border: var(--hover-border-width, 4px) solid
+          rgb(var(--hover-border-color, var(--color-primary)));
+      }
 
       .card-text {
+        grid-area: text;
+        padding: 2rem;
+        background-color: rgb(var(--background-color));
+        color: rgb(var(--text-color));
+
+        .card-categories {
+          display: flex;
+          font-size: var(--text-size-small);
+          gap: 0.5em;
+          margin-bottom: 1rem;
+
+          .category {
+            padding: 0.1em 0.4em;
+            border: 1px solid rgb(var(--color-accent));
+            border-radius: calc(var(--border-radius) * 0.5);
+          }
+        }
+      }
+
+      .card-read-more {
+        grid-area: read-more;
         display: flex;
-        justify-content: center;
+        margin-top: auto;
+        padding: 1rem 2rem;
+        background-color: rgb(
+          var(--read-more-background-color, var(--color-primary))
+        );
+        /* --text-color: 255 255 255; */
+        color: rgb(var(--read-more-text-color, var(--page-background-color)));
+
         align-items: center;
+        justify-content: space-between;
+
+        p {
+          color: inherit;
+          margin: 0;
+          font-weight: bold;
+        }
       }
 
       .card-thumbnail {
-        border-bottom: 0;
+        grid-area: thumbnail;
+        position: relative;
+        border-bottom: 4px solid rgb(var(--color-primary));
 
         &::after {
-          content: none;
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(
+            to bottom,
+            transparent 90%,
+            98%,
+            rgb(var(--color-primary) / 0.8)
+          );
+          z-index: 1;
         }
       }
-    }
 
-    position: relative;
-    flex: 0 1 512px;
+      .card-data {
+        display: flex;
+        gap: 1rem;
+        border-radius: var(--border-radius);
+        width: min-content;
+        padding: 0 1.5rem;
 
-    box-shadow: 0 0 1rem rgb(var(--text-color) / 0.2);
+        &[data-value=""] {
+          .data-value {
+            display: none;
+          }
+        }
 
-    border-radius: var(--border-radius);
-    background-color: rgb(var(--background-color));
-
-    transition:
-      filter 0.4s ease,
-      opacity 0.4s ease,
-      transform 0.4s ease;
-
-    > a {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      display: block;
-      border: 4px solid transparent;
-      border-radius: inherit;
-      transition:
-        background-color 0.2s ease-in-out,
-        border 0.2s ease-in-out;
-    }
-
-    &:hover > a {
-      background-color: rgb(var(--text-color) / 0.1);
-      border: 4px solid rgb(var(--color-primary));
-    }
-
-    .card-text {
-      grid-area: text;
-      padding: 2rem;
-      background-color: rgb(var(--background-color));
-      color: rgb(var(--text-color));
-    }
-
-    .card-read-more {
-      grid-area: read-more;
-      display: flex;
-      margin-top: auto;
-      padding: 1rem 2rem;
-      background-color: rgb(
-        var(--read-more-background-color, var(--color-primary))
-      );
-      /* --text-color: 255 255 255; */
-      color: rgb(var(--read-more-text-color, var(--page-background-color)));
-
-      align-items: center;
-      justify-content: space-between;
-
-      p {
-        color: inherit;
-        margin: 0;
-        font-weight: bold;
-      }
-    }
-
-    .card-thumbnail {
-      grid-area: thumbnail;
-      position: relative;
-      border-bottom: 4px solid rgb(var(--color-primary));
-
-      &::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: linear-gradient(
-          to bottom,
-          transparent 90%,
-          98%,
-          rgb(var(--color-primary) / 0.8)
-        );
-        z-index: 1;
-      }
-    }
-
-    .card-data {
-      display: flex;
-      gap: 1rem;
-      border-radius: var(--border-radius);
-      width: min-content;
-      padding: 0 1.5rem;
-
-      &[data-value=""] {
-        .data-value {
+        &[data-key]:not([data-value]) {
           display: none;
         }
-      }
 
-      &[data-key]:not([data-value]) {
-        display: none;
-      }
-
-      > p {
-        margin: 0;
+        > p {
+          margin: 0;
+        }
       }
     }
   }

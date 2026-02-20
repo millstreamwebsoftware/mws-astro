@@ -139,29 +139,6 @@ const id = `card-index-${key}`;
 const pagination = !!pageSize && cards && cards?.length > pageSize;
 const lightbox =
   include?.includes("lightbox") || cardProps.include?.includes("lightbox");
-
-// function getFilterString(value: any): string | undefined {
-//   let filterString;
-
-//   if (value instanceof Date) filterString = value.getTime().toString();
-//   if (Array.isArray(value))
-//     filterString = value
-//       .map((value) => value.replaceAll(" ", "-"))
-//       .join(" ");
-
-//   return filterString;
-// }
-
-// // {key: Set(value1,value2), key2: Set(valueA,valueB)}
-// const filterEntries = !!filters?.length && Object.fromEntries(
-//   filters.map((filter) => {
-//     const set = new Set(
-//       cards.flatMap((card) => filter in card.data ? (card.data as Record<string, any>)[filter] : undefined),
-//     );
-//     set.delete(undefined);
-//     return [filter, set as Set<string>];
-//   }),
-// );
 ---
 
 <Section component="card-index" {...Astro.props}>
@@ -208,9 +185,9 @@ const lightbox =
         cards &&
           cards.map((card, i) => {
             const combinedCard = {
+              ...card.data,
               id: card.id,
               link: card?.link,
-              ...card.data,
             };
 
             const filterData = Object.fromEntries(
