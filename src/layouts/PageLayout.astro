@@ -28,7 +28,7 @@ var Renderer = undefined;
 if (_schema && _schema in renderers) {
   Renderer = renderers[_schema];
 } else if (!contentBlocks) {
-  throw new Error(`Tried to output page with unsupported schema: ${_schema}`);
+  // throw new Error(`Tried to output page with unsupported schema: ${_schema}`);
 }
 
 // Pass frontmatter into the live context hidden within contentBlocks
