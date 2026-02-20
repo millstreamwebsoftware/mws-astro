@@ -135,6 +135,7 @@ const expando = classList.includes("expando") ? true : false;
   }
 
   <div class="component-wrapper">
+    <slot name="pre" />
     {
       content && (
         <div class="text-content">
