@@ -60,8 +60,8 @@ export async function getPageChildren<T extends CollectionKey>(
   }) => {
     if (
       "status" in data &&
-      (data.status !== "online" ||
-        (data.status === "meta" && data.link?.length))
+      data.status !== "online" &&
+      !(data.status === "meta" && data.link?.length)
     )
       return false;
     const entryFragments = stripSlashes(entryId).split("/");
@@ -80,7 +80,7 @@ export async function getPageChildren<T extends CollectionKey>(
     [childfilter, filter].every((f) => f(entry));
 
   return (await getCollection(collection, _filter))
-    .sort(({ data: { order: a } }, { data: { order: b } }) => a - b)
+    .sort(sortByOrder)
     .map((page) => ({ ...page, link: getLink(page) }));
 }
 
@@ -112,6 +112,18 @@ export function getLink<T extends CollectionEntry<CollectionKey>>(page: T) {
   return page.data.status === "online"
     ? `${collection}/${cleanId(page.id)}`.toLowerCase()
     : page.data.link || undefined;
+}
+
+function sortByDepth<T extends { id: string }>(a: T, b: T): number {
+  return a.id.split("/").length - b.id.split("/").length;
+}
+
+function sortByOrder<
+  T extends { data?: CollectionEntry<CollectionKey>["data"] },
+>(a: T, b: T): number {
+  if (a.data && b.data && "order" in a.data && "order" in b.data)
+    return a.data.order - b.data.order;
+  return 0;
 }
 
 export interface TreeRoot<T extends CollectionKey> {
@@ -153,13 +165,7 @@ export function getTree<T extends CollectionKey>(
     .filter((i) => !(depth && i.id.split("/").length > depth));
 
   // Sort by path depth - ensuring parents are before descendants if they exist (breadth-first)
-  treeItems.sort(
-    (a, b) =>
-      a.id.split("/").length - b.id.split("/").length ||
-      (a.data?.order !== undefined && b.data?.order !== undefined
-        ? a.data!.order - b.data!.order
-        : 0),
-  );
+  treeItems.sort((a, b) => sortByDepth(a, b) || sortByOrder(a, b));
 
   let selectedItem: TreeNode<T> | undefined;
 

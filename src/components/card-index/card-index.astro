@@ -79,7 +79,12 @@ cards?.sort((a, b) => {
   var cmp = 0;
   if (a.data.publishDate instanceof Date && b.data.publishDate instanceof Date)
     cmp ||= b.data.publishDate.getTime() - a.data.publishDate.getTime();
-  if (typeof a.data.order === "number" && typeof b.data.order === "number")
+  if (
+    "order" in a.data &&
+    "order" in b.data &&
+    typeof a.data.order === "number" &&
+    typeof b.data.order === "number"
+  )
     cmp ||= a.data.order - b.data.order;
   return cmp;
 });
@@ -223,7 +228,9 @@ const lightbox =
           {cards.map((card, i) => {
             return (
               <Page
-                contentBlocks={card.data.content_blocks}
+                contentBlocks={
+                  "content_blocks" in card.data ? card.data.content_blocks : []
+                }
                 data-lightbox={`${id}-${i}`}
               />
             );

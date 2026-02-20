@@ -46,7 +46,7 @@ function formatDate(date: Date) {
     {
       categories?.length && (
         <div class="card-categories">
-          {categories.map((c) => {
+          {categories.map((c: any) => {
             return <span class="category">{c}</span>;
           })}
         </div>

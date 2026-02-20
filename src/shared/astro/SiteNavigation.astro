@@ -60,7 +60,6 @@ const navBars = [primary, secondary];
             {items.map((item: any, i: number) => {
               var Component = components[item._bookshop_name];
 
-              const collection = item.collection;
               if (Component) {
                 return (
                   <Component
