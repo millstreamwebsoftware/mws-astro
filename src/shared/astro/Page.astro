@@ -9,7 +9,7 @@ export interface Props {
 
 const { contentBlocks, "data-lightbox": lightbox } = Astro.props;
 
-const frontmatter = contentBlocks.find(
+const frontmatter = contentBlocks?.find(
   (b) => b._bookshop_name === "_meta",
 )?.frontmatter;
 

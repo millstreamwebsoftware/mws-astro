@@ -8,9 +8,9 @@ type Props = {
 };
 
 const props = Astro.props.frontmatter;
-// const contentBlocks = props.content_blocks;
-
-const { content_blocks: contentBlocks, _schema } = props;
+const { _schema } = props;
+var contentBlocks =
+  "content_blocks" in props ? props.content_blocks : undefined;
 
 const renderers: Record<string, any> = {};
 const rendererImports = import.meta.glob("src/components/**/*.schema.astro", {
@@ -32,7 +32,7 @@ if (_schema && _schema in renderers) {
 }
 
 // Pass frontmatter into the live context hidden within contentBlocks
-contentBlocks.unshift({
+contentBlocks?.unshift({
   _bookshop_name: "_meta",
   frontmatter: { ...props, content_blocks: undefined },
 });
@@ -43,7 +43,7 @@ contentBlocks.unshift({
     Renderer ? (
       <Renderer bookshop:live {contentBlocks} />
     ) : (
-      <Page bookshop:live {contentBlocks} />
+      <Page bookshop:live contentBlocks={contentBlocks ?? []} />
     )
   }
 </Layout>
