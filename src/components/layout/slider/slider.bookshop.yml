@@ -14,7 +14,7 @@ spec:
         icon: tag
 
 blueprint:
-  content_blocks: [bookshop:structure:content_blocks]
+  content_blocks: [bookshop:structure:slider_blocks]
   height: 50
   gap: 0
   autoplay: 0
@@ -82,8 +82,8 @@ _inputs:
   transition:
     type: select
     comment: >
-      Slider rewinds the slider to the start after last slide, 
-      Carousel continues in the same direction with the starting items added after the end. 
+      Slider rewinds the slider to the start after last slide,
+      Carousel continues in the same direction with the starting items added after the end.
       Fader does not slide and instead slowly fades between items (Fader overwrites some options).
     options:
       values:

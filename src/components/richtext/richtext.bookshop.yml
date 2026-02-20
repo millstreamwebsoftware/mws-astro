@@ -2,6 +2,7 @@
 spec:
   structures:
     - content_blocks
+    - slider_blocks
   label: Content
   description: Rich text element.
   icon: edit_note

@@ -1,47 +1,50 @@
 ---
 import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
 import Icon from "@shared/icon.astro";
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
 
 const contentBlocks = Astro.props.content_blocks;
 
 const components: Record<string, any> = {};
 const componentImports = import.meta.glob(
-    ["/src/mws-astro/src/components/**/*.astro"],
-    {
-        eager: true,
-    },
+  ["/src/mws-astro/src/components/**/*.astro"],
+  {
+    eager: true,
+  },
 );
 
 const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-    eager: true,
+  eager: true,
 });
 
 Object.entries(componentImports).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 Object.entries(componentOverrides).forEach(
-    ([path, obj]: [string, any]) =>
-        (components[bookshopName(path)] = obj.default),
+  ([path, obj]: [string, any]) =>
+    (components[bookshopName(path)] = obj.default),
 );
 
 export interface Props extends Partial<SectionProps> {
-    content_blocks: any[];
-    height: number;
-    gap?: number;
-    autoplay?: number;
-    perView?: number;
-    focusAtCenter?: boolean;
-    focusAt?: number;
-    bound?: boolean;
-    showBullets?: boolean;
-    showArrows?: boolean;
-    transition?: string;
-    animationDuration?: number;
-    hoverpause?: boolean;
+  content_blocks: any[];
+  height: number;
+  gap?: number;
+  autoplay?: number;
+  perView?: number;
+  focusAtCenter?: boolean;
+  focusAt?: number;
+  bound?: boolean;
+  showBullets?: boolean;
+  showArrows?: boolean;
+  transition?: string;
+  animationDuration?: number;
+  hoverpause?: boolean;
 }
 
 // declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
@@ -49,209 +52,196 @@ export interface Props extends Partial<SectionProps> {
 //     typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
 
 const {
-    key,
-    showBullets,
-    showArrows,
-    transition,
-    height,
-    perView,
-    bound,
-    gap,
-    autoplay,
-    animationDuration,
-    focusAt,
-    focusAtCenter,
-    hoverpause,
-    background_loading,
-    content,
+  key,
+  showBullets,
+  showArrows,
+  transition,
+  height,
+  perView,
+  bound,
+  gap,
+  autoplay,
+  animationDuration,
+  focusAt,
+  focusAtCenter,
+  hoverpause,
+  background_loading,
+  content,
 } = Astro.props;
 const id = "glide" + "-" + (key || "");
 
 type glideOptionsType = Record<string, string | number | boolean | undefined>;
 
 const glideOptions: glideOptionsType = {
-    // glide: ENV_EDITOR ? undefined : id,
-    glide: id,
-    sliderType: transition?.toLowerCase(),
-    autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
-    animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
-    focus: focusAtCenter ? "center" : focusAt,
-    gap,
-    perView,
-    bound,
-    hoverpause,
+  // glide: ENV_EDITOR ? undefined : id,
+  glide: id,
+  sliderType: transition?.toLowerCase(),
+  autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
+  animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
+  focus: focusAtCenter ? "center" : focusAt,
+  gap,
+  perView,
+  bound,
+  hoverpause,
 };
 
 if (glideOptions.sliderType == "fader") {
-    glideOptions.perView = 1;
-    glideOptions.focus = 0;
-    glideOptions.animationDuration = 0;
-    delete Astro.props.content;
+  glideOptions.perView = 1;
+  glideOptions.focus = 0;
+  glideOptions.animationDuration = 0;
+  delete Astro.props.content;
 }
 
 // if (ENV_EDITOR) glideOptions.sliderType = "slider";
 
 // Convert glideOptions to data-* attributes like DOMStringMap
 const dataGlideOptions = Object.entries(glideOptions).reduce(
-    (obj: glideOptionsType, [k, v]) => {
-        obj[`data-${k.replaceAll(/[A-Z]/g, "-$&").toLowerCase()}`] = v;
-        return obj;
-    },
-    {},
+  (obj: glideOptionsType, [k, v]) => {
+    obj[`data-${k.replaceAll(/[A-Z]/g, "-$&").toLowerCase()}`] = v;
+    return obj;
+  },
+  {},
 );
 ---
 
 <Section
-    component="slider"
-    style={{
-        ...(animationDuration && {
-            "--transition": `${animationDuration * 1000}ms`,
-        }),
-    }}
-    {...Astro.props}
+  component="slider"
+  style={{
+    ...(animationDuration && {
+      "--transition": `${animationDuration * 1000}ms`,
+    }),
+  }}
+  {...Astro.props}
 >
-    <Fragment>
-        <div class:list={["glide", `slider-${glideOptions.sliderType}`]} {id} {...dataGlideOptions}>
-            <div
-                class="glide__track"
-                data-glide-el="track"
-                style={height ? `--height:${height}vh;` : ""}
-            >
-                <ul class="glide__slides">
-                    {
-                        contentBlocks.map((block: any, i: any) => {
-                            var Component = components[block._bookshop_name];
-                            if (block._bookshop_name === "layout/slider")
-                                Component = Astro.self;
+  <Fragment>
+    <div
+      class:list={["glide", `slider-${glideOptions.sliderType}`]}
+      {id}
+      {...dataGlideOptions}
+    >
+      <div
+        class="glide__track"
+        data-glide-el="track"
+        style={height ? `--height:${height}vh;` : ""}
+      >
+        <ul class="glide__slides">
+          {
+            contentBlocks.map((block: any, i: any) => {
+              var Component = components[block._bookshop_name];
+              if (block._bookshop_name === "layout/slider")
+                Component = Astro.self;
 
-                            block.content ??= content;
+              block.content ??= content;
 
-                            if (Component) {
-                                return (
-                                    <div class:list={["slider-item"]}>
-                                        <Component
-                                            {...block}
-                                            key={
-                                                (key || "") + "-" + i.toString()
-                                            }
-                                            background_loading={i ? "lazy" : background_loading}
-                                        />
-                                    </div>
-                                );
-                            }
-                            const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-                            console.warn(warnstring);
-                            return (
-                                <div class="missing-component">
-                                    {warnstring}
-                                </div>
-                            );
-                        })
-                    }
-                </ul>
-                <div class="glide__overlay"></div>
-            </div>
-            {
-                showArrows && (
-                    <div class="glide__arrows" data-glide-el="controls">
-                        <button
-                            class="glide__arrow glide__arrow--left"
-                            data-glide-dir="<"
-                        >
-                            <Icon name="carbon:chevron-left" />
-                        </button>
-                        <button
-                            class="glide__arrow glide__arrow--right"
-                            data-glide-dir=">"
-                        >
-                            <Icon name="carbon:chevron-right" />
-                        </button>
-                    </div>
-                )
-            }
-            {
-                showBullets && (
-                    <div class="glide__bullets" data-glide-el="controls[nav]">
-                        {contentBlocks.map((_slide, i) => (
-                            <button
-                                class="glide__bullet"
-                                data-glide-dir={`=${i}`}
-                            />
-                        ))}
-                    </div>
-                )
-            }
-        </div>
-    </Fragment>
+              if (Component) {
+                return (
+                  <div class:list={["slider-item"]}>
+                    <Component
+                      {...block}
+                      key={(key || "") + "-" + i.toString()}
+                      background_loading={i ? "lazy" : background_loading}
+                    />
+                  </div>
+                );
+              }
+              const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+              console.warn(warnstring);
+              return <div class="missing-component">{warnstring}</div>;
+            })
+          }
+        </ul>
+        <div class="glide__overlay"></div>
+      </div>
+      {
+        showArrows && (
+          <div class="glide__arrows" data-glide-el="controls">
+            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
+              <Icon name="carbon:chevron-left" />
+            </button>
+            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
+              <Icon name="carbon:chevron-right" />
+            </button>
+          </div>
+        )
+      }
+      {
+        showBullets && (
+          <div class="glide__bullets" data-glide-el="controls[nav]">
+            {contentBlocks.map((_slide, i) => (
+              <button class="glide__bullet" data-glide-dir={`=${i}`} />
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </Fragment>
 </Section>
 
 <script>
-    import Glide from "@glidejs/glide";
-    setupGlide();
+  import Glide from "@glidejs/glide";
+  setupGlide();
 
-    function setupGlide() {
-        document.querySelectorAll("div[data-glide]").forEach((e) => {
-            if (!(e instanceof HTMLElement)) return;
+  function setupGlide() {
+    document.querySelectorAll("div[data-glide]").forEach((e) => {
+      if (!(e instanceof HTMLElement)) return;
 
-            // if (!e.matches(".ENV_EDITOR *")) {
-            const id = e.getAttribute("id");
+      // if (!e.matches(".ENV_EDITOR *")) {
+      const id = e.getAttribute("id");
 
-            if (!id) return;
-            // console.log(`Slider ${id} started in EDITOR mode!`);
+      if (!id) return;
+      // console.log(`Slider ${id} started in EDITOR mode!`);
 
-            const glideOptions: Partial<Glide.Options> = {
-                autoplay: Number(e.dataset?.autoplay) || false,
-                focusAt:
-                    e.dataset?.focus == "center"
-                        ? "center"
-                        : Number(e.dataset?.focus) || 0,
-                bound:
-                    "bound" in e.dataset
-                        ? e.dataset?.bound === "true"
-                        : undefined,
-                gap: Number(e.dataset?.gap) || 0,
-                type:
-                    e.dataset?.sliderType?.toLowerCase() == "carousel"
-                        ? "carousel"
-                        : "slider",
-                perView: Number(e.dataset?.perView) || undefined,
-                animationDuration:
-                    Number(e.dataset?.animationDuration) || 0,
-                hoverpause: "hoverpause" in e.dataset,
-            };
+      const glideOptions: Partial<Glide.Options> = {
+        autoplay: Number(e.dataset?.autoplay) || false,
+        focusAt:
+          e.dataset?.focus == "center"
+            ? "center"
+            : Number(e.dataset?.focus) || 0,
+        bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
+        gap: Number(e.dataset?.gap) || 0,
+        type:
+          e.dataset?.sliderType?.toLowerCase() == "carousel"
+            ? "carousel"
+            : "slider",
+        perView: Number(e.dataset?.perView) || undefined,
+        animationDuration: Number(e.dataset?.animationDuration) || 0,
+        hoverpause: "hoverpause" in e.dataset,
+      };
 
-            const glide = new Glide(`#${id}`, glideOptions);
+      console.log(glideOptions);
 
-            // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
-            if (Number(e.dataset?.perView) === 1) {
-              glide.on("move", () => {
-                const slider = document.getElementById(id);
-                const slides = slider?.querySelectorAll(".slider-item");
+      const glide = new Glide(`#${id}`, glideOptions);
 
-                slides?.forEach((e) => e.setAttribute("inert", ""));
-                slides?.[glide.index].removeAttribute("inert");
-              });
-            }
+      // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
+      if (Number(e.dataset?.perView) === 1) {
+        glide.on("move", () => {
+          const slider = document.getElementById(id);
+          const slides = slider?.querySelectorAll(".slider-item");
 
-            if (e.dataset?.sliderType?.toLowerCase() == "fader") {
-              glide.on("move", () => {
-                const slider = document.getElementById(id);
-                const slides = slider?.querySelectorAll(".slider-item");
-
-                slides?.forEach((e) => e.removeAttribute("data-fader"));
-                slides?.[glide.index].removeAttribute("style");
-                slides?.[glide.index].setAttribute("data-fader", "");
-              });
-            }
-
-            glide.mount();
-            //}
+          slides?.forEach((e) => e.setAttribute("inert", ""));
+          slides?.[glide.index].removeAttribute("inert");
         });
-    }
+      }
+
+      if (e.dataset?.sliderType?.toLowerCase() == "fader") {
+        glide.on("move", () => {
+          const slider = document.getElementById(id);
+          const slides = slider?.querySelectorAll(".slider-item");
+
+          slides?.forEach((e) => e.removeAttribute("data-fader"));
+          slides?.[glide.index].removeAttribute("style");
+          slides?.[glide.index].setAttribute("data-fader", "");
+        });
+      }
+
+      glide.mount();
+      //}
+    });
+  }
 </script>
 
 <style lang="scss">
-    /* .ENV_EDITOR {
+  /* .ENV_EDITOR {
         .glide__slide {
             position: relative;
             border-right: 1px solid black;
@@ -287,178 +277,179 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         }
     } */
 
-    .glide {
-        --arrow-size: 6rem;
-        --bullet-size: 1rem;
-    }
+  .glide {
+    --arrow-size: 6rem;
+    --bullet-size: 1rem;
+  }
 
-    .glide,
-    .glide__track,
+  .glide,
+  .glide__track,
+  .glide__slides {
+    height: 100%;
+  }
+
+  .glide__slides {
+    min-height: calc(var(--height) - var(--header-content-offset));
+  }
+
+  .glide__arrows {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .glide__arrow {
+    position: absolute;
+    top: calc(50% - var(--arrow-size) * 0.5);
+    height: var(--arrow-size);
+    width: var(--arrow-size);
+    border: none;
+    background-color: #0000000a;
+    border-radius: var(--arrow-size);
+    backdrop-filter: blur(2px) invert(0.1);
+    touch-action: manipulation;
+    pointer-events: all;
+
+    svg {
+      color: rgb(var(--color-accent));
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .glide__arrow:hover {
+    background-color: #00000044;
+  }
+
+  .glide__arrow--left {
+    left: 1rem;
+  }
+
+  .glide__arrow--right {
+    right: 1rem;
+  }
+
+  .glide__bullets {
+    position: absolute;
+    bottom: 0.8rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .glide__bullet {
+    border: none;
+    padding: 5px;
+    height: calc(var(--bullet-size) * 0.5);
+    width: var(--bullet-size);
+    border-radius: 0.5rem;
+    background-color: #bbbbbb22;
+    box-shadow: 0 0 0.2rem #00000011;
+    backdrop-filter: invert(0.2);
+    transition:
+      background-color 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
+  }
+
+  .glide__bullet--active {
+    background-color: #ffffffaa;
+    box-shadow: 0 0 0.2rem #00000044;
+  }
+
+  .glide__bullet:hover {
+    box-shadow: 0 0 0.2rem #00000088;
+  }
+
+  :where(.glide__overlay) {
+    display: none;
+    pointer-events: none;
+  }
+
+  .slider-fader {
     .glide__slides {
-        height: 100%;
+      transform: translate3d(0, 0, 0) !important;
+      width: unset !important;
+      /* max-width: var(--page-max-width); */
     }
 
-    .glide__slides {
-        min-height: calc(var(--height) - var(--header-content-offset));
+    .slider-item:first-child {
+      animation-name: startOpaque;
+      animation-delay: 0s;
+      animation-duration: var(--transition);
+      animation-iteration-count: 1;
     }
 
-    .glide__arrows {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
+    .slider-item {
+      position: absolute;
+      width: 100%;
+      /* top: 0; */
+      /* left: 0; */
+      inset: 0;
+      order: 2;
+      opacity: 0;
+      z-index: 2;
+      transition-delay: 0s;
+      transition: opacity var(--transition) ease-in-out;
     }
 
-    .glide__arrow {
-        position: absolute;
-        top: calc(50% - var(--arrow-size) * 0.5);
-        height: var(--arrow-size);
-        width: var(--arrow-size);
-        border: none;
-        background-color: #0000000a;
-        border-radius: var(--arrow-size);
-        backdrop-filter: blur(2px) invert(0.1);
-        touch-action: manipulation;
-        pointer-events: all;
-
-        svg {
-            color: rgb(var(--color-accent));
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-        }
+    .slider-item[data-fader] {
+      /* position: relative; */
+      order: 1;
+      opacity: 1;
+      z-index: 1;
+      transition-delay: var(--transition);
+      transition: opacity 0s;
     }
 
-    .glide__arrow:hover {
-        background-color: #00000044;
+    .slider-item {
+      display: none;
     }
 
-    .glide__arrow--left {
-        left: 1rem;
+    .glide__slide--active,
+    .slider-item:has(+ .glide__slide--active),
+    .glide__slide--active + .slider-item {
+      display: block;
     }
-
-    .glide__arrow--right {
-        right: 1rem;
+    .glide__slides:has(> .glide__slide--active:first-child)
+      > .slider-item:last-child,
+    .glide__slides:has(> .glide__slide--active:last-child)
+      > .slider-item:first-child {
+      display: block;
+      z-index: 0;
     }
+  }
 
-    .glide__bullets {
-        position: absolute;
-        bottom: 0.8rem;
-        left: 0;
-        right: 0;
-        display: flex;
-        flex-direction: row;
-
-        justify-content: center;
-        gap: 1rem;
+  @keyframes startOpaque {
+    0% {
+      opacity: 1;
     }
-
-    .glide__bullet {
-        border: none;
-        padding: 5px;
-        height: calc(var(--bullet-size) * 0.5);
-        width: var(--bullet-size);
-        border-radius: 0.5rem;
-        background-color: #bbbbbb22;
-        box-shadow: 0 0 0.2rem #00000011;
-        backdrop-filter: invert(0.2);
-        transition:
-            background-color 0.2s ease-in-out,
-            box-shadow 0.2s ease-in-out;
+    100% {
+      opacity: 1;
     }
-
-    .glide__bullet--active {
-        background-color: #ffffffaa;
-        box-shadow: 0 0 0.2rem #00000044;
-    }
-
-    .glide__bullet:hover {
-        box-shadow: 0 0 0.2rem #00000088;
-    }
-
-    :where(.glide__overlay) {
-        display: none;
-        pointer-events: none;
-    }
-
-    .slider-fader {
-        .glide__slides {
-            transform: translate3d(0, 0, 0) !important;
-            width: unset !important;
-            /* max-width: var(--page-max-width); */
-        }
-
-        .slider-item:first-child {
-            animation-name: startOpaque;
-            animation-delay: 0s;
-            animation-duration: var(--transition);
-            animation-iteration-count: 1;
-        }
-
-        .slider-item {
-            position: absolute;
-            width: 100%;
-            /* top: 0; */
-            /* left: 0; */
-            inset: 0;
-            order: 2;
-            opacity: 0;
-            z-index: 2;
-            transition-delay: 0s;
-            transition: opacity var(--transition) ease-in-out;
-        }
-
-        .slider-item[data-fader] {
-            /* position: relative; */
-            order: 1;
-            opacity: 1;
-            z-index: 1;
-            transition-delay: var(--transition);
-            transition: opacity 0s;
-        }
-
-        .slider-item {
-          display: none;
-        }
-
-        .glide__slide--active,
-        .slider-item:has(+ .glide__slide--active),
-        .glide__slide--active + .slider-item,
-         {
-          display: block;
-        }
-        .glide__slides:has(> .glide__slide--active:first-child) > .slider-item:last-child,
-        .glide__slides:has(> .glide__slide--active:last-child) > .slider-item:first-child {
-          display: block;
-          z-index: 0;
-        }
-    }
-
-    @keyframes startOpaque {
-        0% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 1;
-        }
-    }
+  }
 </style>
 
 <style lang="scss" is:global>
-    .slider-item {
-        > section {
-            height: 100%;
+  .slider-item {
+    > section {
+      height: 100%;
 
-            > .component-wrapper {
-                > * {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
+      > .component-wrapper {
+        > * {
+          width: 100%;
+          height: 100%;
         }
+      }
     }
+  }
 
-    #slider-0 .slider-item > section > .component-wrapper {
-        padding-top: calc(var(--header-height) - var(--header-content-offset));
-    }
+  #slider-0 .slider-item > section > .component-wrapper {
+    padding-top: calc(var(--header-height) - var(--header-content-offset));
+  }
 </style>
