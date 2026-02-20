@@ -18,6 +18,8 @@ export interface Props {
   fit?: "contain" | "cover";
   size?: "small" | "medium" | "large";
   "data-size"?: "small" | "medium" | "large";
+  "data-width"?: string;
+  "data-height"?: string;
   align?: "left" | "center" | "right";
   "data-align"?: "left" | "center" | "right";
   classes?: (string | string[])[];
@@ -31,10 +33,17 @@ const {
   description,
   width,
   height,
+  "data-width": _displayWidth,
+  "data-height": _displayHeight,
   fit = "contain",
   size = Astro.props["data-size"],
   align = Astro.props["data-align"] ?? "center",
 } = Astro.props;
+
+const [displayWidth, displayHeight] = [
+  Number.parseInt(_displayWidth || "0") || undefined,
+  Number.parseInt(_displayHeight || "0") || undefined,
+];
 
 const image = Astro.props.src ?? Astro.props.image;
 
@@ -66,11 +75,20 @@ const imgSize =
     {fit}
     {width}
     {height}
-    displayWidth={{ small: 0.33, medium: 0.5, large: 0.66 }[imgSize]}
+    displayWidth={displayWidth
+      ? displayWidth / 100
+      : { small: 0.33, medium: 0.5, large: 0.66 }[imgSize]}
     quality="mid"
   />
   {description && <figcaption>{description}</figcaption>}
 </figure>
+
+<style define:vars={{ displayWidth, displayHeight }}>
+  figure > :global(img) {
+    max-width: calc(var(--displayWidth, 0) * 1%);
+    max-height: calc(var(--displayHeight, 0) * 1%);
+  }
+</style>
 
 <style lang="scss">
   figcaption {
@@ -79,12 +97,17 @@ const imgSize =
     margin-top: 0.5em;
   }
 
-  figure,
-  figure.small {
+  figure {
+    display: flex;
+    justify-content: center;
+  }
+
+  :where(figure),
+  :where(figure.small) {
     max-width: 33%;
   }
 
-  figure.medium {
+  :where(figure.medium) {
     max-width: 50%;
   }
 
@@ -92,7 +115,7 @@ const imgSize =
     max-width: 66%;
   }
 
-  figure {
+  :where(figure) {
     &.align-left {
       margin: 0.5em 4rem 4rem 0;
       float: left;
@@ -109,6 +132,10 @@ const imgSize =
       max-width: 100%;
       float: none;
       margin: 3rem 0;
+
+      /* :global(img) {
+        max-width: 50%;
+      } */
     }
   }
 
@@ -127,26 +154,26 @@ const imgSize =
   figure:last-child {
     margin-bottom: 0;
   }
-</style>
 
-<style is:global lang="scss">
-  figure.aside img {
+  figure.aside :global(img) {
     max-width: 100%;
     max-height: 30rem;
   }
 
-  figure.aside.small img {
+  figure.aside.small :global(img) {
     max-height: 30rem;
   }
 
-  figure.aside.medium img {
+  figure.aside.medium :global(img) {
     max-height: 40rem;
   }
 
-  figure.aside.large img {
+  figure.aside.large :global(img) {
     max-height: 50rem;
   }
+</style>
 
+<style is:global lang="scss">
   /* Live editor support */
   .cms-editor-active .richtext > .component-wrapper img {
     max-height: 30rem;
