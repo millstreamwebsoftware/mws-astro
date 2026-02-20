@@ -58,7 +58,12 @@ export async function getPageChildren<T extends CollectionKey>(
     id: entryId,
     data,
   }) => {
-    if ("status" in data && data.status !== "online") return false;
+    if (
+      "status" in data &&
+      (data.status !== "online" ||
+        (data.status === "meta" && data.link?.length))
+    )
+      return false;
     const entryFragments = stripSlashes(entryId).split("/");
 
     if (entryFragments.at(-1) === "index.md") entryFragments.pop();
