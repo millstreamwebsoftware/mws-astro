@@ -7,117 +7,136 @@ import Icon from "./icon.astro";
 import preferences from "@data/preferences.json";
 const currentYear = new Date().getFullYear();
 
-const footerPreferences = (preferences.footer as typeof preferences.footer & Record<string, any>);
+const footerPreferences = preferences.footer as typeof preferences.footer &
+  Record<string, any>;
 const textColor = convertColorString(footerPreferences?.foreground_color);
 
-const Override = (await Object.values(import.meta.glob("/src/components/**/Footer.astro"))?.[0]?.() as any)?.default;
+const Override = (
+  (await Object.values(
+    import.meta.glob([
+      "/src/components/**/Footer.astro",
+      "/src/components/**/footer.astro",
+    ]),
+  )?.[0]?.()) as any
+)?.default;
 ---
 
-{ Override ? <Override {...Astro.props} /> : (
-  <section
+{
+  Override ? (
+    <Override {...Astro.props} />
+  ) : (
+    <section
       class="footer"
-      style={`--background-color: ${footerPreferences?.background_color};` +
-          `--text-color: ${textColor};`}
-  >
-      {footerPreferences?.show_top_button && <a href="#top" title="Back to top"><Icon name="fa6-solid:chevron-up" height="2rem" /></a>}
-      {
-          footerPreferences?.text_content && (
-              <div class="content">
-                  <Markdown content={footerPreferences?.text_content} />
-              </div>
-          )
+      style={
+        `--background-color: ${footerPreferences?.background_color};` +
+        `--text-color: ${textColor};`
       }
-      {
-          footerPreferences?.show_sitemap && (
-              <Navigation collection="pages" filter="/" parent={false} maxDepth={2} key="footer" indent="no-indent"/>
-          )
-      }
+    >
+      {footerPreferences?.show_top_button && (
+        <a href="#top" title="Back to top">
+          <Icon name="fa6-solid:chevron-up" height="2rem" />
+        </a>
+      )}
+      {footerPreferences?.text_content && (
+        <div class="content">
+          <Markdown content={footerPreferences?.text_content} />
+        </div>
+      )}
+      {footerPreferences?.show_sitemap && (
+        <Navigation
+          collection="pages"
+          filter="/"
+          parent={false}
+          maxDepth={2}
+          key="footer"
+          indent="no-indent"
+        />
+      )}
       {footerPreferences?.show_socials && <Social />}
-      {
-          footerPreferences?.show_copyright && (
-              <div class="copyright">
-                <Markdown content={footerPreferences?.copyright.replace(
-                    "©",
-                    "© " + currentYear,
-                )} />
-              </div>
-          )
-      }
+      {footerPreferences?.show_copyright && (
+        <div class="copyright">
+          <Markdown
+            content={footerPreferences?.copyright.replace(
+              "©",
+              "© " + currentYear,
+            )}
+          />
+        </div>
+      )}
       <p class="brand">
-          Site by <a
-              href="https://www.millstream.com.au/"
-              target="_blank"
-              rel="noopener">Millstream Creative</a
-          >
+        Site by{" "}
+        <a href="https://www.millstream.com.au/" target="_blank" rel="noopener">
+          Millstream Creative
+        </a>
       </p>
-  </section>
-)}
-
+    </section>
+  )
+}
 
 <style>
+  section.footer {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    background-color: var(--background-color);
+    grid-template-rows: auto;
+    grid-template-columns: auto auto;
+    color: rgb(var(--text-color));
+
+    &:has(> a[href="#top"]) {
+      padding-top: max(calc(var(--indent) * var(--vertical-indent)), 4rem);
+    }
+  }
+
+  .copyright {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .brand {
+    margin: 0;
+    /* grid-column: 2 / 3; */
+    text-align: right;
+    opacity: 0.5;
+  }
+
+  a[href="#top"] {
+    position: absolute;
+    top: -3rem;
+    right: calc(var(--indent) * 0.25);
+    background-color: rgb(var(--color-accent));
+    padding: 2rem;
+    border-radius: 9999px;
+  }
+
+  @media only screen and (max-width: 768px) {
     section.footer {
-        position: relative;
-        display: grid;
-        gap: 2rem;
-        background-color: var(--background-color);
-        grid-template-rows: auto;
-        grid-template-columns: auto auto;
-        color: rgb(var(--text-color));
+      /* grid-template-rows: auto; */
+      /* grid-template-columns: 1fr; */
+      /* grid-auto-flow: row; */
+      /* grid-template-rows: 1fr; */
+      /* grid-template-columns: 1fr; */
 
-        &:has(> a[href="#top"]) {
-            padding-top: max(calc(var(--indent) * var(--vertical-indent)), 4rem);
-        }
+      * {
+        grid-column: 1 / 3;
+        grid-row: unset;
+      }
+
+      .copyright {
+        grid-column: 1 / 2;
+      }
+
+      .brand {
+        grid-column: 2 / 3;
+      }
+
+      .social {
+        --align: center;
+      }
+
+      padding-bottom: 100px; /* Create space for mobile navigation button */
     }
-
-    .copyright {
-        margin: 0;
-        height: 100%;
-        display: flex;
-        align-items: center;
-    }
-
-    .brand {
-        margin: 0;
-        /* grid-column: 2 / 3; */
-        text-align: right;
-        opacity: 0.5;
-    }
-
-    a[href="#top"] {
-        position: absolute;
-        top: -3rem;
-        right: calc(var(--indent) * .25);
-        background-color: rgb(var(--color-accent));
-        padding: 2rem;
-        border-radius: 9999px;
-    }
-
-    @media only screen and (max-width: 768px) {
-        section.footer {
-            /* grid-template-rows: auto; */
-            /* grid-template-columns: 1fr; */
-            /* grid-auto-flow: row; */
-            /* grid-template-rows: 1fr; */
-            /* grid-template-columns: 1fr; */
-
-            * {
-                grid-column: 1 / 3 ;
-                grid-row: unset;
-            }
-
-            .copyright {
-                grid-column: 1 / 2;
-            }
-
-            .brand {
-                grid-column: 2 / 3;
-            }
-
-            .social {
-                --align: center;
-            }
-
-            padding-bottom: 100px; /* Create space for mobile navigation button */
-        }
-    }
+  }
 </style>
