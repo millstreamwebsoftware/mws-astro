@@ -6,6 +6,9 @@ import Navigation from "./SiteNavigation.astro";
 export interface Props {}
 
 const theme: "pod" | "single" = preferences.header.theme || "single";
+
+const logo =
+  preferences.header.show_logo || preferences.header.show_logo_mobile;
 ---
 
 <header
@@ -20,8 +23,12 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
 >
   <div id="header-items">
     {
-      preferences.header.show_logo && (
-        <a class="logo" href="/" title="Home">
+      logo && (
+        <a
+          class:list={["logo", { hide: !preferences.header.show_logo }]}
+          href="/"
+          title="Home"
+        >
           <img
             src={preferences.header.logo_image}
             alt={`${preferences.general.site_name} Logo`}
@@ -78,6 +85,38 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
     grid-area: logo;
     width: fit-content;
     min-width: 15rem;
+  }
+
+  .logo:where(.hide) {
+    display: none;
+  }
+
+  :global(.mobile-nav) #header {
+    &.mobile-logo {
+      grid-template-areas: "logo";
+
+      .logo {
+        width: 100%;
+        display: block;
+
+        img {
+          width: 100%;
+          object-position: center;
+        }
+      }
+    }
+
+    &:not(.mobile-logo) {
+      height: 0;
+
+      .logo {
+        display: none;
+      }
+    }
+  }
+
+  :global(body.mobile-nav):has(> #header:not(.mobile-logo)) {
+    --header-height: 0;
   }
 
   .logo img {
@@ -164,32 +203,5 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
 
   header .secondary li {
     font-size: var(--text-size-small);
-  }
-
-  .mobile-nav {
-    #header.mobile-logo {
-      grid-template-areas: "logo";
-
-      .logo {
-        width: 100%;
-
-        img {
-          width: 100%;
-          object-position: center;
-        }
-      }
-    }
-
-    #header:not(.mobile-logo) {
-      height: 0;
-
-      .logo {
-        display: none;
-      }
-    }
-
-    body:has(> #header:not(.mobile-logo)) {
-      --header-height: 0;
-    }
   }
 </style>

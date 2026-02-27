@@ -66,6 +66,8 @@ declare global {
       show_navigation: boolean;
       show_socials: boolean;
       show_arrow: boolean;
+      center_dropdowns?: boolean;
+      dropdown_unfurl_arrow?: boolean | string;
     };
     footer: {
       foreground_color?: string;

@@ -1,0 +1,41 @@
+---
+import _preferences from "@data/preferences.json";
+const preferences = _preferences as unknown as Preferences;
+
+export interface Props {
+  logo?: string;
+  alt?: string;
+  title?: string;
+  link?: string;
+}
+
+const {
+  logo = preferences.header.logo_image,
+  alt = `${preferences.general.site_name} Logo`,
+  title = "Home",
+  link = "/",
+} = Astro.props;
+---
+
+<a class="logo" href={link} {title}>
+  <img src={logo} {alt} />
+</a>
+
+<style>
+  a {
+    display: block;
+    width: fit-content;
+    height: 100%;
+  }
+
+  img {
+    max-height: 100%;
+    width: auto;
+    padding: 1rem;
+  }
+
+  a + :global(div),
+  a + :global(script) + :global(div) {
+    margin-left: auto;
+  }
+</style>
