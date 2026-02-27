@@ -165,7 +165,9 @@ const expando = classList.includes("expando") ? true : false;
 <style lang="scss">
   :where(section) {
     position: relative;
-    min-height: calc((var(--height) * 1vh) - var(--header-content-offset, 0px));
+    min-height: calc(
+      var(--height) * 0.01 * (100vh - var(--header-content-offset, 0px))
+    );
 
     --indent: var(--root-indent);
     padding: calc(var(--indent) * var(--vertical-indent))
