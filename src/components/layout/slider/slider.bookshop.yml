@@ -5,6 +5,21 @@ spec:
   description: Rotating Carousel
   icon: view_carousel
   tags: []
+  place_groups_below: true
+  groups:
+    - heading: Section
+      collapsed: true
+      inputs:
+        - content
+        - classes
+        - color
+        - background_color
+        - background_image
+        - background_video
+        - background_align
+        - background_opacity
+        - background_fixed
+        - background_fit
   preview:
     subtext:
       - key: content_blocks[*]._bookshop_name
@@ -25,18 +40,21 @@ blueprint:
   bound: false
   showBullets: true
   showArrows: true
-  indent: false
+  indent:
   transition: Slider
   animationDuration: 0.4
-  classes:
 
-  # slides:
-  #   values:
-  #     background_fit:
-  #       type: select
-  #       values:
-  #         - cover
-  #           contain
+  content:
+  classes:
+  color:
+  background_color:
+  background_image:
+  background_video:
+  background_align:
+  background_opacity:
+  background_fixed:
+  background_fit:
+
 _inputs:
   height:
     type: number
@@ -77,8 +95,6 @@ _inputs:
     label: Bound
     comment: Avoid showing empty space after last card in slider mode, useful when slides per view is >1.
     hidden: focusAtCenter
-  indent:
-    type: switch
   transition:
     type: select
     comment: >
