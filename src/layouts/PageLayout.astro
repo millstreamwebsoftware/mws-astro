@@ -9,8 +9,7 @@ type Props = {
 
 const props = Astro.props.frontmatter;
 const { _schema } = props;
-var contentBlocks =
-  "content_blocks" in props ? props.content_blocks : undefined;
+var contentBlocks = "content_blocks" in props ? props.content_blocks : [];
 
 const renderers: Record<string, any> = {};
 const rendererImports = import.meta.glob("src/components/**/*.schema.astro", {
@@ -27,9 +26,10 @@ var Renderer = undefined;
 
 if (_schema && _schema in renderers) {
   Renderer = renderers[_schema];
-} else if (!contentBlocks) {
-  // throw new Error(`Tried to output page with unsupported schema: ${_schema}`);
 }
+// else if (!contentBlocks) {
+//   // throw new Error(`Tried to output page with unsupported schema: ${_schema}`);
+// }
 
 // Pass frontmatter into the live context hidden within contentBlocks
 contentBlocks?.unshift({
@@ -43,7 +43,7 @@ contentBlocks?.unshift({
     Renderer ? (
       <Renderer bookshop:live {contentBlocks} />
     ) : (
-      <Page bookshop:live contentBlocks={contentBlocks ?? []} />
+      <Page bookshop:live {contentBlocks} />
     )
   }
 </Layout>
