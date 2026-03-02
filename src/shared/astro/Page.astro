@@ -38,8 +38,14 @@ Object.entries(componentOverrides).forEach(
 );
 
 if (ENV_BOOKSHOP_LIVE) {
-  console.info("[Page] Props:", Astro.props);
-  console.info("[Page] Content Blocks:", Object.keys(components));
+  if (!Object.keys(Astro.props).length)
+    console.error("[Page] Did not recieve props!", Astro.props);
+  else console.info("[Page] Props: ", Astro.props);
+
+  const componentKeys = Object.keys(components);
+  if (!componentKeys.length)
+    console.error("[Page] Did not load components!", componentKeys);
+  else console.info("[Page] Loaded components: ", componentKeys);
 }
 
 const pagefind = status ? (status === "online" ? "" : undefined) : true;
