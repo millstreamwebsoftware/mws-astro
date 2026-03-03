@@ -7,6 +7,7 @@ export interface Props {
   alt?: string;
   title?: string;
   link?: string;
+  showOnMobile?: boolean;
 }
 
 const {
@@ -14,10 +15,15 @@ const {
   alt = `${preferences.general.site_name} Logo`,
   title = "Home",
   link = "/",
+  showOnMobile = true,
 } = Astro.props;
 ---
 
-<a class="logo" href={link} {title}>
+<a
+  class:list={["inline-logo", { "mobile-hide": !showOnMobile }]}
+  href={link}
+  {title}
+>
   <img src={logo} {alt} />
 </a>
 
@@ -34,8 +40,18 @@ const {
     padding: 1rem;
   }
 
-  a + :global(div),
-  a + :global(script) + :global(div) {
+  /*:global(body):not(.mobile-nav) a + :global(div),
+  :global(body):not(.mobile-nav) a + :global(script) + :global(div) {
     margin-left: auto;
+  }*/
+  :global(body):not(.mobile-nav) {
+    & a + :global(div),
+    & a + :global(script) + :global(div) {
+      margin-left: auto;
+    }
+  }
+
+  :global(body).mobile-nav a.mobile-hide {
+    display: none;
   }
 </style>

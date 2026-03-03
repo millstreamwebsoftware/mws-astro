@@ -9,17 +9,22 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
 
 const logo =
   preferences.header.show_logo || preferences.header.show_logo_mobile;
+
+const contain = preferences.header.contain ?? "header";
 ---
 
 <header
   id="header"
-  class:list={{
-    pinned:
-      preferences.header.pin_header &&
-      preferences.header.pin_header !== "false",
-    "mobile-logo": preferences.header.show_logo_mobile ?? false,
-    [`theme-${theme}`]: !!theme,
-  }}
+  class:list={[
+    {
+      pinned:
+        preferences.header.pin_header &&
+        preferences.header.pin_header !== "false",
+      "mobile-logo": preferences.header.show_logo_mobile ?? false,
+      [`theme-${theme}`]: !!theme,
+    },
+    `contain-${contain}`,
+  ]}
 >
   <div id="header-items">
     {
@@ -55,14 +60,26 @@ const logo =
     /* grid-template-columns: auto 1fr; */
     /* padding: 0 var(--page-max-width-padding); */
     padding: 0;
-    padding-left: var(--page-safe-left-padding);
-    padding-right: var(--page-safe-right-padding);
 
     background: linear-gradient(
       to bottom,
       rgba(var(--header-background-color)),
       rgba(var(--header-background-color-bottom))
     );
+  }
+
+  header.contain-header {
+    padding-left: var(--page-safe-left-padding);
+    padding-right: var(--page-safe-right-padding);
+  }
+
+  @layer {
+    :global(body):not(.mobile-nav)
+      header.contain-content
+      :global(#navigation-bars > .navigation-items) {
+      padding-left: var(--page-safe-left-padding);
+      padding-right: var(--page-safe-right-padding);
+    }
   }
 
   #header-items {
@@ -115,7 +132,7 @@ const logo =
     }
   }
 
-  :global(body.mobile-nav):has(> #header:not(.mobile-logo)) {
+  :global(body).mobile-nav:has(> #header:not(.mobile-logo)) {
     --header-height: 0;
   }
 

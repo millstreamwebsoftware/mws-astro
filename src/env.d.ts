@@ -60,6 +60,7 @@ declare global {
       theme?: "single" | "pod";
       logo_image: string;
       pin_header: boolean | string;
+      contain: "header" | "content" | "none";
       navigation_menu_depth: number;
       show_logo: boolean;
       show_logo_mobile: boolean;
