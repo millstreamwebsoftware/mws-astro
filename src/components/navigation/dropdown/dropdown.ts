@@ -23,6 +23,11 @@ if (navigation) {
   navigation.addEventListener("focusout", handleNavigationEvent);
 }
 
+function px(i?: number): string | undefined {
+  if (typeof i === "undefined") return;
+  return `${Math.floor(i)}px`;
+}
+
 function isMobileNav(): boolean {
   return document.body.classList.contains("mobile-nav");
 }
@@ -99,8 +104,8 @@ function openDropdown(dropdown: FloatingUIElement) {
         }
 
         Object.assign(dropdownItems.style, {
-          left: `${x}px`,
-          top: `${y}px`,
+          left: px(x),
+          top: px(y),
         });
 
         dropdown.classList.add("floating");
@@ -111,37 +116,37 @@ function openDropdown(dropdown: FloatingUIElement) {
             | "left"
             | "right"
             | "bottom";
-          const px = (i?: number) => (i ? `${i}px` : undefined);
           const d = (dir: "top" | "left" | "right" | "bottom") =>
             dir === direction;
-          const computedStyles = window.getComputedStyle(caret.parentElement!);
-          const directions = ["top", "right", "bottom", "left"];
-          const borderWidth = computedStyles.borderWidth
-            .split(" ")
-            .map(parseLength);
-          const sideBorderWidth =
-            borderWidth.length === 1
-              ? borderWidth[0]
-              : borderWidth[(directions.indexOf(direction) + 2) % 4];
-          const caretOffset = -(
-            parseLength(
-              computedStyles.getPropertyValue("--header-arrow-size"),
-            ) + sideBorderWidth
-          );
-
           const horizontal = d("left") || d("right");
+          const rotation = `${
+            { bottom: 0, left: 0.25, top: 0.5, right: 0.75 }[direction]
+          }turn`;
 
+          const caretOffset = `calc(var(--header-arrow-size) * -1)`;
+          var transform = "rotate(var(--rotation))";
+          if (horizontal) {
+            // Compensate rotation for non-square shaped carets
+            transform =
+              (d("left")
+                ? "translate(calc((var(--header-arrow-width) - var(--header-arrow-size)) * .5)) "
+                : "translate(calc((var(--header-arrow-width) - var(--header-arrow-size)) * -.5)) ") +
+              transform;
+          }
+
+          caret.style = ""; // Clear styles before updating
           Object.assign(caret.style, {
-            transform: `rotate(${{ bottom: 0, left: 0.25, top: 0.5, right: 0.75 }[direction]}turn)`,
+            transform,
             top: horizontal
               ? px(middlewareData.arrow.y)
-              : d("bottom") && px(caretOffset),
-            right: d("left") && px(caretOffset),
-            bottom: d("top") && px(caretOffset),
+              : d("bottom") && caretOffset,
+            right: d("left") && caretOffset,
+            bottom: d("top") && caretOffset,
             left: !horizontal
               ? px(middlewareData.arrow.x)
-              : d("right") && px(caretOffset),
+              : d("right") && caretOffset,
           });
+          caret.style.setProperty("--rotation", rotation);
         }
       },
     );
@@ -203,8 +208,10 @@ function dropdownOptions(
 
     // Set minWidth to at least scrollWidth to fix incorrect flexbox column sizing in firefox
     Object.assign(elements.floating.style, {
-      maxHeight: `${availableHeight}px`,
-      minWidth: `${Math.max(rects.reference.width, elements.floating.scrollWidth)}px`,
+      maxHeight: px(availableHeight),
+      minWidth: px(
+        Math.max(rects.reference.width, elements.floating.scrollWidth),
+      ),
     });
   };
 
