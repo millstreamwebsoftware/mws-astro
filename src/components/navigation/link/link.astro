@@ -23,7 +23,11 @@ const new_tab =
 <a
   id={key}
   href={link}
-  class:list={[{ external, selected: selected === "selected" }]}
+  class:list={[
+    { external, selected: selected === "selected" },
+    "navi-label",
+    { [`d${d}`]: d },
+  ]}
   data-depth={d}
   {...new_tab}
   >{title}{external && <Icon name="carbon:launch" height="1em" />}
@@ -31,6 +35,7 @@ const new_tab =
 
 <style>
   a {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -45,8 +50,8 @@ const new_tab =
     text-decoration: none;
 
     &:hover {
-      color: rgb(var(--header-hover-color));
-      background-color: rgb(var(--header-hover-background-color));
+      color: oklch(from var(--header-hover-color, currentColor) l c h);
+      background-color: oklch(from var(--header-hover-background-color) l c h);
     }
 
     &.selected {

@@ -82,15 +82,21 @@ const titleCaret = (() => {
 
 <div
   id={key}
-  class:list={["dropdown", { selected }]}
+  class:list={["dropdown", { [`d${d}`]: d }, { selected }]}
   aria-labelledby={`${key}-label`}
   aria-haspopup="menu"
   data-placement={placement}
   data-depth={d}
   tabindex="0"
 >
-  <span id={`${key}-label`} class="dropdown-label"
-    >{title}{titleCaret && <Icon name={titleCaret} height="1em" />}</span
+  <span
+    id={`${key}-label`}
+    class:list={[
+      "dropdown-label",
+      "navi-label",
+      { [`d${d}`]: d },
+      { selected },
+    ]}>{title}{titleCaret && <Icon name={titleCaret} height="1em" />}</span
   >
   <div class="dropdown-items">
     {preferences.header.show_arrow && <div class="dropdown-arrow" />}
@@ -175,8 +181,8 @@ const titleCaret = (() => {
       font-weight: inherit;
 
       &:hover {
-        color: rgb(var(--header-hover-color));
-        background-color: rgb(var(--header-hover-background-color));
+        color: rgb(from var(--header-hover-color, currentColor) r g b);
+        background-color: rgb(from var(--header-hover-background-color) r g b);
       }
     }
 
