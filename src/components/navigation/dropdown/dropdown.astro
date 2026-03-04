@@ -16,6 +16,7 @@ export interface Props {
 
 export type DropdownOptions = {
   titleCaret: boolean | string;
+  titleCaretOpen: string;
   showDropdownCaret: boolean;
   centerDropdown: boolean;
 };
@@ -31,8 +32,8 @@ const {
 } = Astro.props;
 
 const options = {
-  titleCaret:
-    _options?.titleCaret ?? preferences.header.dropdown_unfurl_arrow ?? true,
+  titleCaret: _options?.titleCaret ?? preferences.header.titleCaret ?? true,
+  titleCaretOpen: _options?.titleCaretOpen ?? preferences.header.titleCaretOpen,
   showDropdownCaret:
     _options?.showDropdownCaret ?? preferences.header.show_arrow ?? false,
   centerDropdown:
@@ -78,6 +79,7 @@ const titleCaret = (() => {
       : "carbon:caret-down";
   return false;
 })();
+const { titleCaretOpen } = options;
 ---
 
 <div
@@ -96,8 +98,30 @@ const titleCaret = (() => {
       "navi-label",
       { [`d${d}`]: d },
       { selected },
-    ]}>{title}{titleCaret && <Icon name={titleCaret} height="1em" />}</span
+    ]}
   >
+    {title}
+    {
+      titleCaret && (
+        <Icon
+          name={titleCaret}
+          class="dropdown-title-caret closed"
+          height="1em"
+          inheritScope={true}
+        />
+      )
+    }
+    {
+      titleCaret && titleCaretOpen && (
+        <Icon
+          name={titleCaretOpen}
+          class="dropdown-title-caret open"
+          height="1em"
+          inheritScope={true}
+        />
+      )
+    }
+  </span>
   <div class="dropdown-items">
     {preferences.header.show_arrow && <div class="dropdown-arrow" />}
     {
@@ -211,14 +235,24 @@ const titleCaret = (() => {
       display: block;
     }
   }
-</style>
 
-<style is:global>
-  .dropdown-open > .dropdown-label .icon {
+  .dropdown-open > .dropdown-label > :global(.dropdown-title-caret).closed {
     transform: rotate(180deg);
   }
 
-  /*.dropdown.floating .navigation-item :is(a,span) {
-    color: rgb(var(--header-dropdown-color,var(--header-color)));
-  }*/
+  .dropdown-label > .dropdown-title-caret.open {
+    display: none;
+  }
+
+  .dropdown-open > .dropdown-label:has(.dropdown-title-caret.open) {
+    .closed {
+      display: none;
+    }
+
+    .open {
+      display: block;
+    }
+  }
+
+  /*.dropdown-open*/
 </style>
