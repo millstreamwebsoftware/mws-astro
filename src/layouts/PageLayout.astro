@@ -41,7 +41,9 @@ contentBlocks?.unshift({
 <Layout {...props}>
   {
     Renderer ? (
-      <Renderer bookshop:live {contentBlocks} />
+      <Renderer bookshop:live {contentBlocks}>
+        <slot name="content" slot="content" />
+      </Renderer>
     ) : (
       <Page bookshop:live {contentBlocks} />
     )
