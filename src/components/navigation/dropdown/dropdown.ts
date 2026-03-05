@@ -25,7 +25,7 @@ if (navigation) {
 
 function px(i?: number): string | undefined {
   if (typeof i === "undefined") return;
-  return `${Math.floor(i)}px`;
+  return `${Math.round(i)}px`;
 }
 
 function isMobileNav(): boolean {
