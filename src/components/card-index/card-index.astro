@@ -73,12 +73,34 @@ const Card = components[cardProps._bookshop_name];
 const filterMode = "ignore include"; //ignore include exclude
 var cards = await getPageChildren(target, collection);
 
+// The live editor returns dates as strings rather than Date
+function tryCoerceISODate(d: any): Date | undefined {
+  if (d instanceof Date) return d;
+  if (typeof d === "string") {
+    let date = new Date(Date.parse(d));
+
+    if (isNaN(date.getTime())) return undefined;
+
+    if (date.toISOString() === d) {
+      return date;
+    }
+  }
+
+  return undefined;
+}
+
 // Sort from newest to oldest, fall back on ascending order
 cards?.sort((a, b) => {
   if (!a.data || !b.data) return a.id.localeCompare(b.id);
   var cmp = 0;
-  if (a.data.publishDate instanceof Date && b.data.publishDate instanceof Date)
-    cmp ||= b.data.publishDate.getTime() - a.data.publishDate.getTime();
+
+  const [aDate, bDate] = [
+    tryCoerceISODate(a.data.publishDate),
+    tryCoerceISODate(b.data.publishDate),
+  ];
+
+  if (aDate && bDate) cmp ||= bDate.getTime() - aDate.getTime();
+
   if (
     "order" in a.data &&
     "order" in b.data &&
