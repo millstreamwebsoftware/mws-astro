@@ -208,6 +208,11 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
         hoverpause: "hoverpause" in e.dataset,
       };
 
+      glideOptions.perView &&
+        e.style.setProperty("--per", glideOptions.perView.toString());
+      glideOptions.gap &&
+        e.style.setProperty("--gap", glideOptions.gap.toString());
+
       console.log(glideOptions);
 
       const glide = new Glide(`#${id}`, glideOptions);
@@ -241,41 +246,9 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 </script>
 
 <style lang="scss">
-  /* .ENV_EDITOR {
-        .glide__slide {
-            position: relative;
-            border-right: 1px solid black;
-        }
-
-        .glide__slide::before {
-            content: attr(data-slide-number);
-            position: absolute;
-            top: 0;
-            left: 0;
-            margin-top: 4px;
-            border: 1px solid white;
-            border-left: none;
-            background-color: black;
-            color: white;
-            padding: 2px 5px;
-        }
-
-        .glide__slides {
-            overflow-x: scroll;
-        }
-
-        .glide__arrows,
-        .glide__bullets {
-            opacity: 0.5;
-            transition: opacity 0.4s ease-in-out;
-            pointer-events: none;
-        }
-
-        :hover .glide__arrows,
-        :hover .glide__bullets {
-            opacity: 0;
-        }
-    } */
+  .cms-editor-active .glide__slides > .slider_item {
+    flex: 0 0 calc((100% / var(--per, 1)) - var(--gap, 0));
+  }
 
   .glide {
     --arrow-size: 6rem;
