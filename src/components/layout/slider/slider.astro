@@ -181,6 +181,9 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
   import Glide from "@glidejs/glide";
   setupGlide();
 
+  // Re-init sliders on cms update
+  document.addEventListener("cloudcannon:update", setupGlide);
+
   function setupGlide() {
     document.querySelectorAll("div[data-glide]").forEach((e) => {
       if (!(e instanceof HTMLElement)) return;
