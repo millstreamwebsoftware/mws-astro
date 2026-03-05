@@ -7,6 +7,10 @@ declare global {
 
   var ENV_BOOKSHOP_LIVE: boolean;
 
+  interface Window {
+    inEditorMode?: boolean;
+  }
+
   interface CalendarElement extends HTMLElement {
     calendar?: any;
   }

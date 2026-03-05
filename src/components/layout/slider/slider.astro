@@ -184,6 +184,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
   setupGlide();
 
   function setupGlide() {
+    if (window.inEditorMode) return;
     document.querySelectorAll("div[data-glide]").forEach((e) => {
       if (!(e instanceof HTMLElement)) return;
       console.info("Initialising @glidejs/glide for", e);
