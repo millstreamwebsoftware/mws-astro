@@ -110,6 +110,8 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     ...(animationDuration && {
       "--transition": `${animationDuration * 1000}ms`,
     }),
+    "--gap": gap,
+    "--per": perView,
   }}
   {...Astro.props}
 >
@@ -181,9 +183,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
   import Glide from "@glidejs/glide";
   setupGlide();
 
-  // Re-init sliders on cms update
-  document.addEventListener("cloudcannon:update", setupGlide);
-
   function setupGlide() {
     document.querySelectorAll("div[data-glide]").forEach((e) => {
       if (!(e instanceof HTMLElement)) return;
@@ -246,7 +245,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 </script>
 
 <style lang="scss">
-  :global(.cms-editor-active) .glide__slides > .slider_item {
+  :global(.cms-editor-active) .glide__slides > .slider-item {
     flex: 0 0 calc((100% / var(--per, 1)) - var(--gap, 0));
   }
 
