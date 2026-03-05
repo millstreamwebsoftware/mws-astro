@@ -184,12 +184,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
   function setupGlide() {
     document.querySelectorAll("div[data-glide]").forEach((e) => {
       if (!(e instanceof HTMLElement)) return;
+      console.info("Initialising @glidejs/glide for", e);
 
-      // if (!e.matches(".ENV_EDITOR *")) {
       const id = e.getAttribute("id");
-
       if (!id) return;
-      // console.log(`Slider ${id} started in EDITOR mode!`);
 
       const glideOptions: Partial<Glide.Options> = {
         autoplay: Number(e.dataset?.autoplay) || false,
@@ -240,7 +238,6 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       }
 
       glide.mount();
-      //}
     });
   }
 </script>
