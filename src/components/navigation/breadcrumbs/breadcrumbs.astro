@@ -7,19 +7,16 @@ import {
 } from "@layouts/Section.astro";
 
 interface Props extends Partial<SectionProps> {
-  showHome?: "hidden" | "icon" | "label" | "both";
+  showHome?: "none" | "icon" | "label" | "both";
   homeIcon?: string;
   separator?: string;
   justify?: "left" | "center" | "right";
 }
 
-const {
-  showHome = "both",
-  homeIcon = "carbon:home",
-  separator = "carbon:caret-right",
-  justify,
-  ...section
-} = Astro.props;
+const { showHome = "both", justify, ...section } = Astro.props;
+
+const separator = Astro.props.separator || "carbon:caret-right";
+const homeIcon = Astro.props.homeIcon || "carbon:home";
 
 const ancestors = await getPageAncestors(urlToId(Astro.request.url));
 ---
@@ -27,7 +24,7 @@ const ancestors = await getPageAncestors(urlToId(Astro.request.url));
 <Section component="breadcrumbs" {...section}>
   <div data-justify={justify}>
     {
-      showHome !== "hidden" && (
+      showHome !== "none" && (
         <>
           <a href="/">
             {showHome !== "label" && (
