@@ -350,3 +350,12 @@ section {
 .text-content :where(img) {
   max-width: 100%;
 }
+
+table {
+  max-width: 100%;
+
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
