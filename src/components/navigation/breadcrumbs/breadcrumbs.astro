@@ -1,0 +1,100 @@
+---
+import { getPageAncestors, urlToId } from "@mws-astro/navigation";
+import Icon from "@shared/icon.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@layouts/Section.astro";
+
+interface Props extends Partial<SectionProps> {
+  showHome?: "hidden" | "icon" | "label" | "both";
+  homeIcon?: string;
+  separator?: string;
+  justify?: "left" | "center" | "right";
+}
+
+const {
+  showHome = "both",
+  homeIcon = "carbon:home",
+  separator = "carbon:caret-right",
+  justify,
+  ...section
+} = Astro.props;
+
+const ancestors = await getPageAncestors(urlToId(Astro.request.url));
+---
+
+<Section component="breadcrumbs" {...section}>
+  <div data-justify={justify}>
+    {
+      showHome !== "hidden" && (
+        <>
+          <a href="/">
+            {showHome !== "label" && (
+              <Icon
+                name={homeIcon}
+                height="1em"
+                inheritScope={true}
+                class="home"
+              />
+            )}
+            {showHome !== "icon" && "Home"}
+          </a>
+
+          {separator.length > 1 ? (
+            <Icon
+              name={separator}
+              height="1em"
+              inheritScope={true}
+              class="separator"
+            />
+          ) : (
+            separator
+          )}
+        </>
+      )
+    }
+    {
+      !!ancestors.length &&
+        ancestors.map((p, i) => (
+          <>
+            <a href={p.link}>{p.data.title}</a>
+            {i + 1 < ancestors.length &&
+              (separator.length > 1 ? (
+                <Icon
+                  name={separator}
+                  height="1em"
+                  inheritScope={true}
+                  class="separator"
+                />
+              ) : (
+                separator
+              ))}
+          </>
+        ))
+    }
+  </div>
+</Section>
+
+<style>
+  div,
+  a {
+    display: flex;
+    flex-direction: row;
+    font-size: var(--text-size-small);
+    text-decoration: none;
+    align-items: center;
+    gap: 0.5em;
+    justify-content: var(--justify, flex-start);
+  }
+
+  div[data-justify="left"] {
+    --justify: flex-start;
+  }
+  div[data-justify="center"] {
+    --justify: center;
+  }
+  div[data-justify="right"] {
+    --justify: flex-end;
+  }
+</style>

@@ -2,9 +2,9 @@
 spec:
   structures:
     - content_blocks
-  label: Navigation
-  description: Display a navigation element
-  icon: switch_access_shortcut
+  label: Breadcrumbs
+  description: Navigate to ancestors of this page
+  icon: signpost
   tags: ["navigation"]
   place_groups_below: true
   groups:
@@ -32,9 +32,10 @@ spec:
 
 # Defines the structure of this component, as well as the default values
 blueprint:
-  filter:
-  collection:
-  maxDepth:
+  showHome:
+  homeIcon:
+  separator:
+  justify:
   content:
   classes:
   height:
@@ -50,13 +51,36 @@ blueprint:
   background_fit:
 
 _inputs:
-  filter:
+  showHome:
+    type: choice
+    label: Show Home
+    options:
+      values:
+        - "none"
+        - "label"
+        - "icon"
+        - "both"
+  homeIcon:
     type: text
-    label: Path
-  collection:
+    label: Home Icon
+    options:
+      pattern: "^(.*:.*)?$"
+      pattern_message: "Must be the name of an icon from an installed @iconify-json icon set."
+  separator:
     type: text
-  maxDepth:
-    type: number
+    description: Icon to use as a seperator between items. Optionally use a single letter to display as the seperator e.g. "/"
+    options:
+      pattern: "^(.?|.*:.*)$"
+      pattern_message: "Must be either a single character, or the name of an icon from an installed @iconify-json icon set."
+  justify:
+    type: choice
+    options:
+      values:
+        - "left"
+        - "center"
+        - "right"
+      allow_create: false
+      allow_empty: true
 
 # Overrides any fields in the blueprint when viewing this component in the component browser
 preview:
