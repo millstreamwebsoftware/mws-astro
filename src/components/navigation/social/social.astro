@@ -5,7 +5,7 @@ import Icon from "@shared/icon.astro";
 export interface Props {
   // align?: string;
   // "show-text"?: boolean;
-  socials?: [{ icon?: string; name: string; link: string }];
+  socials?: [{ icon?: string; text?: string; link: string }];
 }
 
 // const { align, "show-text": text } = Astro.props;
@@ -17,19 +17,28 @@ const socialItems = Astro.props.socials?.length
 function getIcon(link: string) {
   if (link.startsWith("tel:")) return "fa6-solid:square-phone";
   if (link.startsWith("mailto:")) return "fa6-solid:square-envelope";
+  if (link.startsWith("sms:")) return "fa6-solid:comment-sms";
+  if (link.startsWith("/")) return "fa6-solid:comment-dots";
 
-  const hostname = new URL(link).hostname.replace(/^www\./, "");
-  return (
-    {
-      "twitter.com": "fa6-brands:square-x-twitter",
-      "x.com": "fa6-brands:square-x-twitter",
-      "facebook.com": "fa6-brands:square-facebook",
-      "instagram.com": "fa6-brands:square-instagram",
-      "linkedin.com": "fa6-brands:linkedin",
-      "wa.me": "fa6-brands:square-whatsapp",
-      "youtube.com": "fa6-brands:square-youtube",
-    }[hostname] || "fa6-solid:square-up-right"
-  );
+  try {
+    const hostname = new URL(link).hostname.replace(/^www\./, "");
+    return (
+      {
+        "twitter.com": "fa6-brands:square-x-twitter",
+        "x.com": "fa6-brands:square-x-twitter",
+        "facebook.com": "fa6-brands:square-facebook",
+        "instagram.com": "fa6-brands:square-instagram",
+        "linkedin.com": "fa6-brands:linkedin",
+        "wa.me": "fa6-brands:square-whatsapp",
+        "youtube.com": "fa6-brands:square-youtube",
+        "youtu.be": "fa6-brands:square-youtube",
+        "vimeo.com": "fa6-brands:square-vimeo",
+      }[hostname] || "fa6-solid:square-up-right"
+    );
+  } catch (e) {
+    if (e instanceof TypeError) return undefined;
+    throw e;
+  }
 }
 
 const socials: Record<string, string>[] = socialItems.map((s: any) => ({
