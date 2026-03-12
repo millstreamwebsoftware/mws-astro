@@ -43,6 +43,7 @@ blueprint:
   indent:
   transition: Slider
   animationDuration: 0.4
+  minSlideWidth:
 
   content:
   classes:
@@ -77,6 +78,7 @@ _inputs:
     type: number
     label: Slides Per View
     comment: Number of slides visible at once.
+    hidden: minSlideWidth
     options:
       min: 1
       step: 1
@@ -116,3 +118,9 @@ _inputs:
   hoverpause:
     type: switch
     label: Pause autoplay on hover
+  minSlideWidth:
+    type: number
+    label: Minimum Slide Width
+    comment: Minimum width of each slide in pixels. When set, the number of slides per view adjusts automatically to fit. Leave unset to use Slides Per View directly.
+    options:
+      min: 100

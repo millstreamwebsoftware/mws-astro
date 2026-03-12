@@ -36,6 +36,7 @@ export interface Props extends Partial<SectionProps> {
   transition?: Options["type"] | "fader";
   animationDuration?: number;
   hoverpause?: boolean;
+  minSlideWidth?: number;
 }
 
 const {
@@ -52,6 +53,7 @@ const {
   focusAt,
   focusAtCenter,
   hoverpause,
+  minSlideWidth,
   background_loading,
   content,
 } = Astro.props;
@@ -103,6 +105,7 @@ const dataGlideOptions = Object.fromEntries(
       {id}
       data-glide={id}
       data-fader={isFader}
+      data-min-slide-width={minSlideWidth || undefined}
       {...dataGlideOptions}
     >
       <div
@@ -193,6 +196,7 @@ const dataGlideOptions = Object.fromEntries(
       const isFader = data.fader === "true";
       const perView = Number(data.perView) || 1;
       const gap = glideOptions.gap || 0;
+      const minSlideWidth = Number(data.minSlideWidth);
 
       // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
       if (glideOptions.perView === 1 || isFader) {
@@ -214,10 +218,28 @@ const dataGlideOptions = Object.fromEntries(
         });
       }
 
+      function doResize() {
+        const w = e.clientWidth;
+        const newPerView = Math.floor(
+          (w - gap * (perView - 1)) / minSlideWidth,
+        );
 
+        const numSlides = e.querySelectorAll(
+          ":scope > .glide__track > .glide__slides > .slider-item:not(.glide__slide--clone)",
+        ).length;
+
+        if (numSlides < newPerView) return;
+
+        glide.update({
+          perView: newPerView || 1,
         });
       }
 
+      if (perView > 1 && minSlideWidth) {
+        glide.on("resize", doResize);
+      }
+
+      doResize();
       glide.mount();
     });
   }
