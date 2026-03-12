@@ -6,29 +6,20 @@ import {
   type Props as SectionProps,
 } from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
+import type { Options } from "@glidejs/glide";
 
 const contentBlocks = Astro.props.content_blocks;
-
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-  eager: true,
-});
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
+const components: Record<string, any> = Object.fromEntries(
+  [
+    ...Object.entries(
+      import.meta.glob("/src/mws-astro/src/components/**/*.astro", {
+        eager: true,
+      }),
+    ),
+    ...Object.entries(
+      import.meta.glob("/src/components/**/*.astro", { eager: true }),
+    ),
+  ].map(([path, obj]: [string, any]) => [bookshopName(path), obj.default]),
 );
 
 export interface Props extends Partial<SectionProps> {
@@ -42,14 +33,10 @@ export interface Props extends Partial<SectionProps> {
   bound?: boolean;
   showBullets?: boolean;
   showArrows?: boolean;
-  transition?: string;
+  transition?: Options["type"] | "fader";
   animationDuration?: number;
   hoverpause?: boolean;
 }
-
-// declare var ENV_BOOKSHOP_LIVE: boolean | undefined;
-// const ENV_EDITOR: boolean =
-//     typeof ENV_BOOKSHOP_LIVE !== "undefined" ? ENV_BOOKSHOP_LIVE : false;
 
 const {
   key,
@@ -68,39 +55,34 @@ const {
   background_loading,
   content,
 } = Astro.props;
+
 const id = "glide" + "-" + (key || "");
-
-type glideOptionsType = Record<string, string | number | boolean | undefined>;
-
-const glideOptions: glideOptionsType = {
-  // glide: ENV_EDITOR ? undefined : id,
-  glide: id,
-  sliderType: transition?.toLowerCase(),
+const isFader = transition.toLowerCase() === "fader";
+const glideOptions: Partial<Options> = {
+  type: isFader ? "slider" : (transition.toLowerCase() as Options["type"]),
   autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
-  animationDuration: animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
-  focus: focusAtCenter ? "center" : focusAt,
+  animationDuration: isFader
+    ? 0
+    : animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
+  focusAt: isFader ? 0 : focusAtCenter ? "center" : focusAt,
   gap,
-  perView,
+  perView: isFader ? 1 : perView,
   bound,
   hoverpause,
 };
 
-if (glideOptions.sliderType == "fader") {
-  glideOptions.perView = 1;
-  glideOptions.focus = 0;
-  glideOptions.animationDuration = 0;
-  delete Astro.props.content;
+if (isFader) {
+  delete Astro.props.content; // Investigate side effect
 }
 
-// if (ENV_EDITOR) glideOptions.sliderType = "slider";
-
 // Convert glideOptions to data-* attributes like DOMStringMap
-const dataGlideOptions = Object.entries(glideOptions).reduce(
-  (obj: glideOptionsType, [k, v]) => {
-    obj[`data-${k.replaceAll(/[A-Z]/g, "-$&").toLowerCase()}`] = v;
-    return obj;
-  },
-  {},
+const dataGlideOptions = Object.fromEntries(
+  Object.entries(glideOptions)
+    .filter(([, v]) => v !== undefined)
+    .map(([k, v]) => [
+      `data-${k.replace(/[A-Z]/g, "-$&").toLowerCase()}`,
+      v.toString(),
+    ]),
 );
 ---
 
@@ -117,8 +99,10 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
 >
   <Fragment>
     <div
-      class:list={["glide", `slider-${glideOptions.sliderType}`]}
+      class:list={["glide", `slider-${glideOptions.type}`]}
       {id}
+      data-glide={id}
+      data-fader={isFader}
       {...dataGlideOptions}
     >
       <div
@@ -128,10 +112,11 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       >
         <ul class="glide__slides">
           {
-            contentBlocks.map((block: any, i: any) => {
-              var Component = components[block._bookshop_name];
-              if (block._bookshop_name === "layout/slider")
-                Component = Astro.self;
+            contentBlocks.map((block: any, i: number) => {
+              const Component =
+                block._bookshop_name === "layout/slider"
+                  ? Astro.self
+                  : components[block._bookshop_name];
 
               block.content ??= content;
 
@@ -169,7 +154,7 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
       {
         showBullets && (
           <div class="glide__bullets" data-glide-el="controls[nav]">
-            {contentBlocks.map((_slide, i) => (
+            {contentBlocks.map((_: any, i: number) => (
               <button class="glide__bullet" data-glide-dir={`=${i}`} />
             ))}
           </div>
@@ -187,56 +172,49 @@ const dataGlideOptions = Object.entries(glideOptions).reduce(
     if (window.inEditorMode) return;
     document.querySelectorAll("div[data-glide]").forEach((e) => {
       if (!(e instanceof HTMLElement)) return;
+      const id = e.getAttribute("id");
+      const data = e.dataset;
+      if (!id || !data) return;
+
       console.info("Initialising @glidejs/glide for", e);
 
-      const id = e.getAttribute("id");
-      if (!id) return;
-
       const glideOptions: Partial<Glide.Options> = {
-        autoplay: Number(e.dataset?.autoplay) || false,
-        focusAt:
-          e.dataset?.focus == "center"
-            ? "center"
-            : Number(e.dataset?.focus) || 0,
-        bound: "bound" in e.dataset ? e.dataset?.bound === "true" : undefined,
-        gap: Number(e.dataset?.gap) || 0,
-        type:
-          e.dataset?.sliderType?.toLowerCase() == "carousel"
-            ? "carousel"
-            : "slider",
-        perView: Number(e.dataset?.perView) || undefined,
-        animationDuration: Number(e.dataset?.animationDuration) || 0,
-        hoverpause: "hoverpause" in e.dataset,
+        autoplay: Number(data.autoplay) || false,
+        focusAt: data.focus === "center" ? "center" : Number(data.focusAt) || 0,
+        bound: data.bound === "true",
+        gap: Number(data.gap) || 0,
+        type: data.type?.toLowerCase() === "carousel" ? "carousel" : "slider",
+        perView: Number(data.perView) || 1,
+        animationDuration: Number(data.animationDuration) || 0,
+        hoverpause: data.hoverpause === "true" || false,
       };
 
-      glideOptions.perView &&
-        e.style.setProperty("--per", glideOptions.perView.toString());
-      glideOptions.gap &&
-        e.style.setProperty("--gap", glideOptions.gap.toString());
-
-      console.log(glideOptions);
-
       const glide = new Glide(`#${id}`, glideOptions);
+      const isFader = data.fader === "true";
+      const perView = Number(data.perView) || 1;
+      const gap = glideOptions.gap || 0;
 
       // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
-      if (Number(e.dataset?.perView) === 1) {
+      if (glideOptions.perView === 1 || isFader) {
         glide.on("move", () => {
-          const slider = document.getElementById(id);
-          const slides = slider?.querySelectorAll(".slider-item");
+          const slides = document
+            .getElementById(id)
+            ?.querySelectorAll(".slider-item");
+          if (!slides) return;
 
-          slides?.forEach((e) => e.setAttribute("inert", ""));
-          slides?.[glide.index].removeAttribute("inert");
+          slides.forEach((s) => {
+            s.setAttribute("inert", "");
+            s.removeAttribute("data-fader");
+          });
+          slides[glide.index].removeAttribute("inert");
+          if (isFader) {
+            slides[glide.index].removeAttribute("style");
+            slides[glide.index].setAttribute("data-fader", "");
+          }
         });
       }
 
-      if (e.dataset?.sliderType?.toLowerCase() == "fader") {
-        glide.on("move", () => {
-          const slider = document.getElementById(id);
-          const slides = slider?.querySelectorAll(".slider-item");
 
-          slides?.forEach((e) => e.removeAttribute("data-fader"));
-          slides?.[glide.index].removeAttribute("style");
-          slides?.[glide.index].setAttribute("data-fader", "");
         });
       }
 
