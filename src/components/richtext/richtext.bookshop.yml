@@ -6,7 +6,7 @@ spec:
   label: Content
   description: Rich text element.
   icon: edit_note
-  tags: []
+  tags: ["text"]
   place_groups_below: true
   groups:
     - heading: Section

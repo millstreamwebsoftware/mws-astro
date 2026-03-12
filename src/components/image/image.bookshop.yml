@@ -5,7 +5,7 @@ spec:
   label: Image
   description: Display a single image.
   icon: image
-  tags: ["image"]
+  tags: ["image", "media"]
   place_groups_below: true
   groups:
     - heading: Section

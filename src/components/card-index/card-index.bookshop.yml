@@ -5,7 +5,7 @@ spec:
   label: Card Index
   description: List information about other pages
   icon: recent_actors
-  tags: []
+  tags: ["collection"]
   place_groups_below: true
   groups:
     - heading: Section

@@ -4,7 +4,7 @@ spec:
   label: Slider
   description: Rotating Carousel
   icon: view_carousel
-  tags: []
+  tags: ["layout"]
   place_groups_below: true
   groups:
     - heading: Section

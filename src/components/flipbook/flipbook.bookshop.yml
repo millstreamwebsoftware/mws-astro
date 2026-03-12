@@ -5,7 +5,7 @@ spec:
   label: Flipbook
   description: Display a PDF as a flipbook
   icon: menu_book
-  tags: ["file"]
+  tags: ["file", "media"]
   place_groups_below: true
   groups:
     - heading: Section

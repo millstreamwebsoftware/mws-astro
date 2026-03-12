@@ -5,7 +5,7 @@ spec:
   label: Social
   description: Display Social Media Icons
   icon: share
-  tags: []
+  tags: ["navigation", "social"]
 
 # Defines the structure of this component, as well as the default values
 blueprint:

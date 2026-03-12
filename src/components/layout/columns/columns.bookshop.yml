@@ -6,7 +6,7 @@ spec:
   label: Columns
   description: Layout content in columns.
   icon: view_column
-  tags: []
+  tags: ["layout"]
   place_groups_below: true
   groups:
     - heading: Section

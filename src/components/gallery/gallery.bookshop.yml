@@ -5,7 +5,7 @@ spec:
   label: Gallery
   description: Display images in a gallery.
   icon: collections
-  tags: ["image", "collection"]
+  tags: ["image", "media", "collection"]
   place_groups_below: true
   groups:
     - heading: Section

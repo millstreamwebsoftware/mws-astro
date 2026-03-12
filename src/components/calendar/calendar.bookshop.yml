@@ -5,7 +5,7 @@ spec:
   label: Calendar
   description: Display events in a calendar.
   icon: event
-  tags: []
+  tags: ["embed"]
   place_groups_below: true
   groups:
     - heading: Section
