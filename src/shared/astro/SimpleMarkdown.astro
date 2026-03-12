@@ -1,0 +1,14 @@
+---
+import { marked } from "marked";
+
+export interface Props {
+  content: string;
+  breaks?: boolean;
+}
+
+const { content, breaks } = Astro.props;
+
+const md = marked.parse(content, { breaks: breaks });
+---
+
+<Fragment set:html={md} />
