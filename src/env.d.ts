@@ -1,4 +1,10 @@
 import type { CollectionEntry, CollectionKey } from "astro:content";
+import type { Props as Section } from "./layouts/Section.astro";
+import type { Props as Breadcrumbs } from "./components/navigation/breadcrumbs/breadcrumbs.astro";
+import type {
+  Props as Blockquote,
+  Prefs as BlockquotePrefs,
+} from "./components/blockquote/blockquote.astro";
 
 declare global {
   type Prettify<T> = {
@@ -87,6 +93,10 @@ declare global {
       google_maps?: { api_key: string };
       google_calendar?: { api_key: string };
       imgix?: { domain: string; token: string };
+    };
+    components?: {
+      breadcrumbs?: Prettify<Omit<Breadcrumbs, keyof Section>>;
+      blockquote?: Blockquote & BlockquotePrefs;
     };
     _input: Record<string, any>;
   }

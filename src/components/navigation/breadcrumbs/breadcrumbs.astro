@@ -5,18 +5,25 @@ import {
   default as Section,
   type Props as SectionProps,
 } from "@layouts/Section.astro";
+import { preferences } from "@shared/preferences";
+const defaults = preferences.components?.breadcrumbs;
 
-interface Props extends Partial<SectionProps> {
+export interface Props extends Partial<SectionProps> {
   showHome?: "none" | "icon" | "label" | "both";
   homeIcon?: string;
   separator?: string;
   justify?: "left" | "center" | "right";
 }
 
-const { showHome = "both", justify, ...section } = Astro.props;
+const {
+  showHome = defaults?.showHome ?? "both",
+  justify = defaults?.justify,
+  ...section
+} = Astro.props;
 
-const separator = Astro.props.separator || "carbon:caret-right";
-const homeIcon = Astro.props.homeIcon || "carbon:home";
+const separator =
+  Astro.props.separator || defaults?.showHome || "carbon:caret-right";
+const homeIcon = Astro.props.homeIcon || defaults?.showHome || "carbon:home";
 
 const ancestors = await getPageAncestors(urlToId(Astro.request.url));
 ---

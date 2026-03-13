@@ -1,60 +1,81 @@
 ---
-// import Markdown from "@shared/Markdown.astro";
 import Icon from "@shared/icon.astro";
+import { preferences } from "@shared/preferences";
+const defaults = preferences.components?.blockquote;
 
 export interface Props {
-    type?: string;
+  type?: string;
 }
 
-// const { html } = Astro.props;
-// <Fragment set:html={html} />
+export interface Prefs {
+  styles?: Record<string, { before: string; after: string }>;
+}
 
-const icons = {
+const { type: blockquoteType = defaults?.type ?? "default" } = Astro.props;
+
+const icons = Object.assign(
+  {
     default: { before: "fa6-solid:quote-left", after: "fa6-solid:quote-right" },
     correct: { before: "fa6-solid:circle-check", after: "" },
-}[Astro.props.type ?? "default"];
+  },
+  defaults?.styles ?? {},
+)[blockquoteType];
+
+// Type narrowing here fixes an undefined property read
+const iconBefore = icons?.before || null;
+const iconAfter = icons?.after || null;
 ---
 
-<blockquote>
-    {icons?.before && <Icon name={icons.before} height="1.8em" />}
-    <span><slot /></span>
-    {icons?.after && <Icon name={icons.after} height="1.8em" />}
+<blockquote data-style={blockquoteType}>
+  {iconBefore && <Icon name={iconBefore} height="1.8em" />}
+  <span><slot /></span>
+  {iconAfter && <Icon name={iconAfter} height="1.8em" />}
 </blockquote>
 
 <style is:global>
-    blockquote > .icon {
-        position: absolute;
-        color: rgb(var(--blockquote-color) / 0.6);
+  blockquote > .icon {
+    position: absolute;
+    color: rgb(var(--blockquote-color) / 0.6);
+  }
+
+  blockquote > .icon:first-child {
+    top: 15px;
+    left: 15px;
+  }
+
+  blockquote > .icon:last-child {
+    bottom: 15px;
+    right: 15px;
+  }
+
+  blockquote {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin: 20px auto;
+
+    :where(&) {
+      padding: 2rem;
+    }
+    :where(&:has(.icon:first-child)) {
+      padding-left: 50px;
+    }
+    :where(&:has(.icon:last-child)) {
+      padding-right: 50px;
     }
 
-    blockquote > .icon:first-child {
-        top: 15px;
-        left: 15px;
-    }
+    font-size: 1.4em;
+    font-style: italic;
+    line-height: 1.6;
+    border-left: 3px solid rgb(var(--blockquote-color) / 0.4);
+    background-color: rgb(var(--blockquote-color) / 0.1);
+    border-radius: var(--border-radius);
+  }
 
-    blockquote > .icon:last-child {
-        bottom: 15px;
-        right: 15px;
-    }
-
-    blockquote {
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        margin: 20px auto;
-        padding: 1em 50px 1em 50px;
-        font-size: 1.4em;
-        font-style: italic;
-        line-height: 1.6;
-        border-left: 3px solid rgb(var(--blockquote-color) / 0.4);
-        background-color: rgb(var(--blockquote-color) / 0.1);
-        border-radius: var(--border-radius);
-    }
-
-    blockquote span {
-        display: block;
-        margin-top: 0.5em;
-        font-style: normal;
-        font-weight: bold;
-    }
+  blockquote span {
+    display: block;
+    margin-top: 0.5em;
+    font-style: normal;
+    font-weight: bold;
+  }
 </style>
