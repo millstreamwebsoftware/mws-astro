@@ -23,7 +23,7 @@ const {
 
 const separator =
   Astro.props.separator || defaults?.showHome || "carbon:caret-right";
-const homeIcon = Astro.props.homeIcon || defaults?.showHome || "carbon:home";
+const homeIcon = Astro.props.homeIcon || defaults?.homeIcon || "carbon:home";
 
 const ancestors = await getPageAncestors(urlToId(Astro.request.url));
 ---
