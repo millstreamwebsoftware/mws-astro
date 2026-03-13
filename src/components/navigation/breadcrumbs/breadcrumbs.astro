@@ -85,11 +85,13 @@ const ancestors = await getPageAncestors(urlToId(Astro.request.url));
   a {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     font-size: var(--text-size-small);
     text-decoration: none;
     align-items: center;
     gap: 0.5em;
     justify-content: var(--justify, flex-start);
+    white-space: nowrap;
   }
 
   div[data-justify="left"] {
