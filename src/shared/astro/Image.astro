@@ -5,9 +5,6 @@ import _preferences from "@data/preferences.json";
 import { getImage } from "astro:assets";
 const preferences = _preferences as unknown as Preferences;
 
-type CssAlignment = "top" | "bottom" | "center" | "left" | "right";
-export type CssAlign = `${CssAlignment} ${CssAlignment}` | CssAlignment;
-
 type ImageSource =
   | {
       imageSource: "public";

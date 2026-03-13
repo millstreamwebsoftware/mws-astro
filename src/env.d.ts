@@ -1,10 +1,10 @@
 import type { CollectionEntry, CollectionKey } from "astro:content";
-import type { Props as Section } from "./layouts/Section.astro";
-import type { Props as Breadcrumbs } from "./components/navigation/breadcrumbs/breadcrumbs.astro";
+import type { Props as Section } from "@layouts/Section.astro";
+import type { Props as Breadcrumbs } from "@components/navigation/breadcrumbs/breadcrumbs.astro";
 import type {
   Props as Blockquote,
   Prefs as BlockquotePrefs,
-} from "./components/blockquote/blockquote.astro";
+} from "@components/blockquote/blockquote.astro";
 
 declare global {
   type Prettify<T> = {
@@ -51,6 +51,14 @@ declare global {
     | "plus-darker"
     | "plus-lighter";
 
+  type CssAlignX = "left" | "center" | "right";
+  type CssAlignY = "top" | "center" | "bottom";
+  type CssAlign =
+    | `${CssAlignX} ${CssAlignY}`
+    | `${CssAlignY} ${CssAlignX}`
+    | CssAlignX
+    | CssAlignY;
+
   interface Preferences {
     general: {
       site_name: string;
@@ -96,7 +104,7 @@ declare global {
     };
     components?: {
       breadcrumbs?: Prettify<Omit<Breadcrumbs, keyof Section>>;
-      blockquote?: Blockquote & BlockquotePrefs;
+      blockquote?: Prettify<Blockquote & BlockquotePrefs>;
     };
     _input: Record<string, any>;
   }
