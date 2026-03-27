@@ -41,10 +41,38 @@ function getIcon(link: string) {
   }
 }
 
+function getSocialName(link: string) {
+  if (link.startsWith("tel:")) return "Phone";
+  if (link.startsWith("mailto:")) return "E-Mail";
+  if (link.startsWith("sms:")) return "SMS";
+  if (link.startsWith("/")) return "Web Contact";
+
+  try {
+    const hostname = new URL(link).hostname.replace(/^www\./, "");
+    return (
+      {
+        "twitter.com": "X (Twitter)",
+        "x.com": "X (Twitter)",
+        "facebook.com": "Facebook",
+        "instagram.com": "Instagram",
+        "linkedin.com": "LinkedIn",
+        "wa.me": "WhatsApp",
+        "youtube.com": "Youtube",
+        "youtu.be": "Youtube",
+        "vimeo.com": "Vimeo",
+      }[hostname] || hostname
+    );
+  } catch (e) {
+    if (e instanceof TypeError) return undefined;
+    throw e;
+  }
+}
+
 const socials: Record<string, string>[] = socialItems.map((s: any) => ({
   icon: s.icon ?? getIcon(s.link),
   link: s.link,
   text: s.text,
+  alt: getSocialName(s.link) ?? s.text ?? s.link,
 }));
 ---
 
@@ -58,7 +86,7 @@ const socials: Record<string, string>[] = socialItems.map((s: any) => ({
             class="social-item"
             rel="noopener noreferrer"
             target="_blank"
-            title={s.title}
+            title={s.title ?? `${preferences.general.site_name} - ${s.alt}`}
           >
             {s.icon && <Icon name={s.icon} height={"1.8em"} />}
             {s.text && <span>{s.text}</span>}

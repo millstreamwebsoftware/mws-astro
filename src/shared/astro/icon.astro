@@ -1,21 +1,17 @@
 ---
 import { getIconData, iconToSVG } from "@iconify/utils";
+import { inheritScope } from "@mws-astro/util";
 
 export interface Props {
   name: string;
   height?: string;
   color?: string;
   class?: any;
+  labelBy?: string;
   inheritScope?: boolean;
 }
 
-const {
-  name,
-  class: classes,
-  color,
-  height,
-  inheritScope = false,
-} = Astro.props;
+const { name, class: classes, color, height, labelBy } = Astro.props;
 // const height = Astro.props.height || "unset";
 var [iconSetName, iconName] = name.split(":");
 const iconSetPath = `/node_modules/@iconify-json/${iconSetName}/icons.json`;
@@ -37,16 +33,6 @@ if (!icon)
   throw Error(`Icon "${iconName}" not found in collection ${iconSetName}.`);
 
 const iconData = iconToSVG(icon, { height: height || "unset" });
-
-const styleScope = inheritScope
-  ? ((props) => {
-      const scope = Object.keys(props).find((k) =>
-        k.startsWith("data-astro-cid-"),
-      );
-      if (!scope) return undefined;
-      return { [scope]: "" };
-    })(Astro.props)
-  : undefined;
 ---
 
 <svg
@@ -55,7 +41,8 @@ const styleScope = inheritScope
   {...iconData.attributes}
   set:html={iconData.body}
   style={{ color }}
-  {...styleScope}
+  aria-labelledby={labelBy}
+  {...inheritScope(Astro.props)}
 />
 
 <style>

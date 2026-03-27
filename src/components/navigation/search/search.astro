@@ -12,8 +12,12 @@ const { hide, endpoint = "/search", param = "q" } = Astro.props;
 
 <form class:list={[hide]} name="search" action={endpoint} method="GET">
   <input name={param} type="text" placeholder="Search" />
-  <button type="submit">
-    <Icon name="fa6-solid:magnifying-glass" height="1.2em" />
+  <button aria-label="Submit Search" type="submit">
+    <Icon
+      name="fa6-solid:magnifying-glass"
+      height="1.2em"
+      inheritScope={true}
+    />
   </button>
 </form>
 
@@ -24,7 +28,7 @@ const { hide, endpoint = "/search", param = "q" } = Astro.props;
     color: #222;
     padding: 0 max(min(var(--header-item-border-radius, 0px), 1em), 0.5em);
     border-radius: var(--header-item-border-radius);
-    height: 1.8em;
+    align-self: stretch;
     font-size: inherit;
     width: 10em;
   }
@@ -38,11 +42,16 @@ const { hide, endpoint = "/search", param = "q" } = Astro.props;
   }
 
   button {
-    border: none;
-    padding: 0;
     color: inherit;
-    padding-left: 0.5rem;
     font-size: inherit;
+    border: none;
+    align-self: stretch;
+    padding-right: 0;
+    padding-left: 0.5rem;
+
+    .icon {
+      margin-bottom: 0.2em;
+    }
 
     &:hover {
       color: rgb(var(--header-hover-hightlight));

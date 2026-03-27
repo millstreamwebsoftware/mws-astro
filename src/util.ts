@@ -64,3 +64,14 @@ export function log<T>(a: T): T {
   console.log(a);
   return a;
 }
+
+export function inheritScope(props: Object & { inheritScope?: boolean }) {
+  return (
+    props.inheritScope &&
+    Object.fromEntries(
+      Object.keys(props)
+        .filter((k) => k.startsWith("data-astro-cid-"))
+        .map((k) => [k, ""]),
+    )
+  );
+}
