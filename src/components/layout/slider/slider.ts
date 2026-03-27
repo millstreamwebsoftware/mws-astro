@@ -1,7 +1,6 @@
 import type { EmblaCarouselType } from "embla-carousel";
 import EmblaCarousel from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
-import ClassNames from "embla-carousel-class-names";
 import Fade from "embla-carousel-fade";
 
 const carousels = document.querySelectorAll<HTMLDivElement>("div.embla");
@@ -97,7 +96,7 @@ function setupCarousel(e: HTMLDivElement) {
   });
 
   if (dotsNode) {
-    emblaApi.on("autoplay:timerset", (emblaApi, event) => {
+    emblaApi.on("autoplay:timerset", (emblaApi, _event) => {
       const autoplay = emblaApi.plugins().autoplay;
       if (!autoplay) return;
       const untilNext = autoplay.timeUntilNext();
@@ -112,7 +111,7 @@ function setupCarousel(e: HTMLDivElement) {
         `${untilNext}ms`,
       );
     });
-    emblaApi.on("autoplay:timerstopped", (emblaApi, event) => {
+    emblaApi.on("autoplay:timerstopped", (emblaApi, _event) => {
       const autoplay = emblaApi.plugins().autoplay;
       if (!autoplay) return;
       dotsNode.classList.toggle("embla__autoplay", false);
@@ -132,7 +131,6 @@ function setupCarousel(e: HTMLDivElement) {
       const perView = Number(styles.getPropertyValue("--perView"));
       if (isNaN(perView)) return;
 
-      const slideAllocation = width / perView;
       const newPerView = Math.floor(width / minSlideWidth);
 
       if (

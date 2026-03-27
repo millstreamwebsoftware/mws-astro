@@ -69,7 +69,6 @@ const {
   hideUI = defaults?.hideUI ?? false,
   key,
 } = Astro.props;
-const id = "glide" + "-" + (key || "");
 
 function data(prop: any) {
   return prop ? (prop === true ? "" : prop.toString()) : undefined;
