@@ -50,6 +50,7 @@ const {
   content,
   autoplay,
   perView,
+  gap,
   focus = Astro.props.focusAtCenter
     ? "center"
     : Astro.props.focusAt === 0
@@ -87,6 +88,7 @@ function data(prop: any) {
     data-min-slide-width={data(minSlideWidth)}
     style={{
       "--perView": transition?.toLowerCase() === "fader" ? 1 : (perView ?? 1),
+      "--gap": (gap && `${gap}px`) || "0px",
     }}
   >
     <div class="embla__viewport">
@@ -143,7 +145,7 @@ function data(prop: any) {
   .embla {
     position: relative;
     anchor-scope: all;
-    --slide-spacing: 10px;
+    --slide-spacing: var(--gap, 0px);
   }
 
   :where(:root) {

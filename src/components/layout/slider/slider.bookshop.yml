@@ -35,13 +35,13 @@ blueprint:
   autoplay: 0
   hoverpause: false
   perView: 1
-  focusAtCenter: true
-  focusAt: 0
+  focus:
   bound: false
   showBullets: true
   showArrows: true
+  hideUI: false
   indent:
-  transition: Slider
+  transition: slider
   animationDuration: 0.4
   minSlideWidth:
 
@@ -82,17 +82,14 @@ _inputs:
     options:
       min: 1
       step: 1
-  focusAtCenter:
-    label: Focus Centre Slide
-    comment: The central visible slide is treated as the active slide. Best when slides per view is odd and bigger than 1.
-  focusAt:
-    label: Focus at Slide
-    comment: The nth visible slide is treated as the active slide. Mainly useful when slides per view is bigger than 1. (Leftmost visible slide is slide 0)
-    hidden: focusAtCenter
-    type: number
+  focus:
+    type: choice
     options:
-      min: 0
-      step: 1
+      values:
+        - start
+        - center
+        - end
+      allow_empty: true
   bound:
     label: Bound
     comment: Avoid showing empty space after last card in slider mode, useful when slides per view is >1.
@@ -105,12 +102,12 @@ _inputs:
       Fader does not slide and instead slowly fades between items (Fader overwrites some options).
     options:
       values:
-        - Slider
-        - Carousel
-        - Fader
+        - slider
+        - carousel
+        - fader
   animationDuration:
     type: number
-    comment: Time spent animating between slides in seconds. If autoplay is enabled, make sure this is shorter.
+    comment: Time spent animating between slides. Lower is faster. Animations are spring-based, so the units are arbitrary.
     options:
       min: 0
       step: 0.1
