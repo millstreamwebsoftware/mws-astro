@@ -1,12 +1,12 @@
 ---
-import "node_modules/@glidejs/glide/dist/css/glide.core.min.css";
-import Icon from "@shared/icon.astro";
 import {
   default as Section,
   type Props as SectionProps,
 } from "@layouts/Section.astro";
 import { bookshopName } from "@mws-astro/util";
-import type { Options } from "@glidejs/glide";
+import Icon from "@shared/icon.astro";
+import { preferences } from "@shared/preferences";
+const defaults = preferences.components?.slider;
 
 const contentBlocks = Astro.props.content_blocks;
 const components: Record<string, any> = Object.fromEntries(
@@ -28,401 +28,246 @@ export interface Props extends Partial<SectionProps> {
   gap?: number;
   autoplay?: number;
   perView?: number;
+  focus?: "start" | "center" | "end";
+  /** @deprecated use float instead. */
   focusAtCenter?: boolean;
+  /** @deprecated use align. */
   focusAt?: number;
   bound?: boolean;
   showBullets?: boolean;
   showArrows?: boolean;
-  transition?: Options["type"] | "fader";
+  transition?: "slider" | "carousel" | "fader";
   animationDuration?: number;
   hoverpause?: boolean;
   minSlideWidth?: number;
+  prevArrowIcon?: string;
+  nextArrowIcon?: string;
+  dotIcon?: string;
+  hideUI?: boolean;
 }
 
 const {
-  key,
+  content,
+  autoplay,
+  perView,
+  focus = Astro.props.focusAtCenter
+    ? "center"
+    : Astro.props.focusAt === 0
+      ? "start"
+      : "center",
+  bound,
+  transition,
+  animationDuration,
   showBullets,
   showArrows,
-  transition,
-  height,
-  perView,
-  bound,
-  gap,
-  autoplay,
-  animationDuration,
-  focusAt,
-  focusAtCenter,
   hoverpause,
   minSlideWidth,
-  background_loading,
-  content,
+  prevArrowIcon = defaults?.prevArrowIcon ?? "carbon:arrow-left",
+  nextArrowIcon = defaults?.nextArrowIcon ?? "carbon:arrow-right",
+  dotIcon = defaults?.dotIcon ?? "carbon:dot-mark",
+  hideUI = defaults?.hideUI ?? false,
+  key,
 } = Astro.props;
-
 const id = "glide" + "-" + (key || "");
-const isFader = transition.toLowerCase() === "fader";
-const glideOptions: Partial<Options> = {
-  type: isFader ? "slider" : (transition.toLowerCase() as Options["type"]),
-  autoplay: autoplay && autoplay * 1000, // Seconds -> Milliseconds
-  animationDuration: isFader
-    ? 0
-    : animationDuration && animationDuration * 1000, // Seconds -> Milliseconds
-  focusAt: isFader ? 0 : focusAtCenter ? "center" : focusAt,
-  gap,
-  perView: isFader ? 1 : perView,
-  bound,
-  hoverpause,
-};
 
-if (isFader) {
-  delete Astro.props.content; // Investigate side effect
+function data(prop: any) {
+  return prop ? (prop === true ? "" : prop.toString()) : undefined;
 }
-
-// Convert glideOptions to data-* attributes like DOMStringMap
-const dataGlideOptions = Object.fromEntries(
-  Object.entries(glideOptions)
-    .filter(([, v]) => v !== undefined)
-    .map(([k, v]) => [
-      `data-${k.replace(/[A-Z]/g, "-$&").toLowerCase()}`,
-      v.toString(),
-    ]),
-);
 ---
 
-<Section
-  component="slider"
-  style={{
-    ...(animationDuration && {
-      "--transition": `${animationDuration * 1000}ms`,
-    }),
-    "--gap": gap,
-    "--per": perView,
-  }}
-  {...Astro.props}
->
-  <Fragment>
-    <div
-      class:list={["glide", `slider-${glideOptions.type}`]}
-      {id}
-      data-glide={id}
-      data-fader={isFader}
-      data-min-slide-width={minSlideWidth || undefined}
-      {...dataGlideOptions}
-    >
-      <div
-        class="glide__track"
-        data-glide-el="track"
-        style={height ? `--height:${height}vh;` : ""}
-      >
-        <ul class="glide__slides">
-          {
-            contentBlocks.map((block: any, i: number) => {
-              const Component =
-                block._bookshop_name === "layout/slider"
-                  ? Astro.self
-                  : components[block._bookshop_name];
+<Section component="slider" {...Astro.props}>
+  <div
+    class:list={["embla", { hideUI }]}
+    data-autoplay={data(autoplay && autoplay * 1000)}
+    data-hoverpause={data(autoplay && hoverpause)}
+    data-transition={data(transition?.toLowerCase())}
+    data-duration={data(animationDuration && animationDuration * 100)}
+    data-focus={data(focus)}
+    data-bound={data(bound)}
+    data-min-slide-width={data(minSlideWidth)}
+    style={{
+      "--perView": transition?.toLowerCase() === "fader" ? 1 : (perView ?? 1),
+    }}
+  >
+    <div class="embla__viewport">
+      <div class="embla__container">
+        {
+          contentBlocks.map((block: any, i: number) => {
+            if (block._bookshop_name === "layout/slider") return;
 
-              block.content ??= content;
+            const Component = components[block._bookshop_name];
+            block.content ??= content;
 
-              if (Component) {
-                return (
-                  <div class:list={["slider-item"]}>
-                    <Component
-                      {...block}
-                      key={(key || "") + "-" + i.toString()}
-                      background_loading={i ? "lazy" : background_loading}
-                    />
-                  </div>
-                );
-              }
-              const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
-              console.warn(warnstring);
-              return <div class="missing-component">{warnstring}</div>;
-            })
-          }
-        </ul>
-        <div class="glide__overlay"></div>
+            if (Component) {
+              return (
+                <div class:list={["embla__slide"]}>
+                  <Component
+                    {...block}
+                    key={(key || "") + "-" + i.toString()}
+                  />
+                </div>
+              );
+            }
+            const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
+            console.warn(warnstring);
+            return <div class="missing-component">{warnstring}</div>;
+          })
+        }
       </div>
-      {
-        showArrows && (
-          <div class="glide__arrows" data-glide-el="controls">
-            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
-              <Icon name="carbon:chevron-left" />
-            </button>
-            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
-              <Icon name="carbon:chevron-right" />
-            </button>
-          </div>
-        )
-      }
-      {
-        showBullets && (
-          <div class="glide__bullets" data-glide-el="controls[nav]">
-            {contentBlocks.map((_: any, i: number) => (
-              <button class="glide__bullet" data-glide-dir={`=${i}`} />
-            ))}
-          </div>
-        )
-      }
     </div>
-  </Fragment>
+
+    {showBullets && <div class="embla__dots" />}
+
+    {
+      showArrows && (
+        <>
+          <button class="embla__prev">
+            <Icon name={prevArrowIcon} height="3rem" />
+          </button>
+          <button class="embla__next">
+            <Icon name={nextArrowIcon} height="3rem" />
+          </button>
+        </>
+      )
+    }
+
+    <template type="text/template" class="embla__dot__template">
+      <button class="embla__dot"><Icon name={dotIcon} height="2rem" /></button>
+    </template>
+  </div>
 </Section>
 
-<script>
-  import Glide from "@glidejs/glide";
-  setupGlide();
+<script src="./slider"></script>
 
-  function setupGlide() {
-    if (window.inEditorMode) return;
-    document.querySelectorAll("div[data-glide]").forEach((e) => {
-      if (!(e instanceof HTMLElement)) return;
-      const id = e.getAttribute("id");
-      const data = e.dataset;
-      if (!id || !data) return;
-
-      console.info("Initialising @glidejs/glide for", e);
-
-      const glideOptions: Partial<Glide.Options> = {
-        autoplay: Number(data.autoplay) || false,
-        focusAt: data.focus === "center" ? "center" : Number(data.focusAt) || 0,
-        bound: data.bound === "true",
-        gap: Number(data.gap) || 0,
-        type: data.type?.toLowerCase() === "carousel" ? "carousel" : "slider",
-        perView: Number(data.perView) || 1,
-        animationDuration: Number(data.animationDuration) || 0,
-        hoverpause: data.hoverpause === "true" || false,
-      };
-
-      const glide = new Glide(`#${id}`, glideOptions);
-      const isFader = data.fader === "true";
-      const perView = Number(data.perView) || 1;
-      const gap = glideOptions.gap || 0;
-      const minSlideWidth = Number(data.minSlideWidth);
-
-      // Make non-visible slides inert, to fix keyboard navigation focusing offscreen elements
-      if (glideOptions.perView === 1 || isFader) {
-        glide.on("move", () => {
-          const slides = document
-            .getElementById(id)
-            ?.querySelectorAll(".slider-item");
-          if (!slides) return;
-
-          slides.forEach((s) => {
-            s.setAttribute("inert", "");
-            s.removeAttribute("data-fader");
-          });
-          slides[glide.index].removeAttribute("inert");
-          if (isFader) {
-            slides[glide.index].removeAttribute("style");
-            slides[glide.index].setAttribute("data-fader", "");
-          }
-        });
-      }
-
-      function doResize() {
-        const w = e.clientWidth;
-        const newPerView = Math.floor(
-          (w - gap * (perView - 1)) / minSlideWidth,
-        );
-
-        const numSlides = e.querySelectorAll(
-          ":scope > .glide__track > .glide__slides > .slider-item:not(.glide__slide--clone)",
-        ).length;
-
-        if (numSlides < newPerView) return;
-
-        glide.update({
-          perView: newPerView || 1,
-        });
-      }
-
-      if (perView > 1 && minSlideWidth) {
-        glide.on("resize", doResize);
-      }
-
-      doResize();
-      glide.mount();
-    });
-  }
-</script>
-
-<style lang="scss">
-  :global(.cms-editor-active) .glide__slides > .slider-item {
-    flex: 0 0 calc((100% / var(--per, 1)) - var(--gap, 0));
+<style>
+  .embla {
+    position: relative;
+    anchor-scope: all;
+    --slide-spacing: 10px;
   }
 
-  .glide {
-    --arrow-size: 6rem;
-    --bullet-size: 1rem;
+  :where(:root) {
+    --slider-color: rgb(var(--text-color));
   }
 
-  .glide,
-  .glide__track,
-  .glide__slides {
-    height: 100%;
+  .embla__viewport {
+    overflow: hidden;
+    anchor-name: --embla-viewport;
   }
 
-  .glide__slides {
-    min-height: calc(var(--height) - var(--header-content-offset));
-  }
-
-  .glide__arrows {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .glide__arrow {
-    position: absolute;
-    top: calc(50% - var(--arrow-size) * 0.5);
-    height: var(--arrow-size);
-    width: var(--arrow-size);
-    border: none;
-    background-color: #0000000a;
-    border-radius: var(--arrow-size);
-    backdrop-filter: blur(2px) invert(0.1);
-    touch-action: manipulation;
-    pointer-events: all;
-
-    svg {
-      color: rgb(var(--color-accent));
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  .glide__arrow:hover {
-    background-color: #00000044;
-  }
-
-  .glide__arrow--left {
-    left: 1rem;
-  }
-
-  .glide__arrow--right {
-    right: 1rem;
-  }
-
-  .glide__bullets {
-    position: absolute;
-    bottom: 0.8rem;
-    left: 0;
-    right: 0;
+  .embla__container {
     display: flex;
-    flex-direction: row;
-
-    justify-content: center;
-    gap: 1rem;
+    touch-action: pan-y pinch-zoom;
+    margin-left: calc(var(--slide-spacing) * -1);
   }
 
-  .glide__bullet {
-    border: none;
-    padding: 5px;
-    height: calc(var(--bullet-size) * 0.5);
-    width: var(--bullet-size);
-    border-radius: 0.5rem;
-    background-color: #bbbbbb22;
-    box-shadow: 0 0 0.2rem #00000011;
-    backdrop-filter: invert(0.2);
-    transition:
-      background-color 0.2s ease-in-out,
-      box-shadow 0.2s ease-in-out;
+  .embla__slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    flex-basis: round(up, calc(100% / var(--perView)), 1px);
+    padding-left: var(--slide-spacing);
   }
 
-  .glide__bullet--active {
-    background-color: #ffffffaa;
-    box-shadow: 0 0 0.2rem #00000044;
-  }
-
-  .glide__bullet:hover {
-    box-shadow: 0 0 0.2rem #00000088;
-  }
-
-  :where(.glide__overlay) {
-    display: none;
-    pointer-events: none;
-  }
-
-  .slider-fader {
-    .glide__slides {
-      transform: translate3d(0, 0, 0) !important;
-      width: unset !important;
-      /* max-width: var(--page-max-width); */
-    }
-
-    .slider-item:first-child {
-      animation-name: startOpaque;
-      animation-delay: 0s;
-      animation-duration: var(--transition);
-      animation-iteration-count: 1;
-    }
-
-    .slider-item {
-      position: absolute;
-      width: 100%;
-      /* top: 0; */
-      /* left: 0; */
-      inset: 0;
-      order: 2;
+  .hideUI {
+    .embla__prev,
+    .embla__next,
+    .embla__dots {
       opacity: 0;
-      z-index: 2;
-      transition-delay: 0s;
-      transition: opacity var(--transition) ease-in-out;
+      transition: opacity 0.4s ease;
     }
 
-    .slider-item[data-fader] {
-      /* position: relative; */
-      order: 1;
-      opacity: 1;
-      z-index: 1;
-      transition-delay: var(--transition);
-      transition: opacity 0s;
-    }
-
-    .slider-item {
-      display: none;
-    }
-
-    .glide__slide--active,
-    .slider-item:has(+ .glide__slide--active),
-    .glide__slide--active + .slider-item {
-      display: block;
-    }
-    .glide__slides:has(> .glide__slide--active:first-child)
-      > .slider-item:last-child,
-    .glide__slides:has(> .glide__slide--active:last-child)
-      > .slider-item:first-child {
-      display: block;
-      z-index: 0;
-    }
-  }
-
-  @keyframes startOpaque {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-</style>
-
-<style lang="scss" is:global>
-  .slider-item {
-    > section {
-      height: 100%;
-
-      > .component-wrapper {
-        > * {
-          width: 100%;
-          height: 100%;
-        }
+    &:hover {
+      .embla__prev,
+      .embla__next,
+      .embla__dots {
+        opacity: 1;
       }
     }
   }
 
-  #slider-0 .slider-item > section > .component-wrapper {
-    padding-top: calc(var(--header-height) - var(--header-content-offset));
+  .embla__prev,
+  .embla__next {
+    position-anchor: --embla-viewport;
+    border: 0;
+    position: absolute;
+    padding: 1rem;
+    color: rgb(from var(--slider-dot-color, var(--slider-color)) r g b);
+    border-radius: 10rem;
+    backdrop-filter: blur(4px) invert(0.1);
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  .embla__prev {
+    left: 1rem;
+    position-area: var(--slider-prev-position, left);
+  }
+
+  .embla__next {
+    right: 1rem;
+    position-area: var(--slider-next-position, right);
+  }
+
+  .embla__dots {
+    position-anchor: --embla-viewport;
+    position-area: var(--slider-dot-position, bottom);
+    position: absolute;
+  }
+
+  .embla__dot {
+    opacity: 0.2;
+    border: 0;
+    color: rgb(from var(--slider-dot-color, var(--slider-color)) r g b);
+    padding: 1rem;
+    line-height: 1;
+
+    transition: opacity 0.4s ease;
+    opacity: 0.2;
+
+    .icon {
+      transform: scale(0.5);
+      transition: transform 0.4s ease;
+    }
+
+    animation-timing-function: ease-in;
+    animation-duration: var(--embla-autoplay-animation-duration);
+
+    &:hover {
+      opacity: 0.6;
+
+      .icon {
+        transform: scale(0.8);
+      }
+    }
+
+    &.embla__dot--selected {
+      opacity: 1;
+
+      .icon {
+        transform: scale(1);
+      }
+    }
+  }
+
+  .embla__dots.embla__autoplay {
+    &:has(> .embla__dot--selected:last-child) > :first-child {
+      animation-name: embla-autoplay;
+    }
+
+    > .embla__dot--selected + .embla__dot {
+      animation-name: embla-autoplay;
+    }
+  }
+
+  @keyframes embla-autoplay {
+    from {
+      opacity: 0.2;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>

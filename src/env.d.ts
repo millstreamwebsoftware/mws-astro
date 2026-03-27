@@ -1,6 +1,7 @@
 import type { CollectionEntry, CollectionKey } from "astro:content";
 import type { Props as Section } from "@layouts/Section.astro";
 import type { Props as Breadcrumbs } from "@components/navigation/breadcrumbs/breadcrumbs.astro";
+import type { Props as Slider } from "@components/layout/slider/slider.astro";
 import type {
   Props as Blockquote,
   Prefs as BlockquotePrefs,
@@ -105,6 +106,7 @@ declare global {
     components?: {
       breadcrumbs?: Prettify<Omit<Breadcrumbs, keyof Section>>;
       blockquote?: Prettify<Blockquote & BlockquotePrefs>;
+      slider?: Prettify<Omit<Slider, keyof Section>>;
     };
     _input: Record<string, any>;
   }
