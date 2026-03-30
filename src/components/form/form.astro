@@ -94,10 +94,19 @@ const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
             id="g-recaptcha-response"
           />
           <input type="hidden" name="g-recaptcha-version" value="v3" />
+          <span class="recaptcha-attribution">
+            This site is protected by reCAPTCHA and the Google
+            <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+            <a href="https://policies.google.com/terms">
+              Terms of Service
+            </a>{" "}
+            apply.
+          </span>
         </>
       )
     }
     <input type="submit" value="Submit" />
+
     <Icon
       name="svg-spinners:3-dots-fade"
       height="2.5rem"
@@ -173,7 +182,9 @@ const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
     const recaptcha = document
       .getElementById("recaptchav3")
       ?.getAttribute("data-token");
-    if (recaptcha)
+    if (recaptcha) {
+      // Unhide recaptcha badge on this page
+      document.firstElementChild?.classList.remove("recaptcha-hidden");
       form.addEventListener("submit", (e: SubmitEvent) => {
         e.preventDefault();
         grecaptcha.ready(() => {
@@ -187,5 +198,6 @@ const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
             });
         });
       });
+    }
   }
 </script>

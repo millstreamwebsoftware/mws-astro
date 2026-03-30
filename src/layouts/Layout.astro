@@ -39,7 +39,7 @@ const recaptcha = preferences.API?.google_recaptcha_v3?.api_key;
 <!doctype html>
 <html
   lang="en"
-  class:list={classes}
+  class:list={[classes, {"recaptcha-hidden": !!recaptcha}]}
   style={{ ...(pageWidth && { "--page-max-width": `${pageWidth}px` }) }}
 >
   <head>
@@ -55,12 +55,19 @@ const recaptcha = preferences.API?.google_recaptcha_v3?.api_key;
     <link rel="sitemap" href="/sitemap-index.xml" />
     {
       !!recaptcha && (
-        <script
-          id="recaptchav3"
-          data-token={recaptcha}
-          src={`https://www.google.com/recaptcha/api.js?render=${recaptcha}`}
-          is:inline
-        />
+        <>
+          <script
+            id="recaptchav3"
+            data-token={recaptcha}
+            src={`https://www.google.com/recaptcha/api.js?render=${recaptcha}`}
+            is:inline
+          />
+          <style is:global>
+            html.recaptcha-hidden .grecaptcha-badge {
+              visibility: hidden !important;
+            }
+          </style>
+        </>
       )
     }
     <Opengraph {title} {description} {thumbnail} />
