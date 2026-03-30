@@ -1,5 +1,5 @@
 ---
-import preferences from "@data/preferences.json";
+import { preferences } from "@shared/preferences";
 import Footer from "@shared/Footer.astro";
 import Header from "@shared/Header.astro";
 import Opengraph from "@shared/Opengraph.astro";
@@ -33,6 +33,7 @@ const {
 } = Astro.props;
 
 const pageWidth = preferences.page.maximum_page_width;
+const recaptcha = preferences.API?.google_recaptcha_v3?.api_key;
 ---
 
 <!doctype html>
@@ -52,7 +53,16 @@ const pageWidth = preferences.page.maximum_page_width;
     <meta name="format-detection" content="telephone=no" />
     {status !== "online" && <meta name="robots" content="noindex" />}
     <link rel="sitemap" href="/sitemap-index.xml" />
-
+    {
+      !!recaptcha && (
+        <script
+          id="recaptchav3"
+          data-token={recaptcha}
+          src={`https://www.google.com/recaptcha/api.js?render=${recaptcha}`}
+          is:inline
+        />
+      )
+    }
     <Opengraph {title} {description} {thumbnail} />
 
     <script>

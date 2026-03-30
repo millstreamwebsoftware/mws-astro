@@ -6,6 +6,7 @@ import {
 } from "@layouts/Section.astro";
 import Required from "./required.astro";
 import Icon from "@shared/icon.astro";
+import { preferences } from "@shared/preferences";
 
 export interface Props extends Partial<SectionProps> {
   action: string;
@@ -60,6 +61,7 @@ function checkRequired(obj: any[]): boolean {
   });
 }
 const required = checkRequired(form_blocks);
+const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
 ---
 
 <Section component="form" class:list={["form", classes]} {...Astro.props}>
@@ -83,6 +85,18 @@ const required = checkRequired(form_blocks);
       })
     }
     <input type="hidden" name="_gotcha" />
+    {
+      !!recaptcha && (
+        <>
+          <input
+            type="hidden"
+            name="g-recaptcha-response"
+            id="g-recaptcha-response"
+          />
+          <input type="hidden" name="g-recaptcha-version" value="v3" />
+        </>
+      )
+    }
     <input type="submit" value="Submit" />
     <Icon
       name="svg-spinners:3-dots-fade"
@@ -145,6 +159,7 @@ const required = checkRequired(form_blocks);
       document.querySelectorAll<HTMLFormElement>("section.form form");
 
     forms.forEach(addSubmissionSpinner);
+    forms.forEach(initRecaptcha);
   }
 
   function addSubmissionSpinner(form: HTMLFormElement) {
@@ -152,5 +167,25 @@ const required = checkRequired(form_blocks);
     form.addEventListener("submit", () => {
       form.setAttribute("data-status", "submitting");
     });
+  }
+
+  function initRecaptcha(form: HTMLFormElement) {
+    const recaptcha = document
+      .getElementById("recaptchav3")
+      ?.getAttribute("data-token");
+    if (recaptcha)
+      form.addEventListener("submit", (e: SubmitEvent) => {
+        e.preventDefault();
+        grecaptcha.ready(() => {
+          grecaptcha
+            .execute(recaptcha, {
+              action: "submit",
+            })
+            .then(function (token: string) {
+              form.getElementById("g-recaptcha-response").value = token;
+              form.submit();
+            });
+        });
+      });
   }
 </script>

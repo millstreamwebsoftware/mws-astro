@@ -14,6 +14,8 @@ declare global {
 
   var ENV_BOOKSHOP_LIVE: boolean;
 
+  const grecaptcha = any;
+
   interface Window {
     inEditorMode?: boolean;
   }
@@ -90,6 +92,11 @@ declare global {
       titleCaret?: boolean | string;
       titleCaretOpen?: string;
     };
+    page: {
+      canvas_background_color: string;
+      panel_background_color: string;
+      maximum_page_width: number;
+    };
     footer: {
       foreground_color?: string;
       background_color?: string;
@@ -101,6 +108,7 @@ declare global {
     API: {
       google_maps?: { api_key: string };
       google_calendar?: { api_key: string };
+      google_recaptcha_v3?: { api_key: string };
       imgix?: { domain: string; token: string };
     };
     components?: {
