@@ -2,6 +2,7 @@ import type { EmblaCarouselType } from "embla-carousel";
 import EmblaCarousel from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Fade from "embla-carousel-fade";
+import { setupTween } from "./sliderTween";
 
 const carousels = document.querySelectorAll<HTMLDivElement>("div.embla");
 carousels.forEach(setupCarousel);
@@ -146,6 +147,7 @@ function setupCarousel(e: HTMLDivElement) {
 
   emblaApi.plugins().autoplay?.play();
   emblaApi.on("reinit", (emblaApi) => emblaApi.plugins().autoplay?.play());
+  setupTween(emblaApi);
 }
 
 function createDotButtons(emblaApi: EmblaCarouselType, dotsNode: HTMLElement) {
