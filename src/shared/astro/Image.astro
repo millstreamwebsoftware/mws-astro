@@ -1,9 +1,9 @@
 ---
 import { inferRemoteSize } from "@mws-astro/filesystem";
 import { Image as AstroImage } from "astro:assets";
-import _preferences from "@data/preferences.json";
+import { preferences } from "@shared/preferences";
 import { getImage } from "astro:assets";
-const preferences = _preferences as unknown as Preferences;
+import { inheritScope } from "@mws-astro/util";
 
 type ImageSource =
   | {
@@ -19,7 +19,8 @@ type ImageSource =
       image: ImageMetadata | Promise<{ default: ImageMetadata }>;
     };
 
-const DESKTOP_WIDTH = 1920;
+const MAX_IMAGE_SIZE = 2048;
+const DESKTOP_WIDTH = preferences.page.maximum_page_width ?? 1920;
 const MOBILE_WIDTH = 768;
 const IMAGE_MIN_WIDTH = 256;
 const DPR = 2;
@@ -41,6 +42,7 @@ export interface Props {
   widths?: number[] | null;
   displayWidth?: number;
   displayWidthMobile?: number;
+  inheritScope?: boolean;
 }
 
 const {
@@ -209,7 +211,7 @@ function createImageWidths(width: number, _height: number) {
       DESKTOP_WIDTH * displayWidth * DPR,
       MOBILE_WIDTH * displayWidthMobile * DPR,
     ),
-    width,
+    Math.min(width, MAX_IMAGE_SIZE),
   );
 
   for (let w = maxWidth; w > IMAGE_MIN_WIDTH; w /= 2) {
@@ -248,6 +250,7 @@ function createImageSizes(widths: number[]) {
   {loading}
   width={srcWidth}
   height={srcHeight}
+  {...inheritScope(Astro.props)}
 />
 
 <style>

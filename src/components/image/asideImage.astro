@@ -22,6 +22,7 @@ export interface Props {
   "data-height"?: string;
   align?: "left" | "center" | "right";
   "data-align"?: "left" | "center" | "right";
+  float?: "left" | "right";
   classes?: (string | string[])[];
   class?: string;
 }
@@ -38,6 +39,7 @@ const {
   fit = "contain",
   size = Astro.props["data-size"],
   align = Astro.props["data-align"] ?? "center",
+  float,
 } = Astro.props;
 
 const [displayWidth, displayHeight] = [
@@ -79,6 +81,7 @@ const imgSize =
       ? displayWidth / 100
       : { small: 0.33, medium: 0.5, large: 0.66 }[imgSize]}
     quality="mid"
+    inheritScope={true}
   />
   {description && <figcaption>{description}</figcaption>}
 </figure>
