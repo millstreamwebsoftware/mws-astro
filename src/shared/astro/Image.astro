@@ -3,7 +3,7 @@ import { inferRemoteSize } from "@mws-astro/filesystem";
 import { Image as AstroImage } from "astro:assets";
 import { preferences } from "@shared/preferences";
 import { getImage } from "astro:assets";
-import { inheritScope } from "@mws-astro/util";
+import { inheritScope, inheritData } from "@mws-astro/util";
 
 type ImageSource =
   | {
@@ -199,7 +199,8 @@ switch (imageSource) {
 }
 
 const style = {
-  "--align": Astro.props.align ?? "center",
+  "--align": Astro.props.align,
+  "--fit": Astro.props.fit,
   "--opacity": opacity,
 };
 
@@ -246,29 +247,22 @@ function createImageSizes(widths: number[]) {
   {alt}
   class:list={[classes, { background, fixed }]}
   {style}
-  data-fit={fit}
   {loading}
   width={srcWidth}
   height={srcHeight}
   {...inheritScope(Astro.props)}
+  {...inheritData(Astro.props)}
 />
 
 <style>
   img {
-    object-fit: cover;
-    object-position: var(--align);
-    background-size: cover;
-    background-position: var(--align);
+    object-fit: var(--fit, cover);
+    object-position: var(--align, center);
+    background-size: var(--fit, cover);
+    background-position: var(--align, center);
     width: 100%;
     height: 100%;
     opacity: var(--opacity, 1);
-    /* width: auto;
-        height: auto; */
-  }
-
-  img[data-fit="contain"] {
-    object-fit: contain;
-    background-size: contain;
   }
 
   img.background {

@@ -7,6 +7,8 @@ import clsx from "clsx";
 // import _preferences from "@data/preferences.json";
 // const preferences = _preferences as unknown as Preferences;
 
+import SimpleMarkdown from "@shared/SimpleMarkdown.astro";
+
 export interface Props {
   image: ImageProps["image"];
   src?: string;
@@ -16,13 +18,13 @@ export interface Props {
   title?: string;
   description?: string;
   fit?: "contain" | "cover";
-  size?: "small" | "medium" | "large";
-  "data-size"?: "small" | "medium" | "large";
+  "data-fit"?: "contain" | "cover";
   "data-width"?: string;
   "data-height"?: string;
-  align?: "left" | "center" | "right";
+  align?: CssAlign;
   "data-align"?: "left" | "center" | "right";
   float?: "left" | "right";
+  "data-float"?: "left" | "right";
   classes?: (string | string[])[];
   class?: string;
 }
@@ -34,193 +36,139 @@ const {
   description,
   width,
   height,
-  "data-width": _displayWidth,
-  "data-height": _displayHeight,
-  fit = "contain",
-  size = Astro.props["data-size"],
-  align = Astro.props["data-align"] ?? "center",
-  float,
+  "data-width": maxWidth,
+  "data-height": maxHeight,
+  fit = Astro.props["data-fit"] ?? "contain",
+  align = Astro.props["data-align"],
+  float = Astro.props["data-float"],
 } = Astro.props;
 
-const [displayWidth, displayHeight] = [
-  Number.parseInt(_displayWidth || "0") || undefined,
-  Number.parseInt(_displayHeight || "0") || undefined,
-];
-
 const image = Astro.props.src ?? Astro.props.image;
-
 const _classes = clsx(classes).split(" ");
 
-const imgAlign =
-  align ??
-  _classes
-    .find(
-      (c) => c === "align-left" || c === "align-center" || c === "align-right",
-    )
-    ?.substring(6) ??
-  "center";
-
-// Hint displayed image size to generate more optimal srcset
-const imgSize =
-  size ??
-  _classes.find((c) => c === "small" || c === "medium" || c === "large") ??
-  "small";
-
-(Astro.props.align || Astro.props.size) &&
-  console.warn("[AsideImage] Align/Size set");
+const style = {
+  ...(maxWidth && { "--width": maxWidth }),
+  ...(maxHeight && { "--height": maxHeight }),
+  ...(align && { "--align": align }),
+};
 ---
 
-<figure class:list={["aside", `align-${imgAlign}`, imgSize]} {title}>
+<figure
+  class:list={["aside", ..._classes]}
+  {title}
+  data-fit={fit}
+  data-float={float}
+  {style}
+>
   <Image
     {image}
     {alt}
     {fit}
     {width}
     {height}
-    displayWidth={displayWidth
-      ? displayWidth / 100
-      : { small: 0.33, medium: 0.5, large: 0.66 }[imgSize]}
+    displayWidth={1}
     quality="mid"
     inheritScope={true}
   />
-  {description && <figcaption>{description}</figcaption>}
+  {
+    description && (
+      <figcaption>
+        <SimpleMarkdown content={description} />
+      </figcaption>
+    )
+  }
 </figure>
 
-<style define:vars={{ displayWidth, displayHeight }}>
-  figure > :global(img) {
-    max-width: calc(var(--displayWidth, 0) * 1%);
-    max-height: calc(var(--displayHeight, 0) * 1%);
-  }
-</style>
-
 <style lang="scss">
-  figcaption {
-    font-size: var(--text-size-medium);
-    color: rgb(var(--text-color));
-    margin-top: 0.5em;
-  }
-
   figure {
+    margin: 2rem 0;
+    position: relative;
     display: flex;
-    justify-content: center;
-  }
+    flex-direction: column;
 
-  :where(figure),
-  :where(figure.small) {
-    max-width: 33%;
-  }
-
-  :where(figure.medium) {
-    max-width: 50%;
-  }
-
-  figure.large {
-    max-width: 66%;
-  }
-
-  :where(figure) {
-    &.align-left {
-      margin: 0.5em 4rem 4rem 0;
-      float: left;
-      clear: left;
+    @media screen and (min-width: 769px) {
+      &[data-float] {
+        clear: both;
+        margin: 0;
+      }
+      &[data-float="left"] {
+        float: left;
+        margin-right: 2em;
+      }
+      &[data-float="right"] {
+        float: right;
+        margin-left: 2em;
+      }
     }
-    &.align-right {
-      margin: 0.5em 0 4rem 4rem;
-      float: right;
-      clear: right;
+    &[data-fit="cover"] {
+      width: var(--width);
+      height: var(--height);
+
+      figcaption {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        z-index: 1;
+
+        padding: 1rem;
+        background-color: rgb(
+          from var(--figure-caption-background-color, white) r g b / 0.7
+        );
+        backdrop-filter: var(--figure-caption-background-filter, blur(2px));
+      }
     }
-    &.align-center {
-      position: relative;
-      width: 100%;
-      max-width: 100%;
-      float: none;
-      margin: 3rem 0;
-
-      /* :global(img) {
-        max-width: 50%;
-      } */
+    &[data-fit="contain"] {
+      width: var(--width);
+      height: var(--height);
     }
-  }
-
-  @media only screen and (max-width: 768px) {
-    figure:is(.small, .medium, .large) {
-      max-width: 100%;
-      width: 100%;
-      float: none;
-      margin: 3rem 0;
+    &:first-child {
+      margin-top: 0;
     }
-  }
-
-  figure:first-child {
-    margin-top: 0;
-  }
-  figure:last-child {
-    margin-bottom: 0;
-  }
-
-  figure.aside :global(img) {
-    max-width: 100%;
-    max-height: 30rem;
-  }
-
-  figure.aside.small :global(img) {
-    max-height: 30rem;
-  }
-
-  figure.aside.medium :global(img) {
-    max-height: 40rem;
-  }
-
-  figure.aside.large :global(img) {
-    max-height: 50rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    > img {
+      margin: 0;
+      border-radius: var(--image-border-radius, var(--border-radius));
+      object-position: var(--align, center);
+    }
+    figcaption {
+      padding-top: 0.5rem;
+    }
   }
 </style>
 
-<style is:global lang="scss">
-  /* Live editor support */
-  .cms-editor-active .richtext > .component-wrapper img {
-    max-height: 30rem;
-    margin: 3rem 0;
-    float: none;
-    object-fit: contain;
+<style lang="scss" is:global>
+  /* Live editor */
+  .text-content {
+    > img {
+      margin-bottom: 2rem;
+      border-radius: var(--image-border-radius, var(--border-radius));
+      object-fit: contain;
+      object-position: attr(data-align type(*), var(--align, center));
 
-    &[data-size="small"] {
-      max-height: 30rem;
-      max-width: 33%;
-    }
+      &[data-fit="cover"] {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+      }
 
-    &[data-size="medium"] {
-      max-height: 40rem;
-      max-width: 50%;
-    }
-
-    &[data-size="large"] {
-      max-height: 50rem;
-      max-width: 66%;
-    }
-
-    &[data-align="left"] {
-      margin: 0.5em 4rem 4rem 0;
-      float: left;
-      clear: left;
-    }
-    &[data-align="right"] {
-      margin: 0.5em 0 4rem 4rem;
-      float: right;
-      clear: right;
-    }
-    &[data-align="center"] {
-      width: 100%;
-      max-width: 100%;
-      float: none;
-      margin: 3rem 0;
-    }
-
-    @media only screen and (max-width: 768px) {
-      max-width: 100%;
-      width: 100%;
-      float: none;
-      margin: 3rem 0;
+      @media screen and (min-width: 769px) {
+        &[data-float] {
+          clear: both;
+          margin: 0;
+          width: attr(data-width type(<length-percentage>), auto);
+          height: attr(data-height type(<length-percentage>), auto);
+        }
+        &[data-float="left"] {
+          float: left;
+          margin-right: 2em;
+        }
+        &[data-float="right"] {
+          float: right;
+          margin-left: 2em;
+        }
+      }
     }
   }
 </style>

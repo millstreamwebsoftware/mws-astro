@@ -75,3 +75,11 @@ export function inheritScope(props: Object & { inheritScope?: boolean }) {
     )
   );
 }
+
+export function inheritData(props: Object) {
+  return Object.fromEntries(
+    Object.entries(props).filter(
+      ([k]) => k.startsWith("data-") && !k.startsWith("data-astro-cid-"),
+    ),
+  );
+}
