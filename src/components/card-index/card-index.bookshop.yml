@@ -46,6 +46,8 @@ blueprint:
   columns: 4
   pageSize: 0
   limit: 0
+  link:
+  link_text:
   content:
   classes:
   height:

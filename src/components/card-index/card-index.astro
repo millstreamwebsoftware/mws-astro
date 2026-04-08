@@ -24,6 +24,8 @@ interface Props extends Partial<SectionProps> {
   aspect?: number;
   layout?: "vertical" | "left" | "right";
   card?: Record<string, any> & { _bookshop_name: string };
+  link?: string;
+  link_text?: string;
 }
 
 const {
@@ -40,6 +42,8 @@ const {
     _bookshop_name: "card-index/cards/card",
     include: ["title", "thumbnail", "link"],
   },
+  link,
+  link_text = "View more",
   key,
 } = Astro.props;
 
@@ -261,6 +265,13 @@ const lightbox =
       )
     }
   </div>
+  {
+    link && (
+      <a class="card-index-link" href={link}>
+        {link_text}
+      </a>
+    )
+  }
 </Section>
 
 <style lang="scss">
@@ -349,6 +360,12 @@ const lightbox =
     &:disabled {
       opacity: 0.2;
     }
+  }
+
+  .card-index-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
   }
 </style>
 
