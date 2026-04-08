@@ -122,6 +122,20 @@ switch (imageSource) {
       break;
     }
 
+    // Don't optimise remote images in the editor
+    if (ENV_BOOKSHOP_LIVE) {
+      src = image;
+      break;
+    }
+
+    // Get image width and allow fall-through to handle remote image via Astro's asset pipeline
+    ({ width: srcWidth, height: srcHeight } = await inferRemoteSize(
+      image,
+    ).catch((e) => {
+      console.warn(e);
+      return { width: undefined, height: undefined };
+    }));
+
     if (ix) {
       src = ix.buildURL(image, {}, {});
       srcset = ix.buildSrcSet(
@@ -144,20 +158,6 @@ switch (imageSource) {
       sizes = createImageSizes(widths);
       break;
     }
-
-    // Don't optimise remote images in the editor
-    if (ENV_BOOKSHOP_LIVE) {
-      src = image;
-      break;
-    }
-
-    // Get image width and allow fall-through to handle remote image via Astro's asset pipeline
-    ({ width: srcWidth, height: srcHeight } = await inferRemoteSize(
-      image,
-    ).catch((e) => {
-      console.warn(e);
-      return { width: undefined, height: undefined };
-    }));
 
     if (!(srcWidth && srcHeight)) {
       console.warn(`[Image] Failed to get remote size for image: ${image}`);
