@@ -5,13 +5,19 @@ export interface Props {
   hide?: "collapse" | "highlight";
   endpoint?: string;
   param?: string;
+  placeholder?: string;
 }
 
-const { hide, endpoint = "/search", param = "q" } = Astro.props;
+const {
+  hide,
+  endpoint = "/search",
+  placeholder = "Search",
+  param = "q",
+} = Astro.props;
 ---
 
 <form class:list={[hide]} name="search" action={endpoint} method="GET">
-  <input name={param} type="text" placeholder="Search" />
+  <input name={param} type="text" {placeholder} />
   <button aria-label="Submit Search" type="submit">
     <Icon
       name="fa6-solid:magnifying-glass"
