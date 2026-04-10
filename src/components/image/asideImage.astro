@@ -99,27 +99,27 @@ const style = {
         float: right;
         margin-left: 2em;
       }
-    }
-    &[data-fit="cover"] {
-      width: var(--width);
-      height: var(--height);
+      &[data-fit="cover"] {
+        width: var(--width);
+        height: var(--height);
 
-      figcaption {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        z-index: 1;
+        figcaption {
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          z-index: 1;
 
-        padding: 1rem;
-        background-color: rgb(
-          from var(--figure-caption-background-color, white) r g b / 0.7
-        );
-        backdrop-filter: var(--figure-caption-background-filter, blur(2px));
+          padding: 1rem;
+          background-color: rgb(
+            from var(--figure-caption-background-color, white) r g b / 0.7
+          );
+          backdrop-filter: var(--figure-caption-background-filter, blur(2px));
+        }
       }
-    }
-    &[data-fit="contain"] {
-      width: var(--width);
-      height: var(--height);
+      &[data-fit="contain"] {
+        width: var(--width);
+        height: var(--height);
+      }
     }
     &:first-child {
       margin-top: 0;
