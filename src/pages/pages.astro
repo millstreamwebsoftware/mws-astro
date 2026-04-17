@@ -1,5 +1,6 @@
 ---
-import PageLayout from "@layouts/PageLayout.astro";
+import PageLayout from "@millstreamwebsoftware/mws-astro/layouts/PageLayout.astro";
+
 import {
   getCollection,
   type CollectionEntry,
@@ -18,7 +19,7 @@ export async function getStaticPaths() {
       Object.keys(collections).map((collection) => {
         return getCollection(
           collection as CollectionKey,
-          ({ data }) =>
+          ({ data }: { data: any }) =>
             (data.status !== "offline" && data.status !== "meta") ||
             BUILDMODE === "EDITOR",
         );
@@ -27,7 +28,7 @@ export async function getStaticPaths() {
   ).flat();
 
   const staticPaths = pages.map((page) => {
-    let slug = page.id.replace(/index$/, "");
+    let slug = page.id.replace(/(?:^|\/)index$/, "");
     if (page.collection !== "pages") slug = `${page.collection}/${slug}`;
 
     return {

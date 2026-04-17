@@ -1,243 +1,246 @@
 ---
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
-import Markdown from "@shared/Markdown.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import Markdown from "@millstreamwebsoftware/mws-astro/shared/Markdown.astro";
 // import fs from "node:fs/promises";
 // import { PDFiumLibrary } from "@hyzyla/pdfium";
-import Image from "@shared/Image.astro";
-import Icon from "@shared/icon.astro";
+import Image from "@millstreamwebsoftware/mws-astro/shared/Image.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
 // import type { PDFiumRenderOptions } from "@hyzyla/pdfium/dist/types.js";
-import { formatBytes } from "@mws-astro/util";
-import { getFilesize, resolvePath } from "@mws-astro/filesystem";
-import { getPDFThumbnail } from "@mws-astro/pdf";
+import { formatBytes } from "@millstreamwebsoftware/mws-astro/src/util.ts";
+import {
+  getFilesize,
+  resolvePath,
+} from "@millstreamwebsoftware/mws-astro/src/filesystem.ts";
+import { getPDFThumbnail } from "@millstreamwebsoftware/mws-astro/src/pdf.ts";
 
 export interface Props extends Partial<SectionProps> {
-    files?: [
-        {
-            path: string;
-            title: string;
-            description: string;
-            size?: number;
-            thumbnail?: string;
-        },
-    ];
-    show_filetype: boolean;
-    show_icon: boolean;
-    show_filesize: boolean;
-    show_thumbnail: boolean;
+  files?: [
+    {
+      path: string;
+      title: string;
+      description: string;
+      size?: number;
+      thumbnail?: string;
+    },
+  ];
+  show_filetype: boolean;
+  show_icon: boolean;
+  show_filesize: boolean;
+  show_thumbnail: boolean;
 }
 
 const { files, show_filetype, show_icon, show_filesize, show_thumbnail } =
-    Astro.props;
+  Astro.props;
 
 function getFileType(path: string) {
-    return path.match(/.*\.(.*?)$/)?.[1].toLowerCase();
+  return path.match(/.*\.(.*?)$/)?.[1].toLowerCase();
 }
 
 function getIcon(path: string) {
-    switch (getFileType(path)) {
-        case "jpg":
-        case "jpeg":
-        case "png":
-        case "gif":
-        case "webp":
-        case "bmp":
-        case "tga":
-        case "heic":
-        case "avif":
-        case "tiff":
-            return "fa6-solid:file-image";
-        case "mp4":
-        case "avi":
-        case "mkv":
-        case "mov":
-        case "webm":
-        case "hevc":
-            return "fa6-solid:file-video";
-        case "mp3":
-        case "wav":
-        case "flac":
-        case "ogg":
-        case "aac":
-            return "fa6-solid:file-audio";
-        case "rtf":
-        case "txt":
-            return "fa6-solid:file-lines";
-        case "doc":
-        case "docx":
-            return "fa6-solid:file-word";
-        case "ppt":
-        case "pptx":
-            return "fa6-solid:file-powerpoint";
-        case "xls":
-        case "xlsx":
-            return "fa6-solid:fa6-solid:file-excel";
-        case "pdf":
-            return "fa6-solid:file-pdf";
-        case "csv":
-            return "fa6-solid:file-csv";
-        case "html":
-        case "xml":
-        case "svg":
-            return "fa6-solid:file-code";
-        case "gz":
-        case "tar":
-        case "zip":
-        case "7z":
-        case "rar":
-            return "fa6-solid:file-zipper";
-        default:
-            return "fa6-solid:file";
-    }
+  switch (getFileType(path)) {
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "gif":
+    case "webp":
+    case "bmp":
+    case "tga":
+    case "heic":
+    case "avif":
+    case "tiff":
+      return "fa6-solid:file-image";
+    case "mp4":
+    case "avi":
+    case "mkv":
+    case "mov":
+    case "webm":
+    case "hevc":
+      return "fa6-solid:file-video";
+    case "mp3":
+    case "wav":
+    case "flac":
+    case "ogg":
+    case "aac":
+      return "fa6-solid:file-audio";
+    case "rtf":
+    case "txt":
+      return "fa6-solid:file-lines";
+    case "doc":
+    case "docx":
+      return "fa6-solid:file-word";
+    case "ppt":
+    case "pptx":
+      return "fa6-solid:file-powerpoint";
+    case "xls":
+    case "xlsx":
+      return "fa6-solid:fa6-solid:file-excel";
+    case "pdf":
+      return "fa6-solid:file-pdf";
+    case "csv":
+      return "fa6-solid:file-csv";
+    case "html":
+    case "xml":
+    case "svg":
+      return "fa6-solid:file-code";
+    case "gz":
+    case "tar":
+    case "zip":
+    case "7z":
+    case "rar":
+      return "fa6-solid:file-zipper";
+    default:
+      return "fa6-solid:file";
+  }
 }
 
-if (!ENV_BOOKSHOP_LIVE && files?.length) {
-    await Promise.all(
-        files.map(async (file) => {
-            file.size = await getFilesize(file.path);
+if (import.meta.env.SSR && files?.length) {
+  await Promise.all(
+    files.map(async (file) => {
+      file.size = await getFilesize(file.path);
 
-            if (show_thumbnail) {
-                switch (getFileType(file.path)) {
-                    case "jpg":
-                    case "jpeg":
-                    case "png":
-                    case "gif":
-                    case "webp":
-                    case "avif":
-                    case "tiff":
-                        file.thumbnail = await resolvePath(file.path);
-                        break;
-                    case "pdf":
-                        file.thumbnail = (await getPDFThumbnail(file.path))?.replace(/^\/?public/, "");
-                        break;
-                    default:
-                }
-            }
-        }),
-    );
+      if (show_thumbnail) {
+        switch (getFileType(file.path)) {
+          case "jpg":
+          case "jpeg":
+          case "png":
+          case "gif":
+          case "webp":
+          case "avif":
+          case "tiff":
+            file.thumbnail = await resolvePath(file.path);
+            break;
+          case "pdf":
+            file.thumbnail = (await getPDFThumbnail(file.path))?.replace(
+              /^\/?public/,
+              "",
+            );
+            break;
+          default:
+        }
+      }
+    }),
+  );
 }
 ---
 
 <Section component="file" {...Astro.props}>
-    <ul>
-        {
-            files &&
-                files.map(({ path, title, description, size, thumbnail }) => {
-                    return (
-                        <li>
-                            {thumbnail && (getFileType(path) !== "pdf" ? (
-                                <Image
-                                    image={thumbnail}
-                                    alt=""
-                                    width={256}
-                                    quality="mid"
-                                    fit="contain"
-                                />
-                            ) : (
-                                <img src={thumbnail} width={256} class="thumbnail" />
-                            ))}
-                            <div class="file-details">
-                                <div class="file-heading">
-                                    {show_icon && (
-                                        <div class="file-icon">
-                                            <Icon
-                                                name={getIcon(path)}
-                                                height={"3rem"}
-                                            />
-                                        </div>
-                                    )}
+  <ul>
+    {
+      files &&
+        files.map(({ path, title, description, size, thumbnail }) => {
+          return (
+            <li>
+              {thumbnail &&
+                (getFileType(path) !== "pdf" ? (
+                  <Image
+                    image={thumbnail}
+                    alt=""
+                    width={256}
+                    quality="mid"
+                    fit="contain"
+                  />
+                ) : (
+                  <img src={thumbnail} width={256} class="thumbnail" />
+                ))}
+              <div class="file-details">
+                <div class="file-heading">
+                  {show_icon && (
+                    <div class="file-icon">
+                      <Icon name={getIcon(path)} height={"3rem"} />
+                    </div>
+                  )}
 
-                                    <h5 class="file-title">{title}</h5>
-                                </div>
-                                {description && (
-                                    <div class="file-description">
-                                        <Markdown content={description} />
-                                    </div>
-                                )}
-                                {(show_filesize || show_filetype) && (
-                                    <div class="file-stats">
-                                        {show_filesize && size && (
-                                            <p class="file-size">
-                                                {formatBytes(size)}
-                                            </p>
-                                        )}
-                                        {show_filetype && (
-                                            <p class="file-type">
-                                                {getFileType(path)}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                            <a href={path.startsWith("/") ? path : `/${path}`} />
-                        </li>
-                    );
-                })
-        }
-    </ul>
+                  <h5 class="file-title">{title}</h5>
+                </div>
+                {description && (
+                  <div class="file-description">
+                    <Markdown content={description} />
+                  </div>
+                )}
+                {(show_filesize || show_filetype) && (
+                  <div class="file-stats">
+                    {show_filesize && size && (
+                      <p class="file-size">{formatBytes(size)}</p>
+                    )}
+                    {show_filetype && (
+                      <p class="file-type">{getFileType(path)}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+              <a href={path.startsWith("/") ? path : `/${path}`} />
+            </li>
+          );
+        })
+    }
+  </ul>
 </Section>
 
 <style lang="scss">
-    ul {
-        width: 100%;
-        padding: 0;
-        list-style: none;
-        display: grid;
-        align-items: stretch;
-        justify-content: center;
-        grid-template-columns: repeat(auto-fill, clamp(15rem, 25vw, 25rem));
-        gap: 2rem;
-        /* gap: var(--grid-gap); */
+  ul {
+    width: 100%;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    align-items: stretch;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fill, clamp(15rem, 25vw, 25rem));
+    gap: 2rem;
+    /* gap: var(--grid-gap); */
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 0;
+    border: 2px solid rgb(var(--color-primary));
+    background-color: #eee5;
+    transform: scale(1);
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
     }
 
-    li {
+    .thumbnail {
+      width: 100%;
+    }
+
+    > .file-details {
+      padding: 2rem;
+      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+
+      .file-heading,
+      .file-stats {
         display: flex;
-        flex-direction: column;
-        position: relative;
-        margin: 0;
-        border: 2px solid rgb(var(--color-primary));
-        background-color: #eee5;
-        transform: scale(1);
-        transition: transform 0.2s ease;
+        gap: 1rem;
+        align-items: center;
 
-        &:hover {
-            transform: scale(1.05);
+        p {
+          margin: 0;
         }
+      }
 
-        .thumbnail {
-            width: 100%;
-        }
+      .file-stats {
+        justify-content: space-between;
+        opacity: 0.5;
+      }
 
-        > .file-details {
-            padding: 2rem;
-            gap: 1rem;
-            display: flex;
-            flex-direction: column;
-
-            .file-heading,
-            .file-stats {
-                display: flex;
-                gap: 1rem;
-                align-items: center;
-
-                p {
-                    margin: 0;
-                }
-            }
-
-            .file-stats {
-                justify-content: space-between;
-                opacity: 0.5;
-            }
-
-            .file-icon {
-                color: rgb(var(--heading-color));
-            }
-        }
+      .file-icon {
+        color: rgb(var(--heading-color));
+      }
     }
+  }
 
-    a {
-        position: absolute;
-        display: block;
-        inset: 0;
-    }
+  a {
+    position: absolute;
+    display: block;
+    inset: 0;
+  }
 </style>

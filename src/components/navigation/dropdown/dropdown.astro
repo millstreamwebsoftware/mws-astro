@@ -1,8 +1,7 @@
 ---
-import { bookshopName } from "@mws-astro/util";
-import Icon from "@shared/icon.astro";
-import _preferences from "@data/preferences.json";
-const preferences = _preferences as unknown as Preferences;
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
+import { components } from "virtual:mws-astro/components";
 
 export interface Props {
   title: string;
@@ -39,31 +38,6 @@ const options = {
   centerDropdown:
     _options?.centerDropdown ?? preferences.header.center_dropdowns ?? false,
 };
-
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/navigation/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(
-  ["/src/components/navigation/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
 
 const _d = d !== undefined;
 

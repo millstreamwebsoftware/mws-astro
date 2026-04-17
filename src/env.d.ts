@@ -1,4 +1,5 @@
 import type { CollectionEntry, CollectionKey } from "astro:content";
+
 import type { Props as Section } from "@layouts/Section.astro";
 import type { Props as Breadcrumbs } from "@components/navigation/breadcrumbs/breadcrumbs.astro";
 import type { Props as Slider } from "@components/layout/slider/slider.astro";
@@ -118,4 +119,8 @@ declare global {
     };
     _input: Record<string, any>;
   }
+}
+
+declare module "astro:env/client" {
+  export const BUILDMODE: "EDITOR" | "PRODUCTION";
 }

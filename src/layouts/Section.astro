@@ -1,12 +1,13 @@
 ---
-import Sticker from "@components/sticker/sticker.astro";
 import clsx from "clsx";
-import { convertColorString } from "@mws-astro/util";
-import preferences from "@data/preferences.json";
-import Icon from "@shared/icon.astro";
-import Image from "@shared/Image.astro";
-import Video from "@shared/Video.astro";
-import Markdown from "@shared/Markdown.astro";
+import Sticker from "@millstreamwebsoftware/mws-astro/components/sticker/sticker.astro";
+import { convertColorString } from "@millstreamwebsoftware/mws-astro/src/util.ts";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import Image from "@millstreamwebsoftware/mws-astro/shared/Image.astro";
+import Video from "@millstreamwebsoftware/mws-astro/shared/Video.astro";
+import Markdown from "@millstreamwebsoftware/mws-astro/shared/Markdown.astro";
+import { inheritData } from "@millstreamwebsoftware/mws-astro/src/util.ts";
 
 export interface Props {
   component: string;
@@ -102,6 +103,7 @@ const expando = classList.includes("expando") ? true : false;
   ]}
   data-component={component}
   data-animation={animation}
+  {...inheritData(Astro.props)}
   {id}
 >
   {
@@ -137,7 +139,7 @@ const expando = classList.includes("expando") ? true : false;
     <slot name="pre" />
     {
       content && (
-        <div class="text-content">
+        <div class="text-content" data-editable="text" data-prop="content">
           <Markdown {content} />
         </div>
       )

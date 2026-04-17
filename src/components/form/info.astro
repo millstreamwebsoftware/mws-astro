@@ -1,10 +1,6 @@
 ---
-// import MarkdownIt from "markdown-it";
-
-import Markdown from "@shared/Markdown.astro";
-import Icon from "@shared/icon.astro";
-
-// const md = new MarkdownIt({ html: true });
+import SimpleMarkdown from "@millstreamwebsoftware/mws-astro/shared/SimpleMarkdown.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
 
 export interface Props {
   content: string;
@@ -12,10 +8,7 @@ export interface Props {
   key?: string;
 }
 
-// const htmlContent = md.render(Astro.props.content);
-
 const content = Astro.props.content;
-
 const style = Astro.props.style?.toLowerCase();
 
 const icon = style
@@ -25,16 +18,13 @@ const icon = style
       error: "fa6-solid:circle-xmark",
     }[style]
   : undefined;
-
-// {Icon && <Icon class="icon" />}
-// <Fragment set:html={htmlContent} />
 ---
 
 <div class:list={["form-info", style, { "has-icon": !!icon }]}>
   <span class="icon-container"
     >{icon && <Icon name={icon} height="2rem" />}</span
   >
-  <span>{content && <Markdown {content} />}</span>
+  <span>{content && <SimpleMarkdown {content} />}</span>
 </div>
 
 <style>
@@ -100,7 +90,8 @@ const icon = style
     inset: 0px;
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
 
-    background: repeating-linear-gradient(
+    background:
+      repeating-linear-gradient(
         45deg,
         rgb(var(--form-info-color)),
         rgb(var(--form-info-color)) 0.5rem,

@@ -1,7 +1,11 @@
 ---
-import { bookshopName } from "@mws-astro/util";
-import { getTree, urlToId, type TreeNode } from "@mws-astro/navigation";
+import {
+  getTree,
+  urlToId,
+  type TreeNode,
+} from "@millstreamwebsoftware/mws-astro/src/navigation.ts";
 import { getCollection, type CollectionKey } from "astro:content";
+import { components } from "virtual:mws-astro/components";
 
 export interface Props {
   collection: CollectionKey;
@@ -12,31 +16,6 @@ export interface Props {
 }
 
 const { collection, show_home = true, depth, key, d } = Astro.props;
-
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/navigation/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(
-  ["/src/components/navigation/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
 
 function createTitle(id: string) {
   return (

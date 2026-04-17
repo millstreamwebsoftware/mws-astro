@@ -2,25 +2,11 @@
 import {
   default as Section,
   type Props as SectionProps,
-} from "@layouts/Section.astro";
-import { bookshopName } from "@mws-astro/util";
-import Icon from "@shared/icon.astro";
-import { preferences } from "@shared/preferences";
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import { components } from "virtual:mws-astro/components";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
 const defaults = preferences.components?.slider;
-
-const contentBlocks = Astro.props.content_blocks;
-const components: Record<string, any> = Object.fromEntries(
-  [
-    ...Object.entries(
-      import.meta.glob("/src/mws-astro/src/components/**/*.astro", {
-        eager: true,
-      }),
-    ),
-    ...Object.entries(
-      import.meta.glob("/src/components/**/*.astro", { eager: true }),
-    ),
-  ].map(([path, obj]: [string, any]) => [bookshopName(path), obj.default]),
-);
 
 export interface Props extends Partial<SectionProps> {
   content_blocks: any[];
@@ -47,6 +33,7 @@ export interface Props extends Partial<SectionProps> {
 }
 
 const {
+  content_blocks,
   content,
   autoplay,
   perView,
@@ -93,7 +80,7 @@ function data(prop: any) {
     <div class="embla__viewport">
       <div class="embla__container">
         {
-          contentBlocks.map((block: any, i: number) => {
+          content_blocks.map((block: any, i: number) => {
             if (block._bookshop_name === "layout/slider") return;
 
             const Component = components[block._bookshop_name];

@@ -2,18 +2,21 @@
 import { Markdown as RemoteMarkdown } from "astro-remote";
 import { marked } from "marked";
 import { gfmHeadingId } from "marked-gfm-heading-id";
-import { replaceCmsEmbeds, forceHTMLBlocks } from "@mws-astro/util";
-import Blockquote from "@components/blockquote/blockquote.astro";
-import Button from "@components/button/button.astro";
-import Icon from "@shared/icon.astro";
-import Mailbuild from "@components/mailbuild/mailbuild.astro";
-import Facebook from "@components/facebook/facebook.astro";
-import Social from "@components/social/social.astro";
-import Counter from "@components/counter/counter.astro";
-import AsideImage from "@components/image/asideImage.astro";
-import Player from "@components/player/player.astro";
-import Accordion from "@components/accordion/accordion.astro";
-import Navigation from "@components/navigation/navigation.astro";
+import {
+  replaceCmsEmbeds,
+  forceHTMLBlocks,
+} from "@millstreamwebsoftware/mws-astro/src/util.ts";
+import Blockquote from "@millstreamwebsoftware/mws-astro/components/blockquote/blockquote.astro";
+import Button from "@millstreamwebsoftware/mws-astro/components/button/button.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import Mailbuild from "@millstreamwebsoftware/mws-astro/components/mailbuild/mailbuild.astro";
+import Facebook from "@millstreamwebsoftware/mws-astro/components/facebook/facebook.astro";
+import Social from "@millstreamwebsoftware/mws-astro/components/social/social.astro";
+import Counter from "@millstreamwebsoftware/mws-astro/components/counter/counter.astro";
+import AsideImage from "@millstreamwebsoftware/mws-astro/components/image/asideImage.astro";
+import Player from "@millstreamwebsoftware/mws-astro/components/player/player.astro";
+import Accordion from "@millstreamwebsoftware/mws-astro/components/accordion/accordion.astro";
+import Navigation from "@millstreamwebsoftware/mws-astro/components/navigation/navigation.astro";
 
 // Preprocess markdown to convert base64 encoded embeds to html, and force newlines after html elements
 const content = forceHTMLBlocks(replaceCmsEmbeds(Astro.props.content));
@@ -35,9 +38,9 @@ var substitutions = {
 
 var md: string | undefined;
 
-// @ts-ignore
-if (ENV_BOOKSHOP_LIVE) {
-  marked.use(gfmHeadingId());
+if (!import.meta.env.SSR) {
+  // marked.use(gfmHeadingId());
+  // marked={{ extensions: [gfmHeadingId() as any] }}
   md = await marked.parse(content);
 } else {
   // Get site specific custom snippets from src/snippets.ts
@@ -58,7 +61,6 @@ if (ENV_BOOKSHOP_LIVE) {
           {content}
           sanitize={{ allowComponents: true }}
           components={substitutions}
-          marked={{ extensions: [gfmHeadingId() as any] }}
         />
       )
 }

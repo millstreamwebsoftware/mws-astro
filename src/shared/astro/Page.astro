@@ -1,5 +1,6 @@
 ---
-import { bookshopName } from "@mws-astro/util";
+import { components } from "virtual:mws-astro/components";
+import { BUILDMODE } from "astro:env/client";
 
 export interface Props {
   contentBlocks: any[];
@@ -14,56 +15,35 @@ const frontmatter = contentBlocks?.find(
 )?.frontmatter;
 
 const status = frontmatter?.status;
-
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-  eager: true,
-});
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-if (ENV_BOOKSHOP_LIVE) {
-  if (!Object.keys(Astro.props).length)
-    console.error("[Page] Did not recieve props!", Astro.props);
-  else console.info("[Page] Props: ", Astro.props);
-
-  const componentKeys = Object.keys(components);
-  if (!componentKeys.length)
-    console.error("[Page] Did not load components!", componentKeys);
-  else console.info("[Page] Loaded components: ", componentKeys);
-}
-
 const pagefind = status ? (status === "online" ? "" : undefined) : true;
+const Wrapper = BUILDMODE === "EDITOR" ? "editable-array-item" : Fragment;
 ---
 
-<main data-pagefind-body={pagefind} data-lightbox={lightbox}>
+<main
+  data-pagefind-body={pagefind}
+  data-lightbox={lightbox}
+  data-editable="array"
+  data-prop="content_blocks"
+  data-id-key="_bookshop_name"
+  data-component-key="_bookshop_name"
+>
   {
     contentBlocks?.map((block: any, i: number) => {
       if ((block._bookshop_name as string).startsWith("_")) return;
       const Component = components[block._bookshop_name];
       if (Component) {
         return (
-          <Component
-            {...block}
-            _meta={frontmatter}
-            background_loading={i ? "lazy" : "eager"}
-            key={String(i)}
-          />
+          <Wrapper
+            data-id={block._bookshop_name}
+            data-component={block._bookshop_name}
+          >
+            <Component
+              {...block}
+              _meta={frontmatter}
+              background_loading={i ? "lazy" : "eager"}
+              key={String(i)}
+            />
+          </Wrapper>
         );
       }
       const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;

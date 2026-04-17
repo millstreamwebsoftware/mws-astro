@@ -1,16 +1,19 @@
 ---
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
-import Icon from "@shared/icon.astro";
-import { formatBytes } from "@mws-astro/util";
-import { getFilesize } from "@mws-astro/filesystem";
-import { getPDFThumbnail } from "@mws-astro/pdf";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import { formatBytes } from "@millstreamwebsoftware/mws-astro/src/util.ts";
+import { getFilesize } from "@millstreamwebsoftware/mws-astro/src/filesystem.ts";
+import { getPDFThumbnail } from "@millstreamwebsoftware/mws-astro/src/pdf.ts";
 
 export interface Props extends Partial<SectionProps> {
   title?: string;
   url?: string;
 }
 
-const {title, url} = Astro.props;
+const { title, url } = Astro.props;
 
 var thumbnail, filesize;
 
@@ -19,308 +22,362 @@ if (url) {
   filesize = await getFilesize(url);
 }
 ---
+
 <Section component="flipbook" {...Astro.props}>
-    <div class="flipbook" data-flipbook={url}>
-        <div class="flipbook-preview">
-            {thumbnail && <img
-                src={thumbnail}
-            />}
-            <div class="flipbook-details">
-                {title && <h1>{title}</h1>}
-                {filesize && <p>{formatBytes(filesize)}</p>}
-                <div class="flipbook-progress"></div>
-                <div class="flipbook-buttons">
-                    <button class="flipbook-read">Read <Icon name="carbon:notebook-reference" height="1.25em"/></button>
-                    <button class="flipbook-download"><Icon name="carbon:download" height="1.25em"/></button>
-                </div>
-            </div>
+  <div class="flipbook" data-flipbook={url}>
+    <div class="flipbook-preview">
+      {thumbnail && <img src={thumbnail} />}
+      <div class="flipbook-details">
+        {title && <h1>{title}</h1>}
+        {filesize && <p>{formatBytes(filesize)}</p>}
+        <div class="flipbook-progress"></div>
+        <div class="flipbook-buttons">
+          <button class="flipbook-read"
+            >Read <Icon
+              name="carbon:notebook-reference"
+              height="1.25em"
+            /></button
+          >
+          <button class="flipbook-download"
+            ><Icon name="carbon:download" height="1.25em" /></button
+          >
         </div>
-        <div class="flipbook-viewport">
-        </div>
-        <div class="toolbar">
-            <button data-action="<" title="Previous Page"><Icon name="carbon:chevron-left" height="1em"/></button>
-            <button data-action="page-number" title="Page Number">1/1</button>
-            <button data-action=">" title="Next Page"><Icon name="carbon:chevron-right" height="1em"/></button>
-            <button data-action="download" title="Download PDF"><Icon name="carbon:download" height="1em"/></button>
-        </div>
+      </div>
     </div>
+    <div class="flipbook-viewport"></div>
+    <div class="toolbar">
+      <button data-action="<" title="Previous Page"
+        ><Icon name="carbon:chevron-left" height="1em" /></button
+      >
+      <button data-action="page-number" title="Page Number">1/1</button>
+      <button data-action=">" title="Next Page"
+        ><Icon name="carbon:chevron-right" height="1em" /></button
+      >
+      <button data-action="download" title="Download PDF"
+        ><Icon name="carbon:download" height="1em" /></button
+      >
+    </div>
+  </div>
 </Section>
 
 <script>
-import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
-import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
-type ResizeableCanvas = HTMLCanvasElement & {_resize?: Function};
+  import PDFJSWorker from "pdfjs-dist/build/pdf.worker.min?worker&url";
+  import type { OnProgressParameters } from "pdfjs-dist/types/src/display/api";
+  type ResizeableCanvas = HTMLCanvasElement & { _resize?: Function };
 
+  setupFlipbook();
 
-setupFlipbook();
+  // async function importPDFJS() {
+  //   if (getDocument && TextLayer && GlobalWorkerOptions) return;
+  //   console.log("Imported PDF.JS");
 
-// async function importPDFJS() {
-//   if (getDocument && TextLayer && GlobalWorkerOptions) return;
-//   console.log("Imported PDF.JS");
+  //   const PDFJS = await import("pdfjs-dist");
+  //   ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
+  //   GlobalWorkerOptions.workerSrc = PDFJSWorker;
+  // }
 
-//   const PDFJS = await import("pdfjs-dist");
-//   ({getDocument, TextLayer, GlobalWorkerOptions} = PDFJS);
-//   GlobalWorkerOptions.workerSrc = PDFJSWorker;
-// }
+  async function setupFlipbook() {
+    const flipbooks = document.querySelectorAll<HTMLElement>("[data-flipbook]");
+    const { getDocument, TextLayer, GlobalWorkerOptions } =
+      await import("pdfjs-dist");
+    GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
-async function setupFlipbook() {
-  const flipbooks = document.querySelectorAll<HTMLElement>("[data-flipbook]");
-  const {getDocument, TextLayer, GlobalWorkerOptions} = await import("pdfjs-dist");
-  GlobalWorkerOptions.workerSrc = PDFJSWorker;
+    flipbooks.forEach(async (flipbook) => {
+      const flipbookPreview =
+        flipbook.querySelector<HTMLDivElement>(".flipbook-preview");
+      const flipbookButton = flipbookPreview?.querySelector<HTMLButtonElement>(
+        "button.flipbook-read",
+      );
+      const flipbookDownloadButton =
+        flipbookPreview?.querySelector<HTMLButtonElement>(
+          "button.flipbook-download",
+        );
+      const flipbookProgress =
+        flipbookPreview?.querySelector<HTMLDivElement>(".flipbook-progress");
+      const flipbookViewport =
+        flipbook.querySelector<HTMLDivElement>(".flipbook-viewport");
+      const toolbar = flipbook.querySelector(".toolbar");
+      const pageCounter = toolbar?.querySelector('[data-action="page-number"]');
 
-  flipbooks.forEach(async (flipbook) => {
-    const flipbookPreview = flipbook.querySelector<HTMLDivElement>(".flipbook-preview");
-    const flipbookButton = flipbookPreview?.querySelector<HTMLButtonElement>("button.flipbook-read");
-    const flipbookDownloadButton = flipbookPreview?.querySelector<HTMLButtonElement>("button.flipbook-download");
-    const flipbookProgress = flipbookPreview?.querySelector<HTMLDivElement>(".flipbook-progress");
-    const flipbookViewport = flipbook.querySelector<HTMLDivElement>(".flipbook-viewport");
-    const toolbar = flipbook.querySelector(".toolbar");
-    const pageCounter = toolbar?.querySelector('[data-action="page-number"]');
+      flipbookButton?.addEventListener("click", startFlipbook);
+      flipbookDownloadButton?.addEventListener("click", download);
 
-    flipbookButton?.addEventListener("click", startFlipbook);
-    flipbookDownloadButton?.addEventListener("click", download);
-
-    function download() {
-      const a = document.createElement('a');
-      const url = flipbook.dataset?.flipbook;
-      if (!url) return;
-      a.href = url;
-      a.download = url.split('/').pop() || "";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    async function startFlipbook() {
-      if (!flipbookViewport) return;
-      const loadTask = getDocument({url: flipbook.dataset.flipbook});
-      loadTask.onProgress = (progress: OnProgressParameters) => {
-        flipbookProgress?.setAttribute("style", `--progress:${(progress.loaded / progress.total).toFixed(2)};`);
-      };
-      flipbook.classList.toggle("loading",true);
-      const pdf = await loadTask.promise;
-      flipbook.classList.toggle("loading",false);
-      flipbook.classList.toggle("loaded",true);
-
-      const singlePage = pdf.numPages === 1;
-      flipbook.classList.toggle("singlepage", singlePage);
-
-      const spreadSize = 2 - Number(singlePage);
-      const evenSpreads = !singlePage;
-      let page = 0;
-
-      updateCounter();
-
-      addSpread(true);
-      addSpread();
-      addSpread(false);
-
-      var touchstart: Array<number> = [];
-      flipbookViewport.addEventListener('touchstart', function (e) {
-        touchstart = [e.changedTouches[0].screenX, e.changedTouches[0].screenY];
-      });
-      flipbookViewport.addEventListener('touchend', function (e) {
-        let touchvector = [e.changedTouches[0].screenX - touchstart[0], e.changedTouches[0].screenY - touchstart[1]];
-
-        let magnitude = Math.sqrt(touchvector[0] * touchvector[0] + touchvector[1] * touchvector[1]);
-        let direction = Math.abs(Math.atan2(touchvector[1], touchvector[0]) / Math.PI);
-
-        if (magnitude < Math.min(screen.width * 0.2, 250)) return;
-        if (direction > .2 && direction < .8) return;
-
-        turnPage(direction < .5 ? true : false);
-      });
-
-      function updateCounter() {
-        if (!pageCounter) return;
-
-        pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), pdf.numPages), 1)}/${pdf.numPages}`;
+      function download() {
+        const a = document.createElement("a");
+        const url = flipbook.dataset?.flipbook;
+        if (!url) return;
+        a.href = url;
+        a.download = url.split("/").pop() || "";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
 
-      async function addSpread(prepend?: boolean) {
-        const newSpread = document.createElement("div");
-        newSpread.classList.add("flipbook-spread");
-        (typeof prepend === "boolean") && newSpread.classList.add(prepend ? "previous" : "next");
-
-        const newPage = document.createElement("div");
-        const newCanvas = document.createElement("canvas");
-        const newTextLayer = document.createElement("div");
-        newPage.classList.add("flipbook-page")
-        newTextLayer.classList.add("textLayer");
-        newPage.appendChild(newCanvas);
-        newPage.appendChild(newTextLayer);
-        !singlePage && newSpread.appendChild(newPage.cloneNode(true));
-        newSpread.appendChild(newPage);
-
-        if (prepend) {
-          flipbookViewport?.prepend(newSpread);
-        } else {
-          flipbookViewport?.append(newSpread);
-        };
-
-        return await renderSpread(newSpread);
-      }
-
-      async function turnPage(backward: boolean = false) {
-        // const spreads = flipbookViewport.querySelectorAll<HTMLDivElement>(".flipbook-spread");
+      async function startFlipbook() {
         if (!flipbookViewport) return;
-        const spreads = Array.from(flipbookViewport.children);
+        const loadTask = getDocument({ url: flipbook.dataset.flipbook });
+        loadTask.onProgress = (progress: OnProgressParameters) => {
+          flipbookProgress?.setAttribute(
+            "style",
+            `--progress:${(progress.loaded / progress.total).toFixed(2)};`,
+          );
+        };
+        flipbook.classList.toggle("loading", true);
+        const pdf = await loadTask.promise;
+        flipbook.classList.toggle("loading", false);
+        flipbook.classList.toggle("loaded", true);
 
+        const singlePage = pdf.numPages === 1;
+        flipbook.classList.toggle("singlepage", singlePage);
 
-        let oldPage = page;
-
-        if (backward) {
-          spreads.reverse()
-          console.log(page, "->", page - spreadSize);
-          page -= spreadSize;
-        } else {
-          console.log(page, "->", page + spreadSize);
-          page += spreadSize;
-        }
-
-        if (page < 0) page = 0;
-
-        // if (page < 0 - Number(evenSpreads)) page = 0 - Number(evenSpreads);
-        if (page > pdf.numPages) page = oldPage;
-
-        if (page === oldPage) return;
-
-        const [before, current, after] = spreads;
-
-        before.parentNode?.removeChild(before);
-        current.classList.add(backward ? "next" : "previous");
-        after.classList.remove("next", "previous");
+        const spreadSize = 2 - Number(singlePage);
+        const evenSpreads = !singlePage;
+        let page = 0;
 
         updateCounter();
-        await addSpread(backward);
-      }
 
-      toolbar?.addEventListener("click", async (e) => {
-        if (!e.target) return;
-        const target = e.target as HTMLElement;
-        const button = target.closest<HTMLButtonElement>("button, .toolbar");
-        if (!button || button.matches(".toolbar")) return;
+        addSpread(true);
+        addSpread();
+        addSpread(false);
 
-        switch (button.dataset.action) {
-          case "<":
-            turnPage(true);
-            break;
-          case ">":
-            turnPage();
-            break;
-          case "download":
-            download();
-            break;
-          default:
-            break;
-        }
-      })
+        var touchstart: Array<number> = [];
+        flipbookViewport.addEventListener("touchstart", function (e) {
+          touchstart = [
+            e.changedTouches[0].screenX,
+            e.changedTouches[0].screenY,
+          ];
+        });
+        flipbookViewport.addEventListener("touchend", function (e) {
+          let touchvector = [
+            e.changedTouches[0].screenX - touchstart[0],
+            e.changedTouches[0].screenY - touchstart[1],
+          ];
 
-      async function renderPage(canvas: ResizeableCanvas, num: number) {
-        const context = canvas.getContext("2d");
-        const text = canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer");
+          let magnitude = Math.sqrt(
+            touchvector[0] * touchvector[0] + touchvector[1] * touchvector[1],
+          );
+          let direction = Math.abs(
+            Math.atan2(touchvector[1], touchvector[0]) / Math.PI,
+          );
 
-        if (num < 0 || num >= pdf.numPages) {
-          // canvas.width = canvas.width;
-          // text && (text.innerHTML = "");
-          canvas.parentElement?.classList.toggle("blank-page", true);
+          if (magnitude < Math.min(screen.width * 0.2, 250)) return;
+          if (direction > 0.2 && direction < 0.8) return;
 
-          return;
-        }
-
-        const page = await pdf.getPage(num+1);
-        var viewport = page.getViewport({scale: 1.5});
-
-        if (canvas.height != viewport.height)
-        canvas.height = viewport.height;
-
-        if (canvas.width != viewport.width)
-        canvas.width = viewport.width;
-
-        if (!context) throw Error("Canvas context missing");
-
-        const renderTask = page.render({canvas, canvasContext: context, viewport}).promise;
-        const textContent = page.getTextContent().then(async (textContent: any) => {
-          if (!text) return;
-
-          text.style.left = canvas.offsetLeft + 'px';
-          text.style.top = canvas.offsetTop + 'px';
-          text.style.height = canvas.offsetHeight + 'px';
-          text.style.width = canvas.offsetWidth + 'px';
-
-          const textLayer = new TextLayer({
-            textContentSource: textContent,
-            container: text,
-            viewport: viewport,
-          });
-
-          canvas._resize = () => {
-            const widthScaleFactor = canvas.clientWidth / (canvas.width / viewport.scale);
-            const heightScaleFactor = canvas.clientHeight / (canvas.height / viewport.scale);
-            const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor); // account for object-fit contain
-
-            text?.parentElement?.setAttribute("style", `--scale-factor: ${scaleFactor}`);
-          }
-
-          canvas._resize();
-
-          const observer = new ResizeObserver((entries) => {
-            entries.forEach((entry: any) => entry.target._resize && entry.target._resize());
-          });
-
-          observer.observe(canvas);
-
-          text.innerHTML = "";
-          await textLayer.render();
-
-          text.style.left = "";
+          turnPage(direction < 0.5 ? true : false);
         });
 
-        return await Promise.all([renderTask, textContent]);
-      }
+        function updateCounter() {
+          if (!pageCounter) return;
 
-      async function renderSpread(spread: HTMLDivElement) {
-        const canvases = Array.from(spread.querySelectorAll("canvas"));
-        var spreadOffset = 0;
-
-        if (spread.classList.contains("next")) {
-          spreadOffset += spreadSize;
-        } else if (spread.classList.contains("previous")) {
-          spreadOffset -= spreadSize;
+          pageCounter.innerHTML = `${Math.max(Math.min(page + Number(!evenSpreads), pdf.numPages), 1)}/${pdf.numPages}`;
         }
 
-        return Promise.all(canvases.map(async (canvas, i) => {
-          let p = page + i + spreadOffset - Number(evenSpreads);
-          console.log(`Render page ${p} to`, canvas, spread.classList.toString());
-          return renderPage(canvas, p);
-        }));
+        async function addSpread(prepend?: boolean) {
+          const newSpread = document.createElement("div");
+          newSpread.classList.add("flipbook-spread");
+          typeof prepend === "boolean" &&
+            newSpread.classList.add(prepend ? "previous" : "next");
+
+          const newPage = document.createElement("div");
+          const newCanvas = document.createElement("canvas");
+          const newTextLayer = document.createElement("div");
+          newPage.classList.add("flipbook-page");
+          newTextLayer.classList.add("textLayer");
+          newPage.appendChild(newCanvas);
+          newPage.appendChild(newTextLayer);
+          !singlePage && newSpread.appendChild(newPage.cloneNode(true));
+          newSpread.appendChild(newPage);
+
+          if (prepend) {
+            flipbookViewport?.prepend(newSpread);
+          } else {
+            flipbookViewport?.append(newSpread);
+          }
+
+          return await renderSpread(newSpread);
+        }
+
+        async function turnPage(backward: boolean = false) {
+          // const spreads = flipbookViewport.querySelectorAll<HTMLDivElement>(".flipbook-spread");
+          if (!flipbookViewport) return;
+          const spreads = Array.from(flipbookViewport.children);
+
+          let oldPage = page;
+
+          if (backward) {
+            spreads.reverse();
+            console.log(page, "->", page - spreadSize);
+            page -= spreadSize;
+          } else {
+            console.log(page, "->", page + spreadSize);
+            page += spreadSize;
+          }
+
+          if (page < 0) page = 0;
+
+          // if (page < 0 - Number(evenSpreads)) page = 0 - Number(evenSpreads);
+          if (page > pdf.numPages) page = oldPage;
+
+          if (page === oldPage) return;
+
+          const [before, current, after] = spreads;
+
+          before.parentNode?.removeChild(before);
+          current.classList.add(backward ? "next" : "previous");
+          after.classList.remove("next", "previous");
+
+          updateCounter();
+          await addSpread(backward);
+        }
+
+        toolbar?.addEventListener("click", async (e) => {
+          if (!e.target) return;
+          const target = e.target as HTMLElement;
+          const button = target.closest<HTMLButtonElement>("button, .toolbar");
+          if (!button || button.matches(".toolbar")) return;
+
+          switch (button.dataset.action) {
+            case "<":
+              turnPage(true);
+              break;
+            case ">":
+              turnPage();
+              break;
+            case "download":
+              download();
+              break;
+            default:
+              break;
+          }
+        });
+
+        async function renderPage(canvas: ResizeableCanvas, num: number) {
+          const context = canvas.getContext("2d");
+          const text =
+            canvas.parentElement?.querySelector<HTMLDivElement>(".textLayer");
+
+          if (num < 0 || num >= pdf.numPages) {
+            // canvas.width = canvas.width;
+            // text && (text.innerHTML = "");
+            canvas.parentElement?.classList.toggle("blank-page", true);
+
+            return;
+          }
+
+          const page = await pdf.getPage(num + 1);
+          var viewport = page.getViewport({ scale: 1.5 });
+
+          if (canvas.height != viewport.height) canvas.height = viewport.height;
+
+          if (canvas.width != viewport.width) canvas.width = viewport.width;
+
+          if (!context) throw Error("Canvas context missing");
+
+          const renderTask = page.render({
+            canvas,
+            canvasContext: context,
+            viewport,
+          }).promise;
+          const textContent = page
+            .getTextContent()
+            .then(async (textContent: any) => {
+              if (!text) return;
+
+              text.style.left = canvas.offsetLeft + "px";
+              text.style.top = canvas.offsetTop + "px";
+              text.style.height = canvas.offsetHeight + "px";
+              text.style.width = canvas.offsetWidth + "px";
+
+              const textLayer = new TextLayer({
+                textContentSource: textContent,
+                container: text,
+                viewport: viewport,
+              });
+
+              canvas._resize = () => {
+                const widthScaleFactor =
+                  canvas.clientWidth / (canvas.width / viewport.scale);
+                const heightScaleFactor =
+                  canvas.clientHeight / (canvas.height / viewport.scale);
+                const scaleFactor = Math.min(
+                  widthScaleFactor,
+                  heightScaleFactor,
+                ); // account for object-fit contain
+
+                text?.parentElement?.setAttribute(
+                  "style",
+                  `--scale-factor: ${scaleFactor}`,
+                );
+              };
+
+              canvas._resize();
+
+              const observer = new ResizeObserver((entries) => {
+                entries.forEach(
+                  (entry: any) =>
+                    entry.target._resize && entry.target._resize(),
+                );
+              });
+
+              observer.observe(canvas);
+
+              text.innerHTML = "";
+              await textLayer.render();
+
+              text.style.left = "";
+            });
+
+          return await Promise.all([renderTask, textContent]);
+        }
+
+        async function renderSpread(spread: HTMLDivElement) {
+          const canvases = Array.from(spread.querySelectorAll("canvas"));
+          var spreadOffset = 0;
+
+          if (spread.classList.contains("next")) {
+            spreadOffset += spreadSize;
+          } else if (spread.classList.contains("previous")) {
+            spreadOffset -= spreadSize;
+          }
+
+          return Promise.all(
+            canvases.map(async (canvas, i) => {
+              let p = page + i + spreadOffset - Number(evenSpreads);
+              console.log(
+                `Render page ${p} to`,
+                canvas,
+                spread.classList.toString(),
+              );
+              return renderPage(canvas, p);
+            }),
+          );
+        }
       }
-    }
-  });
-}
+    });
+  }
 </script>
 
-
 <style lang="scss">
-.loaded {
+  .loaded {
     .flipbook-preview {
-        display: none;
+      display: none;
     }
-}
+  }
 
-.loading .flipbook-read, .loading .flipbook-download {
+  .loading .flipbook-read,
+  .loading .flipbook-download {
     display: none;
-}
+  }
 
-:not(.loaded) .toolbar {
+  :not(.loaded) .toolbar {
     display: none;
-}
+  }
 
-.toolbar button[data-action="page-number"] {
+  .toolbar button[data-action="page-number"] {
     cursor: default;
-}
+  }
 
-.toolbar {
+  .toolbar {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -330,16 +387,16 @@ async function setupFlipbook() {
     z-index: 999;
 
     button {
-        color: #333;
-        border-color: #333;
-        padding: .3em .8em;
-        background-color: #fff;
+      color: #333;
+      border-color: #333;
+      padding: 0.3em 0.8em;
+      background-color: #fff;
 
-        border-radius: var(--border-radius);
+      border-radius: var(--border-radius);
     }
-}
+  }
 
-.flipbook-preview {
+  .flipbook-preview {
     /* position: absolute; */
     /* inset: 0; */
     z-index: 10;
@@ -355,302 +412,311 @@ async function setupFlipbook() {
     color: rgb(var(--text-color));
 
     img {
-        min-height: 20rem;
-        max-height: 100%;
-        max-width: 100%;
+      min-height: 20rem;
+      max-height: 100%;
+      max-width: 100%;
     }
 
     @media only screen and (max-width: 768px) {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr;
 
-        img {
-          width: 100%;
-          object-fit: contain;
-        }
+      img {
+        width: 100%;
+        object-fit: contain;
+      }
     }
 
     .flipbook-buttons {
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
     }
 
     .flipbook-progress {
-        position: relative;
-        width: 20rem;
-        height: 4px;
-        border: 1px solid rgb(var(--text-color));
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        display: none;
+      position: relative;
+      width: 20rem;
+      height: 4px;
+      border: 1px solid rgb(var(--text-color));
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      display: none;
 
-        background-color: rgb(var(--text-color));
+      background-color: rgb(var(--text-color));
 
-        @at-root .loading & {
-            display: block;
+      @at-root .loading & {
+        display: block;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+
+        left: 0;
+        top: 0;
+        right: calc((1 - var(--progress, 0)) * 100%);
+        bottom: 0;
+
+        transition: right 0.5s ease;
+
+        background-color: rgb(var(--color-accent));
+      }
+    }
+  }
+</style>
+
+<style lang="scss" is:global>
+  div.flipbook {
+    position: relative;
+    /* min-height: 50rem; */
+
+    .flipbook-preview img {
+      min-height: 20rem;
+    }
+
+    .flipbook-viewport {
+      display: grid;
+      grid-template-areas: "flipbook";
+
+      grid-template-rows: minmax(0, 1fr);
+      perspective: 10000px;
+    }
+
+    .flipbook-spread {
+      /* position: relative; */
+      grid-area: flipbook;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: 1fr;
+
+      &.previous {
+        .flipbook-page:nth-child(2) {
+          transform: rotateY(-180deg);
+        }
+      }
+      & {
+        z-index: auto;
+
+        .flipbook-page {
+          z-index: 1;
+          transform: rotateY(0deg);
+        }
+      }
+      &.next {
+        .flipbook-page:nth-child(2) {
+          z-index: -1;
+        }
+        .flipbook-page:nth-child(1) {
+          transform: rotateY(180deg);
+        }
+      }
+    }
+
+    .flipbook-page {
+      position: relative;
+      transition:
+        transform 0.2s ease-in-out,
+        z-index 0.2s;
+      backface-visibility: hidden;
+
+      canvas {
+        width: 100%;
+        object-fit: contain;
+        max-height: 90vh;
+      }
+
+      &:nth-child(1) {
+        transform-origin: right;
+
+        canvas {
+          object-position: right;
+        }
+
+        .textLayer {
+          right: 0;
+          left: unset;
         }
 
         &::after {
-            content: "";
-            position: absolute;
-
-            left: 0;
-            top: 0;
-            right: calc((1 - var(--progress,0)) * 100%);
-            bottom: 0;
-
-            transition: right .5s ease;
-
-            background-color: rgb(var(--color-accent));
+          background: linear-gradient(
+            to right,
+            transparent 80%,
+            95%,
+            rgb(0, 0, 0, 0.4)
+          );
         }
-    }
-}
-</style>
+      }
+      &:nth-child(2) {
+        transform-origin: left;
 
-
-<style lang="scss" is:global>
-    div.flipbook {
-        position: relative;
-        /* min-height: 50rem; */
-
-
-        .flipbook-preview img {
-            min-height: 20rem;
+        canvas {
+          object-position: left;
         }
 
-        .flipbook-viewport {
-            display: grid;
-            grid-template-areas: "flipbook";
-
-            grid-template-rows: minmax(0, 1fr);
-            perspective: 10000px;
-        }
-
-        .flipbook-spread {
-            /* position: relative; */
-            grid-area: flipbook;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            grid-template-rows: 1fr;
-
-
-            &.previous {
-                .flipbook-page:nth-child(2) {
-                    transform: rotateY(-180deg);
-                }
-            }
-            & {
-                z-index: auto;
-
-                .flipbook-page {
-                    z-index: 1;
-                    transform: rotateY(0deg);
-                }
-            }
-            &.next {
-                .flipbook-page:nth-child(2) {
-                    z-index: -1;
-                }
-                .flipbook-page:nth-child(1) {
-                    transform: rotateY(180deg);
-                }
-            }
-        }
-
-        .flipbook-page {
-            position: relative;
-            transition: transform 0.2s ease-in-out, z-index 0.2s;
-            backface-visibility: hidden;
-
-            canvas {
-                width: 100%;
-                object-fit: contain;
-                max-height: 90vh;
-            }
-
-            &:nth-child(1) {
-                transform-origin: right;
-
-                canvas {
-                    object-position: right;
-                }
-
-                .textLayer {
-                    right: 0;
-                    left: unset;
-                }
-
-                &::after {
-                    background: linear-gradient(to right, transparent 80%, 95%, rgb(0, 0, 0, 0.4));
-                }
-            }
-            &:nth-child(2) {
-                transform-origin: left;
-
-                canvas {
-                    object-position: left;
-                }
-
-                .textLayer {
-                    left: 0;
-                }
-
-                &::after {
-                    background: linear-gradient(to left, transparent 80%, 95%, rgb(0, 0, 0, 0.4));
-                }
-            }
-
-            &::after {
-                content: "";
-                position: absolute;
-                inset: 0;
-                pointer-events: none;
-            }
-
-            &.blank-page::after {
-                content: none;
-            }
-        }
-
-        &.singlepage {
-            .flipbook-spread {
-                grid-template-columns: 1fr;
-            }
-
-            .flipbook-page {
-                &::after {
-                    content: none;
-                }
-            }
-        }
-    }
-
-    .hiddenCanvasElement {
-        display: none;
-    }
-
-    /* PDF.js styles */
-    .flipbook-page {
         .textLayer {
-          position: absolute;
-          text-align: initial;
-          inset: 0;
-          overflow: clip;
-          opacity: 1;
-          line-height: 1;
-          text-size-adjust: none;
-          forced-color-adjust: none;
-          transform-origin: 0 0;
-          caret-color: CanvasText;
-          z-index: 0;
-
-          ::selection {
-              color: transparent;
-          }
-
-          &.highlighting {
-            touch-action: none;
-          }
-
-          :is(span, br) {
-            color: transparent;
-            position: absolute;
-            white-space: pre;
-            cursor: text;
-            transform-origin: 0% 0%;
-          }
-
-          > :not(.markedContent),
-          .markedContent span:not(.markedContent) {
-            z-index: 1;
-          }
-
-          /* Only necessary in Google Chrome, see issue 14205, and most unfortunately
-           * the problem doesn't show up in "text" reference tests. */
-          /*#if !MOZCENTRAL*/
-          span.markedContent {
-            top: 0;
-            height: 0;
-          }
-          /*#endif*/
-
-          span[role="img"] {
-            user-select: none;
-            cursor: default;
-          }
-
-          .highlight {
-            --highlight-bg-color: rgb(180 0 170 / 0.25);
-            --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
-            --highlight-backdrop-filter: none;
-            --highlight-selected-backdrop-filter: none;
-
-            margin: -1px;
-            padding: 1px;
-            background-color: var(--highlight-bg-color);
-            backdrop-filter: var(--highlight-backdrop-filter);
-            border-radius: 4px;
-
-            @media screen and (forced-colors: active) {
-              --highlight-bg-color: transparent;
-              --highlight-selected-bg-color: transparent;
-              --highlight-backdrop-filter: var(--hcm-highlight-filter);
-              --highlight-selected-backdrop-filter: var(
-                --hcm-highlight-selected-filter
-              );
-            }
-
-            &.appended {
-              position: initial;
-            }
-
-            &.begin {
-              border-radius: 4px 0 0 4px;
-            }
-
-            &.end {
-              border-radius: 0 4px 4px 0;
-            }
-
-            &.middle {
-              border-radius: 0;
-            }
-
-            &.selected {
-              background-color: var(--highlight-selected-bg-color);
-              backdrop-filter: var(--highlight-selected-backdrop-filter);
-            }
-          }
-
-          ::selection {
-            /* stylelint-disable declaration-block-no-duplicate-properties */
-            /*#if !MOZCENTRAL*/
-            background: rgba(0 0 255 / 0.25);
-            /*#endif*/
-            /* stylelint-enable declaration-block-no-duplicate-properties */
-            background: color-mix(in srgb, AccentColor, transparent 75%);
-          }
-
-          /* Avoids https://github.com/mozilla/pdf.js/issues/13840 in Chrome */
-          /*#if !MOZCENTRAL*/
-          br::selection {
-            background: transparent;
-          }
-          /*#endif*/
-
-          .endOfContent {
-            display: block;
-            position: absolute;
-            inset: 100% 0 0;
-            z-index: 0;
-            cursor: default;
-            user-select: none;
-          }
-
-          &.selecting .endOfContent {
-            top: 0;
-          }
+          left: 0;
         }
+
+        &::after {
+          background: linear-gradient(
+            to left,
+            transparent 80%,
+            95%,
+            rgb(0, 0, 0, 0.4)
+          );
+        }
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      &.blank-page::after {
+        content: none;
+      }
     }
+
+    &.singlepage {
+      .flipbook-spread {
+        grid-template-columns: 1fr;
+      }
+
+      .flipbook-page {
+        &::after {
+          content: none;
+        }
+      }
+    }
+  }
+
+  .hiddenCanvasElement {
+    display: none;
+  }
+
+  /* PDF.js styles */
+  .flipbook-page {
+    .textLayer {
+      position: absolute;
+      text-align: initial;
+      inset: 0;
+      overflow: clip;
+      opacity: 1;
+      line-height: 1;
+      text-size-adjust: none;
+      forced-color-adjust: none;
+      transform-origin: 0 0;
+      caret-color: CanvasText;
+      z-index: 0;
+
+      ::selection {
+        color: transparent;
+      }
+
+      &.highlighting {
+        touch-action: none;
+      }
+
+      :is(span, br) {
+        color: transparent;
+        position: absolute;
+        white-space: pre;
+        cursor: text;
+        transform-origin: 0% 0%;
+      }
+
+      > :not(.markedContent),
+      .markedContent span:not(.markedContent) {
+        z-index: 1;
+      }
+
+      /* Only necessary in Google Chrome, see issue 14205, and most unfortunately
+           * the problem doesn't show up in "text" reference tests. */
+      /*#if !MOZCENTRAL*/
+      span.markedContent {
+        top: 0;
+        height: 0;
+      }
+      /*#endif*/
+
+      span[role="img"] {
+        user-select: none;
+        cursor: default;
+      }
+
+      .highlight {
+        --highlight-bg-color: rgb(180 0 170 / 0.25);
+        --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
+        --highlight-backdrop-filter: none;
+        --highlight-selected-backdrop-filter: none;
+
+        margin: -1px;
+        padding: 1px;
+        background-color: var(--highlight-bg-color);
+        backdrop-filter: var(--highlight-backdrop-filter);
+        border-radius: 4px;
+
+        @media screen and (forced-colors: active) {
+          --highlight-bg-color: transparent;
+          --highlight-selected-bg-color: transparent;
+          --highlight-backdrop-filter: var(--hcm-highlight-filter);
+          --highlight-selected-backdrop-filter: var(
+            --hcm-highlight-selected-filter
+          );
+        }
+
+        &.appended {
+          position: initial;
+        }
+
+        &.begin {
+          border-radius: 4px 0 0 4px;
+        }
+
+        &.end {
+          border-radius: 0 4px 4px 0;
+        }
+
+        &.middle {
+          border-radius: 0;
+        }
+
+        &.selected {
+          background-color: var(--highlight-selected-bg-color);
+          backdrop-filter: var(--highlight-selected-backdrop-filter);
+        }
+      }
+
+      ::selection {
+        /* stylelint-disable declaration-block-no-duplicate-properties */
+        /*#if !MOZCENTRAL*/
+        background: rgba(0 0 255 / 0.25);
+        /*#endif*/
+        /* stylelint-enable declaration-block-no-duplicate-properties */
+        background: color-mix(in srgb, AccentColor, transparent 75%);
+      }
+
+      /* Avoids https://github.com/mozilla/pdf.js/issues/13840 in Chrome */
+      /*#if !MOZCENTRAL*/
+      br::selection {
+        background: transparent;
+      }
+      /*#endif*/
+
+      .endOfContent {
+        display: block;
+        position: absolute;
+        inset: 100% 0 0;
+        z-index: 0;
+        cursor: default;
+        user-select: none;
+      }
+
+      &.selecting .endOfContent {
+        top: 0;
+      }
+    }
+  }
 </style>

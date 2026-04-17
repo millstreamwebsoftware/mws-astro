@@ -1,15 +1,15 @@
 ---
-import { preferences } from "@shared/preferences";
-import Footer from "@shared/Footer.astro";
-import Header from "@shared/Header.astro";
-import Opengraph from "@shared/Opengraph.astro";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
+import Footer from "@millstreamwebsoftware/mws-astro/shared/Footer.astro";
+import Header from "@millstreamwebsoftware/mws-astro/shared/Header.astro";
+import Opengraph from "@millstreamwebsoftware/mws-astro/shared/Opengraph.astro";
 
 import * as git from "git-rev-sync";
 
 import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
-import "@styles/styles.scss";
+import "@millstreamwebsoftware/mws-astro/styles/styles.scss";
 import "@custom/custom.scss";
 
 export interface Props {
@@ -53,6 +53,17 @@ const recaptcha = preferences.API?.google_recaptcha_v3?.api_key;
     <meta name="format-detection" content="telephone=no" />
     {status !== "online" && <meta name="robots" content="noindex" />}
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <script>
+      // Cloudcannon editable-regions component registry
+      import { components } from "virtual:mws-astro/components";
+      import { registerAstroComponent } from "@cloudcannon/editable-regions/astro";
+
+      console.info(`✨ Registering ${Object.keys(components).length} components. `)
+
+      Object.entries(components).map(([name, module]) => {
+        registerAstroComponent(name, module);
+      });
+    </script>
     {
       !!recaptcha && (
         <>

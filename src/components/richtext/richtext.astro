@@ -1,11 +1,14 @@
 ---
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
 
 export interface Props extends Partial<SectionProps> {
-    content: string;
-    background_color?: string;
-    classes?: any;
-    style?: Record<string, string>;
+  content: string;
+  background_color?: string;
+  classes?: any;
+  style?: Record<string, string>;
 }
 ---
 

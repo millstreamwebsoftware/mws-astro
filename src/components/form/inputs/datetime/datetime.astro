@@ -1,5 +1,5 @@
 ---
-import Label from "@components/form/label.astro";
+import Label from "@millstreamwebsoftware/mws-astro/components/form/label.astro";
 export interface Props {
   name: string;
   label: string;
@@ -21,7 +21,14 @@ var type: "date" | "time" | "datetime-local" =
 
 <div class="input datetime">
   <Label for={id} {required}>{label}</Label>
-  <input {type} name={name} {id} {required} aria-required={required} onfocus="this.showPicker?.()" />
+  <input
+    {type}
+    name={name}
+    {id}
+    {required}
+    aria-required={required}
+    onfocus="this.showPicker?.()"
+  />
 </div>
 
 <style>

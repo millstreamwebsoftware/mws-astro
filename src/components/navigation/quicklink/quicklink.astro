@@ -1,37 +1,37 @@
 ---
-import Icon from '@shared/icon.astro';
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
 
 export interface Props {
-    text: string;
-    link: string;
-    new_tab?: boolean;
+  text: string;
+  link: string;
+  new_tab?: boolean;
 }
 
 const { text, link } = Astro.props;
 
 const new_tab =
-    (Astro.props.new_tab ?? false)
-        ? { target: "_blank", rel: "noopener" }
-        : undefined;
+  (Astro.props.new_tab ?? false)
+    ? { target: "_blank", rel: "noopener" }
+    : undefined;
 
 const external = !(link.startsWith("/") || link.startsWith("#"));
-
 ---
 
 <a href={link} {...new_tab}>
-    <span>{text}
+  <span
+    >{text}
     {(new_tab || external) && <Icon name="carbon:launch" height="1.25em" />}
-    </span>
+  </span>
 </a>
 
 <style lang="scss">
-    a {
-        text-decoration: none;
+  a {
+    text-decoration: none;
 
-        transition: color 0.2s ease;
+    transition: color 0.2s ease;
 
-        &:hover {
-            color: rgb(var(--color-accent));
-        }
+    &:hover {
+      color: rgb(var(--color-accent));
     }
+  }
 </style>

@@ -1,14 +1,17 @@
 ---
-import Video from "@shared/Video.astro";
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
+import Video from "@millstreamwebsoftware/mws-astro/shared/Video.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
 
 interface Props extends Partial<SectionProps> {
-    src: string;
+  src: string;
 }
 
 const { src } = Astro.props;
 ---
 
 <Section component="player" {...Astro.props}>
-    {src && <Video {src} background={false} />}
+  {src && <Video {src} background={false} />}
 </Section>

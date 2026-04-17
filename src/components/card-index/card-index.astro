@@ -2,15 +2,13 @@
 import {
   default as Section,
   type Props as SectionProps,
-} from "@layouts/Section.astro";
-import Icon from "@shared/icon.astro";
-import Lightbox from "@components/lightbox/lightbox.astro";
-import Page from "@shared/Page.astro";
-import { bookshopName } from "@mws-astro/util";
-
-import { getPageChildren } from "@mws-astro/navigation";
-import type { AstroInstance } from "astro";
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import Lightbox from "@millstreamwebsoftware/mws-astro/components/lightbox/lightbox.astro";
+import Page from "@millstreamwebsoftware/mws-astro/shared/Page.astro";
+import { getPageChildren } from "@millstreamwebsoftware/mws-astro/src/navigation.ts";
 import type { CollectionKey } from "astro:content";
+import { components } from "virtual:mws-astro/components";
 
 interface Props extends Partial<SectionProps> {
   target: string;
@@ -46,31 +44,6 @@ const {
   link_text = "View more",
   key,
 } = Astro.props;
-
-const components: Record<string, AstroInstance["default"]> = {};
-const componentImports = import.meta.glob<AstroInstance>(
-  ["/src/mws-astro/src/components/card-index/cards/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob<AstroInstance>(
-  ["/src/components/card-index/cards/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, AstroInstance]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, AstroInstance]) =>
-    (components[bookshopName(path)] = obj.default),
-);
 
 const Card = components[cardProps._bookshop_name];
 

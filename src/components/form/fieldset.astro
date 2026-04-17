@@ -1,4 +1,7 @@
 ---
+import { components } from "virtual:mws-astro/components";
+import { BUILDMODE } from "astro:env/client";
+
 const selfName = "form/fieldset";
 export interface Props {
   legend: string;
@@ -7,29 +10,7 @@ export interface Props {
 }
 
 const { legend, form_blocks, key } = Astro.props;
-
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  [
-    "/src/mws-astro/src/components/form/**/*.jsx",
-    "/src/mws-astro/src/components/form/**/*.astro",
-  ],
-  {
-    eager: true,
-  }
-);
-
-Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
-  const parts = path
-    .replace(/^.*components\//, "")
-    .split(".")[0]
-    .split("/");
-  if (parts.length > 1 && parts[parts.length - 1] === parts[parts.length - 2]) {
-    parts.pop();
-  }
-  const bookshopName = parts.join("/");
-  components[bookshopName] = obj.default;
-});
+const Wrapper = BUILDMODE === "EDITOR" ? "editable-array-item" : Fragment;
 ---
 
 <fieldset>
@@ -41,7 +22,14 @@ Object.entries(componentImports).forEach(([path, obj]: [string, any]) => {
       }
       const Component = components[block._bookshop_name];
       if (Component) {
-        return <Component {...block} key={String(i) + (key || "")} />;
+        return (
+          <Wrapper
+            data-id={block._bookshop_name}
+            data-component={block._bookshop_name}
+          >
+            <Component {...block} key={String(i) + (key || "")} />
+          </Wrapper>
+        );
       }
       return (
         <div class="missing-component">

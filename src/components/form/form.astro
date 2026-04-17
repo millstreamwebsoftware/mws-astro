@@ -1,12 +1,13 @@
 ---
-import { bookshopName } from "@mws-astro/util";
 import {
   default as Section,
   type Props as SectionProps,
-} from "@layouts/Section.astro";
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
 import Required from "./required.astro";
-import Icon from "@shared/icon.astro";
-import { preferences } from "@shared/preferences";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
+import { components } from "virtual:mws-astro/components";
+import { BUILDMODE } from "astro:env/client";
 
 export interface Props extends Partial<SectionProps> {
   action: string;
@@ -28,31 +29,6 @@ const {
 // const id = (name || "") + "-" + (key || "");
 const id = name.toLowerCase().replaceAll(" ", "-");
 
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/form/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(
-  ["/src/components/form/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
 // Recurse form_blocks to check for any required fields.
 function checkRequired(obj: any[]): boolean {
   return obj.some((element: any) => {
@@ -62,10 +38,20 @@ function checkRequired(obj: any[]): boolean {
 }
 const required = checkRequired(form_blocks);
 const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
+const Wrapper = BUILDMODE === "EDITOR" ? "editable-array-item" : Fragment;
 ---
 
 <Section component="form" class:list={["form", classes]} {...Astro.props}>
-  <form method="post" {action} {name} {id} {enctype}>
+  <form
+    method="post"
+    {action}
+    {name}
+    {id}
+    {enctype}
+    data-prop="form_blocks"
+    data-id-key="_bookshop_name"
+    data-component-key="_bookshop_name"
+  >
     {
       required && (
         <p>
@@ -77,7 +63,19 @@ const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
       form_blocks.map((block: any, i: number) => {
         const Component = components[block._bookshop_name];
         if (Component) {
-          return <Component {...block} key={String(i) + "-" + (key || "")} />;
+          return (
+            <Wrapper
+              data-id={block._bookshop_name}
+              data-component={block._bookshop_name}
+            >
+              <Component
+                data-editable="array-item"
+                data-id={block._bookshop_name}
+                {...block}
+                key={String(i) + "-" + (key || "")}
+              />
+            </Wrapper>
+          );
         }
         const warnstring = `[${Astro.self.name}] Component ${block._bookshop_name} could not be found!`;
         console.warn(warnstring);

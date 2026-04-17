@@ -2,8 +2,8 @@
 import {
   default as Section,
   type Props as SectionProps,
-} from "@layouts/Section.astro";
-import { bookshopName } from "@mws-astro/util";
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import { components } from "virtual:mws-astro/components";
 
 export interface Props extends Partial<SectionProps> {
   content_blocks: any[];
@@ -16,28 +16,6 @@ export interface Props extends Partial<SectionProps> {
 
 const { collapse = true, layout, key, fullwidth = false } = Astro.props;
 const contentBlocks = Astro.props.content_blocks;
-
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(["/src/components/**/*.astro"], {
-  eager: true,
-});
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
 
 // Calculate the lowest common multiple to get the minimum number of columns
 const gcd = (a: number, b: number): number => (b == 0 ? a : gcd(b, a % b));

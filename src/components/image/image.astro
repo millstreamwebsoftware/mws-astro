@@ -1,84 +1,81 @@
 ---
-import SharedImage from "@shared/Image.astro";
-import Markdown from "@shared/Markdown.astro";
-import Lightbox from "@components/lightbox/lightbox.astro";
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
-import preferences from "@data/preferences.json";
+import SharedImage from "@millstreamwebsoftware/mws-astro/shared/Image.astro";
+import Markdown from "@millstreamwebsoftware/mws-astro/shared/Markdown.astro";
+import Lightbox from "@millstreamwebsoftware/mws-astro/components/lightbox/lightbox.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
 
 export interface Props extends Partial<SectionProps> {
-    image: string;
-    title?: string;
-    description?: string;
-    alt: string;
-    height: number;
-    columns: number;
-    aspect?: number;
-    lightbox?: boolean;
+  image: string;
+  title?: string;
+  description?: string;
+  alt: string;
+  height: number;
+  columns: number;
+  aspect?: number;
+  lightbox?: boolean;
 }
 
-const {
-    image,
-    title,
-    description,
-    alt,
-    aspect,
-    lightbox,
-    key,
-} = Astro.props;
+const { image, title, description, alt, aspect, lightbox, key } = Astro.props;
 
 const id = `image-${key}`;
 const figcaption = title || description;
 ---
 
 <Section component="image" classes={{ lightbox }} {...Astro.props}>
-  {image && (<figure
+  {
+    image && (
+      <figure
         data-lightbox={lightbox && id}
         style={{
-            ...(aspect && { "--aspect": aspect }),
+          ...(aspect && { "--aspect": aspect }),
         }}
-    >
+      >
         <SharedImage
-            {image}
-            {alt}
-            width={preferences.page.maximum_page_width}
-            quality="mid"
+          {image}
+          {alt}
+          width={preferences.page.maximum_page_width}
+          quality="mid"
         />
 
-        {
-            figcaption && (
-                <figcaption>
-                    {title && <h3>{title}</h3>}
-                    {description && <Markdown content={description} />}
-                </figcaption>
-            )
-        }
-    </figure>)}
+        {figcaption && (
+          <figcaption>
+            {title && <h3>{title}</h3>}
+            {description && <Markdown content={description} />}
+          </figcaption>
+        )}
+      </figure>
+    )
+  }
 
-    {
-        lightbox && image && (
-            <Lightbox collection={id}>
-                <figure
-                    data-lightbox={id}
-                    class:list={{ caption: title || description }}
-                >
-                    <SharedImage {image} {alt} fit="contain" quality="high" />
+  {
+    lightbox && image && (
+      <Lightbox collection={id}>
+        <figure
+          data-lightbox={id}
+          class:list={{ caption: title || description }}
+        >
+          <SharedImage {image} {alt} fit="contain" quality="high" />
 
-                    {figcaption && (
-                        <figcaption>
-                            {title && <h3>{title}</h3>}
-                            {description && <Markdown content={description} />}
-                        </figcaption>
-                    )}
-                </figure>
-            </Lightbox>
-        )
-    }
+          {figcaption && (
+            <figcaption>
+              {title && <h3>{title}</h3>}
+              {description && <Markdown content={description} />}
+            </figcaption>
+          )}
+        </figure>
+      </Lightbox>
+    )
+  }
 </Section>
 
 <style>
-    figure {
-        overflow: hidden;
-        height: 100%;
-        width: 100%;
-    }
+  figure {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+  }
 </style>

@@ -1,36 +1,12 @@
 ---
-import preferences from "@data/preferences.json";
-import { bookshopName } from "@mws-astro/util";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
 import MobileNavigation from "./MobileNavigation.astro";
+import { components } from "virtual:mws-astro/components";
 
 export interface Props {}
 
 const prefs: Record<string, any> | typeof preferences = preferences;
 const placement = prefs?.header?.center_dropdowns ? "bottom" : "bottom-start";
-const components: Record<string, any> = {};
-const componentImports = import.meta.glob(
-  ["/src/mws-astro/src/components/navigation/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-const componentOverrides = import.meta.glob(
-  ["/src/components/navigation/**/*.astro"],
-  {
-    eager: true,
-  },
-);
-
-Object.entries(componentImports).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
-
-Object.entries(componentOverrides).forEach(
-  ([path, obj]: [string, any]) =>
-    (components[bookshopName(path)] = obj.default),
-);
 
 const primary = prefs.header?.navigation || [
   { _bookshop_name: "navigation/collection", collection: "pages" },

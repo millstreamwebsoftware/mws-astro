@@ -1,26 +1,29 @@
 ---
-import Lightbox from "@components/lightbox/lightbox.astro";
-import Image from "@shared/Image.astro";
-import { default as Section, type Props as SectionProps } from "@layouts/Section.astro";
-import Markdown from "@shared/Markdown.astro";
+import Lightbox from "@millstreamwebsoftware/mws-astro/components/lightbox/lightbox.astro";
+import Image from "@millstreamwebsoftware/mws-astro/shared/Image.astro";
+import {
+  default as Section,
+  type Props as SectionProps,
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import Markdown from "@millstreamwebsoftware/mws-astro/shared/Markdown.astro";
 
 export type Image = {
-    image: string;
-    title?: string;
-    description?: string;
-    alt?: string;
-    link?: string;
+  image: string;
+  title?: string;
+  description?: string;
+  alt?: string;
+  link?: string;
 };
 
 export interface Props extends Partial<SectionProps> {
-    images: Image[];
-    columns: number;
-    gap?: boolean;
-    fit?: "cover" | "contain";
-    aspect?: number;
-    lightbox?: boolean;
-    linkgallery?: boolean;
-    placeholder?: boolean;
+  images: Image[];
+  columns: number;
+  gap?: boolean;
+  fit?: "cover" | "contain";
+  aspect?: number;
+  lightbox?: boolean;
+  linkgallery?: boolean;
+  placeholder?: boolean;
 }
 
 const {
@@ -29,7 +32,7 @@ const {
   classes,
   aspect = 1.0,
   gap = true,
-  fit = "cover"
+  fit = "cover",
 } = Astro.props;
 
 const images = Astro.props.images.filter((img) => !!img);
@@ -39,172 +42,164 @@ const id = `gallery-${key}`;
 ---
 
 <Section
-    component="gallery"
-    {...Astro.props}
-    classes={[{ lightbox }, classes]}
-    style={{
-        "--columns": columns,
-        "--aspect": aspect,
-        ...(!gap && { "--gallery-gap": 0 }),
-    }}
+  component="gallery"
+  {...Astro.props}
+  classes={[{ lightbox }, classes]}
+  style={{
+    "--columns": columns,
+    "--aspect": aspect,
+    ...(!gap && { "--gallery-gap": 0 }),
+  }}
 >
-    <div class="gallery-grid">
-        {
-            images.map((asset, i) => (
-                <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
-                    <Image
-                        image={asset.image}
-                        alt={asset.alt}
-                        {fit}
-                        widths={[1920 / columns]}
-                        quality="low"
-                        placeholder={true}
-                    />
+  <div class="gallery-grid">
+    {
+      images.map((asset, i) => (
+        <figure class="gallery-item" data-lightbox={`${id}-${i}`}>
+          <Image
+            image={asset.image}
+            alt={asset.alt}
+            {fit}
+            widths={[1920 / columns]}
+            quality="low"
+            placeholder={true}
+          />
 
-                    {(asset.title || asset.description) && (
-                        <figcaption>
-                            {asset.title && <h3>{asset.title}</h3>}
-                            {asset.description && (
-                                <Markdown content={asset.description} />
-                            )}
-                        </figcaption>
-                    )}
+          {(asset.title || asset.description) && (
+            <figcaption>
+              {asset.title && <h3>{asset.title}</h3>}
+              {asset.description && <Markdown content={asset.description} />}
+            </figcaption>
+          )}
 
-                    {asset?.link && linkgallery && <a href={asset.link} />}
-                </figure>
-            ))
-        }
-        {
-            lightbox && (
-                <Lightbox collection={id}>
-                    {images.map((asset, i) => (
-                        <figure
-                            data-lightbox={`${id}-${i}`}
-                            class:list={{
-                                caption: asset.title || asset.description,
-                            }}
-                        >
-                            <Image
-                                image={asset.image}
-                                alt={asset.alt}
-                                fit="contain"
-                                width={1920}
-                                quality="high"
-                            />
+          {asset?.link && linkgallery && <a href={asset.link} />}
+        </figure>
+      ))
+    }
+    {
+      lightbox && (
+        <Lightbox collection={id}>
+          {images.map((asset, i) => (
+            <figure
+              data-lightbox={`${id}-${i}`}
+              class:list={{
+                caption: asset.title || asset.description,
+              }}
+            >
+              <Image
+                image={asset.image}
+                alt={asset.alt}
+                fit="contain"
+                width={1920}
+                quality="high"
+              />
 
-                            {(asset.title || asset.description) && (
-                                <figcaption>
-                                    {asset.title && <h3>{asset.title}</h3>}
-                                    {asset.description && (
-                                        <Markdown content={asset.description} />
-                                    )}
-                                </figcaption>
-                            )}
-                        </figure>
-                    ))}
-                </Lightbox>
-            )
-        }
-    </div>
+              {(asset.title || asset.description) && (
+                <figcaption>
+                  {asset.title && <h3>{asset.title}</h3>}
+                  {asset.description && (
+                    <Markdown content={asset.description} />
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          ))}
+        </Lightbox>
+      )
+    }
+  </div>
 </Section>
 
 <style lang="scss">
-    .gallery-grid {
-        grid-template-columns: repeat(var(--columns), 1fr);
-        display: grid;
-        grid-template-rows: 1fr;
-        grid-auto-flow: row;
-        gap: var(--gallery-gap);
-    }
+  .gallery-grid {
+    grid-template-columns: repeat(var(--columns), 1fr);
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-auto-flow: row;
+    gap: var(--gallery-gap);
+  }
 
-    .gallery-item a {
-        position: absolute;
-        inset: 0;
-    }
+  .gallery-item a {
+    position: absolute;
+    inset: 0;
+  }
 </style>
 
 <style lang="scss" is:global>
-    section.gallery.lightbox [data-lightbox] {
-        cursor: pointer;
+  section.gallery.lightbox [data-lightbox] {
+    cursor: pointer;
+  }
+
+  :where(section.gallery) .gallery-grid {
+    &.no-indent {
+      padding: var(--gallery-gap);
     }
 
-    :where(section.gallery) .gallery-grid {
-        &.no-indent {
-            padding: var(--gallery-gap);
-        }
+    .gallery-item {
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
 
-        .gallery-item {
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+        // object-fit: cover;
+        object-position: center;
+        aspect-ratio: var(--aspect);
+      }
 
-            img {
-                width: 100%;
-                height: 100%;
-                // object-fit: cover;
-                object-position: center;
-                aspect-ratio: var(--aspect);
-            }
+      figcaption {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        background: linear-gradient(
+          to right,
+          rgb(var(--background-color, var(--article-background-color)) / 0.7),
+          rgb(var(--background-color, var(--article-background-color)) / 0.5)
+        );
+      }
+    }
+  }
 
-            figcaption {
-                position: absolute;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding: 2rem;
-                background: linear-gradient(
-                    to right,
-                    rgb(
-                        var(--background-color, var(--article-background-color)) /
-                            0.7
-                    ),
-                    rgb(
-                        var(--background-color, var(--article-background-color)) /
-                            0.5
-                    )
-                );
-            }
-        }
+  @media only screen and (max-width: 768px) {
+    section.gallery .gallery-grid {
+      grid-template-columns: repeat(calc(var(--columns) * 0.5), 1fr);
     }
 
-    @media only screen and (max-width: 768px) {
-        section.gallery .gallery-grid {
-            grid-template-columns: repeat(calc(var(--columns) * 0.5), 1fr);
-        }
+    // section.gallery.list figure.gallery-item {
+    //   grid-template-columns: 1fr;
+    //   grid-template-rows: minmax(1fr, auto) auto;
 
-        // section.gallery.list figure.gallery-item {
-        //   grid-template-columns: 1fr;
-        //   grid-template-rows: minmax(1fr, auto) auto;
+    //   img {
+    //     max-height: 50%;
+    //   }
+    // }
+  }
 
-        //   img {
-        //     max-height: 50%;
-        //   }
-        // }
+  section.gallery.list {
+    .gallery-item {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      border-radius: var(--border-radius);
+      background-color: color-mix(
+        in oklab,
+        rgb(var(--background-color)) 95%,
+        rgb(var(--text-color))
+      );
+
+      img {
+        border-radius: var(--border-radius);
+      }
+
+      figcaption {
+        position: relative;
+        justify-content: start;
+        background: none;
+      }
     }
-
-    section.gallery.list {
-        .gallery-item {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            border-radius: var(--border-radius);
-            background-color: color-mix(
-                in oklab,
-                rgb(var(--background-color)) 95%,
-                rgb(var(--text-color))
-            );
-
-            img {
-                border-radius: var(--border-radius);
-            }
-
-            figcaption {
-                position: relative;
-                justify-content: start;
-                background: none;
-            }
-        }
-    }
+  }
 </style>

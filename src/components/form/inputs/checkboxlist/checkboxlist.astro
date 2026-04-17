@@ -1,5 +1,5 @@
 ---
-import Label from "@components/form/label.astro";
+import Label from "@millstreamwebsoftware/mws-astro/components/form/label.astro";
 export interface Props {
   name: string;
   label: string;
@@ -62,23 +62,23 @@ const id = (name || "") + "-" + (key || "");
     let upperBound = Number(checkboxList.dataset.maxchecked) ?? 0;
 
     const checkboxes = checkboxList.querySelectorAll<HTMLInputElement>(
-      'input[type="checkbox"]'
+      'input[type="checkbox"]',
     );
 
     const checkedCount = Array.from(checkboxes).filter(
-      (checkbox) => checkbox.checked
+      (checkbox) => checkbox.checked,
     ).length;
 
     switch (true) {
       case checkedCount < lowerBound:
         checkboxes[0].setCustomValidity(
-          `At least ${lowerBound} checkbox${lowerBound == 1 ? "" : "es"} must be selected. Select ${lowerBound - checkedCount} more checkbox${lowerBound - checkedCount == 1 ? "" : "es"}.`
+          `At least ${lowerBound} checkbox${lowerBound == 1 ? "" : "es"} must be selected. Select ${lowerBound - checkedCount} more checkbox${lowerBound - checkedCount == 1 ? "" : "es"}.`,
         );
         break;
 
       case checkedCount > upperBound && upperBound > 0:
         checkboxes[0].setCustomValidity(
-          `At most ${upperBound} checkbox${upperBound == 1 ? "" : "es"} must be selected. Select ${checkedCount - upperBound} fewer checkbox${checkedCount - upperBound == 1 ? "" : "es"}.`
+          `At most ${upperBound} checkbox${upperBound == 1 ? "" : "es"} must be selected. Select ${checkedCount - upperBound} fewer checkbox${checkedCount - upperBound == 1 ? "" : "es"}.`,
         );
         break;
 
@@ -91,7 +91,7 @@ const id = (name || "") + "-" + (key || "");
   function updateOtherInput(e: Event) {
     const checkbox = e.currentTarget as HTMLInputElement;
     const textinput = checkbox.parentElement?.querySelector<HTMLInputElement>(
-      ':scope > input.other[type="text"]'
+      ':scope > input.other[type="text"]',
     );
     const checked = checkbox.checked;
 
@@ -121,7 +121,7 @@ const id = (name || "") + "-" + (key || "");
       }
 
       const other = checkboxesEl.querySelector(
-        ':scope input.other[type="checkbox"]'
+        ':scope input.other[type="checkbox"]',
       );
       other?.addEventListener("change", updateOtherInput);
       other?.dispatchEvent(new Event("change")); // Trigger update to ensure correct state on load

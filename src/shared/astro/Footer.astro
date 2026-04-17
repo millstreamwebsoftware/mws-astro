@@ -1,10 +1,10 @@
 ---
-import { convertColorString } from "@mws-astro/util";
-import Social from "@components/social/social.astro";
-import Markdown from "@shared/Markdown.astro";
-import Navigation from "@components/navigation/navigation.astro";
+import { convertColorString } from "@millstreamwebsoftware/mws-astro/src/util.ts";
+import Social from "@millstreamwebsoftware/mws-astro/components/social/social.astro";
+import Markdown from "@millstreamwebsoftware/mws-astro/shared/Markdown.astro";
+import Navigation from "@millstreamwebsoftware/mws-astro/components/navigation/navigation.astro";
+import { preferences } from "@millstreamwebsoftware/mws-astro/shared/preferences.ts";
 import Icon from "./icon.astro";
-import preferences from "@data/preferences.json";
 const currentYear = new Date().getFullYear();
 
 const footerPreferences = preferences.footer as typeof preferences.footer &

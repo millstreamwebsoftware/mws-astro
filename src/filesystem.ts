@@ -7,7 +7,7 @@ var fs: typeof import("node:fs/promises") | undefined,
 const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
 
 async function ensureFS(): Promise<boolean> {
-  if (!ENV_BOOKSHOP_LIVE) {
+  if (import.meta.env.SSR) {
     if (!fs)
       fs =
         (await import("node:fs/promises").catch(() =>
@@ -102,7 +102,7 @@ export async function inferRemoteSize(url: string) {
   if (!cacheFileName) throw Error("[InferSize] Cache File naming failed.");
 
   const schema = z.object({
-    url: z.string().url(),
+    url: z.url(),
     width: z.coerce.number().positive(),
     height: z.coerce.number().positive(),
     expires: z.coerce.number().min(0),

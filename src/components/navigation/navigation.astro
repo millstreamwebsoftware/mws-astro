@@ -2,14 +2,14 @@
 import {
   default as Section,
   type Props as SectionProps,
-} from "@layouts/Section.astro";
-import Icon from "@shared/icon.astro";
+} from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import Icon from "@millstreamwebsoftware/mws-astro/shared/icon.astro";
 import {
   getTree,
   urlToId,
   type TreeNode,
   getTreeNode,
-} from "@mws-astro/navigation";
+} from "@millstreamwebsoftware/mws-astro/src/navigation.ts";
 import { getCollection, type CollectionKey } from "astro:content";
 
 interface Props extends Partial<SectionProps> {
@@ -55,7 +55,13 @@ function isRenderedItem(item: TreeNode<CollectionKey>) {
     case "online":
       return true;
     case "meta":
-      if ((item.children && Object.keys(item.children).length && Object.values(item.children).some(isRenderedItem)) || item.link) return true;
+      if (
+        (item.children &&
+          Object.keys(item.children).length &&
+          Object.values(item.children).some(isRenderedItem)) ||
+        item.link
+      )
+        return true;
     case "hidden":
     case "offline":
       return false;
@@ -100,7 +106,12 @@ const Wrapper = depth ? Fragment : "nav";
               : true);
 
           const selected = child.selected === "selected";
-          const link = child.link || (hasChildren && !displayChildren && Object.values(child.children!)[0].link) || undefined;
+          const link =
+            child.link ||
+            (hasChildren &&
+              !displayChildren &&
+              Object.values(child.children!)[0].link) ||
+            undefined;
           const external = link && /^[A-z1-9+.-]*:\/\/.*/.test(link);
 
           return (
