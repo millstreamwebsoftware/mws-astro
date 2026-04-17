@@ -1,12 +1,12 @@
 import type { CollectionEntry, CollectionKey } from "astro:content";
 
-import type { Props as Section } from "@layouts/Section.astro";
-import type { Props as Breadcrumbs } from "@components/navigation/breadcrumbs/breadcrumbs.astro";
-import type { Props as Slider } from "@components/layout/slider/slider.astro";
+import type { Props as Section } from "@millstreamwebsoftware/mws-astro/layouts/Section.astro";
+import type { Props as Breadcrumbs } from "@millstreamwebsoftware/mws-astro/components/navigation/breadcrumbs/breadcrumbs.astro";
+import type { Props as Slider } from "@millstreamwebsoftware/mws-astro/components/layout/slider/slider.astro";
 import type {
   Props as Blockquote,
   Prefs as BlockquotePrefs,
-} from "@components/blockquote/blockquote.astro";
+} from "@millstreamwebsoftware/mws-astro/components/blockquote/blockquote.astro";
 
 declare global {
   type Prettify<T> = {
