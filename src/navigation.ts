@@ -5,8 +5,12 @@ import {
   type CollectionKey,
 } from "astro:content";
 
-export function urlToId(url: string | URL) {
+export function urlToId(
+  url: string | URL,
+  collection: CollectionKey = "pages",
+) {
   var _url = undefined;
+  const pre = new RegExp(`^\/?${collection === "pages" ? "" : collection}`);
 
   if (url instanceof URL) {
     _url = url.pathname;
@@ -17,6 +21,7 @@ export function urlToId(url: string | URL) {
   }
 
   if (!_url) return "";
+  _url = _url.replace(pre, "");
   return _url.replaceAll(/(^\/|\/$)/g, "");
 }
 
@@ -36,13 +41,18 @@ function stripFiletype(slug: string) {
   return slug.replace(/\.(md|mdx)$/, "");
 }
 
-export async function getPage(id: string) {
-  const frontmatter =
-    (await getEntry({ collection: "pages", id })) ||
-    (await getEntry({ collection: "pages", id: `/${id}.md` })) ||
-    (await getEntry({ collection: "pages", id: `/${id}/index.md` }));
+export async function getPage<C extends CollectionKey = "pages">(
+  id: string,
+  collection: C,
+): Promise<CollectionEntry<C> | undefined> {
+  if (ENV_BOOKSHOP_LIVE || !import.meta.env.SSR) {
+    return ((await getEntry({ collection, id: `/${id}.md` })) ||
+      (await getEntry({ collection, id: `/${id}/index.md` }))) as
+      | CollectionEntry<C>
+      | undefined;
+  }
 
-  return frontmatter?.data;
+  return (await getEntry({ collection, id })) as CollectionEntry<C> | undefined;
 }
 
 export async function getPageChildren<T extends CollectionKey>(
@@ -96,11 +106,7 @@ export async function getPageAncestors(
 
   for (let i = 0; i < idFragments.length; i++) {
     const entryId = idFragments.slice(0, i + 1).join("/");
-    const entry =
-      (await getEntry({ collection, id: entryId })) ||
-      (await getEntry({ collection, id: `/${entryId}.md` })) ||
-      (await getEntry({ collection, id: `/${entryId}/index.md` }));
-
+    const entry = await getPage(entryId, collection);
     entry && ancestors.push(entry);
   }
 
