@@ -42,7 +42,7 @@ contentBlocks?.unshift({
   {
     Renderer ? (
       <Renderer bookshop:live {contentBlocks}>
-        <slot name="content" slot="content" {...props} />
+        <slot name="content" slot="content" />
       </Renderer>
     ) : (
       <Page bookshop:live {contentBlocks} />
