@@ -102,7 +102,7 @@ export async function inferRemoteSize(url: string) {
   if (!cacheFileName) throw Error("[InferSize] Cache File naming failed.");
 
   const schema = z.object({
-    url: z.url(),
+    url: z.string().url(),
     width: z.coerce.number().positive(),
     height: z.coerce.number().positive(),
     expires: z.coerce.number().min(0),
