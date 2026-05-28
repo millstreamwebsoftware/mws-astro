@@ -3,6 +3,7 @@ import { preferences } from "@shared/preferences";
 import Footer from "@shared/Footer.astro";
 import Header from "@shared/Header.astro";
 import Opengraph from "@shared/Opengraph.astro";
+import Analytics from "@shared/Analytics.astro";
 
 import * as git from "git-rev-sync";
 
@@ -72,6 +73,7 @@ const recaptcha = preferences.API?.google_recaptcha_v3?.api_key;
       )
     }
     <Opengraph {title} {description} {thumbnail} />
+    <Analytics />
 
     <script>
       window.addEventListener(

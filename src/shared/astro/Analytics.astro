@@ -1,0 +1,32 @@
+---
+import { preferences } from "@shared/preferences";
+import { BUILDMODE } from "astro:env/client";
+
+const g_id = preferences.API?.google_analytics?.id;
+const partytown = {type: "text/partytown"};
+const production = BUILDMODE === "PRODUCTION";
+---
+
+{g_id && production && (<>
+  <script is:inline src={`https://www.googletagmanager.com/gtag/js?id=${g_id}`} {...partytown}></script>
+  <script is:inline define:vars={{ id: g_id }} {...partytown}>
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", id);
+  </script>
+  <script>
+    // If partytown isn't loaded - allow scripts to run in main thread
+    if (!("partytown" in window)) {
+      console.info("[Analytics] Partytown not detected, running scripts in main.");
+      let scriptCount = 0;
+      document.querySelectorAll<HTMLScriptElement>(`script[type="text/partytown"]`).forEach((el) => {
+        if (el.hasAttribute("src")) el.async = true;
+        el.removeAttribute("type");
+        scriptCount += 1;
+      });
+    }
+  </script>
+</>)}

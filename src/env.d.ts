@@ -14,7 +14,7 @@ declare global {
 
   var ENV_BOOKSHOP_LIVE: boolean;
 
-  const grecaptcha = any;
+  const grecaptcha: any;
 
   interface Window {
     inEditorMode?: boolean;
@@ -109,6 +109,7 @@ declare global {
       google_maps?: { api_key: string };
       google_calendar?: { api_key: string };
       google_recaptcha_v3?: { api_key: string };
+      google_analytics?: { id: string };
       imgix?: { domain: string; token: string };
     };
     components?: {
@@ -116,6 +117,7 @@ declare global {
       blockquote?: Prettify<Blockquote & BlockquotePrefs>;
       slider?: Prettify<Omit<Slider, keyof Section>>;
     };
-    _input: Record<string, any>;
+    _input?: Record<string, any>;
+    _inputs_from_glob?: string[];
   }
 }
