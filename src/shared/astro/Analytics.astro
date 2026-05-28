@@ -1,10 +1,8 @@
 ---
 import { preferences } from "@shared/preferences";
-import { BUILDMODE } from "astro:env/client";
-
 const g_id = preferences.API?.google_analytics?.id;
 const partytown = {type: "text/partytown"};
-const production = BUILDMODE === "PRODUCTION";
+const production = !ENV_BOOKSHOP_LIVE;
 ---
 
 {g_id && production && (<>
