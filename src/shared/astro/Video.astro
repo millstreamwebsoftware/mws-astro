@@ -1,4 +1,6 @@
 ---
+import { inferVimeoAspect } from "../../filesystem";
+
 interface Props {
   src: string;
   background?: boolean;
@@ -25,6 +27,7 @@ const {
 
 var url;
 var embed: string | null = null;
+let videoAspect: number | undefined;
 
 try {
   url = new URL(src);
@@ -33,12 +36,17 @@ try {
   return;
 }
 
+let player: "vimeo" | "youtube" | undefined;
+
 if (url.hostname.endsWith("vimeo.com")) {
   // Vimeo
+  player = "vimeo";
+
   url.hostname = "player.vimeo.com";
   url.pathname = url.pathname.replace(/^(\/.*\/)(\d*)$/, "/video/$2");
 
   if (background) {
+    videoAspect = await inferVimeoAspect(src);
     url.searchParams.append("background", "1");
     url.searchParams.append("pip", "0");
   } else {
@@ -84,13 +92,17 @@ if (url.hostname.endsWith("vimeo.com")) {
 }
 ---
 
-<div class:list={["video-wrapper", { background }]}>
+<div
+  class:list={["video-wrapper", { background, [`player-${player}`]: player }]}
+  style={videoAspect ? `--video-aspect: ${videoAspect.toFixed(6)}` : undefined}
+>
   {
     embed && (
       <iframe src={embed} allowfullscreen allow="autoplay; encrypted-media" />
     )
   }
 </div>
+
 <style lang="scss">
   .video-wrapper.background {
     position: absolute;
@@ -104,11 +116,11 @@ if (url.hostname.endsWith("vimeo.com")) {
 
     iframe {
       position: absolute;
-      height: max(56.25cqw, 100cqh);
-      width: max(177.778cqh, 100cqw);
-
-      left: calc((max(177.778cqh, 100cqw) - 100cqw) * -0.5);
-      top: calc((max(56.25cqw, 100cqh) - 100cqh) * -0.5);
+      width: max(100cqw, calc(var(--video-aspect, 1.7778) * 100cqh));
+      height: max(100cqh, calc(100cqw / var(--video-aspect, 1.7778)));
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 

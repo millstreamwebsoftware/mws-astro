@@ -169,3 +169,58 @@ export async function inferRemoteSize(url: string) {
   );
   return { width: cache.width, height: cache.height };
 }
+
+const VIMEO_CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days — aspect ratios don't change
+
+export async function inferVimeoAspect(src: string): Promise<number | undefined> {
+  if (!(await ensureFS())) return undefined;
+
+  const videoId = src.match(/(\d+)\/?(?:[?#].*)?$/)?.[1];
+  if (!videoId) {
+    console.warn(`[VimeoAspect] Could not extract video ID from ${src}`);
+    return undefined;
+  }
+  const cacheFileName = `vimeo.${videoId}.json`;
+
+  const schema = z.object({
+    url: z.string().url(),
+    width: z.coerce.number().positive(),
+    height: z.coerce.number().positive(),
+    expires: z.coerce.number().min(0),
+  });
+
+  const cached = await getCacheFile(cacheFileName, schema).catch(() => undefined);
+  if (cached && Date.now() < cached.expires) {
+    return cached.width / cached.height;
+  }
+
+  const cacheMissReason = cached ? "EXPIRE" : "NOFILE";
+
+  const res = await fetch(
+    `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(src)}`
+  ).catch(() => undefined);
+
+  if (!res?.ok) {
+    console.warn(`[VimeoAspect] oEmbed request failed for ${src}`);
+    return cached ? cached.width / cached.height : undefined;
+  }
+
+  const data = await res.json();
+  if (!data.width || !data.height) {
+    console.warn(`[VimeoAspect] oEmbed response missing dimensions for ${src}`);
+    return cached ? cached.width / cached.height : undefined;
+  }
+
+  const cache = schema.parse({
+    url: src,
+    width: data.width,
+    height: data.height,
+    expires: Date.now() + VIMEO_CACHE_TTL,
+  });
+
+  await setCacheFile(cacheFileName, cache);
+  console.log(
+    `[VimeoAspect][${cacheMissReason}] Fetched oEmbed for ${src}: ${cache.width}x${cache.height}`,
+  );
+  return cache.width / cache.height;
+}
