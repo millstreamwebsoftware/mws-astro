@@ -87,6 +87,7 @@ const pageTitle = Astro.props.title
     data-pagefind-meta="title[content]"
   />
   <meta property="og:site_name" content={preferences.general.site_name} />
+  {description && <meta name="description" content={description} />}
   {description && <meta property="og:description" content={description} />}
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonicalURL} />
