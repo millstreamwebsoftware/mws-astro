@@ -62,7 +62,7 @@ if (thumbnail && !ENV_BOOKSHOP_LIVE) {
       }
     }
   } else {
-    imgSrc = thumbnail?.src;
+    imgSrc = typeof thumbnail === "string" ? thumbnail : thumbnail?.src;
   }
 
   if (imgSrc) {
