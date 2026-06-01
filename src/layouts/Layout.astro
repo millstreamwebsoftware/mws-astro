@@ -55,6 +55,7 @@ const recaptcha = preferences.API?.google_recaptcha_v3?.api_key;
     <meta name="format-detection" content="telephone=no" />
     {status !== "online" && <meta name="robots" content="noindex" />}
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="canonical" href={Astro.url} />
     {
       !!recaptcha && (
         <>
