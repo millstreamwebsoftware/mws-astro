@@ -172,7 +172,9 @@ export async function inferRemoteSize(url: string) {
 
 const VIMEO_CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days — aspect ratios don't change
 
-export async function inferVimeoAspect(src: string): Promise<number | undefined> {
+export async function inferVimeoAspect(
+  src: string,
+): Promise<number | undefined> {
   if (!(await ensureFS())) return undefined;
 
   const videoId = src.match(/(\d+)\/?(?:[?#].*)?$/)?.[1];
@@ -189,7 +191,9 @@ export async function inferVimeoAspect(src: string): Promise<number | undefined>
     expires: z.coerce.number().min(0),
   });
 
-  const cached = await getCacheFile(cacheFileName, schema).catch(() => undefined);
+  const cached = await getCacheFile(cacheFileName, schema).catch(
+    () => undefined,
+  );
   if (cached && Date.now() < cached.expires) {
     return cached.width / cached.height;
   }
@@ -197,7 +201,7 @@ export async function inferVimeoAspect(src: string): Promise<number | undefined>
   const cacheMissReason = cached ? "EXPIRE" : "NOFILE";
 
   const res = await fetch(
-    `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(src)}`
+    `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(src)}`,
   ).catch(() => undefined);
 
   if (!res?.ok) {
