@@ -125,7 +125,9 @@ const navBars = [primary, secondary];
     }
 
     window.addEventListener("resize", resizeHandler);
-    resizeHandler();
+    document.fonts.ready.then(() => resizeHandler());
+    document.body.classList.toggle("mobile-nav", isMobileNav());
+    navigation.classList.toggle("mobile-nav", isMobileNav());
 
     function isMobileNav() {
       return window.innerWidth <= mobileNavWidth;
