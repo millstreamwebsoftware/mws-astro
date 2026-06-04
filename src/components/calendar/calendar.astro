@@ -27,7 +27,7 @@ const subscribeButtons: Record<string, any> = {};
 const headerToolbar: ToolBar = {
     start: "title",
     center: "",
-    end: "prev,today,next dayGridMonth,listWeek",
+    end: "prev,today,next dayGridMonth,listMonth",
 };
 
 const footerToolbar: ToolBar = {};
@@ -202,7 +202,6 @@ const calendarOptions = {
                 customButtons,
                 headerToolbar: calendarOptions.headerToolbar,
                 footerToolbar: calendarOptions.footerToolbar,
-                aspectRatio: 1.77,
                 height: getCalendarHeight(),
             });
             calendarEl.calendar = calendar;
@@ -211,7 +210,10 @@ const calendarOptions = {
     }
 
     function getCalendarHeight() {
-        return window.screen.width > 768 ? undefined : "auto";
+        // "auto" lets the calendar grow to fit its content (all month rows /
+        // all list events) instead of being capped to a fixed-aspect box that
+        // hides overflow behind an easy-to-miss internal scrollbar.
+        return "auto";
     }
 
     function closeCalendarPopup(e: MouseEvent) {
