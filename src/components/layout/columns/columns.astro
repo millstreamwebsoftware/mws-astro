@@ -159,23 +159,37 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
     > :global(section) {
       height: 100%;
 
+      // Per-side so directional no-indent-* classes can drop a single edge.
+      // (A `padding` shorthand here would clobber all four sides at once and
+      // make no-indent-top/bottom/left/right ineffective inside columns.)
       &:not(.no-indent) {
-        padding: calc(var(--column-gap));
+        &:not(.no-indent-top) {
+          padding-top: var(--column-gap);
+        }
+        &:not(.no-indent-bottom) {
+          padding-bottom: var(--column-gap);
+        }
+        &:not(.no-indent-left) {
+          padding-left: var(--column-gap);
+        }
+        &:not(.no-indent-right) {
+          padding-right: var(--column-gap);
+        }
       }
     }
   }
 
   :where(.columns) > {
-    .first-in-row > :global(:where(section:not(.no-indent))) {
+    .first-in-row > :global(:where(section:not(.no-indent):not(.no-indent-left))) {
       padding-left: var(--indent);
     }
-    .last-in-row > :global(:where(section:not(.no-indent))) {
+    .last-in-row > :global(:where(section:not(.no-indent):not(.no-indent-right))) {
       padding-right: var(--indent);
     }
-    .first-in-column > :global(:where(section:not(.no-indent))) {
+    .first-in-column > :global(:where(section:not(.no-indent):not(.no-indent-top))) {
       padding-top: calc(var(--indent) * var(--vertical-indent));
     }
-    .last-in-column > :global(:where(section:not(.no-indent))) {
+    .last-in-column > :global(:where(section:not(.no-indent):not(.no-indent-bottom))) {
       padding-bottom: calc(var(--indent) * var(--vertical-indent));
     }
   }
