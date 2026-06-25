@@ -101,7 +101,8 @@ export async function inferRemoteSize(url: string) {
     ".json";
   if (!cacheFileName) throw Error("[InferSize] Cache File naming failed.");
 
-  const schema = z.object({
+  const successSchema = z.object({
+    type: z.literal("success"),
     url: z.string().url(),
     width: z.coerce.number().positive(),
     height: z.coerce.number().positive(),
@@ -110,27 +111,40 @@ export async function inferRemoteSize(url: string) {
     modified: z.string().nullish(),
   });
 
+  const errorSchema = z.object({
+    type: z.literal("error"),
+    url: z.string().url(),
+    status: z.coerce.number().int().positive(),
+    expires: z.coerce.number().min(0),
+  });
+
+  const schema = z.discriminatedUnion("type", [successSchema, errorSchema]);
+
   const result = await getCacheFile(cacheFileName, schema).catch(() => {
     return undefined;
   });
   if (result && Date.now() < result.expires) {
+    if (result.type === "error") throw Error(`[InferSize] Cached error response for image ${url}: ${result.status}`);
     return { width: result.width, height: result.height };
   }
 
   const cacheMissReason = result ? "EXPIRE" : "NOFILE";
 
+  const prior = result?.type === "success" ? result : undefined;
+
   const remote = await fetch(url, {
     method: "HEAD",
     headers: {
-      ...(result?.etag && { "If-None-Match": result.etag }),
-      ...(result?.modified && { "If-Modified-Since": result.modified }),
+      ...(prior?.etag && { "If-None-Match": prior.etag }),
+      ...(prior?.modified && { "If-Modified-Since": prior.modified }),
     },
   });
 
-  if (!remote.ok && remote.status !== 304)
-    throw Error(
-      `[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`,
-    );
+  if (!remote.ok && remote.status !== 304) {
+    const ERROR_TTL = 60 * 60 * 1000; // 1 hour
+    await setCacheFile(cacheFileName, errorSchema.parse({ type: "error", url, status: remote.status, expires: Date.now() + ERROR_TTL }));
+    throw Error(`[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`);
+  }
 
   var width, height;
   [width, height] = [
@@ -139,9 +153,9 @@ export async function inferRemoteSize(url: string) {
   ];
 
   if (!(width && height)) {
-    if (remote.status === 304 && result?.width && result?.height) {
+    if (remote.status === 304 && prior) {
       // Revalidate cache
-      [width, height] = [result.width, result.height];
+      [width, height] = [prior.width, prior.height];
     } else {
       ({ width, height } = await _inferRemoteSize(url));
     }
@@ -154,7 +168,8 @@ export async function inferRemoteSize(url: string) {
         ?.match(/.*(?:s-)?max-age=([0-9]*).*/)?.[1],
     ) * 1000 || 0;
 
-  const cache = schema.parse({
+  const cache = successSchema.parse({
+    type: "success",
     url,
     width,
     height,
