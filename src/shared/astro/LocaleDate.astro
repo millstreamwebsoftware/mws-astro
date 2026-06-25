@@ -1,0 +1,29 @@
+---
+export interface Props {
+  date: Date;
+  precision?: "date" | "time";
+}
+
+const { date, precision = "time" } = Astro.props;
+---
+
+<span
+  class="localedate"
+  data-timestamp={date.valueOf()}
+  data-precision={precision}
+  title={date.toString()}
+  >{precision === "date" ? date.toDateString() : date.toISOString()}</span
+>
+
+<script>
+  document
+    .querySelectorAll<HTMLSpanElement>(".localedate")
+    .forEach(
+      (d) =>
+        (d.textContent =
+          d.dataset.precision === "date"
+            ? new Date(Number(d.dataset.timestamp)).toLocaleDateString()
+            : new Date(Number(d.dataset.timestamp)).toLocaleString() ||
+              d.textContent),
+    );
+</script>
