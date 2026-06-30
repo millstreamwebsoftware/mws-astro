@@ -5,12 +5,13 @@ export interface Props {
   title: string;
   link: string;
   new_tab?: boolean;
+  mobile_hide?: boolean;
   selected?: "selected" | "ancestor" | false;
   key?: string;
   d?: number;
 }
 
-const { title, link, selected, key, d } = Astro.props;
+const { title, link, mobile_hide = false, selected, key, d } = Astro.props;
 
 const external = /^[A-z1-9+.-]*:\/\/.*/.test(link);
 
@@ -24,7 +25,7 @@ const new_tab =
   id={key}
   href={link}
   class:list={[
-    { external, selected: selected === "selected" },
+    { external, selected: selected === "selected", "mobile-hide": mobile_hide },
     "navi-label",
     { [`d${d}`]: d },
   ]}
@@ -57,5 +58,9 @@ const new_tab =
     &.selected {
       font-weight: bold;
     }
+  }
+
+  :global(body.mobile-nav) a.mobile-hide {
+    display: none;
   }
 </style>

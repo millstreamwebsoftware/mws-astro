@@ -212,6 +212,77 @@ import Icon from "./icon.astro";
     top: 0 !important;
   }
 
+  // ── Header-style mobile nav ─────────────────────────────────────────────
+  // Hamburger button lives inline in the header; nav panel drops down below.
+  #navigation.mobile-nav.mobile-nav-style-header {
+    position: static;
+    pointer-events: auto;
+    background-color: transparent;
+
+    #mobile-nav-buttons {
+      display: flex;
+      position: static;
+      width: auto;
+      padding: 0;
+      background-color: transparent;
+
+      &::after {
+        display: none;
+      }
+
+      :is(button, a) {
+        width: auto;
+        height: var(--header-height);
+        aspect-ratio: 1;
+        padding: 1.5rem;
+        border-radius: 0;
+        border: none;
+        backdrop-filter: none;
+        background-color: transparent;
+        box-shadow: none;
+      }
+
+      :where(#mobile-nav-home) {
+        display: none;
+      }
+    }
+
+    #mobile-nav-overlay {
+      top: var(--header-height);
+      bottom: 0;
+      z-index: 998;
+    }
+
+    #navigation-bars {
+      position: fixed;
+      top: var(--header-height);
+      bottom: unset;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-height: calc(100dvh - var(--header-height));
+      margin: 0;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      padding-bottom: 2rem;
+
+      clip-path: circle(0 at calc(100% - 3rem) 0);
+      transform: none;
+    }
+
+    &.expanded {
+      #navigation-bars {
+        clip-path: circle(150% at calc(100% - 3rem) 0);
+        pointer-events: initial;
+        transform: none;
+        opacity: 1;
+      }
+    }
+  }
+
+  // ── Bottom-style mobile nav (default) ───────────────────────────────────
   #navigation.mobile-nav {
     position: fixed;
     bottom: 0;
@@ -276,7 +347,7 @@ import Icon from "./icon.astro";
 
     .navigation-items {
       display: contents;
-/*
+      /*
       a, .span {
         color: rgb(var(--mobile-header-color));
       } */

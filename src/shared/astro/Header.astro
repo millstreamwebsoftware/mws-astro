@@ -132,7 +132,16 @@ const contain = preferences.header.contain ?? "header";
     }
   }
 
-  :global(body).mobile-nav:has(> #header:not(.mobile-logo)) {
+  /* Restore header visibility when using header-style mobile nav */
+  :global(body).mobile-nav:has(#navigation.mobile-nav-style-header) #header:not(.mobile-logo) {
+    height: var(--header-height);
+
+    .logo {
+      display: block;
+    }
+  }
+
+  :global(body).mobile-nav:not(:has(#navigation.mobile-nav-style-header)):has(> #header:not(.mobile-logo)) {
     --header-height: 0;
   }
 

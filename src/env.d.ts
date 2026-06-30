@@ -82,6 +82,7 @@ declare global {
       logo_image: string;
       pin_header: boolean | string;
       contain: "header" | "content" | "none";
+      mobile_nav_style?: "header" | "bottom";
       navigation_menu_depth: number;
       show_logo: boolean;
       show_logo_mobile: boolean;

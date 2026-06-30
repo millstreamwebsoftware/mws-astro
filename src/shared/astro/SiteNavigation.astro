@@ -38,6 +38,8 @@ const primary = prefs.header?.navigation || [
 
 const secondary: any = prefs.header?.secondary_navigation || [];
 const navBars = [primary, secondary];
+const mobileNavStyle: "bottom" | "header" =
+  prefs?.header?.mobile_nav_style || "bottom";
 ---
 
 <nav
@@ -45,6 +47,7 @@ const navBars = [primary, secondary];
   role="navigation"
   aria-label="Main menu"
   data-placement={placement}
+  class:list={[`mobile-nav-style-${mobileNavStyle}`]}
 >
   <MobileNavigation />
   <div id="navigation-bars">
