@@ -84,7 +84,7 @@ const { titleCaretOpen } = options;
 
 <div
   id={key}
-  class:list={["dropdown", { [`d${d}`]: d }, { selected }]}
+  class:list={["dropdown", { [`d${d}`]: d !== undefined }, { selected }]}
   aria-labelledby={`${key}-label`}
   aria-haspopup="menu"
   data-placement={placement}
@@ -96,7 +96,7 @@ const { titleCaretOpen } = options;
     class:list={[
       "dropdown-label",
       "navi-label",
-      { [`d${d}`]: d },
+      { [`d${d}`]: d !== undefined },
       { selected },
     ]}
   >

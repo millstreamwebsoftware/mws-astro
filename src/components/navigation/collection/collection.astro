@@ -121,7 +121,7 @@ const _d = d !== undefined;
       if (Component) {
         return (
           <Component
-            d={(_d && d + 1) || undefined}
+            d={_d ? d : undefined}
             {...item}
             key={(key || "") + "-" + i.toString()}
           />

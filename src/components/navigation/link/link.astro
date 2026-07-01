@@ -27,7 +27,7 @@ const new_tab =
   class:list={[
     { external, selected: selected === "selected", "mobile-hide": mobile_hide },
     "navi-label",
-    { [`d${d}`]: d },
+    { [`d${d}`]: d !== undefined },
   ]}
   data-depth={d}
   {...new_tab}
