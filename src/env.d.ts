@@ -80,6 +80,7 @@ declare global {
     header: {
       theme?: "single" | "pod";
       logo_image: string;
+      mobile_logo_image?: string | null;
       pin_header: boolean | string;
       contain: "header" | "content" | "none";
       mobile_nav_style?: "header" | "bottom";

@@ -10,6 +10,9 @@ const theme: "pod" | "single" = preferences.header.theme || "single";
 const logo =
   preferences.header.show_logo || preferences.header.show_logo_mobile;
 
+const mobileLogo = preferences.header.mobile_logo_image ?? undefined;
+const hasMobileLogo = !!mobileLogo && mobileLogo !== preferences.header.logo_image;
+
 const contain = preferences.header.contain ?? "header";
 ---
 
@@ -30,14 +33,22 @@ const contain = preferences.header.contain ?? "header";
     {
       logo && (
         <a
-          class:list={["logo", { hide: !preferences.header.show_logo }]}
+          class:list={["logo", { hide: !preferences.header.show_logo, "has-mobile-logo": hasMobileLogo }]}
           href="/"
           title="Home"
         >
           <img
+            class="desktop-logo"
             src={preferences.header.logo_image}
             alt={`${preferences.general.site_name} Logo`}
           />
+          {hasMobileLogo && (
+            <img
+              class="mobile-logo"
+              src={mobileLogo}
+              alt={`${preferences.general.site_name} Logo`}
+            />
+          )}
         </a>
       )
     }
@@ -152,6 +163,14 @@ const contain = preferences.header.contain ?? "header";
     height: var(--header-height);
     max-height: 100%;
     max-width: 100%;
+  }
+
+  :global(body).mobile-nav .logo.has-mobile-logo .desktop-logo {
+    display: none;
+  }
+
+  :global(body):not(.mobile-nav) .logo .mobile-logo {
+    display: none;
   }
 
   .theme-pod {

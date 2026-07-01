@@ -4,6 +4,7 @@ const preferences = _preferences as unknown as Preferences;
 
 export interface Props {
   logo?: string;
+  mobile_logo?: string | null;
   alt?: string;
   title?: string;
   link?: string;
@@ -12,19 +13,23 @@ export interface Props {
 
 const {
   logo = preferences.header.logo_image,
+  mobile_logo = preferences.header.mobile_logo_image ?? undefined,
   alt = `${preferences.general.site_name} Logo`,
   title = "Home",
   link = "/",
   showOnMobile = true,
 } = Astro.props;
+
+const hasMobileLogo = !!mobile_logo && mobile_logo !== logo;
 ---
 
 <a
-  class:list={["inline-logo", { "mobile-hide": !showOnMobile }]}
+  class:list={["inline-logo", { "mobile-hide": !showOnMobile, "has-mobile-logo": hasMobileLogo }]}
   href={link}
   {title}
 >
-  <img src={logo} {alt} fetchpriority="high" />
+  <img class="desktop-logo" src={logo} {alt} fetchpriority="high" />
+  {hasMobileLogo && <img class="mobile-logo" src={mobile_logo} {alt} fetchpriority="high" />}
 </a>
 
 <style>
@@ -40,10 +45,6 @@ const {
     padding: var(--mws-astro-logo-padding, 1rem);
   }
 
-  /*:global(body):not(.mobile-nav) a + :global(div),
-  :global(body):not(.mobile-nav) a + :global(script) + :global(div) {
-    margin-left: auto;
-  }*/
   :global(body):not(.mobile-nav) {
     & a + :global(div),
     & a + :global(script) + :global(div) {
@@ -52,6 +53,14 @@ const {
   }
 
   :global(body).mobile-nav a.mobile-hide {
+    display: none;
+  }
+
+  :global(body).mobile-nav a.has-mobile-logo .desktop-logo {
+    display: none;
+  }
+
+  :global(body):not(.mobile-nav) .mobile-logo {
     display: none;
   }
 </style>
