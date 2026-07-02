@@ -252,6 +252,7 @@ function createImageSizes(widths: number[]) {
   height={srcHeight}
   {...inheritScope(Astro.props)}
   {...inheritData(Astro.props)}
+  aria-hidden={background ? true : undefined}
 />
 
 <style>
