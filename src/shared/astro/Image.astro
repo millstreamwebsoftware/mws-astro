@@ -149,13 +149,17 @@ switch (imageSource) {
               : { low: 50, mid: 60, high: 75, max: 100 }[quality],
         },
         {
-          maxWidth: Math.floor(DESKTOP_WIDTH * displayWidth * DPR),
+          maxWidth: Math.floor(
+            Math.max(
+              DESKTOP_WIDTH * displayWidth,
+              MOBILE_WIDTH * displayWidthMobile,
+            ) * DPR,
+          ),
           minWidth: 128,
         },
       );
 
-      let widths = srcset.split(",").map((src) => parseInt(src.split(" ")[1]));
-      sizes = createImageSizes(widths);
+      sizes = createImageSizes();
       break;
     }
 
@@ -173,7 +177,7 @@ switch (imageSource) {
         ? createImageWidths(w, h)
         : (Astro.props.widths ?? undefined);
     sizes =
-      (widths && widths.length > 1 && createImageSizes(widths)) || undefined;
+      (widths && widths.length > 1 && createImageSizes()) || undefined;
 
     // Don't bother using widths/sizes for images with one width
     if (widths && widths.length < 2) {
@@ -222,21 +226,12 @@ function createImageWidths(width: number, _height: number) {
   return widths;
 }
 
-// Generate sizes
-// TODO: Better image sizes for mobile - should sometimes be larger than desktop
-function createImageSizes(widths: number[]) {
-  const _sizes = [...widths]
-    .sort((a, b) => b - a)
-    .reduce<string[]>((a, c, i, o) => {
-      if (a.length) a.push(`(max-width: ${o[i - 1]}px) ${c}px`);
-      else a.push(`${c}px`);
+function createImageSizes(): string {
+  const desktopVw = Math.round(displayWidth * 100);
+  const mobileVw = Math.round(displayWidthMobile * 100);
 
-      return a;
-    }, []);
-
-  _sizes.push("auto"); // Currently only supported on chromium - Only when loading="lazy"
-  _sizes.reverse();
-  return _sizes.join(", ");
+  if (desktopVw === mobileVw) return `${desktopVw}vw`;
+  return `(max-width: ${MOBILE_WIDTH}px) ${mobileVw}vw, ${desktopVw}vw`;
 }
 ---
 
