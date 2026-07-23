@@ -198,7 +198,9 @@ const recaptcha = preferences.API.google_recaptcha_v3?.api_key;
               action: "submit",
             })
             .then(function (token: string) {
-              form.getElementById("g-recaptcha-response").value = token;
+              form.querySelector<HTMLInputElement>(
+                "#g-recaptcha-response",
+              )!.value = token;
               form.submit();
             });
         });
