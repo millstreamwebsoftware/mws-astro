@@ -3,11 +3,12 @@ import Icon from '@shared/icon.astro';
 
 export interface Props {
   title?: string;
+  group?: string;
 }
 
-const {title} = Astro.props;
+const {title, group} = Astro.props;
 ---
-<div class="accordion">
+<div class="accordion" data-group={group}>
     <script>
       setupAccordion();
 
@@ -26,15 +27,16 @@ const {title} = Astro.props;
           if (!e.currentTarget) return;
 
           // Ignore clicks within accordion content
-          const target = (e.target as Element);
+          const target = (e.target as HTMLElement);
           if (target.closest(".accordion-heading, .accordion")?.matches(".accordion")) return;
 
-          const acccordion = (e.currentTarget as Element);
+          const acccordion = (e.currentTarget as HTMLElement);
           const state = acccordion.classList.contains("expanded");
+          const group = acccordion.dataset?.group === "none" ? undefined : (acccordion.dataset?.group ?? "section");
 
-          if (!state) acccordion.closest("section")?.querySelectorAll(".accordion").forEach((sibling) => {
-          if (sibling !== acccordion)
-          sibling.classList.remove("expanded");
+          if (group && !state) acccordion.closest(group)?.querySelectorAll(".accordion" + (group === "section" ? "" : `[data-group="${group}"]`)).forEach((sibling) => {
+            if (sibling !== acccordion)
+              sibling.classList.remove("expanded");
           });
 
           acccordion.classList.toggle("expanded");
