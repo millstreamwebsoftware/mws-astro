@@ -20,10 +20,10 @@ const production = !ENV_BOOKSHOP_LIVE;
     if (!("partytown" in window)) {
       console.info("[Analytics] Partytown not detected, running scripts in main.");
       let scriptCount = 0;
-      document.querySelectorAll<HTMLScriptElement>(`script[type="text/partytown"]`).forEach((el) => {
-        if (el.hasAttribute("src")) el.async = true;
-        el.removeAttribute("type");
-        scriptCount += 1;
+      document.querySelectorAll<HTMLScriptElement>('script[type="text/partytown"]').forEach(old => {
+        const s = document.createElement('script');
+        if (old.src) { s.src = old.src; s.async = true; } else { s.textContent = old.textContent; }
+        old.replaceWith(s);
       });
     }
   </script>
