@@ -1,5 +1,6 @@
 import { z } from "astro/zod";
 import {
+  CACHE_DIRECTORY,
   REMOTE_DEFAULT_TTL,
   downloadRemoteFile,
   getCacheFile,
@@ -10,7 +11,10 @@ import {
   setCacheFile,
 } from "./filesystem";
 
-/** Thumbnails for remote PDFs are written here (inside `publicDir`) so they can be served statically. */
+/**
+ * Thumbnails for remote PDFs are cached here (inside the cache directory) and
+ * served from the same path inside `publicDir`.
+ */
 const REMOTE_THUMBNAIL_DIRECTORY = "_thumbnails";
 
 /** Records which version of a remote PDF a thumbnail was generated from. */
@@ -53,38 +57,49 @@ function remoteFileStem(url: string) {
 }
 
 /**
- * Astro copies `publicDir` into the build output before pages render, so a
- * thumbnail generated during a build would otherwise only appear on the next
- * build. Mirror it straight into the client output directory as well.
+ * Make a thumbnail servable at `publicPath`. Remote thumbnails live in the
+ * cache directory (preserved between CI builds, unlike `publicDir`), so are
+ * copied into `publicDir` for the dev server. Astro copies `publicDir` into the
+ * build output before pages render, so in builds the thumbnail is also copied
+ * straight into the client output directory. `updated` overwrites existing
+ * copies.
  */
-async function publishToOutDir(publicPath: string, thumbPath: string) {
-  if (!import.meta.env.PROD) return;
-
+async function publishThumbnail(
+  thumbPath: string,
+  publicPath: string,
+  updated = false,
+) {
   const [fs, path, { fileURLToPath }, config] = await Promise.all([
     import("node:fs"),
     import("node:path"),
     import("node:url"),
     import("astro:config/server").catch(() => undefined),
   ]);
-  if (!config?.outDir) return;
 
-  // Static files are served from `build.client` for server output (and some
-  // adapters), otherwise from `outDir`. Astro empties `outDir` and runs the
-  // client build before pages render, so `build.client` only exists when it's
-  // the served directory.
-  const client = config.build?.client && fileURLToPath(config.build.client);
-  const outDir =
-    client && fs.existsSync(client) ? client : fileURLToPath(config.outDir);
-  const target = path.join(outDir, publicPath);
+  const targets = [path.join(await getPublicDir(), publicPath)];
+  if (import.meta.env.PROD && config?.outDir) {
+    // Static files are served from `build.client` for server output (and some
+    // adapters), otherwise from `outDir`. Astro empties `outDir` and runs the
+    // client build before pages render, so `build.client` only exists when
+    // it's the served directory.
+    const client = config.build?.client && fileURLToPath(config.build.client);
+    const outDir =
+      client && fs.existsSync(client) ? client : fileURLToPath(config.outDir);
+    targets.push(path.join(outDir, publicPath));
+  }
 
-  try {
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(thumbPath, target);
-  } catch (e) {
-    console.warn(
-      `[PDF Thumbnailer] Could not copy ${thumbPath} to ${target}`,
-      e,
-    );
+  for (const target of targets) {
+    if (path.resolve(target) === path.resolve(thumbPath)) continue;
+    if (!updated && fs.existsSync(target)) continue;
+    try {
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.copyFileSync(thumbPath, target);
+    } catch (e) {
+      console.warn(
+        `[PDF Thumbnailer] Could not copy ${thumbPath} to ${target}`,
+        e,
+      );
+    }
   }
 }
 
@@ -133,15 +148,14 @@ async function generatePDFThumbnail(file: string, pageNum: number, res: number) 
   hash.update(`${file}${pageNum}${res}`, "utf-8");
   const digest = hash.digest("hex").slice(0, 6);
 
+  const remoteName = `${remoteFileStem(file)}.${digest}.webp`;
   const thumbPath = remote
-    ? path.join(
-        publicDir,
-        REMOTE_THUMBNAIL_DIRECTORY,
-        `${remoteFileStem(file)}.${digest}.webp`,
-      )
+    ? path.join(CACHE_DIRECTORY, REMOTE_THUMBNAIL_DIRECTORY, remoteName)
     : `${filePath}.${digest}.webp`;
 
-  const publicPath = path.relative(publicDir, thumbPath);
+  const publicPath = remote
+    ? path.join(REMOTE_THUMBNAIL_DIRECTORY, remoteName)
+    : path.relative(publicDir, thumbPath);
   if (publicPath.startsWith("..") || path.isAbsolute(publicPath)) {
     console.warn(
       `[PDF Thumbnailer] ${file} is outside ${publicDir}, so its thumbnail can't be served.`,
@@ -150,15 +164,20 @@ async function generatePDFThumbnail(file: string, pageNum: number, res: number) 
   }
   const src = `/${publicPath.split(path.sep).join("/")}`;
   const exists = fs.existsSync(thumbPath);
+  const serveExisting = async () => {
+    if (!exists) return;
+    await publishThumbnail(thumbPath, publicPath);
+    return src;
+  };
 
   let data: Buffer;
   let source: z.infer<typeof thumbnailSourceSchema> | undefined;
-  const sourceCacheFile = `thumbnail.${path.basename(thumbPath)}.json`;
+  const sourceCacheFile = `thumbnail.${remoteName}.json`;
 
   if (remote) {
     const info = await getRemoteFileInfo(file);
     // Keep serving the last thumbnail if the remote is unreachable.
-    if (!info) return exists ? src : undefined;
+    if (!info) return serveExisting();
 
     const prior = await getCacheFile(
       sourceCacheFile,
@@ -168,11 +187,11 @@ async function generatePDFThumbnail(file: string, pageNum: number, res: number) 
       ? prior?.version === info.version
       : prior && Date.now() - prior.generated < REMOTE_DEFAULT_TTL;
     // Keep serving the last good thumbnail if the file stops being a PDF.
-    if (current && prior?.invalid) return exists ? src : undefined;
-    if (current && exists) return src;
+    if (current && prior?.invalid) return serveExisting();
+    if (current && exists) return serveExisting();
 
     const download = await downloadRemoteFile(file);
-    if (!download) return exists ? src : undefined;
+    if (!download) return serveExisting();
     if (!isPDF(download.data)) {
       console.warn(
         `[PDF Thumbnailer] ${file} is not a PDF (Content-Type: ${download.contentType ?? "none"})`,
@@ -183,13 +202,13 @@ async function generatePDFThumbnail(file: string, pageNum: number, res: number) 
         generated: Date.now(),
         invalid: true,
       });
-      return exists ? src : undefined;
+      return serveExisting();
     }
 
     data = download.data;
     source = { url: file, version: info.version, generated: Date.now() };
   } else {
-    if (exists) return src;
+    if (exists) return serveExisting();
     data = fs.readFileSync(filePath!);
   }
 
@@ -212,7 +231,7 @@ async function generatePDFThumbnail(file: string, pageNum: number, res: number) 
   fs.mkdirSync(path.dirname(thumbPath), { recursive: true });
   await sharp.default(pixmap.asPNG()).webp({ quality: 60 }).toFile(thumbPath);
   if (source) await setCacheFile(sourceCacheFile, source);
-  await publishToOutDir(publicPath, thumbPath);
+  await publishThumbnail(thumbPath, publicPath, true);
 
   console.log(
     `[PDF Thumbnailer] Generated ${thumbPath} in ${(performance.now() - time).toFixed(0)}ms`,

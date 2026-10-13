@@ -5,7 +5,7 @@ var fs: typeof import("node:fs/promises") | undefined,
   path: typeof import("node:path") | undefined,
   createHash: (typeof import("node:crypto"))["createHash"] | undefined,
   publicDir: string | undefined;
-const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
+export const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
 
 async function ensureFS(): Promise<boolean> {
   if (!ENV_BOOKSHOP_LIVE) {
