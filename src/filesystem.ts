@@ -4,7 +4,12 @@ import { inferRemoteSize as _inferRemoteSize } from "astro:assets";
 var fs: typeof import("node:fs/promises") | undefined,
   path: typeof import("node:path") | undefined,
   createHash: (typeof import("node:crypto"))["createHash"] | undefined;
-const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
+export const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
+/**
+ * Assumed rather than read from `astro:config/server`, which Bookshop can't
+ * bundle.
+ */
+export const PUBLIC_DIRECTORY = "public";
 
 async function ensureFS(): Promise<boolean> {
   if (!ENV_BOOKSHOP_LIVE) {
@@ -28,8 +33,19 @@ async function ensureFS(): Promise<boolean> {
   return false;
 }
 
+/** True for absolute (`https://…`) and protocol-relative (`//…`) URLs. */
+export function isRemotePath(file: string) {
+  return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(file);
+}
+
+/** Make a protocol-relative URL fetchable by assuming https. */
+export function toFetchableUrl(url: string) {
+  return url.startsWith("//") ? `https:${url}` : url;
+}
+
 export async function resolvePath(file: string): Promise<string | undefined> {
   if (!(await ensureFS())) return;
+  if (isRemotePath(file)) return;
 
   var filePath = file;
   if (
@@ -39,7 +55,7 @@ export async function resolvePath(file: string): Promise<string | undefined> {
     )
   )
     return filePath;
-  filePath = path!.join("public", filePath);
+  filePath = path!.join(PUBLIC_DIRECTORY, filePath);
   if (
     await fs!.stat(filePath).then(
       () => true,
@@ -50,8 +66,277 @@ export async function resolvePath(file: string): Promise<string | undefined> {
   return;
 }
 
+const REMOTE_TIMEOUT = 15 * 1000;
+const REMOTE_DOWNLOAD_TIMEOUT = 2 * 60 * 1000;
+const REMOTE_ERROR_TTL = 60 * 60 * 1000; // 1 hour
+/** Used when the server sends neither Cache-Control nor validators. */
+export const REMOTE_DEFAULT_TTL = 24 * 60 * 60 * 1000; // 1 day
+/** How long a check is reused in-process (a build, or a dev server session). */
+const REMOTE_MEMO_TTL = 5 * 60 * 1000;
+
+const remoteFileSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("success"),
+    url: z.string(),
+    size: z.coerce.number().positive().nullish(),
+    expires: z.coerce.number().min(0),
+    etag: z.string().nullish(),
+    modified: z.string().nullish(),
+  }),
+  z.object({
+    type: z.literal("error"),
+    url: z.string(),
+    status: z.coerce.number().int().min(0),
+    expires: z.coerce.number().min(0),
+  }),
+]);
+type RemoteFileCache = z.infer<typeof remoteFileSchema>;
+
+export interface RemoteFileInfo {
+  size?: number;
+  /** Changes whenever the remote file does (ETag, Last-Modified or size). */
+  version?: string;
+}
+
+const remoteInfoMemo = new Map<
+  string,
+  { at: number; info: Promise<RemoteFileInfo | undefined> }
+>();
+const remoteDownloads = new Map<
+  string,
+  Promise<{ data: Buffer; contentType: string | null } | undefined>
+>();
+
+function remoteCacheFileName(url: string) {
+  return `file.${createHash!("sha256").update(url).digest("base64url").slice(0, 16)}.json`;
+}
+
+function toRemoteFileInfo(
+  entry: Extract<RemoteFileCache, { type: "success" }>,
+): RemoteFileInfo {
+  return {
+    size: entry.size ?? undefined,
+    version:
+      entry.etag ?? entry.modified ?? (entry.size ? `size:${entry.size}` : undefined),
+  };
+}
+
+/**
+ * Fetch a remote file with a timeout. Asks for an uncompressed response: CDNs
+ * drop Content-Length (or report the compressed size) when they negotiate
+ * gzip/brotli with Node's fetch.
+ */
+function requestRemote(
+  url: string,
+  init: RequestInit = {},
+  timeout = REMOTE_TIMEOUT,
+) {
+  return fetch(toFetchableUrl(url), {
+    ...init,
+    headers: { "Accept-Encoding": "identity", ...init.headers },
+    signal: AbortSignal.timeout(timeout),
+  }).catch((e: Error) => {
+    console.warn(`[RemoteFile] Request to ${url} failed: ${e.message}`);
+    return undefined;
+  });
+}
+
+/** `max-age`/`s-maxage` from Cache-Control in ms, or 0 if absent. */
+function getMaxAge(headers: Headers) {
+  const maxAge = headers
+    .get("Cache-Control")
+    ?.match(/\b(?:s-maxage|max-age)=([0-9]+)/)?.[1];
+  return Number(maxAge) * 1000 || 0;
+}
+
+/** Conditional request headers from a cached entry's validators. */
+function conditionalHeaders(prior?: {
+  etag?: string | null;
+  modified?: string | null;
+}) {
+  return {
+    ...(prior?.etag && { "If-None-Match": prior.etag }),
+    ...(prior?.modified && { "If-Modified-Since": prior.modified }),
+  };
+}
+
+/**
+ * Cache a successful check. `known` is the entry being revalidated by a 304,
+ * whose validators are kept when the 304 doesn't repeat them.
+ */
+async function writeRemoteCache(
+  url: string,
+  headers: Headers,
+  size?: number,
+  known?: Extract<RemoteFileCache, { type: "success" }>,
+) {
+  const etag = headers.get("Etag") ?? known?.etag;
+  const modified = headers.get("Last-Modified") ?? known?.modified;
+  const maxAge = getMaxAge(headers);
+  // With validators a stale entry costs one conditional request; without them
+  // it costs a full re-check, so keep it for longer.
+  const ttl = maxAge || (etag || modified ? 0 : REMOTE_DEFAULT_TTL);
+
+  const entry = remoteFileSchema.parse({
+    type: "success",
+    url,
+    size,
+    expires: Date.now() + ttl,
+    etag,
+    modified,
+  }) as Extract<RemoteFileCache, { type: "success" }>;
+  await setCacheFile(remoteCacheFileName(url), entry);
+  return entry;
+}
+
+/** Read the size from a `Range: bytes=0-0` request, for servers that reject HEAD. */
+async function requestRemoteRange(url: string) {
+  const res = await requestRemote(url, { headers: { Range: "bytes=0-0" } });
+  // Never read the body: a server that ignores Range sends the whole file.
+  await res?.body?.cancel().catch(() => {});
+  if (!res) return;
+  if (!res.ok) return { res };
+
+  const size =
+    res.status === 206
+      ? Number(res.headers.get("Content-Range")?.split("/")[1])
+      : Number(res.headers.get("Content-Length"));
+  return { res, size: size > 0 ? size : undefined };
+}
+
+/** Failures that say nothing about the file, so shouldn't replace a good entry. */
+function isTransientFailure(res?: Response) {
+  return (
+    !res || res.status === 408 || res.status === 429 || res.status >= 500
+  );
+}
+
+async function fetchRemoteFileInfo(
+  url: string,
+): Promise<RemoteFileInfo | undefined> {
+  const cacheFileName = remoteCacheFileName(url);
+  const prior = await getCacheFile(cacheFileName, remoteFileSchema).catch(
+    () => undefined,
+  );
+
+  if (prior && Date.now() < prior.expires) {
+    if (prior.type === "error") {
+      console.warn(
+        `[RemoteFile] Cached error response for ${url}: ${prior.status}`,
+      );
+      return;
+    }
+    return toRemoteFileInfo(prior);
+  }
+
+  const known = prior?.type === "success" ? prior : undefined;
+  const head = await requestRemote(url, {
+    method: "HEAD",
+    headers: conditionalHeaders(known),
+  });
+
+  if (head?.status === 304 && known)
+    return toRemoteFileInfo(
+      await writeRemoteCache(
+        url,
+        head.headers,
+        known.size ?? undefined,
+        known,
+      ),
+    );
+
+  const headSize = Number(head?.headers.get("Content-Length"));
+  if (head?.ok && headSize > 0)
+    return toRemoteFileInfo(await writeRemoteCache(url, head.headers, headSize));
+
+  // HEAD is often refused (S3 presigned URLs, some DAMs) or sent without a
+  // Content-Length; a one-byte ranged GET usually still reports the size.
+  const range = await requestRemoteRange(url);
+  if (range?.size)
+    return toRemoteFileInfo(
+      await writeRemoteCache(url, range.res.headers, range.size),
+    );
+  if (head?.ok)
+    return toRemoteFileInfo(await writeRemoteCache(url, head.headers));
+  if (range?.res.ok)
+    return toRemoteFileInfo(await writeRemoteCache(url, range.res.headers));
+
+  const failed = range?.res ?? head;
+  console.warn(
+    `[RemoteFile] Could not read remote file ${url}${failed ? `: ${failed.status} - ${failed.statusText}` : ""}`,
+  );
+
+  // Keep using the last good result through outages, rechecking after the
+  // error TTL rather than on every page.
+  if (known && isTransientFailure(failed)) {
+    await setCacheFile(cacheFileName, {
+      ...known,
+      expires: Date.now() + REMOTE_ERROR_TTL,
+    });
+    return toRemoteFileInfo(known);
+  }
+
+  await setCacheFile(
+    cacheFileName,
+    remoteFileSchema.parse({
+      type: "error",
+      url,
+      status: failed?.status ?? 0,
+      expires: Date.now() + REMOTE_ERROR_TTL,
+    }),
+  );
+}
+
+/**
+ * Size and version of a remote file, without downloading it. Cached on disk
+ * (revalidated with ETag/Last-Modified) and shared between pages in-process.
+ */
+export async function getRemoteFileInfo(url: string) {
+  if (!(await ensureFS())) return;
+
+  const memo = remoteInfoMemo.get(url);
+  if (memo && Date.now() - memo.at < REMOTE_MEMO_TTL) return memo.info;
+
+  const info = fetchRemoteFileInfo(url);
+  remoteInfoMemo.set(url, { at: Date.now(), info });
+  return info;
+}
+
+/** Download a remote file. Concurrent requests for the same URL share one download. */
+export async function downloadRemoteFile(url: string) {
+  if (!(await ensureFS())) return;
+
+  let download = remoteDownloads.get(url);
+  if (!download) {
+    download = (async () => {
+      const res = await requestRemote(url, {}, REMOTE_DOWNLOAD_TIMEOUT);
+      if (!res?.ok) {
+        if (res)
+          console.warn(
+            `[RemoteFile] Could not download ${url}: ${res.status} - ${res.statusText}`,
+          );
+        return;
+      }
+
+      const data = await res
+        .arrayBuffer()
+        .then((b) => Buffer.from(b))
+        .catch((e: Error) => {
+          console.warn(`[RemoteFile] Download of ${url} failed: ${e.message}`);
+          return undefined;
+        });
+      if (!data) return;
+
+      return { data, contentType: res.headers.get("Content-Type") };
+    })().finally(() => remoteDownloads.delete(url));
+    remoteDownloads.set(url, download);
+  }
+  return download;
+}
+
 export async function getFilesize(file: string) {
   if (!(await ensureFS())) return;
+  if (isRemotePath(file)) return (await getRemoteFileInfo(file))?.size;
   const filePath = await resolvePath(file);
 
   if (!filePath) return;
@@ -74,13 +359,16 @@ export async function getCacheFile<T extends z.ZodTypeAny>(
     .then((j) => schema.parse(j) as z.infer<T>);
 }
 
+/** Best-effort: a missing or read-only cache directory shouldn't fail a render. */
 export async function setCacheFile(file: string, obj: any) {
   if (!(await ensureFS())) return;
   await fs!
-    .mkdir(CACHE_DIRECTORY)
-    .catch(() => {})
-    .finally(() =>
+    .mkdir(CACHE_DIRECTORY, { recursive: true })
+    .then(() =>
       fs!.writeFile(path!.join(CACHE_DIRECTORY, file), JSON.stringify(obj)),
+    )
+    .catch((e: Error) =>
+      console.warn(`[Cache] Could not write ${file}: ${e.message}`),
     );
 }
 
@@ -124,7 +412,10 @@ export async function inferRemoteSize(url: string) {
     return undefined;
   });
   if (result && Date.now() < result.expires) {
-    if (result.type === "error") throw Error(`[InferSize] Cached error response for image ${url}: ${result.status}`);
+    if (result.type === "error")
+      throw Error(
+        `[InferSize] Cached error response for image ${url}: ${result.status}`,
+      );
     return { width: result.width, height: result.height };
   }
 
@@ -134,16 +425,24 @@ export async function inferRemoteSize(url: string) {
 
   const remote = await fetch(url, {
     method: "HEAD",
-    headers: {
-      ...(prior?.etag && { "If-None-Match": prior.etag }),
-      ...(prior?.modified && { "If-Modified-Since": prior.modified }),
-    },
+    signal: AbortSignal.timeout(REMOTE_TIMEOUT),
+    headers: conditionalHeaders(prior),
   });
 
   if (!remote.ok && remote.status !== 304) {
     const ERROR_TTL = 60 * 60 * 1000; // 1 hour
-    await setCacheFile(cacheFileName, errorSchema.parse({ type: "error", url, status: remote.status, expires: Date.now() + ERROR_TTL }));
-    throw Error(`[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`);
+    await setCacheFile(
+      cacheFileName,
+      errorSchema.parse({
+        type: "error",
+        url,
+        status: remote.status,
+        expires: Date.now() + ERROR_TTL,
+      }),
+    );
+    throw Error(
+      `[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`,
+    );
   }
 
   var width, height;
@@ -161,12 +460,7 @@ export async function inferRemoteSize(url: string) {
     }
   }
 
-  const maxAge =
-    Number(
-      remote.headers
-        .get("Cache-Control")
-        ?.match(/.*(?:s-)?max-age=([0-9]*).*/)?.[1],
-    ) * 1000 || 0;
+  const maxAge = getMaxAge(remote.headers);
 
   const cache = successSchema.parse({
     type: "success",

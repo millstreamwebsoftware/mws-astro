@@ -15,8 +15,10 @@ const {title, url} = Astro.props;
 var thumbnail, filesize;
 
 if (url) {
-  thumbnail = (await getPDFThumbnail(url, 0, 1024))?.replace(/^\/?public/, "");
-  filesize = await getFilesize(url);
+  [thumbnail, filesize] = await Promise.all([
+    getPDFThumbnail(url, 0, 1024),
+    getFilesize(url),
+  ]);
 }
 ---
 <Section component="flipbook" {...Astro.props}>
