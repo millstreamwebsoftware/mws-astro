@@ -3,9 +3,13 @@ import { inferRemoteSize as _inferRemoteSize } from "astro:assets";
 
 var fs: typeof import("node:fs/promises") | undefined,
   path: typeof import("node:path") | undefined,
-  createHash: (typeof import("node:crypto"))["createHash"] | undefined,
-  publicDir: string | undefined;
+  createHash: (typeof import("node:crypto"))["createHash"] | undefined;
 export const CACHE_DIRECTORY = "./node_modules/.mws-astro/";
+/**
+ * Assumed rather than read from `astro:config/server`, which Bookshop can't
+ * bundle.
+ */
+export const PUBLIC_DIRECTORY = "public";
 
 async function ensureFS(): Promise<boolean> {
   if (!ENV_BOOKSHOP_LIVE) {
@@ -27,22 +31,6 @@ async function ensureFS(): Promise<boolean> {
   }
 
   return false;
-}
-
-/** The site's `publicDir`, relative to the working directory (usually `public`). */
-export async function getPublicDir(): Promise<string> {
-  if (publicDir !== undefined) return publicDir;
-  if (!(await ensureFS())) return "public";
-
-  const [config, { fileURLToPath }] = await Promise.all([
-    import("astro:config/server").catch(() => undefined),
-    import("node:url"),
-  ]);
-
-  publicDir = config?.publicDir
-    ? path!.relative(process.cwd(), fileURLToPath(config.publicDir))
-    : "public";
-  return publicDir;
 }
 
 /** True for absolute (`https://…`) and protocol-relative (`//…`) URLs. */
@@ -67,7 +55,7 @@ export async function resolvePath(file: string): Promise<string | undefined> {
     )
   )
     return filePath;
-  filePath = path!.join(await getPublicDir(), filePath);
+  filePath = path!.join(PUBLIC_DIRECTORY, filePath);
   if (
     await fs!.stat(filePath).then(
       () => true,
@@ -153,12 +141,38 @@ function requestRemote(
   });
 }
 
-async function writeRemoteCache(url: string, headers: Headers, size?: number) {
-  const etag = headers.get("Etag");
-  const modified = headers.get("Last-Modified");
-  const maxAge =
-    Number(headers.get("Cache-Control")?.match(/(?:s-)?max-age=([0-9]+)/)?.[1]) *
-    1000;
+/** `max-age`/`s-maxage` from Cache-Control in ms, or 0 if absent. */
+function getMaxAge(headers: Headers) {
+  const maxAge = headers
+    .get("Cache-Control")
+    ?.match(/\b(?:s-maxage|max-age)=([0-9]+)/)?.[1];
+  return Number(maxAge) * 1000 || 0;
+}
+
+/** Conditional request headers from a cached entry's validators. */
+function conditionalHeaders(prior?: {
+  etag?: string | null;
+  modified?: string | null;
+}) {
+  return {
+    ...(prior?.etag && { "If-None-Match": prior.etag }),
+    ...(prior?.modified && { "If-Modified-Since": prior.modified }),
+  };
+}
+
+/**
+ * Cache a successful check. `known` is the entry being revalidated by a 304,
+ * whose validators are kept when the 304 doesn't repeat them.
+ */
+async function writeRemoteCache(
+  url: string,
+  headers: Headers,
+  size?: number,
+  known?: Extract<RemoteFileCache, { type: "success" }>,
+) {
+  const etag = headers.get("Etag") ?? known?.etag;
+  const modified = headers.get("Last-Modified") ?? known?.modified;
+  const maxAge = getMaxAge(headers);
   // With validators a stale entry costs one conditional request; without them
   // it costs a full re-check, so keep it for longer.
   const ttl = maxAge || (etag || modified ? 0 : REMOTE_DEFAULT_TTL);
@@ -180,13 +194,21 @@ async function requestRemoteRange(url: string) {
   const res = await requestRemote(url, { headers: { Range: "bytes=0-0" } });
   // Never read the body: a server that ignores Range sends the whole file.
   await res?.body?.cancel().catch(() => {});
-  if (!res?.ok) return res;
+  if (!res) return;
+  if (!res.ok) return { res };
 
   const size =
     res.status === 206
       ? Number(res.headers.get("Content-Range")?.split("/")[1])
       : Number(res.headers.get("Content-Length"));
   return { res, size: size > 0 ? size : undefined };
+}
+
+/** Failures that say nothing about the file, so shouldn't replace a good entry. */
+function isTransientFailure(res?: Response) {
+  return (
+    !res || res.status === 408 || res.status === 429 || res.status >= 500
+  );
 }
 
 async function fetchRemoteFileInfo(
@@ -210,15 +232,17 @@ async function fetchRemoteFileInfo(
   const known = prior?.type === "success" ? prior : undefined;
   const head = await requestRemote(url, {
     method: "HEAD",
-    headers: {
-      ...(known?.etag && { "If-None-Match": known.etag }),
-      ...(known?.modified && { "If-Modified-Since": known.modified }),
-    },
+    headers: conditionalHeaders(known),
   });
 
   if (head?.status === 304 && known)
     return toRemoteFileInfo(
-      await writeRemoteCache(url, head.headers, known.size ?? undefined),
+      await writeRemoteCache(
+        url,
+        head.headers,
+        known.size ?? undefined,
+        known,
+      ),
     );
 
   const headSize = Number(head?.headers.get("Content-Length"));
@@ -228,17 +252,30 @@ async function fetchRemoteFileInfo(
   // HEAD is often refused (S3 presigned URLs, some DAMs) or sent without a
   // Content-Length; a one-byte ranged GET usually still reports the size.
   const range = await requestRemoteRange(url);
-  if (range && "size" in range)
+  if (range?.size)
     return toRemoteFileInfo(
       await writeRemoteCache(url, range.res.headers, range.size),
     );
   if (head?.ok)
     return toRemoteFileInfo(await writeRemoteCache(url, head.headers));
+  if (range?.res.ok)
+    return toRemoteFileInfo(await writeRemoteCache(url, range.res.headers));
 
-  const failed = range ?? head;
+  const failed = range?.res ?? head;
   console.warn(
     `[RemoteFile] Could not read remote file ${url}${failed ? `: ${failed.status} - ${failed.statusText}` : ""}`,
   );
+
+  // Keep using the last good result through outages, rechecking after the
+  // error TTL rather than on every page.
+  if (known && isTransientFailure(failed)) {
+    await setCacheFile(cacheFileName, {
+      ...known,
+      expires: Date.now() + REMOTE_ERROR_TTL,
+    });
+    return toRemoteFileInfo(known);
+  }
+
   await setCacheFile(
     cacheFileName,
     remoteFileSchema.parse({
@@ -322,13 +359,16 @@ export async function getCacheFile<T extends z.ZodTypeAny>(
     .then((j) => schema.parse(j) as z.infer<T>);
 }
 
+/** Best-effort: a missing or read-only cache directory shouldn't fail a render. */
 export async function setCacheFile(file: string, obj: any) {
   if (!(await ensureFS())) return;
   await fs!
-    .mkdir(CACHE_DIRECTORY)
-    .catch(() => {})
-    .finally(() =>
+    .mkdir(CACHE_DIRECTORY, { recursive: true })
+    .then(() =>
       fs!.writeFile(path!.join(CACHE_DIRECTORY, file), JSON.stringify(obj)),
+    )
+    .catch((e: Error) =>
+      console.warn(`[Cache] Could not write ${file}: ${e.message}`),
     );
 }
 
@@ -386,10 +426,7 @@ export async function inferRemoteSize(url: string) {
   const remote = await fetch(url, {
     method: "HEAD",
     signal: AbortSignal.timeout(REMOTE_TIMEOUT),
-    headers: {
-      ...(prior?.etag && { "If-None-Match": prior.etag }),
-      ...(prior?.modified && { "If-Modified-Since": prior.modified }),
-    },
+    headers: conditionalHeaders(prior),
   });
 
   if (!remote.ok && remote.status !== 304) {
@@ -423,12 +460,7 @@ export async function inferRemoteSize(url: string) {
     }
   }
 
-  const maxAge =
-    Number(
-      remote.headers
-        .get("Cache-Control")
-        ?.match(/.*(?:s-)?max-age=([0-9]*).*/)?.[1],
-    ) * 1000 || 0;
+  const maxAge = getMaxAge(remote.headers);
 
   const cache = successSchema.parse({
     type: "success",

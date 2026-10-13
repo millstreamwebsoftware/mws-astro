@@ -108,32 +108,30 @@ function getIcon(path: string) {
   }
 }
 
+async function getThumbnail(path: string) {
+  switch (getFileType(path)) {
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "gif":
+    case "webp":
+    case "avif":
+    case "tiff":
+      // Image only treats http(s) URLs as remote, so give
+      // protocol-relative URLs a scheme.
+      return isRemotePath(path) ? toFetchableUrl(path) : resolvePath(path);
+    case "pdf":
+      return getPDFThumbnail(path);
+  }
+}
+
 if (!ENV_BOOKSHOP_LIVE && files?.length) {
   await Promise.all(
     files.map(async (file) => {
-      file.size = await getFilesize(file.path);
-
-      if (show_thumbnail) {
-        switch (getFileType(file.path)) {
-          case "jpg":
-          case "jpeg":
-          case "png":
-          case "gif":
-          case "webp":
-          case "avif":
-          case "tiff":
-            // Image only treats http(s) URLs as remote, so give
-            // protocol-relative URLs a scheme.
-            file.thumbnail = isRemotePath(file.path)
-              ? toFetchableUrl(file.path)
-              : await resolvePath(file.path);
-            break;
-          case "pdf":
-            file.thumbnail = await getPDFThumbnail(file.path);
-            break;
-          default:
-        }
-      }
+      [file.size, file.thumbnail] = await Promise.all([
+        getFilesize(file.path),
+        show_thumbnail ? getThumbnail(file.path) : undefined,
+      ]);
     }),
   );
 }
