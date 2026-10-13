@@ -14,6 +14,7 @@ import {
   getFilesize,
   isRemotePath,
   resolvePath,
+  toFetchableUrl,
 } from "@mws-astro/filesystem";
 import { getPDFThumbnail } from "@mws-astro/pdf";
 
@@ -121,15 +122,14 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
           case "webp":
           case "avif":
           case "tiff":
+            // Image only treats http(s) URLs as remote, so give
+            // protocol-relative URLs a scheme.
             file.thumbnail = isRemotePath(file.path)
-              ? file.path
+              ? toFetchableUrl(file.path)
               : await resolvePath(file.path);
             break;
           case "pdf":
-            file.thumbnail = (await getPDFThumbnail(file.path))?.replace(
-              /^\/?public/,
-              "",
-            );
+            file.thumbnail = await getPDFThumbnail(file.path);
             break;
           default:
         }

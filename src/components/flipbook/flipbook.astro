@@ -15,7 +15,7 @@ const {title, url} = Astro.props;
 var thumbnail, filesize;
 
 if (url) {
-  thumbnail = (await getPDFThumbnail(url, 0, 1024))?.replace(/^\/?public/, "");
+  thumbnail = await getPDFThumbnail(url, 0, 1024);
   filesize = await getFilesize(url);
 }
 ---
