@@ -162,17 +162,20 @@ let items = layoutBlocks.length ? layoutBlocks : contentBlocks;
       // Per-side so directional no-indent-* classes can drop a single edge.
       // (A `padding` shorthand here would clobber all four sides at once and
       // make no-indent-top/bottom/left/right ineffective inside columns.)
+      // The directional exclusions sit inside :where() so this rule keeps the
+      // same specificity as the original `section:not(.no-indent)` and stays
+      // below the first/last-in-row edge rules and any site-level overrides.
       &:not(.no-indent) {
-        &:not(.no-indent-top) {
+        &:where(:not(.no-indent-top)) {
           padding-top: var(--column-gap);
         }
-        &:not(.no-indent-bottom) {
+        &:where(:not(.no-indent-bottom)) {
           padding-bottom: var(--column-gap);
         }
-        &:not(.no-indent-left) {
+        &:where(:not(.no-indent-left)) {
           padding-left: var(--column-gap);
         }
-        &:not(.no-indent-right) {
+        &:where(:not(.no-indent-right)) {
           padding-right: var(--column-gap);
         }
       }
