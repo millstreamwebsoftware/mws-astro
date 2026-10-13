@@ -10,7 +10,11 @@ import Image from "@shared/Image.astro";
 import Icon from "@shared/icon.astro";
 // import type { PDFiumRenderOptions } from "@hyzyla/pdfium/dist/types.js";
 import { formatBytes } from "@mws-astro/util";
-import { getFilesize, resolvePath } from "@mws-astro/filesystem";
+import {
+  getFilesize,
+  isRemotePath,
+  resolvePath,
+} from "@mws-astro/filesystem";
 import { getPDFThumbnail } from "@mws-astro/pdf";
 
 export interface Props extends Partial<SectionProps> {
@@ -31,7 +35,19 @@ const { files, show_filetype, show_icon, show_filesize, show_thumbnail } =
   Astro.props;
 
 function getFileType(path: string) {
-  return path.match(/.*\.(.*?)$/)?.[1].toLowerCase();
+  return path
+    .replace(/[?#].*$/, "")
+    .match(/.*\.(.*?)$/)?.[1]
+    .toLowerCase();
+}
+
+/**
+ * Absolute URLs (e.g. DAM files) are linked as-is; site-relative paths are
+ * made root-relative. Spaces are percent-encoded so the href is well-formed.
+ */
+function getHref(path: string) {
+  const href = isRemotePath(path) || path.startsWith("/") ? path : `/${path}`;
+  return href.replace(/ /g, "%20");
 }
 
 function getIcon(path: string) {
@@ -105,7 +121,9 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
           case "webp":
           case "avif":
           case "tiff":
-            file.thumbnail = await resolvePath(file.path);
+            file.thumbnail = isRemotePath(file.path)
+              ? file.path
+              : await resolvePath(file.path);
             break;
           case "pdf":
             file.thumbnail = (await getPDFThumbnail(file.path))?.replace(
@@ -166,7 +184,7 @@ if (!ENV_BOOKSHOP_LIVE && files?.length) {
                   </div>
                 )}
               </div>
-              <a href={path.startsWith("/") ? path : `/${path}`} />
+              <a href={getHref(path)} />
             </li>
           );
         })

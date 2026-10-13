@@ -1,49 +1,126 @@
-import { resolvePath } from "./filesystem";
+import { isRemotePath, resolvePath, toFetchableUrl } from "./filesystem";
+
+/** Thumbnails for remote PDFs are written here so they can be served statically. */
+const REMOTE_THUMBNAIL_DIRECTORY = "public/_thumbnails";
+
+/** Derive a safe, readable file stem from a remote URL. */
+function remoteFileStem(url: string) {
+  const last =
+    url
+      .split("/")
+      .at(-1)
+      ?.replace(/[?#].*/, "") ?? "";
+  let name = last;
+  try {
+    name = decodeURIComponent(last);
+  } catch {}
+
+  return (
+    name
+      .replace(/\.pdf$/i, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "file"
+  );
+}
+
+async function fetchRemotePDF(url: string) {
+  const remote = await fetch(toFetchableUrl(url)).catch(() => undefined);
+
+  if (!remote?.ok) {
+    console.warn(
+      `[PDF Thumbnailer] Could not fetch remote PDF ${url}${remote ? `: ${remote.status} - ${remote.statusText}` : ""}`,
+    );
+    return;
+  }
+
+  return Buffer.from(await remote.arrayBuffer());
+}
+
+/**
+ * Astro copies `public/` into the output directory before pages render, so a
+ * thumbnail generated during a build would otherwise only appear on the next
+ * build. Mirror it straight into the output directory as well.
+ */
+async function publishToOutDir(thumbPath: string) {
+  if (!import.meta.env.PROD) return;
+
+  const [fs, path, { fileURLToPath }, config] = await Promise.all([
+    import("node:fs"),
+    import("node:path"),
+    import("node:url"),
+    import("astro:config/server").catch(() => undefined),
+  ]);
+  if (!config?.outDir) return;
+
+  const relative = thumbPath.replace(/^\/?public\//, "");
+  const target = path.join(fileURLToPath(config.outDir), relative);
+
+  try {
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(thumbPath, target);
+  } catch (e) {
+    console.warn(
+      `[PDF Thumbnailer] Could not copy ${thumbPath} to ${target}`,
+      e,
+    );
+  }
+}
 
 export async function getPDFThumbnail(file: string, pageNum = 0, res = 512) {
-  if (!ENV_BOOKSHOP_LIVE) {
-    const [fs, pdf, sharp, crypto] = await Promise.all([
-      import("node:fs"),
-      import("mupdf"),
-      import("sharp"),
-      import("crypto"),
-    ]);
+  if (ENV_BOOKSHOP_LIVE) return;
 
-    const filePath = await resolvePath(file);
-    if (!filePath) return;
+  const [fs, path, pdf, sharp, crypto] = await Promise.all([
+    import("node:fs"),
+    import("node:path"),
+    import("mupdf"),
+    import("sharp"),
+    import("crypto"),
+  ]);
 
-    const hash = crypto.createHash("md5");
+  const remote = isRemotePath(file);
+  const filePath = remote ? undefined : await resolvePath(file);
+  if (!remote && !filePath) return;
 
-    hash.update(`${file}${pageNum}${res}`, "utf-8");
-    let thumbPath = `${filePath}.${hash.digest("hex").slice(0, 6)}.webp`;
+  const hash = crypto.createHash("md5");
+  hash.update(`${file}${pageNum}${res}`, "utf-8");
+  const digest = hash.digest("hex").slice(0, 6);
 
-    if (fs.existsSync(thumbPath)) return thumbPath;
-    const time = performance.now();
+  const thumbPath = remote
+    ? path.join(
+        REMOTE_THUMBNAIL_DIRECTORY,
+        `${remoteFileStem(file)}.${digest}.webp`,
+      )
+    : `${filePath}.${digest}.webp`;
 
-    const doc = pdf.PDFDocument.openDocument(
-      fs.readFileSync(filePath),
-      "application/pdf",
-    );
+  if (fs.existsSync(thumbPath)) return thumbPath;
+  const time = performance.now();
 
-    const page = doc.loadPage(pageNum);
+  const data = remote ? await fetchRemotePDF(file) : fs.readFileSync(filePath!);
+  if (!data) return;
 
-    const [, , bound_w, bound_h] = page.getBounds();
-    const [scale_w, scale_h] = [res / bound_w, res / bound_h];
-    const scale = Math.min(scale_w, scale_h);
+  const doc = pdf.PDFDocument.openDocument(data, "application/pdf");
 
-    let pixmap = page.toPixmap(
-      pdf.Matrix.scale(scale, scale),
-      pdf.ColorSpace.DeviceRGB,
-      false,
-      true,
-    );
+  const page = doc.loadPage(pageNum);
 
-    await sharp.default(pixmap.asPNG()).webp({ quality: 60 }).toFile(thumbPath);
+  const [, , bound_w, bound_h] = page.getBounds();
+  const [scale_w, scale_h] = [res / bound_w, res / bound_h];
+  const scale = Math.min(scale_w, scale_h);
 
-    console.log(
-      `[PDF Thumbnailer] Generated ${thumbPath} in ${(performance.now() - time).toFixed(0)}ms`,
-    );
+  let pixmap = page.toPixmap(
+    pdf.Matrix.scale(scale, scale),
+    pdf.ColorSpace.DeviceRGB,
+    false,
+    true,
+  );
 
-    return thumbPath;
-  }
+  fs.mkdirSync(path.dirname(thumbPath), { recursive: true });
+  await sharp.default(pixmap.asPNG()).webp({ quality: 60 }).toFile(thumbPath);
+  await publishToOutDir(thumbPath);
+
+  console.log(
+    `[PDF Thumbnailer] Generated ${thumbPath} in ${(performance.now() - time).toFixed(0)}ms`,
+  );
+
+  return thumbPath;
 }

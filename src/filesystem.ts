@@ -28,8 +28,19 @@ async function ensureFS(): Promise<boolean> {
   return false;
 }
 
+/** True for absolute (`https://…`) and protocol-relative (`//…`) URLs. */
+export function isRemotePath(file: string) {
+  return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(file);
+}
+
+/** Make a protocol-relative URL fetchable by assuming https. */
+export function toFetchableUrl(url: string) {
+  return url.startsWith("//") ? `https:${url}` : url;
+}
+
 export async function resolvePath(file: string): Promise<string | undefined> {
   if (!(await ensureFS())) return;
+  if (isRemotePath(file)) return;
 
   var filePath = file;
   if (
@@ -50,8 +61,35 @@ export async function resolvePath(file: string): Promise<string | undefined> {
   return;
 }
 
+export async function getRemoteFilesize(url: string) {
+  // Ask for an uncompressed response: CDNs drop Content-Length (or report the
+  // compressed size) when they negotiate gzip/brotli with Node's fetch.
+  const init = { headers: { "Accept-Encoding": "identity" } };
+  const target = toFetchableUrl(url);
+
+  const head = await fetch(target, { ...init, method: "HEAD" }).catch(
+    () => undefined,
+  );
+
+  if (!head?.ok) {
+    console.warn(
+      `[Filesize] Could not read size of remote file ${url}${head ? `: ${head.status} - ${head.statusText}` : ""}`,
+    );
+    return;
+  }
+
+  const size = Number(head.headers.get("content-length"));
+  if (size > 0) return size;
+
+  // No usable Content-Length: fall back to downloading the file.
+  const body = await fetch(target, init).catch(() => undefined);
+  if (!body?.ok) return;
+  return (await body.arrayBuffer()).byteLength || undefined;
+}
+
 export async function getFilesize(file: string) {
   if (!(await ensureFS())) return;
+  if (isRemotePath(file)) return getRemoteFilesize(file);
   const filePath = await resolvePath(file);
 
   if (!filePath) return;
@@ -124,7 +162,10 @@ export async function inferRemoteSize(url: string) {
     return undefined;
   });
   if (result && Date.now() < result.expires) {
-    if (result.type === "error") throw Error(`[InferSize] Cached error response for image ${url}: ${result.status}`);
+    if (result.type === "error")
+      throw Error(
+        `[InferSize] Cached error response for image ${url}: ${result.status}`,
+      );
     return { width: result.width, height: result.height };
   }
 
@@ -142,8 +183,18 @@ export async function inferRemoteSize(url: string) {
 
   if (!remote.ok && remote.status !== 304) {
     const ERROR_TTL = 60 * 60 * 1000; // 1 hour
-    await setCacheFile(cacheFileName, errorSchema.parse({ type: "error", url, status: remote.status, expires: Date.now() + ERROR_TTL }));
-    throw Error(`[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`);
+    await setCacheFile(
+      cacheFileName,
+      errorSchema.parse({
+        type: "error",
+        url,
+        status: remote.status,
+        expires: Date.now() + ERROR_TTL,
+      }),
+    );
+    throw Error(
+      `[InferSize] Error response while contacting remote server for image ${url}: ${remote.status} - ${remote.statusText}`,
+    );
   }
 
   var width, height;
